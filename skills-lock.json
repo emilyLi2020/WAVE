@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "skills": {
+    "bugfix-doctor": {
+      "source": "idkwhatimd0ing/hackathonstarterkit",
+      "sourceType": "github",
+      "computedHash": "d276603d09f23805e8d54d2f596371489314098ebe3ee6570dd420e6bbde4e82"
+    },
+    "demo-prep": {
+      "source": "idkwhatimd0ing/hackathonstarterkit",
+      "sourceType": "github",
+      "computedHash": "9f4c9c4b0862427bdb6c116224e9feb9ea87c24c83f7bdad5815369d19106e11"
+    },
+    "domain-to-spec": {
+      "source": "idkwhatimd0ing/hackathonstarterkit",
+      "sourceType": "github",
+      "computedHash": "de281bb6873e5ae6a0463dc247a39d9e3bd814a966f3e160b16acb56f1763b59"
+    },
+    "feature-builder": {
+      "source": "idkwhatimd0ing/hackathonstarterkit",
+      "sourceType": "github",
+      "computedHash": "5acd6e5b416d74baec8eac63d3595d3b07e0861e894a86aa6ed2c111ae027ba9"
+    },
+    "non-coder-mode": {
+      "source": "idkwhatimd0ing/hackathonstarterkit",
+      "sourceType": "github",
+      "computedHash": "df8a77a50287f318195ecac3b1d40c03b05824ceae66e0e5aa3aebad7edeaf7d"
+    },
+    "scaffold-app": {
+      "source": "idkwhatimd0ing/hackathonstarterkit",
+      "sourceType": "github",
+      "computedHash": "569ec18c395798c46dabb3766c5ea1c37e15b2316c29f76fc3b0d54688491cd3"
+    }
+  }
+}
