@@ -14,6 +14,7 @@ WAVE is a trauma-informed urge-surfing companion (MBRP-style) for people in reco
 
 - Copy `web/.env.example` to `web/.env.local` and set `ANTHROPIC_API_KEY`, `NEXT_PUBLIC_SUPABASE_URL`, and `SUPABASE_SECRET_KEY` (or `SUPABASE_SERVICE_ROLE_KEY`).
 - Run SQL in `../supabase/migrations/001_wave_tables.sql` in the Supabase SQL editor once per project.
+- **Supabase Auth (SSR):** `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` + `src/utils/supabase/{server,client,middleware}.ts` and root `src/middleware.ts` refresh the user session on each matched request. Use `createClient()` from `@/utils/supabase/server` in Server Components and `@/utils/supabase/client` in Client Components when you add auth.
 - From `web/`: `npm install`, `npm run dev`, open http://localhost:3000
 - `npm run lint` · `npm run build`
 
