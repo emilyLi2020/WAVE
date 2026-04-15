@@ -7,11 +7,11 @@ import { Card } from "@/components/shared/card";
 import { useUserStore } from "@/store/userStore";
 
 export function HomeGate() {
-  const { hydrated, medProfile, hydrate } = useUserStore();
+  const { hydrated, medProfile } = useUserStore();
 
   useEffect(() => {
-    hydrate();
-  }, [hydrate]);
+    void useUserStore.getState().hydrate();
+  }, []);
 
   if (!hydrated) {
     return (
@@ -34,8 +34,9 @@ export function HomeGate() {
       <Card>
         <h1 className="text-2xl font-semibold tracking-tight">You are set up</h1>
         <p className="mt-2 text-sm leading-relaxed text-foreground/70">
-          When a craving shows up, start a guided session. Your history stays in
-          this browser until you connect a backend.
+          When a craving shows up, start a guided session. Your data is tied to
+          this browser (device id) and stored in Supabase when configured;
+          otherwise it falls back to local storage.
         </p>
         <div className="mt-8 flex flex-col gap-3">
           <Link

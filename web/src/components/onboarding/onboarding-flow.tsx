@@ -18,13 +18,13 @@ export function OnboardingFlow() {
   const [usualDoseTime, setUsualDoseTime] = useState("08:00");
   const [vivWeek, setVivWeek] = useState<number | null>(null);
 
-  const finish = () => {
+  const finish = async () => {
     const profile: MedProfile = {
       medType,
       usualDoseTime,
       onVivitrolWeek: medType === "naltrexone_vivitrol" ? vivWeek : null,
     };
-    setMedProfile(profile);
+    await setMedProfile(profile);
     router.push("/dashboard");
   };
 

@@ -1,19 +1,19 @@
 import { create } from "zustand";
 import type { MedProfile, UserPrefs } from "@/lib/types";
 import {
-  getMedProfile,
-  getUserPrefs,
-  saveMedProfile,
-  saveUserPrefs,
-} from "@/lib/storage";
+  loadMedProfile,
+  loadUserPrefs,
+  persistMedProfile,
+  persistUserPrefs,
+} from "@/lib/wave-storage";
 
 interface UserState {
   prefs: UserPrefs;
   medProfile: MedProfile | null;
   hydrated: boolean;
-  hydrate: () => void;
-  setMedProfile: (profile: MedProfile) => void;
-  setPrefs: (prefs: UserPrefs) => void;
+  hydrate: () => Promise<void>;
+  setMedProfile: (profile: MedProfile) => Promise<void>;
+  setPrefs: (prefs: UserPrefs) => Promise<void>;
 }
 
 export const useUserStore = create<UserState>((set) => ({
@@ -24,22 +24,26 @@ export const useUserStore = create<UserState>((set) => ({
   medProfile: null,
   hydrated: false,
 
-  hydrate: () => {
+  hydrate: async () => {
     if (typeof window === "undefined") return;
-    set({
-      prefs: getUserPrefs(),
-      medProfile: getMedProfile(),
-      hydrated: true,
-    });
+    try {
+      const [prefs, medProfile] = await Promise.all([
+        loadUserPrefs(),
+        loadMedProfile(),
+      ]);
+      set({ prefs, medProfile, hydrated: true });
+    } catch {
+      set((s) => ({ ...s, hydrated: true }));
+    }
   },
 
-  setMedProfile: (medProfile) => {
-    saveMedProfile(medProfile);
+  setMedProfile: async (medProfile) => {
+    await persistMedProfile(medProfile);
     set({ medProfile });
   },
 
-  setPrefs: (prefs) => {
-    saveUserPrefs(prefs);
+  setPrefs: async (prefs) => {
+    await persistUserPrefs(prefs);
     set({ prefs });
   },
 }));

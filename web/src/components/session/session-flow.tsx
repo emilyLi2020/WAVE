@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { IntakeContainer } from "@/components/intake/intake-container";
@@ -15,7 +15,7 @@ import { useWaveSequence } from "@/hooks/use-wave-sequence";
 import { postSessionStep } from "@/lib/api-session";
 import { medTypeLabel } from "@/lib/medications";
 import { getCurrentStreak } from "@/lib/patterns";
-import { getAllSessions, saveSession } from "@/lib/storage";
+import { loadSessions, persistSession } from "@/lib/wave-storage";
 import type {
   BodyRegion,
   MedStatus,
@@ -72,6 +72,17 @@ export function SessionFlow() {
   const [loadingReflection, setLoadingReflection] = useState(false);
   const [saving, setSaving] = useState(false);
   const [waveActive, setWaveActive] = useState(false);
+  const [sessionSnapshot, setSessionSnapshot] = useState<SessionLog[]>([]);
+
+  useEffect(() => {
+    void loadSessions().then(setSessionSnapshot);
+  }, []);
+
+  useEffect(() => {
+    if (currentStep === "reflection") {
+      void loadSessions().then(setSessionSnapshot);
+    }
+  }, [currentStep]);
 
   const intakePayload = useCallback(() => {
     if (!medProfile || trigger == null || medStatus == null) {
@@ -90,12 +101,8 @@ export function SessionFlow() {
     setLoadingMed(true);
     try {
       const intake = buildIntakePayload(inten, tr, ms, medProfile.medType);
-      const text = await postSessionStep(
-        "med_ack",
-        intake,
-        getAllSessions(),
-        {},
-      );
+      const history = await loadSessions();
+      const text = await postSessionStep("med_ack", intake, history, {});
       setIntensity(inten);
       setTrigger(tr);
       setMedStatus(ms);
@@ -115,7 +122,8 @@ export function SessionFlow() {
     setLoadingBody(true);
     try {
       const intake = intakePayload();
-      const text = await postSessionStep("body_scan", intake, getAllSessions(), {
+      const history = await loadSessions();
+      const text = await postSessionStep("body_scan", intake, history, {
         bodyLocation: region,
       });
       setBodyScanText(text);
@@ -133,7 +141,8 @@ export function SessionFlow() {
     try {
       const intake = intakePayload();
       const li = useSessionStore.getState().liveIntensity;
-      const text = await postSessionStep("wave_phase", intake, getAllSessions(), {
+      const history = await loadSessions();
+      const text = await postSessionStep("wave_phase", intake, history, {
         phase,
         currentIntensity: li,
       });
@@ -151,7 +160,8 @@ export function SessionFlow() {
     try {
       const intake = intakePayload();
       const end = useSessionStore.getState().liveIntensity;
-      const text = await postSessionStep("reflection", intake, getAllSessions(), {
+      const history = await loadSessions();
+      const text = await postSessionStep("reflection", intake, history, {
         intensityEnd: end,
       });
       setReflectionText(text);
@@ -193,7 +203,7 @@ export function SessionFlow() {
         journalNote: journalNote?.trim() || null,
         nextStepChoice: nextStepChoice,
       };
-      saveSession(log);
+      await persistSession(log);
       resetSession();
       router.push("/dashboard");
     } catch (e) {
@@ -203,9 +213,8 @@ export function SessionFlow() {
     }
   };
 
-  const allSessions = getAllSessions();
-  const recentSessions = allSessions.filter((s) => s.completed);
-  const streakCount = getCurrentStreak(allSessions);
+  const recentSessions = sessionSnapshot.filter((s) => s.completed);
+  const streakCount = getCurrentStreak(sessionSnapshot);
   const avgDrop =
     recentSessions.length > 0
       ? recentSessions.reduce((acc, s) => {

@@ -7,7 +7,8 @@ Monorepo-style layout: **Cursor skills** under `.agents/skills/`, the **WAVE web
 ```bash
 cd web
 cp .env.example .env.local
-# Add ANTHROPIC_API_KEY to .env.local
+# Set ANTHROPIC_API_KEY, NEXT_PUBLIC_SUPABASE_URL, and SUPABASE_SECRET_KEY in .env.local
+# Run supabase/migrations/001_wave_tables.sql in the Supabase SQL editor once.
 
 npm install
 npm run dev

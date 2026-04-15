@@ -10,14 +10,14 @@ function trimSessions(sessions: SessionLog[]): SessionLog[] {
   return sessions.filter((s) => new Date(s.startedAt).getTime() >= cutoff);
 }
 
-export function saveSession(log: SessionLog): void {
+export function saveSessionLocal(log: SessionLog): void {
   if (typeof window === "undefined") return;
-  const existing = getAllSessions();
+  const existing = getAllSessionsLocal();
   const next = trimSessions([log, ...existing.filter((s) => s.id !== log.id)]);
   window.localStorage.setItem(SESSIONS_KEY, JSON.stringify(next));
 }
 
-export function getAllSessions(): SessionLog[] {
+export function getAllSessionsLocal(): SessionLog[] {
   if (typeof window === "undefined") return [];
   try {
     const raw = window.localStorage.getItem(SESSIONS_KEY);
@@ -33,12 +33,12 @@ export function getAllSessions(): SessionLog[] {
   }
 }
 
-export function saveMedProfile(profile: MedProfile): void {
+export function saveMedProfileLocal(profile: MedProfile): void {
   if (typeof window === "undefined") return;
   window.localStorage.setItem(MED_PROFILE_KEY, JSON.stringify(profile));
 }
 
-export function getMedProfile(): MedProfile | null {
+export function getMedProfileLocal(): MedProfile | null {
   if (typeof window === "undefined") return null;
   try {
     const raw = window.localStorage.getItem(MED_PROFILE_KEY);
@@ -54,12 +54,12 @@ const defaultPrefs = (): UserPrefs => ({
   notificationPrefs: { inAppRemindersEnabled: true },
 });
 
-export function saveUserPrefs(prefs: UserPrefs): void {
+export function saveUserPrefsLocal(prefs: UserPrefs): void {
   if (typeof window === "undefined") return;
   window.localStorage.setItem(USER_PREFS_KEY, JSON.stringify(prefs));
 }
 
-export function getUserPrefs(): UserPrefs {
+export function getUserPrefsLocal(): UserPrefs {
   if (typeof window === "undefined") return defaultPrefs();
   try {
     const raw = window.localStorage.getItem(USER_PREFS_KEY);

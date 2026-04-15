@@ -4,14 +4,14 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Card } from "@/components/shared/card";
 import type { SessionLog } from "@/lib/types";
-import { getAllSessions } from "@/lib/storage";
+import { loadSessions } from "@/lib/wave-storage";
 
 export function HistoryView() {
   const [sessions, setSessions] = useState<SessionLog[]>([]);
 
   useEffect(() => {
     const id = requestAnimationFrame(() => {
-      setSessions(getAllSessions());
+      void loadSessions().then(setSessions);
     });
     return () => cancelAnimationFrame(id);
   }, []);

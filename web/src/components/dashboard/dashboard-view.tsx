@@ -20,7 +20,7 @@ import type {
   SessionLog,
   TriggerStat,
 } from "@/lib/types";
-import { getAllSessions } from "@/lib/storage";
+import { loadSessions } from "@/lib/wave-storage";
 import { useUserStore } from "@/store/userStore";
 
 type Insights = {
@@ -41,8 +41,8 @@ export function DashboardView() {
   }, [hydrate]);
 
   useEffect(() => {
-    const list = getAllSessions();
     const load = async () => {
+      const list = await loadSessions();
       try {
         const res = await fetch("/api/insights", {
           method: "POST",
