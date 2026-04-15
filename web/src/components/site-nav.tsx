@@ -2,7 +2,9 @@ import Link from "next/link";
 
 const links = [
   { href: "/", label: "Home" },
-  { href: "/feature", label: "Core feature" },
+  { href: "/dashboard", label: "Dashboard" },
+  { href: "/session", label: "Session" },
+  { href: "/history", label: "History" },
 ] as const;
 
 export function SiteNav() {
@@ -13,9 +15,12 @@ export function SiteNav() {
           href="/"
           className="text-sm font-semibold tracking-tight text-foreground"
         >
-          Wave
+          WAVE
         </Link>
-        <nav className="flex gap-6 text-sm" aria-label="Primary">
+        <nav
+          className="flex flex-wrap justify-end gap-x-5 gap-y-1 text-sm"
+          aria-label="Primary"
+        >
           {links.map((item) => (
             <Link
               key={item.href}

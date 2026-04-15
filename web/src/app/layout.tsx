@@ -15,10 +15,11 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "Wave",
-    template: "%s · Wave",
+    default: "WAVE",
+    template: "%s · WAVE",
   },
-  description: "Hackathon starter UI for the Wave project.",
+  description:
+    "WAVE — trauma-informed urge surfing companion for recovery (web MVP).",
 };
 
 export default function RootLayout({
