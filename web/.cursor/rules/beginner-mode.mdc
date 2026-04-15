@@ -1,0 +1,8 @@
+---
+description: Plain-language explanations and small-step changes for newer builders.
+alwaysApply: true
+---
+
+- Define jargon when you use it the first time.
+- Break work into small, reviewable steps.
+- After coding, say how to run and verify the app locally.
