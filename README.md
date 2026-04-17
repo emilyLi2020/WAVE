@@ -22,5 +22,4 @@ The scaffold is intentionally a stub — each page renders its PRD-defined layou
 
 - **`AGENTS.md`** — shared instructions every AI coding tool (Cursor, Claude Code, Codex, Copilot, etc.) reads automatically.
 - **`PRD.md`** — source of truth for what to build. Every scaffold, route, and prompt is derived from it.
-- **`DOMAIN_SPEC.md`** — legacy starter spec, superseded by `PRD.md`.
 - **`clients/.cursor/rules/frontend-guardrails.mdc`** — frontend guardrails scoped to `clients/`.

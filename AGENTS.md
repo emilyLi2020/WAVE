@@ -14,7 +14,6 @@ The production vision is a **React Native mobile app** that runs **Gemma 4 entir
 - `frontend/`, `backend/` — Empty legacy folders. Do not use. The live app is in `web/`.
 - `AGENTS.md` — This file. Shared instructions for every AI agent working in the repo.
 - `PRD.md` — Product Requirements Document. The source of truth for what to build and the medication-aware prompt logic.
-- `DOMAIN_SPEC.md` — Legacy starter spec, superseded by `PRD.md`. Safe to ignore.
 - `README.md` — Human-facing quickstart.
 
 ## Setup Commands
