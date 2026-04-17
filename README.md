@@ -22,5 +22,6 @@ The scaffold is intentionally a stub — each page renders its PRD-defined layou
 
 - **`AGENTS.md`** — shared instructions every AI coding tool (Cursor, Claude Code, Codex, Copilot, etc.) reads automatically.
 - **`PRD.md`** — source of truth for what to build. Every scaffold, route, and prompt is derived from it.
-- **`docs/gemma-4-integration.md`** — per-surface Gemma 4 plan (model sizes, JSON schemas, latency budgets, fine-tuning strategy, and evaluation harness).
+- **`docs/models.md`** — per-model reference: the Gemma 4 base, every LoRA adapter, what each one is fine-tuned for, where it is used in the product, and its input/output contract.
+- **`docs/model-training.md`** — how we produce every LoRA: data collection, Synthetix synthetic-data pipeline, clinician spot-check, train/test split, QLoRA training recipe, eval harness, and ship gates.
 - **`clients/.cursor/rules/frontend-guardrails.mdc`** — frontend guardrails scoped to `clients/`.
