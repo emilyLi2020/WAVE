@@ -1,5 +1,7 @@
 # Wave — Domain to Spec
 
+> **Superseded by [`PRD.md`](./PRD.md).** This file is the original generic starter baseline from before WAVE was specified as a medication-aware urge surfing companion for SUD recovery. It is kept only for history. Read `PRD.md` and `AGENTS.md` for the current product and engineering source of truth.
+
 This spec was generated as a **starter baseline** because no profession-specific domain was provided yet. Replace the bracketed or generic sections with your real domain before serious feature work.
 
 ## 1. One-Sentence Summary
@@ -8,7 +10,7 @@ Wave is a small web app that introduces the project, links to the core experienc
 
 ## 2. Target User
 
-You (the builder) and teammates during the hackathon: you need a visible running app, clear navigation, and agent-friendly docs (`AGENTS.md`, `PRD.md`) so iteration stays fast.
+You (the builder) and teammates during the hackathon: you need a visible running app, clear navigation, and a short product spec (this file and `README.md`) so iteration stays fast.
 
 ## 3. Domain Constraints
 
@@ -28,18 +30,18 @@ OUTPUT: Clear value proposition, working navigation, and a placeholder area for 
 
 ## 5. Data Model (plain English)
 
-For this MVP: none required. Later: users, sessions, or domain entities you define in `PRD.md`.
+For this MVP: none required. Later: users, sessions, or domain entities you capture in this spec or product docs you add later.
 
 ## 6. Risk Areas
 
 1. **Scope creep** — adding backend/auth before the core loop is proven.
-2. **Vague requirements** — building features before updating this spec and the PRD.
+2. **Vague requirements** — building features before updating this spec.
 3. **Deployment gaps** — env vars and secrets mishandled under time pressure.
 
 ## 7. MVP Scope (first week)
 
 - Next.js app with landing page, core feature page, shared layout and nav.
-- `AGENTS.md` and `PRD.md` at the app root for agents and humans.
+- This `DOMAIN_SPEC.md` and repo `README.md` / `web/README.md` for humans and tooling.
 - Repo README pointing to how to run the app.
 
 ## 8. Out of Scope (later)

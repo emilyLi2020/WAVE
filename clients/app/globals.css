@@ -1,0 +1,65 @@
+@import "tailwindcss";
+
+:root {
+  --background: #f5f8fb;
+  --foreground: #0b1f33;
+  --surface: #ffffff;
+  --surface-muted: #eef3f9;
+  --border: #d6e1ec;
+  --accent: #0e7490;
+  --accent-foreground: #ffffff;
+  --accent-soft: #cffafe;
+  --wave-rise: #38bdf8;
+  --wave-peak: #0284c7;
+  --wave-fall: #67e8f9;
+  --warn: #b45309;
+  --warn-soft: #fef3c7;
+  --danger: #b91c1c;
+  --danger-soft: #fee2e2;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-surface-muted: var(--surface-muted);
+  --color-border: var(--border);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent-soft: var(--accent-soft);
+  --color-wave-rise: var(--wave-rise);
+  --color-wave-peak: var(--wave-peak);
+  --color-wave-fall: var(--wave-fall);
+  --color-warn: var(--warn);
+  --color-warn-soft: var(--warn-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #05131f;
+    --foreground: #e6f1fa;
+    --surface: #0c1f30;
+    --surface-muted: #0a1a28;
+    --border: #1e3a52;
+    --accent: #22d3ee;
+    --accent-foreground: #05131f;
+    --accent-soft: #164e63;
+    --wave-rise: #38bdf8;
+    --wave-peak: #0ea5e9;
+    --wave-fall: #67e8f9;
+    --warn: #fbbf24;
+    --warn-soft: #3b2e10;
+    --danger: #f87171;
+    --danger-soft: #3b1414;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
+}

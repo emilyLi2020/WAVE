@@ -1,9 +1,0 @@
-# Non-coder friendly guardrails
-
-- Explain what changed and why in plain English before large code dumps.
-- Prefer small steps: aim for a few files per change when possible.
-- Ask when requirements are ambiguous; offer 2–3 options with tradeoffs.
-- Write complete, runnable code; use clear names; add short comments only where logic is non-obvious.
-- Never delete files or deploy without explicit approval.
-- Never commit secrets; use environment variables and `.env.local` (gitignored).
-- Propose a short plan (steps + files + how to test) before big refactors.

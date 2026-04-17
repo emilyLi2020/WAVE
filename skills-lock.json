@@ -1,6 +1,11 @@
 {
   "version": 1,
   "skills": {
+    "blog-writer": {
+      "source": "idkwhatimd0ing/hackathonstarterkit",
+      "sourceType": "github",
+      "computedHash": "ec9cc6a7979d2b2e7300bf4071502e23f6fedc74de6d80a2d56577367e752703"
+    },
     "bugfix-doctor": {
       "source": "idkwhatimd0ing/hackathonstarterkit",
       "sourceType": "github",
@@ -14,7 +19,7 @@
     "domain-to-spec": {
       "source": "idkwhatimd0ing/hackathonstarterkit",
       "sourceType": "github",
-      "computedHash": "de281bb6873e5ae6a0463dc247a39d9e3bd814a966f3e160b16acb56f1763b59"
+      "computedHash": "e050d90a314eb894ab35c38d51b06ed63438efedd33ba3a93a62ff22f3ca9ac9"
     },
     "feature-builder": {
       "source": "idkwhatimd0ing/hackathonstarterkit",
@@ -26,10 +31,25 @@
       "sourceType": "github",
       "computedHash": "df8a77a50287f318195ecac3b1d40c03b05824ceae66e0e5aa3aebad7edeaf7d"
     },
+    "quickstart": {
+      "source": "idkwhatimd0ing/hackathonstarterkit",
+      "sourceType": "github",
+      "computedHash": "1711c929baea952d5ac48453d44081e37b28f8067f12d084486b5daf3546d373"
+    },
     "scaffold-app": {
       "source": "idkwhatimd0ing/hackathonstarterkit",
       "sourceType": "github",
       "computedHash": "569ec18c395798c46dabb3766c5ea1c37e15b2316c29f76fc3b0d54688491cd3"
+    },
+    "scaffold-backend": {
+      "source": "idkwhatimd0ing/hackathonstarterkit",
+      "sourceType": "github",
+      "computedHash": "e5e44361720aeee748a48031443469f6c03deaacd38d807a2286ad8a23f4bce0"
+    },
+    "scaffold-frontend": {
+      "source": "idkwhatimd0ing/hackathonstarterkit",
+      "sourceType": "github",
+      "computedHash": "9ec6c66085a368105e59840835cee1b98f8fec5eb62ac32e507d7435370cfe97"
     },
     "supabase": {
       "source": "supabase/agent-skills",
@@ -40,6 +60,11 @@
       "source": "supabase/agent-skills",
       "sourceType": "github",
       "computedHash": "abf015aafed757edaf2a329299fc106abebdc53bc7f089e92e1f762ed3d8f117"
+    },
+    "v0-prompt-crafter": {
+      "source": "idkwhatimd0ing/hackathonstarterkit",
+      "sourceType": "github",
+      "computedHash": "b07653b8e281841effc0838efa32a2101e3a3a7c723073b10e26b63b79adaab5"
     }
   }
 }

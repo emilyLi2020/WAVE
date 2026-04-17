@@ -1,8 +1,0 @@
----
-description: Safety rails for destructive actions and production changes.
-alwaysApply: true
----
-
-- Do not delete files or run destructive git commands without explicit user approval.
-- Do not deploy to production or add paid APIs without confirmation.
-- Never print or commit API keys, tokens, or passwords.
