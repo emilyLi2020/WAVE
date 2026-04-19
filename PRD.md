@@ -15,20 +15,30 @@ INPUT:   Patient opens WAVE (via proactive notification, lock-screen
          widget, watch complication, or Siri shortcut) and taps three
          answers: craving intensity (1-10), medication status (on-time /
          late / missed / N/A), trigger category (social / stress /
-         physical / unknown).
+         physical / unknown). Immediately after the three-tap intake,
+         and *before* any LoRA runs, the intake phase asks two
+         sequential yes/no safety questions: (1) "Have you used any
+         substances today?" and, only if yes, (2) "Are you feeling
+         physically unwell, dizzy, or having trouble breathing right
+         now?" A "yes" on both skips the session entirely and routes
+         the patient to the SAMHSA National Helpline
+         (1-800-662-HELP / 1-800-662-4357) plus an explicit prompt to
+         contact the patient's therapist or social worker now. This
+         routing is rule-based and never touches an LLM.
 
 PROCESS: One Gemma 4 E2B-it base + a stack of small LoRA adapters
          (one per clinical situation) generate the session end-to-end
          on-device — LiteRT on mobile, transformers.js + WebGPU in the
          web demo. An Adapter Manager swaps the right LoRA in per
          phase: `lora-med-ack` for the 1-2 min medication
-         acknowledgment, `lora-body-scan` for the body scan,
+         acknowledgment (runs only after the intake safety screen
+         clears), `lora-body-scan` for the body scan,
          `lora-wave-rise` / `-peak` / `-fall` across the 5-8 min wave,
          `lora-reflection` for the closing insight. Crisis triage runs
-         on base Gemma with no LoRA; routing to 988 / SAMHSA is
-         rule-based. No cloud LLM is ever called. Per-model
-         reference: `docs/models.md`. Training process:
-         `docs/model-training.md`.
+         on base Gemma with no LoRA; routing to 988 / SAMHSA and the
+         intake safety-screen handoff are both rule-based. No cloud
+         LLM is ever called. Per-model reference: `docs/models.md`.
+         Training process: `docs/model-training.md`.
 
 OUTPUT:  Patient rates ending intensity on the slider, sees a one-screen
          insight ("You surfed a 7 down to 2. On medication days you drop
@@ -39,7 +49,7 @@ OUTPUT:  Patient rates ending intensity on the slider, sees a one-screen
 
 ## Core Features (MVP)
 
-1. **Three-tap intake** — intensity, medication status, trigger — that fully conditions the rest of the session.
+1. **Three-tap intake + intake safety screen** — intensity, medication status, trigger fully condition the rest of the session, and two sequential yes/no safety questions ("Have you used any substances today?" then, only if yes, "Are you feeling physically unwell, dizzy, or having trouble breathing right now?") run before any LoRA is loaded. Both-yes routes to SAMHSA + therapist/social-worker handoff and skips the session; yes-then-no logs a `usedSubstanceToday` flag and continues the session.
 2. **Medication-aware acknowledgment** — Gemma 4 generates pharmacologically correct, trauma-informed copy based on which MAT the patient is on and whether they took today's dose.
 3. **Urge surf wave session** — animated wave (Lottie) with adaptive rise / peak / fall narration and a live intensity slider the patient drags as the wave changes.
 4. **Longitudinal pattern learning** — after ~7 sessions, the on-device model surfaces high-risk time windows and a medication-vs-craving correlation the patient can see in their own data.
@@ -52,7 +62,7 @@ OUTPUT:  Patient rates ending intensity on the slider, sees a one-screen
 |------|---------|--------------|
 | Landing (`/`) | Explain WAVE to a clinician or patient in 10 seconds; route to onboarding or an in-session demo | Hero, one-sentence value prop, "Start a session" CTA, privacy pledge, demo video link |
 | Onboarding (`/onboarding`) | Capture the only three things we need: first name (optional), what MAT if any, usual dose time | 3-step form, Zod validation, written consent checkbox, stored locally (localStorage in web demo, SQLCipher on mobile) |
-| Session (`/session`) | The whole urge-surfing protocol — intake → medication ack → body scan → wave → reflection → next step | Intake 3-tap, medication-ack text block, body diagram with tappable regions, Lottie wave animation, live intensity slider, post-session insight card, next-step chips |
+| Session (`/session`) | The whole urge-surfing protocol — intake → intake safety screen → medication ack → body scan → wave → reflection → next step | Intake 3-tap, two sequential Y/N intake safety screens (substance-use-today + physical-symptoms), safety handoff screen (SAMHSA 1-800-662-HELP + therapist/social-worker prompt) as an early-exit from the safety screen, medication-ack text block, body diagram with tappable regions, Lottie wave animation, live intensity slider, post-session insight card, next-step chips |
 | Dashboard (`/dashboard`) | Show the patient their own data so medication adherence feels visible | Sessions count, average drop, medication-vs-no-medication drop delta, high-risk windows heatmap, current streak |
 | History (`/history`) | Chronological list of sessions with expandable details and optional journal entries | Session list, filter by outcome / trigger / medication status, "Export for clinician" button (local PDF) |
 | Insights (`/insights`) | Plain-English patterns Gemma 4 has noticed, updated weekly | Trigger frequency, time-of-day risk, medication correlation, one-actionable suggestion per week |
@@ -61,19 +71,20 @@ OUTPUT:  Patient rates ending intensity on the slider, sees a one-screen
 
 1. **Pre-craving**: WAVE's local scheduler fires a notification 15 minutes before a predicted risk window. Patient sees it on the lock screen: "Your history shows the next 2 hours can be challenging. Open WAVE now — before the wave builds." One tap opens the app directly into the intake.
 2. **Intake**: Patient taps intensity (e.g. 7/10), medication status (e.g. "took Suboxone on time"), and trigger (e.g. "stress"). No typing. ~30 seconds.
-3. **Acknowledgment**: Gemma 4 generates 2-3 sentences specific to "Suboxone + on-time + 7/10 + stress". Patient hears that their medication is already dampening this craving — what they feel at 7 would be a 9 without it.
-4. **Body scan**: Patient taps the part of a body diagram where the craving sits (chest / jaw / legs / stomach). The narration acknowledges the specific location.
-5. **Wave**: 5-8 minute animated wave. Narration adapts to phase — hardest language at "rising", most grounded at "peak", and celebration at "falling". Patient drags a live intensity slider that logs every 15 seconds.
-6. **Reflection**: Post-session screen: "You surfed a 7 down to 2. That's your 12th session. On medication days you drop 5.1 points on average." Optional one-line journal.
-7. **Next step**: Patient picks a 10-minute action (call someone / walk / water / hands / rest). Session logs and closes.
-8. **Over time**: Notifications get more precise as the pattern model sees more sessions. Dashboard and Insights show the patient their recovery in their own numbers.
+3. **Intake safety screen**: Rule-based, runs before any LLM call. Patient answers Q1 "Have you used any substances today?" (Yes / No). If **No**, skip to step 4; Q2 never shows. If **Yes**, show Q2: "Are you feeling physically unwell, dizzy, or having trouble breathing right now?" (Yes / No). If Q2 is **No**, log `usedSubstanceToday: true` on the session for clinical context (the reflection phase may acknowledge that the patient chose to surf a craving even after using — that is clinically meaningful) and continue to step 4. If Q2 is **Yes**, skip the rest of the session and render the safety handoff screen: **SAMHSA National Helpline: 1-800-662-HELP (1-800-662-4357)** and the line "If you have a therapist or social worker, reach out to them now." The session is logged with `outcome: safety_exited`. No LoRA is loaded; no model call is made.
+4. **Acknowledgment**: Gemma 4 generates 2-3 sentences specific to "Suboxone + on-time + 7/10 + stress". Patient hears that their medication is already dampening this craving — what they feel at 7 would be a 9 without it.
+5. **Body scan**: Patient taps the part of a body diagram where the craving sits (chest / jaw / legs / stomach). The narration acknowledges the specific location.
+6. **Wave**: 5-8 minute animated wave. Narration adapts to phase — hardest language at "rising", most grounded at "peak", and celebration at "falling". Patient drags a live intensity slider that logs every 15 seconds.
+7. **Reflection**: Post-session screen: "You surfed a 7 down to 2. That's your 12th session. On medication days you drop 5.1 points on average." Optional one-line journal. If `usedSubstanceToday: true` was logged at the intake safety screen, the reflection LoRA may acknowledge that the patient chose to surf a craving even after using — a clinically meaningful moment worth capturing, and never shamed.
+8. **Next step**: Patient picks a 10-minute action (call someone / walk / water / hands / rest). Session logs and closes.
+9. **Over time**: Notifications get more precise as the pattern model sees more sessions. Dashboard and Insights show the patient their recovery in their own numbers.
 
 ## Data Model
 
 All entities are stored **locally on the patient's device** in production (encrypted SQLite). In the hackathon web demo, the same shapes live in Supabase with Row Level Security scoping every row to the authenticated user (or in `localStorage` for the anonymous demo mode).
 
 - **Patient profile** — first name (optional), MAT type (`buprenorphine | naltrexone | methadone | vivitrol | none`), usual dose time, created at. No account, no email required.
-- **Session** — id, started at, ended at, intake craving intensity (1-10), ending craving intensity (1-10), medication status at session (`on_time | late | missed | none`), trigger category (`social | stress | physical | unknown | other`), body-scan location (`chest | jaw | shoulders | legs | stomach | other`), outcome (`completed | left_early | used`), optional journal text.
+- **Session** — id, started at, ended at, intake craving intensity (1-10), ending craving intensity (1-10), medication status at session (`on_time | late | missed | none`), trigger category (`social | stress | physical | unknown | other`), body-scan location (`chest | jaw | shoulders | legs | stomach | other`), outcome (`completed | left_early | used | safety_exited`), `usedSubstanceToday: boolean` (captured at the intake safety screen — true when the patient answered "yes" to "Have you used any substances today?"; used for clinical context in the reflection phase and for longitudinal pattern learning), optional journal text. `outcome: safety_exited` indicates the session was terminated at the intake safety screen because the patient answered "yes" to both safety questions and was routed to the SAMHSA handoff; in that case the body-scan, wave, and reflection fields are null.
 - **Intensity sample** — session id, timestamp, intensity value. Written every 15 seconds during the wave phase so we can show the patient the actual shape of their craving later.
 - **Medication log** — id, timestamp, MAT type, dose amount (if known), source (`manual | photo`). Photos are never stored — only the extracted structured fields.
 - **Notification event** — id, fired at, type (`prophylactic | missed_dose | trough | reinforcement`), predicted risk window, whether the patient opened the app within 30 minutes.
@@ -104,7 +115,9 @@ Every narration string shown in the session UI is generated by Gemma 4 E2B runni
 - **Trauma-informed tone** — warm, grounded, never toxic-positivity. Never imply failure. Missed doses and relapses are normalized and redirected, never shamed.
 - **Medication accuracy** — all pharmacology copy must match FDA labels and SAMHSA MAT guidance. See the Medication-Aware Prompt Logic section below for the canonical mapping.
 - **Not medical advice** — WAVE never prescribes. "Take your medication if available" is acceptable; "increase your dose" is not.
-- **Crisis handoff** — any signal of active suicidality, overdose risk, or lethal-dose use surfaces 988 (Suicide & Crisis Lifeline) and 1-800-662-HELP (SAMHSA National Helpline) before the session continues.
+- **Crisis handoff** — safety routing happens at two distinct points in the session, both rule-based, neither trusted to an LLM:
+  1. **Intake safety screen (earliest possible point, before any LoRA loads).** Immediately after the three-tap intake, two sequential yes/no questions run: Q1 "Have you used any substances today?", and — only if Q1 is yes — Q2 "Are you feeling physically unwell, dizzy, or having trouble breathing right now?". If both answers are yes, the session is skipped entirely and the patient is routed to **SAMHSA National Helpline 1-800-662-HELP (1-800-662-4357)** with the explicit prompt "If you have a therapist or social worker, reach out to them now." If Q1 is yes but Q2 is no, the session continues with a `usedSubstanceToday: true` flag that the reflection phase may reference in a trauma-informed way. If Q1 is no, Q2 never appears and the session proceeds normally. This screen exists because lexical scanning of `optionalJournalText` at the end of the session is too late for a patient who opens the app already in medical distress.
+  2. **In-session signals.** Any later signal of active suicidality, overdose risk, or lethal-dose use (e.g. a crisis lexical match on the optional journal text, or a `crisisSignalDetected: true` flag from any LoRA output) surfaces **988 (Suicide & Crisis Lifeline)** and **1-800-662-HELP (SAMHSA National Helpline)** before the session continues, via the base-model-only crisis triage surface in `docs/models.md > Not fine-tuned — base model only`.
 - **Privacy floor** — no account required, no third-party analytics in the session path, opt-in only for any export to a clinician, and exports must be local files the patient chooses to share.
 - **Offline-first (everywhere)** — the session path makes zero LLM network requests on mobile **and** the web demo. Mobile runs Gemma 4 E2B via LiteRT; the web demo runs Gemma 4 E2B via `@huggingface/transformers` + WebGPU. A single scripted narration bank under `clients/lib/prompts/` is the fallback when WebGPU is unavailable or a model output fails Zod validation twice.
 
@@ -131,6 +144,7 @@ This is the clinical core of WAVE and the source of truth for every prompt in `w
 - [ ] Prophylactic notifications fire locally in the web demo (service worker or scheduled Supabase job) for at least one simulated risk window.
 - [ ] App is deployed to a public Vercel URL and loads with JavaScript disabled far enough to show the value prop and privacy pledge.
 - [ ] Judges can open DevTools Network tab, toggle Offline after the initial Gemma 4 model download, and complete a full session end-to-end with zero LLM network requests.
+- [ ] The intake safety screen correctly implements the routing logic: (a) Q1=No → proceeds to acknowledgment without showing Q2; (b) Q1=Yes, Q2=No → continues the session with `usedSubstanceToday: true` logged on the session row; (c) Q1=Yes, Q2=Yes → skips the session, renders the SAMHSA handoff screen with 1-800-662-HELP and the therapist/social-worker prompt, and writes a session row with `outcome: safety_exited`. No LoRA is loaded on the safety-exit path.
 
 ## What This Is NOT
 
