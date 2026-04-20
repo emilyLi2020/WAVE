@@ -8,7 +8,7 @@ The production vision is a **React Native mobile app** that runs **Gemma 4 entir
 
 ## Repo Layout
 
-- `web/` — Next.js 15 (App Router) + TypeScript + Tailwind v4 web demo. This is the active hackathon surface and what `pnpm dev` / `npm run dev` runs. Includes `src/app` routes, API Route Handlers that proxy Claude, and Supabase client wiring.
+- `web/` — Next.js 15 (App Router) + TypeScript + Tailwind v4 web demo. This is the active hackathon surface and what `pnpm dev` / `npm run dev` runs. Includes `src/app` routes and Supabase client wiring. **All LLM inference runs in the browser via Gemma 4 E2B-it on WebGPU — no server-side LLM call exists in this repo.**
 - `supabase/migrations/` — SQL migrations for the demo's Supabase project (session logs, medication logs, journal entries). Production mobile app replaces this with encrypted on-device SQLite.
 - `.agents/skills/`, `.claude/skills/` — Cursor / Claude Code agent skills (`domain-to-spec`, `scaffold-frontend`, `scaffold-backend`, `v0-prompt-crafter`, `demo-prep`, etc.). Do not edit these during feature work.
 - `frontend/`, `backend/` — Empty legacy folders. Do not use. The live app is in `web/`.
@@ -24,7 +24,7 @@ The production vision is a **React Native mobile app** that runs **Gemma 4 entir
 - Dev: `cd web && npm run dev` (http://localhost:3000)
 - Build: `cd web && npm run build`
 - Lint: `cd web && npm run lint`
-- Env: copy `web/.env.example` to `web/.env.local` and set `ANTHROPIC_API_KEY`, `NEXT_PUBLIC_SUPABASE_URL`, `SUPABASE_SECRET_KEY`.
+- Env: copy `web/.env.example` to `web/.env.local` and set `NEXT_PUBLIC_SUPABASE_URL`, `SUPABASE_SECRET_KEY`. **No LLM API key is required** — inference runs in-browser on Gemma 4 E2B via WebGPU.
 - Database: run `supabase/migrations/001_wave_tables.sql` once in the Supabase SQL editor (or via the Supabase CLI).
 
 ### Mobile (future, not in this repo yet)
@@ -33,20 +33,22 @@ The production vision is a **React Native mobile app** that runs **Gemma 4 entir
 
 ## Tech Stack
 
-**Hackathon web demo (what runs today):**
+**Hackathon web demo (Gemma end-to-end — what runs today):**
 - Next.js 15 (App Router), TypeScript strict, Tailwind CSS v4
-- Anthropic Claude API (stand-in for Gemma 4) via Route Handlers
+- **One Gemma 4 E2B-it (INT4) base + a stack of small LoRA adapters — one LoRA per clinical situation.** The base and the adapters run in the browser via `@huggingface/transformers` (transformers.js) + WebGPU. An Adapter Manager hot-swaps LoRAs per session phase. No server-side LLM, no cloud LLM, no API key. Per-model reference: `docs/models.md`. Training process: `docs/model-training.md`.
+- **Synthetix** pipeline (developer-only, not shipped to users) produces each LoRA's training set in a small loop: (1) small human-written seed set → (2) Gemma expands it into `N` synthetic examples → (3) clinician spot-checks a sample in a small UI and leaves feedback on anything wrong → (4) regenerate with that feedback until a spot-check passes clean. Then an 80 / 20 stratified train / test split, **one** QLoRA run (Unsloth + TRL) on the train split, and a simple four-check eval harness on the test split (JSON validity, safety lexicon, surface invariants, latency). Source of truth: `clients/synthetix/`.
+- **Crisis triage runs on base Gemma with no LoRA** — the safety boundary that must never be fine-tuned. Routing to 988 / SAMHSA / local emergency is rule-based and never trusted to the model.
 - Supabase Postgres (stand-in for encrypted on-device SQLite) for session/medication/journal logs
 - Lottie for the wave animation
-- localStorage fallback for fully offline demos
+- Scripted local narration bank as the single fallback when WebGPU is unavailable or a model call fails Zod validation twice
 
 **Production mobile (roadmap):**
 - React Native (iOS + Android), Expo
-- Gemma 4 E2B via LiteRT (on-device LLM)
-- Gemma 4 multimodal (on-device medication photo identification)
+- Gemma 4 E2B via LiteRT (on-device LLM), loading the **same LoRA stack** the web demo uses. The Adapter Manager contract (`clients/lib/gemma/adapter-manager.ts`) is runtime-agnostic; only the inference backend changes.
+- Gemma 4 multimodal (on-device medication photo identification) with its own LoRA, trained by the same Synthetix pipeline.
 - SQLite with SQLCipher (encrypted local DB)
 - iOS/Android local notification schedulers
-- Unsloth + QLoRA fine-tuning on MBRP facilitator materials, MI transcripts, SAMHSA MAT guides, and synthetic clinical dialogues.
+- Unsloth + TRL + QLoRA fine-tuning, one LoRA per clinical situation, trained on Synthetix-generated synthetic datasets (seeded by MBRP facilitator materials, MI transcripts, SAMHSA MAT guides, and FDA labels) with a mandatory clinician-review gate.
 
 ## Code Style
 
@@ -55,7 +57,7 @@ The production vision is a **React Native mobile app** that runs **Gemma 4 entir
 - Server components by default in the App Router; add `"use client"` only for interactivity (intake forms, wave animation, intensity slider, body-scan tap targets).
 - kebab-case for filenames, PascalCase for components, camelCase for functions and variables.
 - Validate all user input with Zod at every API boundary.
-- **Clinical copy lives in data, not in components.** Medication-aware prompts (`AGENTS.md > Domain Constraints`) must be stored as structured prompt templates in `web/src/lib/prompts/` so a clinician can review them without reading React code.
+- **Clinical behavior lives in data, not in components.** Both medication-aware **prompt templates** (stored under `clients/lib/prompts/` so a clinician can review them without reading React) and the **LoRA adapters** that encode fine-tuned behavior are treated as first-class reviewable artifacts. Each LoRA has a typed stack-array spec under `clients/synthetix/stacks/`, a rubric under `clients/synthetix/rubric/`, and an entry in the adapter manifest (`clients/lib/gemma/adapter-manifest.ts`) with its clinician approver, dataset hash, and eval scores.
 - No single-letter variable names. No unexplained abbreviations.
 - Every craving-rating, medication-status, and trigger field must be typed with a narrow union (not `string`).
 
@@ -68,15 +70,15 @@ The production vision is a **React Native mobile app** that runs **Gemma 4 entir
   3. Expect medication-acknowledgment text that references Suboxone working
   4. Drag slider to 2
   5. Expect post-session reflection citing the drop
-- Do not add automated tests that hit the Anthropic API in CI. Mock the Route Handler response.
+- Do not add automated tests that download the Gemma 4 weights or hit any remote LLM in CI. Mock `generateJSON<T>()` in `clients/lib/gemma/session.ts` and test the prompt-assembly + Zod-validation paths against fixtures.
 
 ## Security Considerations
 
 - **Never store or log raw medication photos.** In the production mobile app the photo must be processed in-memory by on-device vision and discarded. In the web demo, do not upload photos to Supabase — if a demo photo feature is added, process it client-side only.
-- Never hardcode API keys. `ANTHROPIC_API_KEY` and `SUPABASE_SECRET_KEY` live only in `web/.env.local`. `.env.local` is in `.gitignore`.
+- Never hardcode API keys. `SUPABASE_SECRET_KEY` lives only in `web/.env.local`. `.env.local` is in `.gitignore`. There is no LLM API key anywhere in the repo — Gemma 4 runs in the browser.
 - Craving logs, medication logs, and journal entries are **protected-health-information-adjacent**. Treat them as PHI-like even though the app is not a covered entity: no third-party analytics, no error-tracking payloads containing user text, no shipping logs off-device without explicit opt-in.
 - The web demo's Supabase tables must enable Row Level Security and scope every row to the authenticated user. See `.claude/skills/supabase-postgres-best-practices/SKILL.md`.
-- Ask the user before destructive database operations, large refactors of the session flow, or adding any new network request to the session experience. **The session path must stay zero-network on mobile; keep the web demo's session network surface minimal.**
+- Ask the user before destructive database operations, large refactors of the session flow, or adding any new network request to the session experience. **The session path must make zero LLM network calls on both mobile and the web demo.** The only network traffic allowed in the session flow is the one-time Gemma 4 weight download (cached in IndexedDB) and opt-in Supabase writes after the session ends.
 
 ## PR Instructions
 
@@ -84,6 +86,7 @@ The production vision is a **React Native mobile app** that runs **Gemma 4 entir
 - Run lint and typecheck before committing. Fix any errors you introduced.
 - Keep diffs small and focused. Split prompt-copy changes from code changes where possible so clinicians can review prompt PRs without noise.
 - Every PR that changes session prompts must link the MBRP / SAMHSA / FDA source that justifies the new copy, or cite the synthetic clinical dialogue in the training set.
+- Every PR that ships or updates a LoRA adapter must satisfy the ship gates in `docs/model-training.md > Ship gates`: (a) bump the adapter's `version` + `sha256` in `clients/lib/gemma/adapter-manifest.ts`, (b) point at the Synthetix run ID under `clients/synthetix/runs/<lora-id>/<run-id>/` that produced its training data, (c) include the spot-check log from that run showing `pass: true` with zero flagged problems, (d) include the eval report from `eval.json` in that run showing `pass: true` on the held-out 20 % test split (JSON validity ≥ 98 %, safety lexicon 100 %, surface invariants 100 %, p95 latency under budget), and (e) name the clinician whose initials are on the clean spot-check. Never ship a LoRA for crisis triage — that surface is base-only on purpose; see `docs/models.md > Not fine-tuned — base model only`.
 - Include a manual test path in the PR description (see Testing Instructions).
 
 ## Domain Constraints
@@ -92,6 +95,8 @@ The production vision is a **React Native mobile app** that runs **Gemma 4 entir
 - **Trauma-informed, non-judgmental tone**: Never use toxic-positivity phrasing ("You've got this!", "Stay strong!") and never imply the patient has failed. If the patient missed a dose or used, the response must normalize and redirect, never shame.
 - **Medication accuracy**: All pharmacology statements (half-lives, trough windows, receptor effects) must match FDA labels and SAMHSA MAT guidance. The canonical medication→prompt logic map lives in `PRD.md > Medication-Aware Prompt Logic`. Any change to medication copy requires a citation.
 - **Not medical advice**: The app is a support tool, not a prescriber. Never tell a patient to start, stop, or change a medication. "Take your medication if available" is acceptable; "You should increase your dose" is not.
-- **Crisis handoff**: If a patient indicates active suicidality, overdose risk, or that they have already used a potentially lethal amount, the app must surface the 988 Suicide & Crisis Lifeline and SAMHSA's National Helpline (1-800-662-HELP) before continuing the session.
-- **Offline-first (production)**: In the mobile product, the session path must make **zero network requests**. The web demo may call Claude via a Route Handler but must degrade gracefully to a scripted local fallback if the network fails.
+- **Crisis handoff**: Safety routing has **two** rule-based checkpoints, neither of which is ever delegated to a LoRA or LLM decision:
+  1. **Intake safety screen, before any LoRA runs.** Immediately after the three-tap intake, the session presents two sequential yes/no questions: Q1 "Have you used any substances today?" and, only if Q1 is yes, Q2 "Are you feeling physically unwell, dizzy, or having trouble breathing right now?". Both-yes → skip the session entirely and render the safety handoff screen with SAMHSA National Helpline **1-800-662-HELP (1-800-662-4357)** and the line "If you have a therapist or social worker, reach out to them now." Q1=yes, Q2=no → continue the session but record `usedSubstanceToday: true` on the session row so the reflection phase can reference it. Q1=no → Q2 never shows. This screen exists because a keyword scan on the end-of-session journal text is too late for a patient who opens the app already in medical distress.
+  2. **In-session crisis signals.** If a patient later indicates active suicidality, overdose risk, or that they have already used a potentially lethal amount, the app must surface the **988 Suicide & Crisis Lifeline** and **SAMHSA's National Helpline (1-800-662-HELP)** before continuing the session, routed through the base-model-only crisis triage surface documented in `docs/models.md > Not fine-tuned — base model only`.
+- **Offline-first (everywhere)**: The session path must make **zero LLM network requests** on both mobile and the web demo. Mobile runs Gemma 4 E2B via LiteRT; the web demo runs Gemma 4 E2B via transformers.js + WebGPU. The one scripted narration bank in `clients/lib/prompts/` is the single fallback when WebGPU is unavailable or a model output fails Zod validation twice.
 - **Privacy floor**: No account required to use the app. No third-party analytics in the session flow. Opt-in only for any data export to a clinician, and exports must be local files (PDF/JSON) the patient chooses to share.
