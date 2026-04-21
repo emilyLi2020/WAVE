@@ -31,6 +31,11 @@
       "sourceType": "github",
       "computedHash": "df8a77a50287f318195ecac3b1d40c03b05824ceae66e0e5aa3aebad7edeaf7d"
     },
+    "prompt-master": {
+      "source": "nidhinjs/prompt-master",
+      "sourceType": "github",
+      "computedHash": "e33af64470b4b6ae61220b3a04a5d914e35f8fca22c056c7f4ac8ce1644bf790"
+    },
     "quickstart": {
       "source": "idkwhatimd0ing/hackathonstarterkit",
       "sourceType": "github",

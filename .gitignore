@@ -1,0 +1,13 @@
+.env
+.env.*
+!.env.example
+
+.cursor/hooks/state/
+
+.DS_Store
+
+node_modules/
+
+__pycache__/
+*.pyc
+.ipynb_checkpoints/

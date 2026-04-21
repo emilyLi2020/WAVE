@@ -446,7 +446,7 @@ The shipped app includes a typed, versioned, signed manifest. The entries
 here correspond one-to-one with the LoRAs above.
 
 ```ts
-// clients/lib/gemma/adapter-manifest.ts
+// client/lib/gemma/adapter-manifest.ts
 type AdapterManifest = {
   baseModel: {
     id: "google/gemma-4-E2B-it";
@@ -459,7 +459,7 @@ type AdapterManifest = {
     sha256: string;             // content hash for cache invalidation
     url: string;                // same-origin static asset
     sizeBytes: number;
-    synthetixRunId: string;     // points at clients/synthetix/runs/<lora-id>/<run-id>/
+    synthetixRunId: string;     // points at client/synthetix/runs/<lora-id>/<run-id>/
     spotCheckPassed: true;      // literal true; false never ships
     evalPassed: true;           // literal true; harness passed on the test split
     approvedBy: string;         // clinician initials on the clean spot-check
@@ -492,7 +492,7 @@ that adds or updates an adapter must satisfy the gates documented in
   LoRA is held to.
 - `model-training.md` is the "how": data collection, Synthetix pipeline,
   spot-check, split, training, eval, ship gates.
-- `clients/lib/gemma/adapter-manager.ts` (future) is the runtime contract
+- `client/lib/gemma/adapter-manager.ts` (future) is the runtime contract
   the Adapter Manager implements.
-- `clients/synthetix/` (future) is the developer-only pipeline that
+- `client/synthetix/` (future) is the developer-only pipeline that
   produces the training data for every LoRA in this document.

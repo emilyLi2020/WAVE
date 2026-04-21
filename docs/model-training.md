@@ -61,28 +61,28 @@ Per LoRA, before any generation happens:
 1. **A small human-written seed set.** 15–40 structured (input → JSON
    output) examples per LoRA, hand-written by a clinician or a
    domain-informed developer. Committed as typed TypeScript under
-   `clients/synthetix/seeds/<lora-id>.ts` so the seed set is reviewable
+   `client/synthetix/seeds/<lora-id>.ts` so the seed set is reviewable
    in a normal code review.
 
 2. **The LoRA's Zod schemas** from `models.md` (one schema for the
    input, one for the output). These are already defined per LoRA and
-   live in `clients/lib/prompts/schemas.ts`.
+   live in `client/lib/prompts/schemas.ts`.
 
 3. **The LoRA's stack axes.** The typed enumerations the generator
    samples from — e.g. for `lora-med-ack`, the axes are `matType`,
    `medicationStatus`, `trigger`, `intensityBucket`, `timeOfDay`. The
-   stack axes live under `clients/synthetix/stacks/<lora-id>.ts`. They
+   stack axes live under `client/synthetix/stacks/<lora-id>.ts`. They
    do **not** need to be enumerated exhaustively; they are just the
    bag the generator samples inputs from.
 
 4. **The LoRA's hard safety invariants.** Copied verbatim from the
    corresponding section of `models.md` into
-   `clients/synthetix/invariants/<lora-id>.ts`. These are executable
+   `client/synthetix/invariants/<lora-id>.ts`. These are executable
    predicates (e.g. `output.encouragement !== "celebrating"`), not
    prose.
 
 5. **The shared tone rules.** One file, not per-LoRA:
-   `clients/synthetix/tone-rules.ts`. Encodes the toxic-positivity
+   `client/synthetix/tone-rules.ts`. Encodes the toxic-positivity
    lexicon, the substance-name blocklist, and the pharmacology-directive
    allow-list from `AGENTS.md > Domain Constraints`.
 
@@ -90,7 +90,7 @@ Per LoRA, before any generation happens:
    allowed to draw on: MBRP facilitator guide excerpts, SAMHSA TIP 63
    paragraphs, FDA MAT labels (Suboxone, Naltrexone, Vivitrol,
    Methadone), and MI transcripts. Stored as plain text under
-   `clients/synthetix/corpus/` with a short provenance header on each
+   `client/synthetix/corpus/` with a short provenance header on each
    file.
 
 ---
@@ -121,21 +121,21 @@ For a given LoRA, the generator is called with a prompt built from:
     - Never name a substance: <blocklist>
     - Never emit a pharmacology directive: <allow-list>
   LoRA-specific invariants:
-    <paste from clients/synthetix/invariants/<lora-id>.ts>
+    <paste from client/synthetix/invariants/<lora-id>.ts>
   Previous issues to avoid (only present if this is a regenerate round):
     <bullet list of clinician feedback strings from the last spot-check>
 
 [ Reference clinical sources ]
-  <excerpts from clients/synthetix/corpus/ relevant to this LoRA>
+  <excerpts from client/synthetix/corpus/ relevant to this LoRA>
 
 [ Human seed examples ]
-  <the full seed set from clients/synthetix/seeds/<lora-id>.ts>
+  <the full seed set from client/synthetix/seeds/<lora-id>.ts>
 
 [ Input schema ]
-  <from clients/lib/prompts/schemas.ts>
+  <from client/lib/prompts/schemas.ts>
 
 [ Output schema ]
-  <from clients/lib/prompts/schemas.ts>
+  <from client/lib/prompts/schemas.ts>
 
 [ User ]
   Generate <K> new (input, output) pairs. Each input should be a
@@ -169,7 +169,7 @@ and clinical judgment, not on obvious malformed outputs.
 Each generation round writes to:
 
 ```
-clients/synthetix/runs/<lora-id>/<run-id>/
+client/synthetix/runs/<lora-id>/<run-id>/
   generator-prompt.md          # the exact prompt that was used
   generated.jsonl              # all examples that passed the pre-filter
   prefilter-drops.jsonl        # examples that were dropped, for debugging
@@ -182,7 +182,7 @@ clients/synthetix/runs/<lora-id>/<run-id>/
 
 ## 3. Clinician spot-check
 
-A small local Next.js page at `clients/app/synthetix-review/`, gated to
+A small local Next.js page at `client/app/synthetix-review/`, gated to
 the dev team (no public route), loads `generated.jsonl` for a given
 `(lora-id, run-id)` and samples examples uniformly across stack cells.
 
@@ -212,7 +212,7 @@ A round **passes clean** when every sampled example is "Looks good" —
 zero problems flagged. The review UI writes one file:
 
 ```
-clients/synthetix/runs/<lora-id>/<run-id>/spotcheck.json
+client/synthetix/runs/<lora-id>/<run-id>/spotcheck.json
 {
   "runId": "2026-04-17-001",
   "sampledCount": 30,
@@ -255,7 +255,7 @@ the 30-example sample) **80 / 20**, stratified by `matType` and
 splitter is seeded:
 
 ```ts
-// clients/synthetix/split.ts
+// client/synthetix/split.ts
 export function split(
   examples: GeneratedExample[],
   seed: number,
@@ -266,7 +266,7 @@ The test split is frozen at split time and committed to the run
 directory:
 
 ```
-clients/synthetix/runs/<lora-id>/<run-id>/
+client/synthetix/runs/<lora-id>/<run-id>/
   train.jsonl
   test.jsonl
   split-meta.json   # { seed, trainSize, testSize, strataCounts }
@@ -301,9 +301,9 @@ One QLoRA run per LoRA, on the 80 % train split.
   one GPU.
 - **Artifact.** A PEFT adapter directory committed (or uploaded, if
   too large for git) under
-  `clients/synthetix/runs/<lora-id>/<run-id>/adapter/`.
+  `client/synthetix/runs/<lora-id>/<run-id>/adapter/`.
 
-The training script is `clients/synthetix/train/<lora-id>.py`. The
+The training script is `client/synthetix/train/<lora-id>.py`. The
 Python side reads `train.jsonl` and writes the adapter directory; no
 other output.
 
@@ -323,7 +323,7 @@ ship:
   WebGPU.
 - **Mobile (future):** LiteRT adapter format.
 
-The converters live under `clients/synthetix/export/`. They are
+The converters live under `client/synthetix/export/`. They are
 deterministic; two runs of the converter on the same PEFT adapter must
 produce byte-identical output. CI pins the converter version.
 
@@ -360,7 +360,7 @@ not the training-time model.
 The harness emits one file:
 
 ```
-clients/synthetix/runs/<lora-id>/<run-id>/eval.json
+client/synthetix/runs/<lora-id>/<run-id>/eval.json
 {
   "loraId": "lora-med-ack",
   "runId": "2026-04-17-001",
@@ -378,7 +378,7 @@ report does **not** ship — see §8.
 
 ### 7.3 Implementation
 
-The harness lives under `clients/synthetix/eval/<lora-id>.ts`. It is
+The harness lives under `client/synthetix/eval/<lora-id>.ts`. It is
 TypeScript (not Python) because it needs to run the actual Adapter
 Manager — the thing that actually ships — and not a training-time
 Python loader that might quantize or decode differently.
@@ -390,9 +390,9 @@ Python loader that might quantize or decode differently.
 Every PR that ships or updates a LoRA must include, in the PR body:
 
 - [ ] Bumped `version` and `sha256` for this LoRA in
-      `clients/lib/gemma/adapter-manifest.ts`.
+      `client/lib/gemma/adapter-manifest.ts`.
 - [ ] Synthetix run ID
-      (`clients/synthetix/runs/<lora-id>/<run-id>/`) linked in the PR
+      (`client/synthetix/runs/<lora-id>/<run-id>/`) linked in the PR
       description.
 - [ ] `spotcheck.json` in that run shows `pass: true` with zero
       flagged problems.
@@ -413,7 +413,7 @@ manifest.
 ## 9. Directory map (developer tree, not shipped to users)
 
 ```
-clients/synthetix/
+client/synthetix/
 ├── corpus/                     # reference clinical sources (MBRP, SAMHSA,
 │                               # FDA labels, MI transcripts) with provenance
 ├── seeds/
@@ -445,7 +445,7 @@ clients/synthetix/
         ├── adapter.onnx        # exported web adapter
         └── eval.json
 
-clients/app/synthetix-review/   # local-only Next.js UI for §3 spot-check
+client/app/synthetix-review/   # local-only Next.js UI for §3 spot-check
 ```
 
 ---
@@ -456,11 +456,11 @@ clients/app/synthetix-review/   # local-only Next.js UI for §3 spot-check
   follow this file's process end-to-end for the new adapter.
 - **Changing the generator, the spot-check flow, the split, the
   training recipe, or the eval** → update this file. Bump a version
-  marker in `clients/synthetix/VERSION.md` so prior runs are clearly
+  marker in `client/synthetix/VERSION.md` so prior runs are clearly
   tied to the old process.
 - **Changing a tone rule or a safety invariant** → update both
   `AGENTS.md > Domain Constraints` (the human-readable source of
-  truth) and `clients/synthetix/tone-rules.ts` or the relevant
+  truth) and `client/synthetix/tone-rules.ts` or the relevant
   `invariants/<lora-id>.ts` file. Every previously-shipped LoRA must
   be re-evaluated against the new rule before the next release.
 
@@ -493,7 +493,7 @@ clients/app/synthetix-review/   # local-only Next.js UI for §3 spot-check
   matrix. Seed sets and invariants must match it.
 - `AGENTS.md > Domain Constraints` — the source of truth for tone
   rules and crisis handoff. `tone-rules.ts` encodes these.
-- `clients/lib/gemma/adapter-manager.ts` (future) — the runtime that
+- `client/lib/gemma/adapter-manager.ts` (future) — the runtime that
   consumes the adapters this process produces.
-- `clients/lib/prompts/schemas.ts` (future) — the Zod schemas that
+- `client/lib/prompts/schemas.ts` (future) — the Zod schemas that
   define the input / output contract every LoRA is trained against.

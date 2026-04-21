@@ -1,0 +1,13 @@
+name: wave-models
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  - pip
+  - pip:
+      - torch>=2.4.0
+      - transformers>=4.46.0
+      - accelerate>=1.0.0
+      - huggingface_hub>=0.26.0
+      - jupyter>=1.1.0
+      - ipykernel>=6.29.0

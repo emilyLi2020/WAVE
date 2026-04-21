@@ -24,8 +24,19 @@ The production vision is a **React Native mobile app** that runs **Gemma 4 entir
 - Dev: `cd web && npm run dev` (http://localhost:3000)
 - Build: `cd web && npm run build`
 - Lint: `cd web && npm run lint`
-- Env: copy `web/.env.example` to `web/.env.local` and set `NEXT_PUBLIC_SUPABASE_URL`, `SUPABASE_SECRET_KEY`. **No LLM API key is required** — inference runs in-browser on Gemma 4 E2B via WebGPU.
+- Env: copy `web/.env.example` to `web/.env.local` and set `NEXT_PUBLIC_SUPABASE_URL`, `SUPABASE_SECRET_KEY`. **No LLM API key is required by the production design** — inference runs in-browser on Gemma 4 E2B via WebGPU. See **Temporary scaffolding** below for the one current exception.
 - Database: run `supabase/migrations/001_wave_tables.sql` once in the Supabase SQL editor (or via the Supabase CLI).
+
+### Temporary scaffolding (delete when in-browser Gemma lands)
+
+Until the in-browser Gemma 4 + LoRA stack ships, the session route uses an **OpenAI `gpt-5-mini` stand-in** behind the same `generateJSON<T>()` boundary the Gemma path will use:
+
+- Server route: [client/app/api/narrate/route.ts](client/app/api/narrate/route.ts) — Node-runtime POST handler that reads prompt templates and Zod schemas from `client/lib/prompts/` and calls `gpt-5-mini` with `response_format: { type: "json_schema", strict: true }`.
+- Client boundary: [client/lib/gemma/session.ts](client/lib/gemma/session.ts) — `generateJSON<T>()` posts to `/api/narrate`, retries once on Zod failure, and falls through to `client/lib/prompts/fallback-bank.ts` after two failed attempts.
+- Env: copy `client/.env.local.example` to `client/.env.local` and set `OPENAI_API_KEY`. The key is server-side only and is never sent to the browser.
+- Deletion plan: when the in-browser Gemma stack ships, delete `client/app/api/narrate/`, the `openai` dependency in [client/package.json](client/package.json), and the `OPENAI_API_KEY` env var. Every `TODO:replace-with-gemma` marker in `client/lib/gemma/` is a swap-in point. No prompt template, Zod schema, or UI component depends on OpenAI directly — only the route handler and `generateJSON()`'s `fetch` body do.
+
+This exception is the **only** allowed LLM network call in the repo. The intake safety screen, fallback bank, and crisis-routing rules remain rule-based and never touch any model.
 
 ### Mobile (future, not in this repo yet)
 
@@ -35,8 +46,8 @@ The production vision is a **React Native mobile app** that runs **Gemma 4 entir
 
 **Hackathon web demo (Gemma end-to-end — what runs today):**
 - Next.js 15 (App Router), TypeScript strict, Tailwind CSS v4
-- **One Gemma 4 E2B-it (INT4) base + a stack of small LoRA adapters — one LoRA per clinical situation.** The base and the adapters run in the browser via `@huggingface/transformers` (transformers.js) + WebGPU. An Adapter Manager hot-swaps LoRAs per session phase. No server-side LLM, no cloud LLM, no API key. Per-model reference: `docs/models.md`. Training process: `docs/model-training.md`.
-- **Synthetix** pipeline (developer-only, not shipped to users) produces each LoRA's training set in a small loop: (1) small human-written seed set → (2) Gemma expands it into `N` synthetic examples → (3) clinician spot-checks a sample in a small UI and leaves feedback on anything wrong → (4) regenerate with that feedback until a spot-check passes clean. Then an 80 / 20 stratified train / test split, **one** QLoRA run (Unsloth + TRL) on the train split, and a simple four-check eval harness on the test split (JSON validity, safety lexicon, surface invariants, latency). Source of truth: `clients/synthetix/`.
+- **One Gemma 4 E2B-it (INT4) base + a stack of small LoRA adapters — one LoRA per clinical situation.** The base and the adapters run in the browser via `@huggingface/transformers` (transformers.js) + WebGPU. **Temporary today:** the session route is wired to OpenAI `gpt-5-mini` via [client/app/api/narrate/route.ts](client/app/api/narrate/route.ts) behind the same `generateJSON<T>()` boundary in [client/lib/gemma/session.ts](client/lib/gemma/session.ts) — see *Setup Commands > Temporary scaffolding* for the deletion plan. An Adapter Manager hot-swaps LoRAs per session phase. No server-side LLM, no cloud LLM, no API key. Per-model reference: `docs/models.md`. Training process: `docs/model-training.md`.
+- **Synthetix** pipeline (developer-only, not shipped to users) produces each LoRA's training set in a small loop: (1) small human-written seed set → (2) Gemma expands it into `N` synthetic examples → (3) clinician spot-checks a sample in a small UI and leaves feedback on anything wrong → (4) regenerate with that feedback until a spot-check passes clean. Then an 80 / 20 stratified train / test split, **one** QLoRA run (Unsloth + TRL) on the train split, and a simple four-check eval harness on the test split (JSON validity, safety lexicon, surface invariants, latency). Source of truth: `client/synthetix/`.
 - **Crisis triage runs on base Gemma with no LoRA** — the safety boundary that must never be fine-tuned. Routing to 988 / SAMHSA / local emergency is rule-based and never trusted to the model.
 - Supabase Postgres (stand-in for encrypted on-device SQLite) for session/medication/journal logs
 - Lottie for the wave animation
@@ -44,7 +55,7 @@ The production vision is a **React Native mobile app** that runs **Gemma 4 entir
 
 **Production mobile (roadmap):**
 - React Native (iOS + Android), Expo
-- Gemma 4 E2B via LiteRT (on-device LLM), loading the **same LoRA stack** the web demo uses. The Adapter Manager contract (`clients/lib/gemma/adapter-manager.ts`) is runtime-agnostic; only the inference backend changes.
+- Gemma 4 E2B via LiteRT (on-device LLM), loading the **same LoRA stack** the web demo uses. The Adapter Manager contract (`client/lib/gemma/adapter-manager.ts`) is runtime-agnostic; only the inference backend changes.
 - Gemma 4 multimodal (on-device medication photo identification) with its own LoRA, trained by the same Synthetix pipeline.
 - SQLite with SQLCipher (encrypted local DB)
 - iOS/Android local notification schedulers
@@ -57,7 +68,7 @@ The production vision is a **React Native mobile app** that runs **Gemma 4 entir
 - Server components by default in the App Router; add `"use client"` only for interactivity (intake forms, wave animation, intensity slider, body-scan tap targets).
 - kebab-case for filenames, PascalCase for components, camelCase for functions and variables.
 - Validate all user input with Zod at every API boundary.
-- **Clinical behavior lives in data, not in components.** Both medication-aware **prompt templates** (stored under `clients/lib/prompts/` so a clinician can review them without reading React) and the **LoRA adapters** that encode fine-tuned behavior are treated as first-class reviewable artifacts. Each LoRA has a typed stack-array spec under `clients/synthetix/stacks/`, a rubric under `clients/synthetix/rubric/`, and an entry in the adapter manifest (`clients/lib/gemma/adapter-manifest.ts`) with its clinician approver, dataset hash, and eval scores.
+- **Clinical behavior lives in data, not in components.** Both medication-aware **prompt templates** (stored under `client/lib/prompts/` so a clinician can review them without reading React) and the **LoRA adapters** that encode fine-tuned behavior are treated as first-class reviewable artifacts. Each LoRA has a typed stack-array spec under `client/synthetix/stacks/`, a rubric under `client/synthetix/rubric/`, and an entry in the adapter manifest (`client/lib/gemma/adapter-manifest.ts`) with its clinician approver, dataset hash, and eval scores.
 - No single-letter variable names. No unexplained abbreviations.
 - Every craving-rating, medication-status, and trigger field must be typed with a narrow union (not `string`).
 
@@ -70,7 +81,7 @@ The production vision is a **React Native mobile app** that runs **Gemma 4 entir
   3. Expect medication-acknowledgment text that references Suboxone working
   4. Drag slider to 2
   5. Expect post-session reflection citing the drop
-- Do not add automated tests that download the Gemma 4 weights or hit any remote LLM in CI. Mock `generateJSON<T>()` in `clients/lib/gemma/session.ts` and test the prompt-assembly + Zod-validation paths against fixtures.
+- Do not add automated tests that download the Gemma 4 weights or hit any remote LLM in CI. Mock `generateJSON<T>()` in `client/lib/gemma/session.ts` and test the prompt-assembly + Zod-validation paths against fixtures.
 
 ## Security Considerations
 
@@ -86,7 +97,7 @@ The production vision is a **React Native mobile app** that runs **Gemma 4 entir
 - Run lint and typecheck before committing. Fix any errors you introduced.
 - Keep diffs small and focused. Split prompt-copy changes from code changes where possible so clinicians can review prompt PRs without noise.
 - Every PR that changes session prompts must link the MBRP / SAMHSA / FDA source that justifies the new copy, or cite the synthetic clinical dialogue in the training set.
-- Every PR that ships or updates a LoRA adapter must satisfy the ship gates in `docs/model-training.md > Ship gates`: (a) bump the adapter's `version` + `sha256` in `clients/lib/gemma/adapter-manifest.ts`, (b) point at the Synthetix run ID under `clients/synthetix/runs/<lora-id>/<run-id>/` that produced its training data, (c) include the spot-check log from that run showing `pass: true` with zero flagged problems, (d) include the eval report from `eval.json` in that run showing `pass: true` on the held-out 20 % test split (JSON validity ≥ 98 %, safety lexicon 100 %, surface invariants 100 %, p95 latency under budget), and (e) name the clinician whose initials are on the clean spot-check. Never ship a LoRA for crisis triage — that surface is base-only on purpose; see `docs/models.md > Not fine-tuned — base model only`.
+- Every PR that ships or updates a LoRA adapter must satisfy the ship gates in `docs/model-training.md > Ship gates`: (a) bump the adapter's `version` + `sha256` in `client/lib/gemma/adapter-manifest.ts`, (b) point at the Synthetix run ID under `client/synthetix/runs/<lora-id>/<run-id>/` that produced its training data, (c) include the spot-check log from that run showing `pass: true` with zero flagged problems, (d) include the eval report from `eval.json` in that run showing `pass: true` on the held-out 20 % test split (JSON validity ≥ 98 %, safety lexicon 100 %, surface invariants 100 %, p95 latency under budget), and (e) name the clinician whose initials are on the clean spot-check. Never ship a LoRA for crisis triage — that surface is base-only on purpose; see `docs/models.md > Not fine-tuned — base model only`.
 - Include a manual test path in the PR description (see Testing Instructions).
 
 ## Domain Constraints
@@ -98,5 +109,20 @@ The production vision is a **React Native mobile app** that runs **Gemma 4 entir
 - **Crisis handoff**: Safety routing has **two** rule-based checkpoints, neither of which is ever delegated to a LoRA or LLM decision:
   1. **Intake safety screen, before any LoRA runs.** Immediately after the three-tap intake, the session presents two sequential yes/no questions: Q1 "Have you used any substances today?" and, only if Q1 is yes, Q2 "Are you feeling physically unwell, dizzy, or having trouble breathing right now?". Both-yes → skip the session entirely and render the safety handoff screen with SAMHSA National Helpline **1-800-662-HELP (1-800-662-4357)** and the line "If you have a therapist or social worker, reach out to them now." Q1=yes, Q2=no → continue the session but record `usedSubstanceToday: true` on the session row so the reflection phase can reference it. Q1=no → Q2 never shows. This screen exists because a keyword scan on the end-of-session journal text is too late for a patient who opens the app already in medical distress.
   2. **In-session crisis signals.** If a patient later indicates active suicidality, overdose risk, or that they have already used a potentially lethal amount, the app must surface the **988 Suicide & Crisis Lifeline** and **SAMHSA's National Helpline (1-800-662-HELP)** before continuing the session, routed through the base-model-only crisis triage surface documented in `docs/models.md > Not fine-tuned — base model only`.
-- **Offline-first (everywhere)**: The session path must make **zero LLM network requests** on both mobile and the web demo. Mobile runs Gemma 4 E2B via LiteRT; the web demo runs Gemma 4 E2B via transformers.js + WebGPU. The one scripted narration bank in `clients/lib/prompts/` is the single fallback when WebGPU is unavailable or a model output fails Zod validation twice.
+- **Offline-first (everywhere)**: The session path must make **zero LLM network requests** on both mobile and the web demo. Mobile runs Gemma 4 E2B via LiteRT; the web demo runs Gemma 4 E2B via transformers.js + WebGPU. The one scripted narration bank in `client/lib/prompts/` is the single fallback when WebGPU is unavailable or a model output fails Zod validation twice.
 - **Privacy floor**: No account required to use the app. No third-party analytics in the session flow. Opt-in only for any data export to a clinician, and exports must be local files (PDF/JSON) the patient chooses to share.
+
+## Learned User Preferences
+
+- When editing prompt templates under `client/lib/prompts/`, preserve clinical content verbatim and only tighten structural/voice work; never alter pharmacology, citations, or safety copy without a fresh citation.
+- Mock datasets that drive visualizations (e.g., the dashboard heatmap) should be dense enough that almost every cell shows data — leave at most 1-2 cells deliberately blank rather than rendering a sparse grid.
+- Treat OpenAI (`gpt-5-mini`) as a temporary stand-in only; every new LLM-touching feature must go through the `generateJSON<T>()` boundary so the in-browser Gemma swap stays a one-file change.
+
+## Learned Workspace Facts
+
+- `models/` is the repo's ad-hoc Python experiment area for Gemma smoke tests, and it uses Miniconda via `models/environment.yml` with the `wave-models` environment.
+- The active web demo lives in `client/` (lowercase, renamed from `clients/` via `git mv`); any older `web/` or `clients/` paths in docs are stale.
+- `client/lib/data/mock-sessions.ts` is the single source of truth for mock session data; the dashboard, history, and insights pages must consume `MOCK_SESSIONS` and its derived aggregators (`MOCK_SESSION_STATS`, `MOCK_RISK_GRID`, `MOCK_WEEK_SUMMARY`, `MOCK_RECENT_SESSIONS`, `STATIC_INSIGHTS`) from it instead of redefining local constants.
+- Prompt templates in `client/lib/prompts/` use XML-style tagged sections (`<role>`, `<voice>`, `<never>`, `<output>` in system prompts; `<situation>` / `<clinical_source>` / `<citation_required>` in user turns) so the same prompts run portably on Gemma 4 E2B-it and `gpt-5-mini`.
+- The insights regenerate flow lives at `client/app/api/insights/route.ts` and posts session history to `gpt-5-mini` (Responses API, medium reasoning effort) through the same `generateJSON<T>()` boundary as the session narrate route.
+- The `sessions` array on insights/regen requests is capped at 200 in `client/lib/prompts/schemas.ts`; expanding the mock dataset past that cap requires bumping the schema first.
