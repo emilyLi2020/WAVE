@@ -89,19 +89,25 @@ export interface ConstFieldSpec extends BaseField {
 }
 
 /**
- * Stack-axis configuration. The stratification grid on the LoRA index
- * page is computed from this — by default, rows × cols with `count` per
- * cell, drawn from the seed's `input` payload. Picking matType ×
- * medicationStatus matches the train/test split in
- * docs/model-training.md §5.
+ * One clinical situation where the LoRA must behave qualitatively
+ * differently. Voice scenarios are the *axes that matter* for the
+ * fine-tune — not every input combination, just the variations where
+ * the model needs a distinct posture or framing.
+ *
+ * Synthetix expands across the full input grid (matType, status,
+ * trigger, etc.) by sampling the doctor's seeds. The doctor only needs
+ * to demonstrate each *voice* once or twice; Synthetix handles
+ * coverage. See docs/model-training.md.
+ *
+ * `match` is server-only — it walks the seed's `input` to decide if the
+ * scenario is demonstrated. The serializable projection in
+ * client-spec.ts strips it.
  */
-export interface StackAxes {
-  rowKey: string; // path into input, e.g. "matType"
-  rowLabel: string;
-  rowOptions: readonly string[];
-  colKey: string;
-  colLabel: string;
-  colOptions: readonly string[];
+export interface VoiceScenario {
+  id: string;
+  label: string;
+  description: string;
+  match: (input: Record<string, unknown>) => boolean;
 }
 
 /**
@@ -119,14 +125,23 @@ export interface LoraFormSpec {
   invariants: readonly string[];
   /** Citation prompt — what clinical source the doctor should cite. */
   citationPrompt?: string;
-  /** Target seed count per docs/model-training.md §1 (15–40 typical). */
+  /**
+   * How many `ready`/`approved` examples the doctor should aim for.
+   * Calibrated for the "voice not coverage" approach: enough variety to
+   * teach posture, with Synthetix handling stack-axis expansion. Per
+   * docs/model-training.md §1.
+   */
   targetCount: number;
   isStretch: boolean;
   inputFields: readonly FieldSpec[];
   outputFields: readonly FieldSpec[];
   inputSchema: z.ZodType;
   outputSchema: z.ZodType;
-  stackAxes: StackAxes;
+  /**
+   * Clinical scenarios the doctor's seed set must cover at least once.
+   * The /training UI uses these for a checklist, not a stratified grid.
+   */
+  voiceScenarios: readonly VoiceScenario[];
 }
 
 /**

@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState, useTransition } from "react";
 
+import type { PharmacologySnippet } from "@/lib/clinical/pharmacology";
 import type { ClientLoraFormSpec } from "@/lib/training/client-spec";
 import type {
   ConstFieldSpec,
@@ -11,6 +12,8 @@ import type {
   TrainingSeed,
 } from "@/lib/training/types";
 import { SEED_STATUSES } from "@/lib/training/types";
+
+import { PharmacologyHelper } from "./pharmacology-helper";
 
 type Json = Record<string, unknown>;
 
@@ -353,6 +356,18 @@ export function SeedForm({ spec, existing }: Props) {
           onChange={update}
         />
       </div>
+
+      {spec.loraId === "lora-med-ack" ? (
+        <PharmacologyHelper
+          matType={inputState.matType}
+          medicationStatus={inputState.medicationStatus}
+          onApplyToClaim={(snippet: PharmacologySnippet) => {
+            update("output", ["pharmacologyClaim", "medication"], snippet.matType);
+            update("output", ["pharmacologyClaim", "claim"], snippet.claim);
+            update("output", ["pharmacologyClaim", "citation"], snippet.citation);
+          }}
+        />
+      ) : null}
 
       <div className="rounded-2xl border border-border bg-surface p-5 grid gap-4 sm:grid-cols-3">
         <label className="text-sm">

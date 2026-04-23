@@ -10,8 +10,12 @@
  * Each spec is the source of truth for:
  *   - the form the doctor fills out (inputFields + outputFields)
  *   - the Zod validators the API route checks before insert
- *   - the stack-axis coverage grid on the LoRA index page
+ *   - the voice-scenario checklist on the LoRA index page
  *   - the clinical rationale + invariant reminders rendered alongside
+ *
+ * "Voice not coverage" — see docs/model-training.md §1. The doctor's
+ * job is to demonstrate clinical *postures*, not enumerate every input
+ * combination. Synthetix expands the seed set across stack axes.
  */
 
 import { z } from "zod";
@@ -34,6 +38,7 @@ import {
   WAVE_TRENDS,
   type LoRAId,
   type LoraFormSpec,
+  type VoiceScenario,
 } from "./types";
 
 const INTAKE_INPUT_FIELDS = [
@@ -103,23 +108,79 @@ const intakeInputSchema = z.object({
   localeTimeOfDay: z.enum(TIME_OF_DAY),
 });
 
-const STACK_AXES_BY_MAT_AND_STATUS = {
-  rowKey: "matType",
-  rowLabel: "MAT",
-  rowOptions: MAT_TYPES,
-  colKey: "medicationStatus",
-  colLabel: "Med status",
-  colOptions: MEDICATION_STATUSES,
-} as const;
+// ---------------------------------------------------------------------------
+// Voice-scenario helpers
+// ---------------------------------------------------------------------------
+
+const num = (input: Record<string, unknown>, key: string): number | null => {
+  const value = input[key];
+  if (typeof value === "number") return value;
+  if (typeof value === "string" && value.trim() !== "") {
+    const parsed = Number.parseFloat(value);
+    return Number.isFinite(parsed) ? parsed : null;
+  }
+  return null;
+};
+
+const str = (input: Record<string, unknown>, key: string): string | null => {
+  const value = input[key];
+  return typeof value === "string" ? value : null;
+};
+
+const bool = (input: Record<string, unknown>, key: string): boolean => {
+  return Boolean(input[key]);
+};
+
+// ---------------------------------------------------------------------------
+// LoRA: med-ack
+// ---------------------------------------------------------------------------
+
+const medAckScenarios: readonly VoiceScenario[] = [
+  {
+    id: "missed-dose",
+    label: "Missed-dose framing",
+    description:
+      "Acknowledgment when medicationStatus is 'missed' — non-shaming, names the gap, never directive.",
+    match: (i) => str(i, "medicationStatus") === "missed",
+  },
+  {
+    id: "on-time-positive",
+    label: "On-time pharmacology framing",
+    description:
+      "Acknowledgment when medicationStatus is 'on_time' — invokes the medication doing its job without celebrating.",
+    match: (i) => str(i, "medicationStatus") === "on_time",
+  },
+  {
+    id: "no-mat",
+    label: "No-MAT framing",
+    description:
+      "Acknowledgment when matType is 'none' — works without invoking pharmacology.",
+    match: (i) => str(i, "matType") === "none",
+  },
+  {
+    id: "high-intensity",
+    label: "High-intensity acknowledgment (≥ 8)",
+    description:
+      "Tone shift toward extra grounding when intensity is at the top of the scale.",
+    match: (i) => (num(i, "intensity") ?? 0) >= 8,
+  },
+  {
+    id: "low-intensity",
+    label: "Low-intensity acknowledgment (≤ 3)",
+    description:
+      "Lighter touch when intensity is low — don't over-medicalize a small craving.",
+    match: (i) => (num(i, "intensity") ?? 99) <= 3,
+  },
+];
 
 const medAck: LoraFormSpec = {
   loraId: "lora-med-ack",
   title: "lora-med-ack — medication-aware acknowledgment",
   shortTitle: "Med-ack",
   whereUsed:
-    "Session phase 3 — the 1-2 min acknowledgment that runs right after the intake safety screen clears.",
+    "Session phase 3 — the 1–2 min acknowledgment that runs right after the intake safety screen clears.",
   clinicalRationale:
-    "Only LoRA that emits medication-specific factual content tied to an FDA / SAMHSA / MBRP citation. Mixing with any other LoRA would dilute pharmacology accuracy or risk a non-pharmacology surface accidentally emitting a dose directive.",
+    "Only LoRA whose output cites pharmacology. The actual pharmacology paragraph is a lookup (client/lib/clinical/pharmacology.ts), so the fine-tune is teaching the trauma-informed framing around it, not the facts themselves.",
   invariants: [
     "pharmacologyClaim.medication must equal input.matType.",
     "Acknowledgment must never name a substance (no \"opioid\", \"alcohol\", \"fentanyl\", etc.).",
@@ -128,8 +189,8 @@ const medAck: LoraFormSpec = {
     "Trauma-informed and non-shaming, even when medicationStatus is missed.",
   ],
   citationPrompt:
-    "Cite the FDA label, SAMHSA TIP 63 section, or MBRP facilitator chapter the pharmacology claim is drawn from.",
-  targetCount: 30,
+    "The pharmacology paragraph is supplied by the clinical lookup table. Your acknowledgment is the framing around it; cite the same source.",
+  targetCount: 15,
   isStretch: false,
   inputFields: INTAKE_INPUT_FIELDS,
   outputFields: [
@@ -140,13 +201,13 @@ const medAck: LoraFormSpec = {
       multiline: true,
       minLength: 20,
       maxLength: 280,
-      help: "2–3 sentences, second-person, trauma-informed.",
+      help: "2–3 sentences, second-person, trauma-informed. The pharmacology fact is provided to the model from a lookup; you are teaching how to frame it humanely.",
     },
     {
       key: "pharmacologyClaim",
       kind: "object",
       label: "Pharmacology claim",
-      help: "The factual statement the acknowledgment is built on.",
+      help: "Pre-filled from the clinical lookup once you set matType + medicationStatus. Edit only if you genuinely disagree with the canonical text.",
       fields: [
         {
           key: "medication",
@@ -161,8 +222,8 @@ const medAck: LoraFormSpec = {
           label: "Claim",
           multiline: true,
           minLength: 8,
-          maxLength: 240,
-          help: "Short factual statement, e.g. \"Suboxone occupies your mu-opioid receptors for 24-72 hours.\"",
+          maxLength: 320,
+          help: "Auto-filled from client/lib/clinical/pharmacology.ts.",
         },
         {
           key: "citation",
@@ -190,18 +251,56 @@ const medAck: LoraFormSpec = {
     acknowledgment: z.string().min(20).max(280),
     pharmacologyClaim: z.object({
       medication: z.enum(MAT_TYPES),
-      claim: z.string().min(8).max(240),
+      claim: z.string().min(8).max(320),
       citation: z.enum(CITATIONS),
     }),
     crisisSignalDetected: z.boolean(),
     nextPhase: z.literal("body_scan"),
   }),
-  stackAxes: STACK_AXES_BY_MAT_AND_STATUS,
+  voiceScenarios: medAckScenarios,
 };
+
+// ---------------------------------------------------------------------------
+// LoRA: body-scan
+// ---------------------------------------------------------------------------
 
 const bodyScanInputSchema = intakeInputSchema.extend({
   bodyLocation: z.enum(BODY_LOCATIONS),
 });
+
+const bodyScanScenarios: readonly VoiceScenario[] = [
+  {
+    id: "common-location",
+    label: "Common location (chest/jaw)",
+    description: "Body scan when the patient taps a common somatic site.",
+    match: (i) => {
+      const loc = str(i, "bodyLocation");
+      return loc === "chest" || loc === "jaw";
+    },
+  },
+  {
+    id: "uncommon-location",
+    label: "Uncommon location (legs/stomach)",
+    description: "Body scan when the patient taps a less-typical region.",
+    match: (i) => {
+      const loc = str(i, "bodyLocation");
+      return loc === "legs" || loc === "stomach";
+    },
+  },
+  {
+    id: "absent-sensation",
+    label: "Absent / unsure sensation",
+    description:
+      "Body scan when the patient picks 'other' — the model must normalize not knowing where the craving sits.",
+    match: (i) => str(i, "bodyLocation") === "other",
+  },
+  {
+    id: "high-intensity-scan",
+    label: "High-intensity scan (≥ 8)",
+    description: "Firmer grounding tone when the craving is at the top.",
+    match: (i) => (num(i, "intensity") ?? 0) >= 8,
+  },
+];
 
 const bodyScan: LoraFormSpec = {
   loraId: "lora-body-scan",
@@ -217,7 +316,7 @@ const bodyScan: LoraFormSpec = {
     "sensationLabel must come from the closed vocabulary (no free-text sensations).",
     "breathCount is one of 3 / 4 / 5 — never higher.",
   ],
-  targetCount: 30,
+  targetCount: 15,
   isStretch: false,
   inputFields: [
     ...INTAKE_INPUT_FIELDS,
@@ -258,8 +357,12 @@ const bodyScan: LoraFormSpec = {
     breathCount: z.union([z.literal(3), z.literal(4), z.literal(5)]),
     sensationLabel: z.enum(SENSATION_LABELS),
   }),
-  stackAxes: STACK_AXES_BY_MAT_AND_STATUS,
+  voiceScenarios: bodyScanScenarios,
 };
+
+// ---------------------------------------------------------------------------
+// LoRA: wave (rise / peak / fall) — shared shape
+// ---------------------------------------------------------------------------
 
 const waveInputSchema = bodyScanInputSchema.extend({
   phase: z.enum(WAVE_PHASES),
@@ -338,6 +441,32 @@ const waveOutputFields = (
   },
 ];
 
+const waveRiseScenarios: readonly VoiceScenario[] = [
+  {
+    id: "early-rise",
+    label: "Early rise (intensity ≤ 5, climbing)",
+    description: "Low-intensity climb — short, directive build language.",
+    match: (i) =>
+      (num(i, "currentIntensity") ?? 0) <= 5 &&
+      str(i, "intensityTrendLast60s") === "up",
+  },
+  {
+    id: "late-rise",
+    label: "Late rise (intensity ≥ 7, climbing)",
+    description: "Already-high climb where the patient may bail.",
+    match: (i) =>
+      (num(i, "currentIntensity") ?? 0) >= 7 &&
+      str(i, "intensityTrendLast60s") === "up",
+  },
+  {
+    id: "rise-after-missed",
+    label: "Rise after a missed dose",
+    description:
+      "The build framed honestly when the medication gap is part of the picture.",
+    match: (i) => str(i, "medicationStatus") === "missed",
+  },
+];
+
 const waveRise: LoraFormSpec = {
   loraId: "lora-wave-rise",
   title: "lora-wave-rise — rise-phase narration",
@@ -350,7 +479,7 @@ const waveRise: LoraFormSpec = {
     "Never shaming, never names a substance.",
     "Don't describe the wave as falling while it's rising.",
   ],
-  targetCount: 30,
+  targetCount: 15,
   isStretch: false,
   inputFields: waveInputFields("rise"),
   outputFields: waveOutputFields(
@@ -358,8 +487,40 @@ const waveRise: LoraFormSpec = {
   ),
   inputSchema: waveInputSchema,
   outputSchema: waveOutputSchema,
-  stackAxes: STACK_AXES_BY_MAT_AND_STATUS,
+  voiceScenarios: waveRiseScenarios,
 };
+
+const wavePeakScenarios: readonly VoiceScenario[] = [
+  {
+    id: "peak-7-8",
+    label: "Peak at 7–8",
+    description: "High-but-typical peak.",
+    match: (i) => {
+      const v = num(i, "currentIntensity") ?? 0;
+      return v >= 7 && v <= 8;
+    },
+  },
+  {
+    id: "peak-9-10",
+    label: "Peak at 9–10 (highest dropout risk)",
+    description:
+      "Top-of-scale peak. Most clinically sensitive — pure grounding, no celebrating.",
+    match: (i) => (num(i, "currentIntensity") ?? 0) >= 9,
+  },
+  {
+    id: "peak-flat",
+    label: "Peak with trend = flat (stuck)",
+    description:
+      "Patient is parked at the top of the wave; never imply the urge will end soon.",
+    match: (i) => str(i, "intensityTrendLast60s") === "flat",
+  },
+  {
+    id: "peak-after-missed",
+    label: "Peak after a missed dose",
+    description: "Honest framing of a peak that lines up with a medication gap.",
+    match: (i) => str(i, "medicationStatus") === "missed",
+  },
+];
 
 const wavePeak: LoraFormSpec = {
   loraId: "lora-wave-peak",
@@ -374,7 +535,7 @@ const wavePeak: LoraFormSpec = {
     "Never shaming, never names a substance.",
     "Don't promise the urge will end soon — it might not.",
   ],
-  targetCount: 30,
+  targetCount: 15,
   isStretch: false,
   inputFields: waveInputFields("peak"),
   outputFields: waveOutputFields(
@@ -385,8 +546,37 @@ const wavePeak: LoraFormSpec = {
     (output) => output.encouragement !== "celebrating",
     { message: "encouragement must not be 'celebrating' at peak", path: ["encouragement"] },
   ),
-  stackAxes: STACK_AXES_BY_MAT_AND_STATUS,
+  voiceScenarios: wavePeakScenarios,
 };
+
+const waveFallScenarios: readonly VoiceScenario[] = [
+  {
+    id: "modest-drop",
+    label: "Modest drop, trend down",
+    description: "Intensity 4–6 with a downward trend; reserved acknowledgment.",
+    match: (i) => {
+      const v = num(i, "currentIntensity") ?? 0;
+      return v >= 4 && v <= 6 && str(i, "intensityTrendLast60s") === "down";
+    },
+  },
+  {
+    id: "big-drop",
+    label: "Big drop (≤ 3, trend down)",
+    description: "Dropped to the bottom of the scale; modest celebration.",
+    match: (i) =>
+      (num(i, "currentIntensity") ?? 99) <= 3 &&
+      str(i, "intensityTrendLast60s") === "down",
+  },
+  {
+    id: "still-high-not-falling",
+    label: "Still high (≥ 7) and trend not down",
+    description:
+      "Trend-respecting check — the model must NOT frame this as falling.",
+    match: (i) =>
+      (num(i, "currentIntensity") ?? 0) >= 7 &&
+      str(i, "intensityTrendLast60s") !== "down",
+  },
+];
 
 const waveFall: LoraFormSpec = {
   loraId: "lora-wave-fall",
@@ -400,7 +590,7 @@ const waveFall: LoraFormSpec = {
     "Limited celebration is OK; tone stays modest, not triumphant.",
     "Never names a substance.",
   ],
-  targetCount: 30,
+  targetCount: 15,
   isStretch: false,
   inputFields: waveInputFields("fall"),
   outputFields: waveOutputFields(
@@ -408,8 +598,12 @@ const waveFall: LoraFormSpec = {
   ),
   inputSchema: waveInputSchema,
   outputSchema: waveOutputSchema,
-  stackAxes: STACK_AXES_BY_MAT_AND_STATUS,
+  voiceScenarios: waveFallScenarios,
 };
+
+// ---------------------------------------------------------------------------
+// LoRA: reflection
+// ---------------------------------------------------------------------------
 
 const reflectionInputSchema = z.object({
   intakeIntensity: z.number().int().min(1).max(10),
@@ -421,6 +615,50 @@ const reflectionInputSchema = z.object({
   usedSubstanceToday: z.boolean(),
   optionalJournalText: z.string().max(500).optional(),
 });
+
+const reflectionScenarios: readonly VoiceScenario[] = [
+  {
+    id: "big-drop",
+    label: "Big drop (≥ 5 points)",
+    description: "Intake well above ending — celebrate the surf, modestly.",
+    match: (i) => {
+      const start = num(i, "intakeIntensity") ?? 0;
+      const end = num(i, "endingIntensity") ?? 0;
+      return start - end >= 5;
+    },
+  },
+  {
+    id: "minimal-change",
+    label: "Minimal change or stayed flat",
+    description:
+      "Validate the work without inflating a result that didn't happen.",
+    match: (i) => {
+      const start = num(i, "intakeIntensity") ?? 0;
+      const end = num(i, "endingIntensity") ?? 0;
+      return Math.abs(start - end) <= 1;
+    },
+  },
+  {
+    id: "use-day",
+    label: "Use-day reflection (usedSubstanceToday = true)",
+    description:
+      "Patient chose to surf a craving AFTER using; non-shaming, normalize, redirect. The most sensitive scenario.",
+    match: (i) => bool(i, "usedSubstanceToday"),
+  },
+  {
+    id: "first-session",
+    label: "First session (sessionsCount = 1)",
+    description: "Welcome / encouragement framing.",
+    match: (i) => (num(i, "sessionsCount") ?? 0) === 1,
+  },
+  {
+    id: "longitudinal",
+    label: "Longitudinal (sessionsCount ≥ 30)",
+    description:
+      "References the pattern across many sessions, not just this one.",
+    match: (i) => (num(i, "sessionsCount") ?? 0) >= 30,
+  },
+];
 
 const reflection: LoraFormSpec = {
   loraId: "lora-reflection",
@@ -436,7 +674,7 @@ const reflection: LoraFormSpec = {
     "suggestedNextStep is one of the closed vocabulary values.",
     "If optionalJournalText trips the crisis lexical filter, set crisisSignalDetected = true.",
   ],
-  targetCount: 30,
+  targetCount: 15,
   isStretch: false,
   inputFields: [
     {
@@ -547,8 +785,12 @@ const reflection: LoraFormSpec = {
         });
       }
     }),
-  stackAxes: STACK_AXES_BY_MAT_AND_STATUS,
+  voiceScenarios: reflectionScenarios,
 };
+
+// ---------------------------------------------------------------------------
+// LoRA: notification (stretch)
+// ---------------------------------------------------------------------------
 
 const notificationInputSchema = z.object({
   matType: z.enum(MAT_TYPES),
@@ -562,6 +804,27 @@ const notificationInputSchema = z.object({
   ignoredWindowCount: z.number().int().min(0).max(50),
   localeTimeOfDay: z.enum(TIME_OF_DAY),
 });
+
+const notificationScenarios: readonly VoiceScenario[] = [
+  {
+    id: "high-confidence",
+    label: "High-confidence prediction",
+    description: "Direct nudge when the model is sure.",
+    match: (i) => str(i, "windowConfidence") === "high",
+  },
+  {
+    id: "low-confidence",
+    label: "Low-confidence prediction",
+    description: "Hedged language; patient may not be craving yet.",
+    match: (i) => str(i, "windowConfidence") === "low",
+  },
+  {
+    id: "many-ignored",
+    label: "Patient has ignored ≥ 3 recently",
+    description: "Softer, less directive — respect the no.",
+    match: (i) => (num(i, "ignoredWindowCount") ?? 0) >= 3,
+  },
+];
 
 const notification: LoraFormSpec = {
   loraId: "lora-notification",
@@ -577,7 +840,7 @@ const notification: LoraFormSpec = {
     "Never prescribes (no \"take your dose\", \"go to a meeting now\").",
     "When ignoredWindowCount ≥ 3, body must be softer / less directive.",
   ],
-  targetCount: 25,
+  targetCount: 10,
   isStretch: true,
   inputFields: [
     {
@@ -642,8 +905,12 @@ const notification: LoraFormSpec = {
     title: z.string().min(4).max(40),
     body: z.string().min(10).max(120),
   }),
-  stackAxes: STACK_AXES_BY_MAT_AND_STATUS,
+  voiceScenarios: notificationScenarios,
 };
+
+// ---------------------------------------------------------------------------
+// LoRA: insights (stretch)
+// ---------------------------------------------------------------------------
 
 const insightsInputSchema = z.object({
   matType: z.enum(MAT_TYPES),
@@ -660,6 +927,27 @@ const insightsInputSchema = z.object({
     ),
 });
 
+const insightsScenarios: readonly VoiceScenario[] = [
+  {
+    id: "strong-medication-correlation",
+    label: "Strong medication correlation (delta ≥ 1.5)",
+    description: "Big difference on med-days vs non-med-days.",
+    match: (i) => (num(i, "medicationDayDelta") ?? 0) >= 1.5,
+  },
+  {
+    id: "weak-data",
+    label: "Weak data (≤ 2 weeks)",
+    description: "Honest, low-confidence statement when data is thin.",
+    match: (i) => (num(i, "weeksObserved") ?? 99) <= 2,
+  },
+  {
+    id: "no-correlation",
+    label: "No correlation (|delta| < 0.5)",
+    description: "Statement when medication isn't the dominant variable.",
+    match: (i) => Math.abs(num(i, "medicationDayDelta") ?? 0) < 0.5,
+  },
+];
+
 const insights: LoraFormSpec = {
   loraId: "lora-insights",
   title: "lora-insights — weekly pattern summary (stretch)",
@@ -673,7 +961,7 @@ const insights: LoraFormSpec = {
     "Never tells the patient to start, stop, or change a medication.",
     "Confidence levels are honest — \"high\" only with weeks of data.",
   ],
-  targetCount: 20,
+  targetCount: 10,
   isStretch: true,
   inputFields: [
     { key: "matType", kind: "enum", label: "MAT type", options: MAT_TYPES },
@@ -754,15 +1042,12 @@ const insights: LoraFormSpec = {
     confidence: z.enum(INSIGHT_CONFIDENCE),
     actionableSuggestion: z.string().min(20).max(280),
   }),
-  stackAxes: {
-    rowKey: "matType",
-    rowLabel: "MAT",
-    rowOptions: MAT_TYPES,
-    colKey: "topTrigger",
-    colLabel: "Top trigger",
-    colOptions: TRIGGER_CATEGORIES,
-  },
+  voiceScenarios: insightsScenarios,
 };
+
+// ---------------------------------------------------------------------------
+// Export
+// ---------------------------------------------------------------------------
 
 export const LORA_SPECS: Record<LoRAId, LoraFormSpec> = {
   "lora-med-ack": medAck,

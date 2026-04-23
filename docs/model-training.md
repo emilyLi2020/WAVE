@@ -25,14 +25,34 @@ We also want WAVE to run on-device with zero LLM network calls. That
 constrains us to a small base model (Gemma 4 E2B) and forces real
 specialization to live in LoRA adapters, not in the base weights.
 
-From those two observations the pipeline falls out:
+A third constraint: **the clinician's time is the bottleneck.** A
+non-technical clinical partner can realistically hand-write ~10–15
+high-quality examples per LoRA. So the pipeline has to treat the seed
+set as a **voice template**, not as coverage — the clinician shows
+the generator how to *speak*, and the generator handles enumeration
+across (matType × medicationStatus × trigger × intensity × time-of-day).
 
-1. A **clinician writes a small seed set** of good examples per LoRA. The
-   seed set exists to show the generator what "good" looks like — it is
-   not meant to cover the whole stack of clinical situations.
+A fourth: **pharmacology facts are facts, not training signal.** The
+half-life of buprenorphine is the half-life of buprenorphine. We
+should not teach that to the model via fine-tuning; we should give it
+to the model as data. The canonical pharmacology paragraphs live in
+[`client/lib/clinical/pharmacology.ts`](../client/lib/clinical/pharmacology.ts)
+keyed by `(matType, medicationStatus)`, are FDA / SAMHSA cited, and
+are injected into the runtime prompt as a slot. The med-ack LoRA is
+fine-tuned on the *framing around the slot*, not on the slot's
+contents.
+
+From those four observations the pipeline falls out:
+
+1. A **clinician writes a small voice-template seed set** per LoRA.
+   The seed set exists to show the generator what "good" *sounds like*
+   — covering each clinical voice (missed-dose framing, peak at 9–10,
+   use-day reflection, etc.) at least once. It is **not** meant to
+   cover every input combination; the generator handles that.
 2. A **larger Gemma** (only ever on the developer workstation, never
    shipped) expands the seed set into a few hundred synthetic examples
-   per LoRA, sampled across the stack axes the LoRA cares about.
+   per LoRA, sampled uniformly across the stack axes the LoRA cares
+   about.
 3. A **clinician spot-checks** a sample of the generated examples in a
    small review UI and leaves free-text feedback on anything wrong.
 4. If anything was flagged, we **regenerate** with the feedback folded
@@ -58,11 +78,20 @@ before release.
 
 Per LoRA, before any generation happens:
 
-1. **A small human-written seed set.** 15–40 structured (input → JSON
-   output) examples per LoRA, hand-written by a clinician or a
-   domain-informed developer. Committed as typed TypeScript under
+1. **A small human-written voice-template seed set.** Targets are
+   **~15 examples for MVP LoRAs and ~10 for stretch LoRAs**,
+   hand-written by a clinician or a domain-informed developer.
+   Committed as typed TypeScript under
    `client/synthetix/seeds/<lora-id>.ts` so the seed set is reviewable
    in a normal code review.
+
+   The clinician collects these through the dev-only UI at
+   `/training/<lora-id>` (gated by `NEXT_PUBLIC_TRAINING_ENABLED`).
+   That page lists each LoRA's **voice scenarios** — clinical
+   situations where the model needs to behave differently (missed-dose
+   framing, peak at 9–10, use-day reflection, etc.) — and shows a
+   checklist of which voices have at least one ready example. The
+   clinician's job is to cover the voices, not the input grid.
 
 2. **The LoRA's Zod schemas** from `models.md` (one schema for the
    input, one for the output). These are already defined per LoRA and
@@ -72,8 +101,9 @@ Per LoRA, before any generation happens:
    samples from — e.g. for `lora-med-ack`, the axes are `matType`,
    `medicationStatus`, `trigger`, `intensityBucket`, `timeOfDay`. The
    stack axes live under `client/synthetix/stacks/<lora-id>.ts`. They
-   do **not** need to be enumerated exhaustively; they are just the
-   bag the generator samples inputs from.
+   do **not** need to be enumerated exhaustively in the seed set; they
+   are just the bag the generator samples inputs from when it expands
+   the seeds into the full synthetic dataset.
 
 4. **The LoRA's hard safety invariants.** Copied verbatim from the
    corresponding section of `models.md` into
@@ -86,7 +116,17 @@ Per LoRA, before any generation happens:
    lexicon, the substance-name blocklist, and the pharmacology-directive
    allow-list from `AGENTS.md > Domain Constraints`.
 
-6. **The reference clinical sources.** Seed material the generator is
+6. **The pharmacology lookup table.** One file, not per-LoRA:
+   [`client/lib/clinical/pharmacology.ts`](../client/lib/clinical/pharmacology.ts).
+   Holds canonical FDA / SAMHSA-cited pharmacology paragraphs keyed by
+   `(matType, medicationStatus)`. The runtime injects the matching
+   paragraph into the med-ack prompt as a slot, and the `/training`
+   UI's pharmacology helper auto-fills the seed's `pharmacologyClaim`
+   field from the same lookup. **This is data, not training signal.**
+   The med-ack LoRA learns the trauma-informed framing around the
+   slot; it does not learn pharmacology.
+
+7. **The reference clinical sources.** Seed material the generator is
    allowed to draw on: MBRP facilitator guide excerpts, SAMHSA TIP 63
    paragraphs, FDA MAT labels (Suboxone, Naltrexone, Vivitrol,
    Methadone), and MI transcripts. Stored as plain text under
@@ -417,7 +457,8 @@ client/synthetix/
 ├── corpus/                     # reference clinical sources (MBRP, SAMHSA,
 │                               # FDA labels, MI transcripts) with provenance
 ├── seeds/
-│   └── <lora-id>.ts            # typed seed set, 15–40 examples per LoRA
+│   └── <lora-id>.ts            # typed voice-template seed set,
+│                               # ~15 examples per MVP LoRA, ~10 per stretch
 ├── stacks/
 │   └── <lora-id>.ts            # the stack axes the generator samples from
 ├── invariants/
@@ -482,6 +523,12 @@ client/app/synthetix-review/   # local-only Next.js UI for §3 spot-check
   The eval harness in §7 is what we hold adapters to.
 - **Any fine-tune for crisis triage.** See `models.md > Not
   fine-tuned — base model only`. This is deliberate and permanent.
+- **Fine-tune for pharmacology facts.** Half-lives, receptor occupancy
+  windows, and similar pharmacokinetic claims are loaded from the
+  pharmacology lookup table (§1.6) and injected into the prompt as a
+  slot. Teaching the model to memorize them via fine-tuning is a worse
+  contract — facts can change (FDA label updates), and the lookup is
+  trivially auditable while the weights are not.
 
 ---
 

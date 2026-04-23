@@ -1,16 +1,17 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { toClientSpec } from "@/lib/training/client-spec";
 import { assertTrainingEnabled } from "@/lib/training/guard";
 import { getSpec, isLoraId } from "@/lib/training/lora-specs";
 import {
-  computeStackCoverage,
+  computeVoiceCoverage,
   listSeedsForLora,
 } from "@/lib/training/storage";
 import type { SeedStatus } from "@/lib/training/types";
 
-import { CoverageGrid } from "./coverage-grid";
 import { SeedActions } from "./seed-actions";
+import { VoiceChecklist } from "./voice-checklist";
 
 export const dynamic = "force-dynamic";
 
@@ -36,14 +37,9 @@ export default async function LoraIndexPage({ params }: PageProps) {
   if (!isLoraId(loraId)) notFound();
 
   const spec = getSpec(loraId);
+  const clientSpec = toClientSpec(spec);
   const seeds = await listSeedsForLora(loraId);
-  const coverage = computeStackCoverage(
-    seeds,
-    spec.stackAxes.rowKey,
-    spec.stackAxes.colKey,
-    spec.stackAxes.rowOptions,
-    spec.stackAxes.colOptions,
-  );
+  const coverage = computeVoiceCoverage(seeds, spec.voiceScenarios);
 
   const ready = seeds.filter((s) => s.status !== "draft").length;
   const draft = seeds.length - ready;
@@ -51,6 +47,11 @@ export default async function LoraIndexPage({ params }: PageProps) {
   // Pick a representative output field to preview in the seed list.
   const previewField = spec.outputFields.find((f) => f.kind === "text") ??
     spec.outputFields[0];
+
+  // Pick up to two enum input fields to chip-render alongside each seed.
+  const chipFields = spec.inputFields
+    .filter((f) => f.kind === "enum")
+    .slice(0, 2);
 
   return (
     <div className="space-y-8">
@@ -97,7 +98,10 @@ export default async function LoraIndexPage({ params }: PageProps) {
         </div>
       </div>
 
-      <CoverageGrid axes={spec.stackAxes} coverage={coverage} />
+      <VoiceChecklist
+        scenarios={clientSpec.voiceScenarios}
+        coverage={coverage}
+      />
 
       <section>
         <div className="flex items-baseline justify-between">
@@ -119,8 +123,9 @@ export default async function LoraIndexPage({ params }: PageProps) {
               const previewValue = previewField
                 ? seed.output[previewField.key]
                 : undefined;
-              const rowAxis = seed.input[spec.stackAxes.rowKey];
-              const colAxis = seed.input[spec.stackAxes.colKey];
+              const chipValues = chipFields
+                .map((field) => seed.input[field.key])
+                .filter((value): value is string => typeof value === "string");
               return (
                 <li key={seed.id} className="p-4 hover:bg-surface-muted/40">
                   <div className="flex items-start justify-between gap-4 flex-wrap">
@@ -131,16 +136,15 @@ export default async function LoraIndexPage({ params }: PageProps) {
                         >
                           {seed.status}
                         </span>
-                        {typeof rowAxis === "string" ? (
-                          <span className="text-foreground/55">
-                            {rowAxis}
+                        {chipValues.map((value, idx) => (
+                          <span
+                            key={`${value}-${idx}`}
+                            className="text-foreground/55"
+                          >
+                            {idx === 0 ? "" : "· "}
+                            {value}
                           </span>
-                        ) : null}
-                        {typeof colAxis === "string" ? (
-                          <span className="text-foreground/55">
-                            · {colAxis}
-                          </span>
-                        ) : null}
+                        ))}
                         {seed.authorInitials ? (
                           <span className="text-foreground/55">
                             · by {seed.authorInitials}

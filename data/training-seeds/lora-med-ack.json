@@ -1,0 +1,28 @@
+[
+  {
+    "id": "f9408889-6b76-43f1-b201-c6331553c273",
+    "loraId": "lora-med-ack",
+    "input": {
+      "intensity": 1,
+      "matType": "buprenorphine",
+      "medicationStatus": "on_time",
+      "trigger": "social",
+      "localeTimeOfDay": "morning"
+    },
+    "output": {
+      "acknowledgment": "",
+      "pharmacologyClaim": {
+        "medication": "buprenorphine",
+        "claim": "Your buprenorphine is on board. It is occupying your mu-opioid receptors right now and will keep doing so for roughly the next 24 to 72 hours, which is why what you are feeling at this intensity would be sharper without it.",
+        "citation": "FDA_LABEL"
+      },
+      "crisisSignalDetected": false,
+      "nextPhase": "body_scan"
+    },
+    "authorInitials": null,
+    "notes": null,
+    "status": "draft",
+    "createdAt": "2026-04-22T01:40:51.237Z",
+    "updatedAt": "2026-04-22T01:40:51.237Z"
+  }
+]

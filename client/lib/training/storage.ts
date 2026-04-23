@@ -266,32 +266,41 @@ export async function countSeedsByLora(): Promise<Record<LoRAId, SeedCounts>> {
 }
 
 /**
- * Cell-by-cell coverage on the LoRA's stack axes (e.g. matType ×
- * medicationStatus). The page renders this as a heatmap so the doctor
- * can see which strata are under-represented.
+ * Per-voice-scenario coverage. The /training UI renders this as a
+ * checklist on each LoRA's index page. Drafts don't count toward
+ * coverage so a half-written example can't make a scenario look
+ * "covered" before it's actually ready.
+ *
+ * See docs/model-training.md §1 — the doctor's job is to demonstrate
+ * each clinical voice at least once. Synthetix expands across the
+ * input grid afterwards.
  */
-export type StackCoverage = Record<string, Record<string, number>>;
+import type { VoiceScenario } from "./types";
 
-export function computeStackCoverage(
+export interface VoiceCoverage {
+  scenarioId: string;
+  count: number; // number of ready/approved seeds whose input matches
+  totalIncludingDrafts: number;
+}
+
+export function computeVoiceCoverage(
   seeds: readonly TrainingSeed[],
-  rowKey: string,
-  colKey: string,
-  rowOptions: readonly string[],
-  colOptions: readonly string[],
-): StackCoverage {
-  const grid: StackCoverage = {};
-  for (const r of rowOptions) {
-    grid[r] = {};
-    for (const c of colOptions) grid[r][c] = 0;
-  }
-  for (const seed of seeds) {
-    const r = seed.input[rowKey];
-    const c = seed.input[colKey];
-    if (typeof r === "string" && typeof c === "string" && grid[r] && c in grid[r]) {
-      grid[r][c] += 1;
+  scenarios: readonly VoiceScenario[],
+): VoiceCoverage[] {
+  return scenarios.map((scenario) => {
+    let count = 0;
+    let total = 0;
+    for (const seed of seeds) {
+      if (!scenario.match(seed.input)) continue;
+      total += 1;
+      if (seed.status !== "draft") count += 1;
     }
-  }
-  return grid;
+    return {
+      scenarioId: scenario.id,
+      count,
+      totalIncludingDrafts: total,
+    };
+  });
 }
 
 /**

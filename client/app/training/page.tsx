@@ -59,12 +59,21 @@ export default async function TrainingOverviewPage() {
             drafts are safe scratch space.
           </li>
           <li>
-            Aim to spread examples across the coverage grid on each
-            LoRA&apos;s page — different medications, different missed
-            doses, different triggers. A strong dataset has a few examples
-            in every cell.
+            <strong>Cover the voices, not every cell.</strong> Each LoRA
+            page lists a small set of <em>voice scenarios</em> — clinical
+            situations where the model needs to behave differently
+            (missed-dose framing, peak at 9–10, use-day reflection, etc.).
+            Aim for at least one ready example per scenario. Don&apos;t
+            try to enumerate every medication × status × trigger
+            combination — our Synthetix pipeline expands across that grid
+            automatically using your seeds as the voice template.
           </li>
         </ol>
+        <p className="mt-4 text-xs text-foreground/55">
+          Target: ~15 examples per MVP LoRA (~10 for stretch). The
+          checklist on each LoRA page tells you which voices you have
+          covered and which are still missing.
+        </p>
       </div>
 
       <div>
