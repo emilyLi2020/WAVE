@@ -231,6 +231,17 @@ function isAffirmativeReply(text: string): boolean {
   return false;
 }
 
+function isReadinessQuestion(text: string): boolean {
+  const normalized = text.toLowerCase();
+  return (
+    normalized.includes("ready to continue") ||
+    normalized.includes("ready to keep going") ||
+    normalized.includes("willing to try") ||
+    normalized.includes("before we continue") ||
+    normalized.includes("before continuing")
+  );
+}
+
 function safeParseToolArgs(raw: string): EndConversationArgs | null {
   try {
     const parsed = JSON.parse(raw) as Record<string, unknown>;
@@ -338,11 +349,19 @@ export async function POST(request: Request) {
   const lastPatient = [...req.history]
     .reverse()
     .find((turn) => turn.role === "patient");
-  const forceEndConversation =
-    toolCallAllowed &&
-    !req.context.demoMode &&
+  const lastAgent = [...req.history]
+    .reverse()
+    .find((turn) => turn.role === "agent");
+  const lastAgentAskedReadiness =
+    lastAgent !== undefined && isReadinessQuestion(lastAgent.content);
+  const readinessConfirmed =
     lastPatient !== undefined &&
-    isAffirmativeReply(lastPatient.content);
+    isAffirmativeReply(lastPatient.content) &&
+    lastAgentAskedReadiness;
+  const forceEndConversation =
+    (toolCallAllowed || readinessConfirmed) &&
+    !req.context.demoMode &&
+    readinessConfirmed;
 
   let client: OpenAI;
   try {
@@ -440,7 +459,7 @@ export async function POST(request: Request) {
             const argsText =
               toolArgBuffer.get(itemId) ?? event.arguments ?? "";
             const parsedArgs = safeParseToolArgs(argsText);
-            if (parsedArgs && toolCallAllowed) {
+            if (parsedArgs && (toolCallAllowed || readinessConfirmed)) {
               emittedEndConversation = true;
               controller.enqueue(
                 encoder.encode(

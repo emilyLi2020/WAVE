@@ -307,6 +307,15 @@ export function CheckInChat({
     applyTurns(newTurns);
     setComposerText("");
 
+    if (isAffirmative(trimmed) && lastAgentAskedReadiness(turns)) {
+      const readinessSignal: EndConversationSignal = {
+        cravingScore,
+        obstacleCategory: null,
+      };
+      finalizeCheckIn(newTurns, cravingScore, readinessSignal);
+      return;
+    }
+
     const llmHistory: CheckInChatTurnPayload[] = newTurns.map((t) => ({
       role: t.role,
       content: t.content,
@@ -397,6 +406,19 @@ export function CheckInChat({
         )}
       </div>
     </div>
+  );
+}
+
+function lastAgentAskedReadiness(turns: readonly InternalTurn[]): boolean {
+  const lastAgent = [...turns].reverse().find((turn) => turn.role === "agent");
+  if (!lastAgent) return false;
+  const normalized = lastAgent.content.toLowerCase();
+  return (
+    normalized.includes("ready to continue") ||
+    normalized.includes("ready to keep going") ||
+    normalized.includes("willing to try") ||
+    normalized.includes("before we continue") ||
+    normalized.includes("before continuing")
   );
 }
 
