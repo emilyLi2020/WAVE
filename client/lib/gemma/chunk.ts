@@ -1,10 +1,9 @@
 /**
  * Chunk-generation client boundary.
  *
- * Mirrors `generateJSON()` in client/lib/gemma/session.ts: POSTs to
- * `/api/chunk`, validates the response with Zod, retries once on
- * stream/Zod failure, and falls through to `fallbackChunk()` after
- * the second failure (PRD § Session Runtime Requirements rule 7).
+ * Returns pre-generated chunk narration from the local scripted bank.
+ * This keeps the instruction segments fast and predictable during a
+ * live session, and avoids runtime model punctuation artifacts.
  *
  * The route returns plain `{ lines: string[] }`. This boundary
  * additionally wraps the lines as a runtime `Chunk` (text segments
@@ -18,15 +17,12 @@
  */
 
 import {
-  chunkLinesSchema,
   CHUNK_LINE_COUNT,
   type ChunkGenerationContextPayload,
   type ChunkLinesPayload,
 } from "@/lib/prompts/schemas";
 import { fallbackChunk } from "@/lib/prompts/fallback-bank";
 import type { Chunk, ChunkNumber, Segment } from "@/types/session";
-
-const MAX_MODEL_ATTEMPTS = 2;
 
 /**
  * Default pause length (seconds) inserted between consecutive text
@@ -60,53 +56,6 @@ export interface GenerateChunkResult {
 export async function generateChunk(
   options: GenerateChunkOptions,
 ): Promise<GenerateChunkResult> {
-  let attempts = 0;
-  let lastError: unknown = null;
-
-  while (attempts < MAX_MODEL_ATTEMPTS) {
-    attempts += 1;
-    try {
-      const response = await fetch("/api/chunk", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        signal: options.signal,
-        body: JSON.stringify({ context: options.context }),
-      });
-
-      if (!response.ok) {
-        lastError = new Error(`chunk route returned ${response.status}`);
-        continue;
-      }
-
-      const json: unknown = await response.json();
-      const parsed = chunkLinesSchema.safeParse(json);
-      if (!parsed.success) {
-        lastError = parsed.error;
-        continue;
-      }
-
-      const lines = sanitizeChunkLines(parsed.data.lines);
-      return {
-        chunk: chunkFromLines(options.context.chunkNumber, lines),
-        lines,
-        source: "model",
-        attempts,
-      };
-    } catch (err) {
-      if (err instanceof DOMException && err.name === "AbortError") {
-        throw err;
-      }
-      lastError = err;
-    }
-  }
-
-  if (typeof console !== "undefined") {
-    console.warn(
-      `[wave] generateChunk falling back for chunk=${options.context.chunkNumber} after ${attempts} attempts`,
-      lastError,
-    );
-  }
-
   const fallback: ChunkLinesPayload = fallbackChunk(
     options.context.chunkNumber,
   );
@@ -115,7 +64,7 @@ export async function generateChunk(
     chunk: chunkFromLines(options.context.chunkNumber, fallbackLines),
     lines: fallbackLines,
     source: "fallback",
-    attempts,
+    attempts: 0,
   };
 }
 
@@ -124,6 +73,7 @@ function sanitizeChunkLines(lines: readonly string[]): string[] {
     line
       .replace(/\]\s*\[/g, " ")
       .replace(/[\[\]]/g, "")
+      .replace(/[–—]/g, ",")
       .replace(/\s+([,.;:?])/g, "$1")
       .replace(/\s+/g, " ")
       .trim(),

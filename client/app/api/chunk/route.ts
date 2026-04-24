@@ -145,6 +145,7 @@ function sanitizeChunkLines(lines: readonly string[]): string[] {
     line
       .replace(/\]\s*\[/g, " ")
       .replace(/[\[\]]/g, "")
+      .replace(/[–—]/g, ",")
       .replace(/\s+([,.;:?])/g, "$1")
       .replace(/\s+/g, " ")
       .trim(),

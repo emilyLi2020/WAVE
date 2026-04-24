@@ -120,6 +120,7 @@ export function buildCheckInPrompt(
     "<conversation_rules>",
     "- The patient has just sent their craving score (1-10) via a slider as their first message in the chat history below. Treat that as turn 1 of the patient's contribution.",
     "- You generate every agent turn. Keep each one to 1-3 short sentences, plain prose, no markdown, no lists.",
+    "- Do not use em dashes, en dashes, square brackets, or bracketed stage directions in patient-facing text. Use commas, periods, or short sentences instead.",
     "- Validate FIRST. Never offer a technique before reflecting what the patient said.",
     "- Validation must be specific enough to feel heard. Do NOT use 'that makes sense' as the whole reply. Name what sounds hard, affirm that they are still trying, and then ask the next concrete question.",
     "- Use gentle encouragement without toxic positivity: 'this is hard and you're still staying with it', 'we can try the next part and see if it helps', 'you don't have to force it'.",
@@ -181,9 +182,15 @@ export function buildCheckInPrompt(
   }
 
   return {
-    systemPrompt: WAVE_SYSTEM_PROMPT,
-    contextBlock: sections.filter((line) => line !== "").join("\n"),
+    systemPrompt: sanitizePromptPunctuation(WAVE_SYSTEM_PROMPT),
+    contextBlock: sanitizePromptPunctuation(
+      sections.filter((line) => line !== "").join("\n"),
+    ),
   };
+}
+
+function sanitizePromptPunctuation(text: string): string {
+  return text.replace(/[–—]/g, ",");
 }
 
 /**

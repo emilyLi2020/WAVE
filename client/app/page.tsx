@@ -4,7 +4,7 @@ const features = [
   {
     title: "Three-tap intake",
     description:
-      "Intensity, medication status, trigger. No typing required to start a session — meet the craving in 30 seconds.",
+      "Intensity, medication status, trigger. No typing required to start a session, meet the craving in 30 seconds.",
   },
   {
     title: "Medication-aware acknowledgment",
@@ -14,7 +14,7 @@ const features = [
   {
     title: "Ride the wave",
     description:
-      "An animated wave with adaptive narration for the rise, peak, and fall — plus a live slider so you can feel the drop.",
+      "An animated wave with adaptive narration for the rise, peak, and fall, plus a live slider so you can feel the drop.",
   },
   {
     title: "Your data, shown back to you",
@@ -24,7 +24,7 @@ const features = [
   {
     title: "Prophylactic notifications",
     description:
-      "Your history predicts your high-risk windows. WAVE pings you fifteen minutes before, while you still have agency.",
+      "Your history predicts your high-risk windows. WAVE pings you 15 minutes before, while you still have agency.",
   },
   {
     title: "Offline-first and private",
@@ -167,34 +167,40 @@ export default function LandingPage() {
 function HomeWaveBackground() {
   return (
     <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
-      <div className="absolute inset-x-[-20%] top-10 h-80 opacity-50 blur-3xl">
-        <div className="h-full rounded-full bg-accent-soft" />
+      <div className="absolute inset-x-[-20%] top-0 h-[34rem] opacity-70 blur-3xl">
+        <div className="h-full rounded-full bg-gradient-to-r from-wave-fall/40 via-accent-soft to-wave-rise/40" />
       </div>
-      <DecorativeWave
-        className="absolute left-1/2 top-16 w-[1200px] -translate-x-1/2 text-wave-fall opacity-20"
+      <div className="absolute inset-x-0 bottom-0 h-[48%] bg-gradient-to-t from-wave-peak/30 via-wave-rise/14 to-transparent" />
+      <OceanLayer
+        className="absolute left-1/2 bottom-[-2rem] w-[1800px] -translate-x-1/2 text-wave-peak opacity-35"
+        durationSec={36}
+        heightClassName="h-72"
+      />
+      <OceanLayer
+        className="absolute left-1/2 bottom-12 w-[1600px] -translate-x-1/2 text-wave-rise opacity-25"
         durationSec={28}
+        heightClassName="h-60"
       />
-      <DecorativeWave
-        className="absolute left-1/2 top-36 w-[1400px] -translate-x-1/2 text-wave-rise opacity-25"
-        durationSec={22}
-      />
-      <DecorativeWave
-        className="absolute left-1/2 bottom-0 w-[1500px] -translate-x-1/2 text-wave-peak opacity-20"
-        durationSec={34}
+      <OceanLayer
+        className="absolute left-1/2 bottom-28 w-[1400px] -translate-x-1/2 text-wave-fall opacity-20 blur-[1px]"
+        durationSec={44}
+        heightClassName="h-48"
       />
     </div>
   );
 }
 
-function DecorativeWave({
+function OceanLayer({
   className,
   durationSec,
+  heightClassName,
 }: {
   className: string;
   durationSec: number;
+  heightClassName: string;
 }) {
   return (
-    <div className={className}>
+    <div className={`${className} overflow-hidden`}>
       <div
         className="flex"
         style={{
@@ -202,23 +208,28 @@ function DecorativeWave({
           animation: `wave-slide ${durationSec}s linear infinite`,
         }}
       >
-        <WaveSvg />
-        <WaveSvg />
+        <OceanSvg heightClassName={heightClassName} />
+        <OceanSvg heightClassName={heightClassName} />
       </div>
     </div>
   );
 }
 
-function WaveSvg() {
+function OceanSvg({ heightClassName }: { heightClassName: string }) {
   return (
     <svg
-      className="h-52 w-1/2 flex-none"
-      viewBox="0 0 800 160"
+      className={`${heightClassName} w-1/2 flex-none`}
+      viewBox="0 0 900 260"
       preserveAspectRatio="none"
     >
       <path
-        d="M0 80 C50 30 150 30 200 80 C250 130 350 130 400 80 C450 30 550 30 600 80 C650 130 750 130 800 80 V160 H0 Z"
+        d="M0 96 C75 28 150 28 225 96 C300 164 375 164 450 96 C525 28 600 28 675 96 C750 164 825 164 900 96 V260 H0 Z"
         fill="currentColor"
+      />
+      <path
+        d="M0 128 C75 72 150 72 225 128 C300 184 375 184 450 128 C525 72 600 72 675 128 C750 184 825 184 900 128 V260 H0 Z"
+        fill="currentColor"
+        opacity="0.45"
       />
     </svg>
   );

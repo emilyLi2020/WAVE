@@ -189,7 +189,14 @@ Requirements:
 - The first line is the opener for this chunk; the last line is the closer that hands off to the upcoming check-in without announcing it.
 </task>`;
 
-  return { systemPrompt, userPrompt };
+  return {
+    systemPrompt: sanitizePromptPunctuation(systemPrompt),
+    userPrompt: sanitizePromptPunctuation(userPrompt),
+  };
+}
+
+function sanitizePromptPunctuation(text: string): string {
+  return text.replace(/[–—]/g, ",");
 }
 
 function renderIntakeBlock(

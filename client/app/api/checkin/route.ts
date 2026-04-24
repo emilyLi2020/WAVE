@@ -75,6 +75,15 @@ function sseFrame(event: string, data: unknown): string {
   return `event: ${event}\ndata: ${JSON.stringify(data)}\n\n`;
 }
 
+function sanitizePatientFacingText(text: string): string {
+  return text
+    .replace(/\]\s*\[/g, " ")
+    .replace(/[\[\]]/g, "")
+    .replace(/[–—]/g, ",")
+    .replace(/\s+([,.;:?])/g, "$1")
+    .replace(/\s+/g, " ");
+}
+
 type ResponseInputItem =
   | { role: "system"; content: string }
   | { role: "user"; content: string }
@@ -439,12 +448,15 @@ export async function POST(request: Request) {
 
         for await (const event of events) {
           if (event.type === "response.output_text.delta") {
-            aggregated += event.delta;
+            const safeDelta = sanitizePatientFacingText(event.delta);
+            aggregated += safeDelta;
             controller.enqueue(
-              encoder.encode(sseFrame("delta", { text: event.delta })),
+              encoder.encode(sseFrame("delta", { text: safeDelta })),
             );
           } else if (event.type === "response.output_text.done") {
-            const finalText = event.text ?? aggregated;
+            const finalText = sanitizePatientFacingText(
+              event.text ?? aggregated,
+            );
             aggregated = finalText;
           } else if (
             event.type === "response.function_call_arguments.delta"

@@ -146,13 +146,24 @@ export async function streamCheckInTurn(
     options.history,
     options.context.scoreHistory,
   );
-  options.onDelta?.(fallback.text);
+  const fallbackText = sanitizeCheckInText(fallback.text);
+  options.onDelta?.(fallbackText);
   return {
-    text: fallback.text,
+    text: fallbackText,
     source: "fallback",
     attempts,
     endConversation: null,
   };
+}
+
+function sanitizeCheckInText(text: string): string {
+  return text
+    .replace(/\]\s*\[/g, " ")
+    .replace(/[\[\]]/g, "")
+    .replace(/[–—]/g, ",")
+    .replace(/\s+([,.;:?])/g, "$1")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 // ---------------------------------------------------------------------------
