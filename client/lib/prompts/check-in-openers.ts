@@ -47,25 +47,29 @@ export const CHECK_IN_OPENERS: Record<ChunkNumber, CheckInOpeners> = {
       "Before we go deeper — on a scale of 1 to 10, how intense is the craving or urge right now?",
     turn2:
       "How are you feeling right now — emotionally, in your body? Anything that stands out?",
-    turn5: "Ready to continue into the body scan?",
+    turn5:
+      "Ready to continue with the next part, the body scan, and see if it helps?",
   },
   2: {
     turn1: "Craving score right now, 1 to 10?",
     turn2:
       "[score reflection] Were you able to locate where the urge lives in your body?",
-    turn5: "Ready to continue into the sound anchor?",
+    turn5:
+      "Ready to continue with the next part, the sound anchor, and see if it helps?",
   },
   3: {
     turn1: "How intense is the craving now, 1 to 10?",
     turn2:
       "[score reflection] Could you hold onto the sound of water, or was it hard to stay with?",
-    turn5: "Ready to move into the breathing?",
+    turn5:
+      "Ready to continue with the next part, the breathing, and see if it helps?",
   },
   4: {
     turn1: "Craving score, 1 to 10?",
     turn2:
       "[score reflection] How did the breathing feel — were you able to follow your own count, or did something get in the way?",
-    turn5: "Ready for the closing reflection?",
+    turn5:
+      "Ready to continue with the next part, the closing reflection, and see if it helps?",
   },
   5: {
     turn1: "Last check-in — craving score 1 to 10?",

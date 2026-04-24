@@ -296,7 +296,7 @@ function ensureQuestionForOpenTurn(text: string, req: CheckInRequest): string {
         : agentTurnsInHistory === 1
           ? "Can you bring attention to the edges of that sensation for one breath and tell me what you notice?"
           : nextChunkLabel
-            ? `Would you be willing to try ${nextChunkLabel} and see if it helps?`
+            ? `Ready to continue with the next part, ${nextChunkLabel}, and see if it helps?`
             : "Ready to continue?";
 
   const separator = /\s$/.test(text) ? "" : " ";

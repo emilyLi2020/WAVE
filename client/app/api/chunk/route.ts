@@ -129,11 +129,24 @@ export async function POST(request: Request) {
       );
     }
 
-    return NextResponse.json(validated.data);
+    return NextResponse.json({
+      lines: sanitizeChunkLines(validated.data.lines),
+    });
   } catch (err) {
     return NextResponse.json(
       { error: "openai_call_failed", message: (err as Error).message },
       { status: 502 },
     );
   }
+}
+
+function sanitizeChunkLines(lines: readonly string[]): string[] {
+  return lines.map((line) =>
+    line
+      .replace(/\]\s*\[/g, " ")
+      .replace(/[\[\]]/g, "")
+      .replace(/\s+([,.;:?])/g, "$1")
+      .replace(/\s+/g, " ")
+      .trim(),
+  );
 }

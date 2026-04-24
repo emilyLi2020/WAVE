@@ -122,6 +122,7 @@ export async function generateChunk(
 function sanitizeChunkLines(lines: readonly string[]): string[] {
   return lines.map((line) =>
     line
+      .replace(/\]\s*\[/g, " ")
       .replace(/[\[\]]/g, "")
       .replace(/\s+([,.;:?])/g, "$1")
       .replace(/\s+/g, " ")
