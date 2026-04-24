@@ -41,19 +41,20 @@ export default function LandingPage() {
           aria-hidden
           className="absolute inset-0 -z-10 bg-gradient-to-b from-accent-soft/40 via-background to-background"
         />
-        <div className="mx-auto max-w-6xl px-6 py-20 sm:py-28">
+        <HomeWaveBackground />
+        <div className="mx-auto flex min-h-[calc(100vh-5rem)] max-w-5xl flex-col items-center justify-center px-6 py-20 text-center sm:py-28">
           <p className="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-1 text-xs font-medium text-foreground/70">
             <span className="h-1.5 w-1.5 rounded-full bg-accent" />
             Marlatt&apos;s MBRP protocol, personalized in real time
           </p>
-          <h1 className="mt-6 text-4xl sm:text-6xl font-semibold tracking-tight max-w-3xl">
+          <h1 className="mt-6 max-w-4xl text-4xl font-semibold tracking-tight sm:text-6xl">
             When a craving hits, start here.
           </h1>
           <p className="mt-4 max-w-2xl text-lg text-foreground/70">
             One clear path into an urge-surfing session. No account, no setup,
             no typing required to begin.
           </p>
-          <div className="mt-10 flex flex-col items-stretch gap-3 sm:max-w-xl sm:flex-row sm:items-center">
+          <div className="mt-10 flex w-full max-w-2xl flex-col items-stretch gap-3 sm:flex-row sm:items-center">
             <Link
               href="/session"
               className="inline-flex min-h-24 flex-1 items-center justify-center gap-3 rounded-[2rem] bg-accent px-8 py-7 text-center text-2xl font-semibold tracking-tight text-accent-foreground shadow-lg shadow-accent/20 transition hover:-translate-y-0.5 hover:opacity-90 focus:outline-none focus:ring-4 focus:ring-accent/20 sm:text-3xl"
@@ -63,7 +64,7 @@ export default function LandingPage() {
             </Link>
             <Link
               href="/onboarding"
-              className="inline-flex items-center justify-center rounded-full border border-border bg-surface px-5 py-3 text-sm font-medium text-foreground/75 transition hover:border-accent hover:text-accent focus:outline-none focus:ring-4 focus:ring-accent/10 sm:self-end"
+              className="inline-flex items-center justify-center rounded-full border border-border bg-surface/90 px-5 py-3 text-sm font-medium text-foreground/75 shadow-sm backdrop-blur transition hover:border-accent hover:text-accent focus:outline-none focus:ring-4 focus:ring-accent/10 sm:self-end"
             >
               First time? Build profile
             </Link>
@@ -160,5 +161,65 @@ export default function LandingPage() {
         </div>
       </section>
     </div>
+  );
+}
+
+function HomeWaveBackground() {
+  return (
+    <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
+      <div className="absolute inset-x-[-20%] top-10 h-80 opacity-50 blur-3xl">
+        <div className="h-full rounded-full bg-accent-soft" />
+      </div>
+      <DecorativeWave
+        className="absolute left-1/2 top-16 w-[1200px] -translate-x-1/2 text-wave-fall opacity-20"
+        durationSec={28}
+      />
+      <DecorativeWave
+        className="absolute left-1/2 top-36 w-[1400px] -translate-x-1/2 text-wave-rise opacity-25"
+        durationSec={22}
+      />
+      <DecorativeWave
+        className="absolute left-1/2 bottom-0 w-[1500px] -translate-x-1/2 text-wave-peak opacity-20"
+        durationSec={34}
+      />
+    </div>
+  );
+}
+
+function DecorativeWave({
+  className,
+  durationSec,
+}: {
+  className: string;
+  durationSec: number;
+}) {
+  return (
+    <div className={className}>
+      <div
+        className="flex"
+        style={{
+          width: "200%",
+          animation: `wave-slide ${durationSec}s linear infinite`,
+        }}
+      >
+        <WaveSvg />
+        <WaveSvg />
+      </div>
+    </div>
+  );
+}
+
+function WaveSvg() {
+  return (
+    <svg
+      className="h-52 w-1/2 flex-none"
+      viewBox="0 0 800 160"
+      preserveAspectRatio="none"
+    >
+      <path
+        d="M0 78 C80 22 160 22 240 78 S400 134 480 78 S640 22 720 78 S880 134 960 78 V160 H0 Z"
+        fill="currentColor"
+      />
+    </svg>
   );
 }
