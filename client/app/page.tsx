@@ -217,7 +217,7 @@ function WaveSvg() {
       preserveAspectRatio="none"
     >
       <path
-        d="M0 78 C80 22 160 22 240 78 S400 134 480 78 S640 22 720 78 S880 134 960 78 V160 H0 Z"
+        d="M0 80 C50 30 150 30 200 80 C250 130 350 130 400 80 C450 30 550 30 600 80 C650 130 750 130 800 80 V160 H0 Z"
         fill="currentColor"
       />
     </svg>
