@@ -247,6 +247,47 @@ function safeParseToolArgs(raw: string): EndConversationArgs | null {
   }
 }
 
+function ensureQuestionForOpenTurn(text: string, req: CheckInRequest): string {
+  const trimmed = text.trim();
+  if (trimmed.length === 0 || /\?\s*$/.test(trimmed)) {
+    return text;
+  }
+
+  const patientMessageCount = req.history.filter(
+    (turn) => turn.role === "patient",
+  ).length;
+  if (req.context.demoMode && patientMessageCount >= 2) {
+    // Demo mode's second agent turn is the closing hand-off. The client
+    // finalizes immediately after it, so adding a question would create
+    // the exact false continuation this guard is meant to prevent.
+    return text;
+  }
+
+  const agentTurnsInHistory = req.history.filter(
+    (turn) => turn.role === "agent",
+  ).length;
+  const nextChunkLabel =
+    req.context.chunkNumber === 1
+      ? "the body scan"
+      : req.context.chunkNumber === 2
+        ? "the sound anchor"
+        : req.context.chunkNumber === 3
+          ? "the breathing"
+          : req.context.chunkNumber === 4
+            ? "the closing reflection"
+            : null;
+
+  const repairQuestion =
+    req.context.chunkNumber === 5
+      ? "What do you want to carry with you into the rest of today?"
+      : agentTurnsInHistory >= 1 && nextChunkLabel
+        ? `Would you be willing to try ${nextChunkLabel} and see if it helps?`
+        : "What came up for you as you tried that?";
+
+  const separator = /\s$/.test(text) ? "" : " ";
+  return `${text}${separator}${repairQuestion}`;
+}
+
 export async function POST(request: Request) {
   let raw: unknown;
   try {
@@ -316,6 +357,7 @@ export async function POST(request: Request) {
     async start(controller) {
       let aggregated = "";
       let finished = false;
+      let emittedEndConversation = false;
       // Function-call args stream in deltas keyed by item_id; collect
       // them and parse on the matching `output_item.done`.
       const toolArgBuffer = new Map<string, string>();
@@ -393,6 +435,7 @@ export async function POST(request: Request) {
               toolArgBuffer.get(itemId) ?? event.arguments ?? "";
             const parsedArgs = safeParseToolArgs(argsText);
             if (parsedArgs && toolCallAllowed) {
+              emittedEndConversation = true;
               controller.enqueue(
                 encoder.encode(
                   sseFrame("end_conversation", parsedArgs),
@@ -405,8 +448,11 @@ export async function POST(request: Request) {
             toolArgBuffer.delete(itemId);
           } else if (event.type === "response.completed") {
             finished = true;
+            const finalText = emittedEndConversation
+              ? aggregated
+              : ensureQuestionForOpenTurn(aggregated, req);
             controller.enqueue(
-              encoder.encode(sseFrame("done", { text: aggregated })),
+              encoder.encode(sseFrame("done", { text: finalText })),
             );
             break;
           } else if (
@@ -428,8 +474,11 @@ export async function POST(request: Request) {
           // The model may have closed the response with only a tool
           // call and no text. Still emit `done` so the client can
           // close out the streamed-bubble state cleanly.
+          const finalText = emittedEndConversation
+            ? aggregated
+            : ensureQuestionForOpenTurn(aggregated, req);
           controller.enqueue(
-            encoder.encode(sseFrame("done", { text: aggregated })),
+            encoder.encode(sseFrame("done", { text: finalText })),
           );
         }
       } catch (err) {

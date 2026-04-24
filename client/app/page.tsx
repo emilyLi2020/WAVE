@@ -47,31 +47,34 @@ export default function LandingPage() {
             Marlatt&apos;s MBRP protocol, personalized in real time
           </p>
           <h1 className="mt-6 text-4xl sm:text-6xl font-semibold tracking-tight max-w-3xl">
-            Cravings are waves.{" "}
-            <span className="text-accent">You can learn to surf them.</span>
+            When a craving hits, start here.
           </h1>
-          <p className="mt-6 max-w-2xl text-lg text-foreground/70">
-            WAVE is an offline-first, medication-aware urge surfing companion
-            for SUD recovery. It learns your personal high-risk windows,
-            notifies you before the next craving peaks, and guides you through
-            evidence-based sessions tuned to what&apos;s actually happening in
-            your body — including whether your medication is working right now.
+          <p className="mt-4 max-w-2xl text-lg text-foreground/70">
+            One clear path into an urge-surfing session. No account, no setup,
+            no typing required to begin.
           </p>
-          <div className="mt-10 flex flex-wrap items-center gap-3">
+          <div className="mt-10 flex flex-col items-stretch gap-3 sm:max-w-xl sm:flex-row sm:items-center">
             <Link
               href="/session"
-              className="inline-flex items-center gap-2 rounded-full bg-accent px-6 py-3 text-accent-foreground font-medium shadow-sm hover:opacity-90 transition"
+              className="inline-flex min-h-24 flex-1 items-center justify-center gap-3 rounded-[2rem] bg-accent px-8 py-7 text-center text-2xl font-semibold tracking-tight text-accent-foreground shadow-lg shadow-accent/20 transition hover:-translate-y-0.5 hover:opacity-90 focus:outline-none focus:ring-4 focus:ring-accent/20 sm:text-3xl"
             >
-              Start a session
+              Start Session
               <span aria-hidden>→</span>
             </Link>
             <Link
               href="/onboarding"
-              className="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-6 py-3 font-medium text-foreground/80 hover:border-accent hover:text-accent transition"
+              className="inline-flex items-center justify-center rounded-full border border-border bg-surface px-5 py-3 text-sm font-medium text-foreground/75 transition hover:border-accent hover:text-accent focus:outline-none focus:ring-4 focus:ring-accent/10 sm:self-end"
             >
-              First time? Begin onboarding
+              First time? Build profile
             </Link>
           </div>
+          <p className="mt-8 max-w-2xl text-lg text-foreground/70">
+            WAVE is an offline-first, medication-aware urge surfing companion
+            for SUD recovery. It learns your personal high-risk windows,
+            notifies you before the next craving peaks, and guides you through
+            evidence-based sessions tuned to what&apos;s actually happening in
+            your body, including whether your medication is working right now.
+          </p>
           <p className="mt-6 text-xs text-foreground/50 max-w-2xl">
             If you are in crisis, call or text 988 (Suicide &amp; Crisis
             Lifeline) or call SAMHSA&apos;s National Helpline at

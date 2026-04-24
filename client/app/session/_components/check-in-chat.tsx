@@ -38,6 +38,7 @@ import type {
   ObstacleCategory,
   SessionUserProfile,
 } from "@/types/session";
+import { AnimatedWave } from "./animated-wave";
 
 interface Props {
   chunkNumber: ChunkNumber;
@@ -78,7 +79,8 @@ export function CheckInChat({
   demoMode,
   onComplete,
 }: Props) {
-  const startedAtRef = useRef(Date.now());
+  const [startedAt] = useState(() => Date.now());
+  const [completed, setCompleted] = useState(false);
   const completedRef = useRef(false);
   const endSignalRef = useRef<EndConversationSignal | null>(null);
 
@@ -95,15 +97,19 @@ export function CheckInChat({
   const turnsRef = useRef<InternalTurn[]>([]);
 
   const containerRef = useRef<HTMLDivElement>(null);
+  const lastTurnContentLength = turns[turns.length - 1]?.content.length ?? 0;
 
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
     el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
-  }, [turns.length, turns[turns.length - 1]?.content.length]);
+  }, [turns.length, lastTurnContentLength]);
 
   const patientTurnCount = turns.filter((t) => t.role === "patient").length;
   const onTurn1 = patientTurnCount === 0;
+  const latestKnownScore = priorScores[priorScores.length - 1];
+  const displayedIntensity =
+    cravingScore ?? pendingScore ?? latestKnownScore ?? intakeIntensity;
 
   function buildContext(activeScore: number): CheckInContextPayload {
     return {
@@ -290,6 +296,7 @@ export function CheckInChat({
   ) {
     if (completedRef.current) return;
     completedRef.current = true;
+    setCompleted(true);
 
     const obstacleCategory: ObstacleCategory | null = signal.obstacleCategory;
 
@@ -307,7 +314,7 @@ export function CheckInChat({
       ),
       obstacleCategory,
       readyToContinue: chunkNumber === 5 ? null : true,
-      startedAt: startedAtRef.current,
+      startedAt,
       endedAt: Date.now(),
     };
 
@@ -326,7 +333,12 @@ export function CheckInChat({
         <h2 className="text-sm font-semibold uppercase tracking-wide text-foreground/60">
           Check-in {chunkNumber} of 5
         </h2>
+        <p className="text-xs text-foreground/50">
+          Wave height: {displayedIntensity}/10
+        </p>
       </header>
+
+      <AnimatedWave mode="ambient" intensity={displayedIntensity} />
 
       <div
         ref={containerRef}
@@ -355,7 +367,7 @@ export function CheckInChat({
             value={composerText}
             onChange={setComposerText}
             onSend={handleSendText}
-            disabled={agentBusy || completedRef.current}
+            disabled={agentBusy || completed}
           />
         )}
       </div>
