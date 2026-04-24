@@ -256,8 +256,8 @@ function ensureQuestionForOpenTurn(text: string, req: CheckInRequest): string {
   const patientMessageCount = req.history.filter(
     (turn) => turn.role === "patient",
   ).length;
-  if (req.context.demoMode && patientMessageCount >= 2) {
-    // Demo mode's second agent turn is the closing hand-off. The client
+  if (req.context.demoMode && patientMessageCount >= 4) {
+    // Demo mode's fourth agent turn is the closing hand-off. The client
     // finalizes immediately after it, so adding a question would create
     // the exact false continuation this guard is meant to prevent.
     return text;
@@ -280,9 +280,13 @@ function ensureQuestionForOpenTurn(text: string, req: CheckInRequest): string {
   const repairQuestion =
     req.context.chunkNumber === 5
       ? "What do you want to carry with you into the rest of today?"
-      : agentTurnsInHistory >= 1 && nextChunkLabel
-        ? `Would you be willing to try ${nextChunkLabel} and see if it helps?`
-        : "What came up for you as you tried that?";
+      : agentTurnsInHistory <= 0
+        ? "What came up for you as you tried that?"
+        : agentTurnsInHistory === 1
+          ? "Can you bring attention to the edges of that sensation for one breath and tell me what you notice?"
+          : nextChunkLabel
+            ? `Would you be willing to try ${nextChunkLabel} and see if it helps?`
+            : "Ready to continue?";
 
   const separator = /\s$/.test(text) ? "" : " ";
   return `${text}${separator}${repairQuestion}`;
@@ -313,12 +317,14 @@ export async function POST(request: Request) {
   // check-in and jump straight to the next chunk with no conversation
   // visible to the patient.
   //
-  //   demo   : score + 1 free-text reply = 2 patient messages minimum
-  //   normal : score + 2 free-text replies = 3 patient messages minimum
+  //   demo   : score + body answer + practice answer + readiness = 4
+  //            patient messages minimum
+  //   normal : score + body answer + practice answer + readiness = 4
+  //            patient messages minimum
   const patientMessageCount = req.history.filter(
     (turn) => turn.role === "patient",
   ).length;
-  const minPatientMessages = req.context.demoMode ? 2 : 3;
+  const minPatientMessages = 4;
   const toolCallAllowed = patientMessageCount >= minPatientMessages;
 
   // "I already said yes" backstop. When the last patient message is an
@@ -389,7 +395,7 @@ export async function POST(request: Request) {
               : {}),
             stream: true,
             // Reasoning effort is tuned per mode:
-            //   • demo mode keeps `low` — the 2-agent-turn demo shape
+            //   • demo mode keeps `low` — the compressed text-only demo shape
             //     is tightly scripted in the prompt and the whole
             //     session is backstopped client-side, so the extra
             //     latency of `medium` is not worth it for a reviewer

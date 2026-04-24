@@ -27,6 +27,7 @@ import {
   type CheckInChatTurnPayload,
   type EndConversationSignal,
 } from "@/lib/gemma/checkin";
+import { isAffirmative } from "@/lib/session/is-affirmative";
 import type {
   CheckInContextPayload,
   SessionHistoryEntry,
@@ -217,15 +218,39 @@ export function CheckInChat({
       if (endSignalRef.current) {
         finalizeCheckIn(turnsRef.current, activeScore, endSignalRef.current);
       } else if (demoMode) {
-        // Demo-mode backstop: after the patient has sent their score
-        // + at least one free-text reply, force-finalize even if the
-        // model produced a text turn instead of the endConversation
-        // tool call. The demo arc is meant to flow in ~2 turns per
-        // check-in, and we can't let a chatty model stall it.
-        const patientTurns = turnsRef.current.filter(
+        // Demo-mode backstop: the demo route is text-only, so after the
+        // patient answers the readiness question affirmatively we
+        // synthesize the end-conversation signal client-side.
+        const patientMessages = turnsRef.current.filter(
           (t) => t.role === "patient",
-        ).length;
-        if (patientTurns >= 2 && !completedRef.current) {
+        );
+        const lastPatient = patientMessages[patientMessages.length - 1];
+        if (
+          patientMessages.length >= 4 &&
+          lastPatient &&
+          isAffirmative(lastPatient.content) &&
+          !completedRef.current
+        ) {
+          const fallbackSignal: EndConversationSignal = {
+            cravingScore: activeScore,
+            obstacleCategory: null,
+          };
+          finalizeCheckIn(turnsRef.current, activeScore, fallbackSignal);
+        }
+      } else if (result.source === "fallback") {
+        // If the model path is down, the local fallback can still
+        // reach the readiness gate. Preserve the protocol by finalizing
+        // only after an explicit affirmative readiness reply.
+        const patientMessages = turnsRef.current.filter(
+          (t) => t.role === "patient",
+        );
+        const lastPatient = patientMessages[patientMessages.length - 1];
+        if (
+          patientMessages.length >= 4 &&
+          lastPatient &&
+          isAffirmative(lastPatient.content) &&
+          !completedRef.current
+        ) {
           const fallbackSignal: EndConversationSignal = {
             cravingScore: activeScore,
             obstacleCategory: null,

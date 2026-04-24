@@ -334,37 +334,29 @@ export function fallbackCheckInTurn(
       return { text: filled, isReadinessAsk: false };
     }
     case 2: {
-      // Free text after Turn 2. Validate or affirm.
+      // Free text after Turn 2. Validate, then offer one small practice
+      // and ask the patient to try it before readiness.
       const obstacle = lastPatient
         ? classifyObstacle(lastPatient.content)
         : null;
       if (obstacle) {
         const entry: ObstacleEntry = OBSTACLE_LIBRARY[obstacle];
-        return { text: entry.validate, isReadinessAsk: false };
+        const technique = entry.technique
+          ? ` ${entry.technique} ${entry.didItLand}`
+          : " You're still here. Want to keep going?";
+        return { text: `${entry.validate}${technique}`, isReadinessAsk: false };
       }
       return {
         text:
           chunkNumber === 5
-            ? "What you're noticing right now matters. You stayed with the practice all the way through — that takes something."
-            : "That makes sense. You're doing the work just by staying with it.",
+            ? "What you're noticing right now matters. You stayed with the practice all the way through — that takes something. What do you want to carry with you into the rest of today?"
+            : "That sensation gives us something real to work with. Try bringing your attention to the edges of it — where it starts, where it stops, whether it feels tight, warm, hollow, or pulsing. Can you try that for one breath and tell me what you notice?",
         isReadinessAsk: false,
       };
     }
     case 3: {
-      // After validation. Offer one technique if obstacle present, else
-      // skip straight to the readiness ask (or closing reflection at C5).
-      const earliestPatient = history.find((t) => t.role === "patient");
-      const middlePatient = history.filter((t) => t.role === "patient")[1];
-      const candidate = middlePatient ?? earliestPatient;
-      const obstacle = candidate ? classifyObstacle(candidate.content) : null;
-      if (obstacle && OBSTACLE_LIBRARY[obstacle].technique) {
-        const entry = OBSTACLE_LIBRARY[obstacle];
-        return {
-          text: `${entry.technique} ${entry.didItLand}`,
-          isReadinessAsk: false,
-        };
-      }
-      // No obstacle / no technique to teach — go straight to readiness.
+      // After the patient tried the brief practice, move to readiness
+      // (or the closing carry-forward question at C5).
       return {
         text: openers.turn5,
         isReadinessAsk: chunkNumber !== 5,
