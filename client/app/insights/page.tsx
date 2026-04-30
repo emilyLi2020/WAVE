@@ -8,7 +8,7 @@ import {
   STATIC_INSIGHTS,
   type InsightCard,
 } from "@/lib/data/mock-sessions";
-import type { InsightsPayload } from "@/lib/prompts/schemas";
+import { generateInsights } from "@/lib/gemma/insights";
 
 type Status = "idle" | "loading" | "error";
 
@@ -21,23 +21,8 @@ export default function InsightsPage() {
     setStatus("loading");
     setErrorMessage(null);
     try {
-      const res = await fetch("/api/insights", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sessions: MOCK_SESSIONS }),
-      });
-
-      if (!res.ok) {
-        const detail = (await res.json().catch(() => null)) as
-          | { error?: string; message?: string }
-          | null;
-        throw new Error(
-          detail?.message ?? detail?.error ?? `Request failed (${res.status})`,
-        );
-      }
-
-      const data = (await res.json()) as InsightsPayload;
-      setCards(data.insights);
+      const payload = await generateInsights(MOCK_SESSIONS);
+      setCards(payload.insights);
       setStatus("idle");
     } catch (err) {
       setErrorMessage((err as Error).message);

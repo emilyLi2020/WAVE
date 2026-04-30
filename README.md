@@ -16,7 +16,7 @@ pnpm dev
 
 Open [http://localhost:3000](http://localhost:3000). Navigate between **Home**, **Onboarding**, **Session**, **Dashboard**, **History**, **Insights**, and the developer-only **Training** screens from the top nav.
 
-The active demo is in `client/`. The session flow currently uses scripted meditation chunks, a multi-turn check-in chat, and a reflection card. Until the in-browser Gemma + LoRA runtime lands, check-ins, reflection, and insight regeneration use temporary `gpt-5-mini` route handlers behind the `client/lib/gemma/*` boundaries; chunks are served from the local fallback bank.
+The active demo is in `client/`. The session flow currently uses scripted meditation chunks, a multi-turn check-in chat, and a reflection card. Check-ins, reflection, and insight regeneration run through the local Gemma runtime behind the `client/lib/gemma/*` boundaries; chunks are served from the local fallback bank.
 
 ## Docs
 

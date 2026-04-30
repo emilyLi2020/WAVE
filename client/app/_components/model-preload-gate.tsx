@@ -1,0 +1,159 @@
+"use client";
+
+import { useEffect, useMemo, useState } from "react";
+
+import {
+  GEMMA_MODEL_ID,
+  getGemmaModelLoadState,
+  preloadLocalGemma,
+  subscribeGemmaModelLoad,
+  type GemmaModelLoadState,
+} from "@/lib/gemma/local-runtime";
+
+interface Props {
+  children: React.ReactNode;
+}
+
+export function ModelPreloadGate({ children }: Props) {
+  const [state, setState] = useState<GemmaModelLoadState>(
+    getGemmaModelLoadState,
+  );
+  const [retryKey, setRetryKey] = useState(0);
+
+  useEffect(() => {
+    return subscribeGemmaModelLoad(setState);
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    void preloadLocalGemma().catch((err) => {
+      if (cancelled || typeof console === "undefined") return;
+      console.error("[wave] Gemma preload failed", err);
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [retryKey]);
+
+  const runtimeLabel = useMemo(() => {
+    if (state.device === "webgpu") return "WebGPU acceleration";
+    if (state.device === "wasm") return "browser fallback runtime";
+    if (state.device === "cpu") return "CPU runtime";
+    return "checking device support";
+  }, [state.device]);
+
+  if (state.phase === "ready") {
+    return <>{children}</>;
+  }
+
+  const progress = state.progress ?? 0;
+  const showProgress = state.phase === "loading" && state.progress !== null;
+  const isError = state.phase === "error";
+  const statusLabel = isError
+    ? "Setup paused"
+    : state.phase === "idle"
+      ? "Starting local model setup"
+      : "Preparing local Gemma model";
+  const detailLabel = state.file
+    ? `${state.status} ${state.file}`
+    : state.message;
+
+  return (
+    <main className="flex min-h-screen items-center justify-center bg-background px-6 py-12 text-foreground">
+      <section
+        className="w-full max-w-xl rounded-[2rem] border border-border bg-surface p-8 shadow-2xl shadow-accent/10"
+        aria-live="polite"
+      >
+        <div className="flex items-center gap-3">
+          <span
+            aria-hidden
+            className="grid h-11 w-11 place-items-center rounded-full bg-accent-soft text-accent"
+          >
+            <span className="h-3 w-3 animate-pulse rounded-full bg-accent" />
+          </span>
+          <div>
+            <p className="text-xs uppercase tracking-[0.2em] text-foreground/45">
+              Local model setup
+            </p>
+            <h1 className="text-2xl font-semibold tracking-tight">
+              {isError
+                ? "Gemma could not load"
+                : "Preparing Gemma on this device"}
+            </h1>
+          </div>
+        </div>
+
+        <p className="mt-6 text-sm leading-relaxed text-foreground/70">
+          WAVE uses Gemma locally for sessions, check-ins, reflections, and
+          insights. The first visit downloads and caches the model; after that,
+          the app can reuse it from browser storage.
+        </p>
+
+        <div className="mt-6 rounded-2xl border border-border bg-surface-muted p-4">
+          <div className="flex items-center justify-between gap-4 text-sm">
+            <span className="min-w-0 font-medium">
+              {statusLabel}
+            </span>
+            <span className="w-28 shrink-0 text-right font-mono tabular-nums text-foreground/50">
+              {showProgress ? `${progress}%` : runtimeLabel}
+            </span>
+          </div>
+
+          <div className="mt-3 h-2 overflow-hidden rounded-full bg-border">
+            <div
+              className="h-full rounded-full bg-accent transition-all duration-300"
+              style={{
+                width: showProgress ? `${Math.max(4, progress)}%` : "18%",
+              }}
+            />
+          </div>
+
+          <p
+            className="mt-3 h-5 truncate text-xs text-foreground/55"
+            title={detailLabel}
+          >
+            {detailLabel}
+          </p>
+
+          <dl className="mt-4 grid gap-3 text-xs text-foreground/55 sm:grid-cols-2">
+            <div>
+              <dt className="font-medium text-foreground/70">Model</dt>
+              <dd className="mt-1 h-4 truncate" title={GEMMA_MODEL_ID}>
+                {GEMMA_MODEL_ID}
+              </dd>
+            </div>
+            <div>
+              <dt className="font-medium text-foreground/70">Current file</dt>
+              <dd
+                className="mt-1 h-4 truncate"
+                title={state.file ?? undefined}
+              >
+                {state.file ?? (isError ? "not available" : "checking cache")}
+              </dd>
+            </div>
+          </dl>
+        </div>
+
+        {isError ? (
+          <div className="mt-6 rounded-2xl border border-danger/30 bg-danger-soft p-4 text-sm text-danger">
+            <p className="font-medium">Download or runtime setup failed.</p>
+            <p className="mt-1 text-danger/80">{state.message}</p>
+            <button
+              type="button"
+              onClick={() => setRetryKey((key) => key + 1)}
+              className="mt-4 rounded-full border border-danger/40 bg-surface px-4 py-2 text-xs font-medium text-danger transition hover:bg-danger-soft"
+            >
+              Try again
+            </button>
+          </div>
+        ) : (
+          <p className="mt-5 text-xs leading-relaxed text-foreground/50">
+            Keep this tab open during the first download. Chrome or Edge with
+            WebGPU gives the smoothest demo; cached loads should be much faster.
+          </p>
+        )}
+      </section>
+    </main>
+  );
+}

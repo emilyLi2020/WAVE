@@ -333,9 +333,9 @@ produce byte-identical output. CI pins the converter version.
 ## 7. Eval harness (on the 20 % test split)
 
 Small, automated, no human-in-the-loop at this step. The adapter is
-loaded through the production Adapter Manager (web runtime for the
-web demo, LiteRT for the mobile port) so the eval measures what ships,
-not the training-time model.
+loaded through the same rule-based runtime routing the product uses
+(web runtime for the web demo, LiteRT for the mobile port) so the eval
+measures what ships, not the training-time model.
 
 ### 7.1 Four checks
 
@@ -494,8 +494,8 @@ client/app/synthetix-review/   # local-only Next.js UI for §3 spot-check
   matrix. Seed sets and invariants must match it.
 - `AGENTS.md > Domain Constraints` — the source of truth for tone
   rules and crisis handoff. `tone-rules.ts` encodes these.
-- `client/lib/gemma/adapter-manager.ts` — the runtime contract that
-  consumes the adapters this process produces. Today it returns prompt ids
-  for temporary scaffolding; after the Gemma swap it returns LoRA ids.
+- `client/lib/gemma/local-runtime.ts` — the browser runtime that consumes
+  the base model and mounted generation boundaries. Production LoRA
+  selection remains rule-based rather than model-selected.
 - `client/lib/prompts/schemas.ts` — the Zod schemas that define the input /
   output contract every LoRA is trained against.

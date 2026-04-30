@@ -44,8 +44,8 @@ import {
   type ReflectionTitle,
 } from "@/lib/gemma/session";
 import type {
-  PhasePayloadMap,
   ReflectionContext,
+  ReflectionPayload,
   SessionHistoryEntry,
 } from "@/lib/prompts/schemas";
 import type { SessionOutcome } from "@/types/models";
@@ -206,9 +206,8 @@ function reducer(state: State, action: Action): State {
         };
       }
       // Hand off to the chunk loader. The RelaxingLoader stays on
-      // screen — pulsing soft breath cues — until the next chunk's
-      // lines arrive from `/api/chunk`. There is no fixed-duration
-      // countdown; the meditation paces with the network.
+      // screen with soft breath cues until the next scripted chunk is
+      // ready. There is no fixed-duration countdown.
       return {
         ...state,
         checkIns,
@@ -463,7 +462,7 @@ type ReflectionState =
   | { kind: "loading"; titles: ReflectionTitle[] }
   | {
       kind: "ready";
-      payload: PhasePayloadMap["reflection"];
+      payload: ReflectionPayload;
       source: "model" | "fallback";
     };
 

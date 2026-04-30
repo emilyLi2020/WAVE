@@ -1,5 +1,9 @@
 import type { Session } from "@/types/models";
-import type { BuiltPrompt } from "./medication-ack";
+
+interface BuiltPrompt {
+  systemPrompt: string;
+  userPrompt: string;
+}
 
 const SYSTEM_PROMPT = `<role>
 You write the "What Wave noticed" cards on the WAVE insights page for an adult in Substance Use Disorder recovery. You are reasoning over the patient's own session log, not generic SUD literature.

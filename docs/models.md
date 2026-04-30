@@ -14,8 +14,8 @@
 ## Quick overview
 
 WAVE ships **one base model** and **a stack of small LoRA adapters**. One base
-is loaded in memory; the Adapter Manager hot-swaps the appropriate LoRA in for
-each session phase.
+is loaded in memory; runtime routing hot-swaps the appropriate LoRA in for
+each model-backed surface that has an adapter.
 
 ```
                  ┌─────────────────────────────────────────────┐
@@ -28,7 +28,7 @@ each session phase.
 │ lora-check-in-1   │   ...    │ lora-check-in-5    │          │ lora-reflection │
 └───────────────────┘          └────────────────────┘          └────────────────┘
                                         ▲
-                          hot-swapped per check-in by the Adapter Manager
+                          hot-swapped per check-in by runtime routing
 ```
 
 Base is shared across every surface. Each LoRA targets one clinical situation.
@@ -80,9 +80,9 @@ The adaptive model surface is the multi-turn check-in chat after each chunk,
 plus the final reflection.
 
 The current checked-in web demo has not shipped these adapters yet. It uses
-temporary `gpt-5-mini` route handlers behind the `client/lib/gemma/*`
-boundaries so the UI, prompt contracts, SSE parsing, and fallbacks can stabilize
-before the in-browser Gemma swap.
+Gemma 4 E2B-it locally through `client/lib/gemma/local-runtime.ts` so the UI,
+prompt contracts, validation, and fallbacks can stabilize before LoRA loading is
+added.
 
 ### 1-5. `lora-check-in-1` through `lora-check-in-5`
 
@@ -284,8 +284,8 @@ chosen route. A fine-tune on synthetic data — however well-intentioned —
 could drift the model's notion of which hotline fits which signal. That is
 an unacceptable regression. Keeping this surface on the base with
 rule-based routing makes the safety boundary **explicit in the type
-system**: the Adapter Manager is called with `loraId: null` for crisis
-triage, and `null` is the only legal value for that surface.
+system**: runtime routing uses `loraId: null` for crisis triage, and
+`null` is the only legal value for that surface.
 
 If someone adds a `lora-crisis` in a future PR, this document is the
 reason to reject it.
@@ -399,8 +399,9 @@ that adds or updates an adapter must satisfy the gates documented in
   LoRA is held to.
 - `model-training.md` is the "how": data collection, Synthetix pipeline,
   spot-check, split, training, eval, ship gates.
-- `client/lib/gemma/adapter-manager.ts` is the runtime contract the Adapter
-  Manager implements. Today it returns prompt ids for temporary scaffolding;
-  after the Gemma swap it returns LoRA ids.
+- `client/lib/gemma/local-runtime.ts` is the browser runtime that loads base
+  Gemma and exposes the mounted local generation boundaries.
+- Runtime LoRA selection remains rule-based. The old prompt-id
+  `adapter-manager.ts` scaffold was removed with the OpenAI route cleanup.
 - `client/synthetix/` (future) is the developer-only pipeline that
   produces the training data for every LoRA in this document.

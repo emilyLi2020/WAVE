@@ -16,12 +16,11 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 ## Current Runtime Shape
 
 - The session uses five scripted meditation chunks from `lib/prompts/fallback-bank.ts`.
-- The adaptive check-in chat calls temporary `gpt-5-mini` scaffolding through `/api/checkin`.
-- The reflection screen calls temporary `gpt-5-mini` scaffolding through `/api/narrate/reflection`.
-- The `/insights` regenerate button calls temporary `gpt-5-mini` scaffolding through `/api/insights`.
-- The final target is in-browser Gemma 4 E2B-it + LoRAs via `@huggingface/transformers` + WebGPU, with no LLM network calls.
+- The adaptive check-in chat, reflection screen, and `/insights` regenerate flow call Gemma 4 E2B-it locally through `@huggingface/transformers`.
+- Model weights are cached by the browser after first load; WebGPU is used when available.
+- The final target adds LoRA adapters on top of this local Gemma boundary, with no LLM network calls during inference.
 
-Copy `.env.local.example` to `.env.local` and set `OPENAI_API_KEY` for the temporary routes. Set `NEXT_PUBLIC_TRAINING_ENABLED=true` only when you want the developer training UI visible.
+Copy `.env.local.example` to `.env.local` and set `NEXT_PUBLIC_TRAINING_ENABLED=true` only when you want the developer training UI visible.
 
 ## Useful Commands
 

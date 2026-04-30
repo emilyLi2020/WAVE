@@ -1,0 +1,558 @@
+import type {
+  DeviceType,
+  ProgressInfo,
+  TextGenerationPipeline,
+} from "@huggingface/transformers";
+
+import { isAffirmative } from "@/lib/session/is-affirmative";
+import { buildCheckInPrompt } from "@/lib/prompts/check-in";
+import { buildChunkPrompt } from "@/lib/prompts/chunk-generator";
+import { buildInsightsPrompt } from "@/lib/prompts/insights";
+import { buildReflectionPrompt } from "@/lib/prompts/reflection";
+import type {
+  CheckInContextPayload,
+  ChunkGenerationContextPayload,
+  ReflectionContext,
+} from "@/lib/prompts/schemas";
+import type { Session } from "@/types/models";
+import type {
+  CheckInChatTurnPayload,
+  EndConversationSignal,
+} from "@/lib/gemma/checkin";
+import type { ObstacleCategory } from "@/types/session";
+
+export const GEMMA_MODEL_ID = "onnx-community/gemma-4-E2B-it-ONNX";
+const GEMMA_CACHE_KEY = "wave-gemma4-cache";
+const GEMMA_DTYPE = "q4f16";
+
+type ChatRole = "system" | "user" | "assistant";
+
+interface ChatMessage {
+  role: ChatRole;
+  content: string;
+}
+
+interface GenerateOptions {
+  maxNewTokens: number;
+  signal?: AbortSignal;
+  onDelta?: (accumulated: string) => void;
+}
+
+export interface LocalCheckInResult {
+  text: string;
+  endConversation: EndConversationSignal | null;
+}
+
+export interface LocalChunkResult {
+  text: string;
+}
+
+export interface LocalInsightsResult {
+  text: string;
+}
+
+export type GemmaModelLoadPhase = "idle" | "loading" | "ready" | "error";
+
+export interface GemmaModelLoadState {
+  phase: GemmaModelLoadPhase;
+  status: string;
+  file: string | null;
+  progress: number | null;
+  device: DeviceType | null;
+  message: string;
+}
+
+const ALLOWED_OBSTACLES: readonly ObstacleCategory[] = [
+  "cannot_visualize",
+  "mind_wandering",
+  "urge_overwhelming",
+  "breath_tight",
+  "breath_anxiety",
+  "gave_in",
+  "guilt_failure",
+  "physical_discomfort",
+  "sleepiness",
+];
+
+let generatorPromise: Promise<TextGenerationPipeline> | null = null;
+let modelLoadState: GemmaModelLoadState = {
+  phase: "idle",
+  status: "idle",
+  file: null,
+  progress: null,
+  device: null,
+  message: "Waiting to prepare Gemma.",
+};
+
+const modelLoadListeners = new Set<(state: GemmaModelLoadState) => void>();
+const MODEL_LOAD_NOTIFY_INTERVAL_MS = 300;
+let lastModelLoadPublishedAt = 0;
+let pendingModelLoadPublish: ReturnType<typeof setTimeout> | null = null;
+
+export function isLocalGemmaAvailable(): boolean {
+  return typeof window !== "undefined" || typeof process !== "undefined";
+}
+
+export function getGemmaModelLoadState(): GemmaModelLoadState {
+  return modelLoadState;
+}
+
+export function subscribeGemmaModelLoad(
+  listener: (state: GemmaModelLoadState) => void,
+): () => void {
+  modelLoadListeners.add(listener);
+  listener(modelLoadState);
+  return () => {
+    modelLoadListeners.delete(listener);
+  };
+}
+
+export async function preloadLocalGemma(): Promise<void> {
+  await getGenerator();
+}
+
+export async function generateGemmaReflection(
+  input: ReflectionContext,
+  options: GenerateOptions,
+): Promise<LocalChunkResult> {
+  const prompt = buildReflectionPrompt(input);
+  const text = await generateChatText(
+    [
+      { role: "system", content: prompt.systemPrompt },
+      { role: "user", content: prompt.userPrompt },
+    ],
+    options,
+  );
+
+  return { text: extractFirstJSONObject(text) };
+}
+
+export async function generateGemmaCheckIn(
+  history: readonly CheckInChatTurnPayload[],
+  context: CheckInContextPayload,
+  options: GenerateOptions,
+): Promise<LocalCheckInResult> {
+  const agentTurnsInHistory = history.filter(
+    (turn) => turn.role === "agent",
+  ).length;
+  const { systemPrompt, contextBlock } = buildCheckInPrompt(context, {
+    agentTurnsInHistory,
+  });
+
+  const messages: ChatMessage[] = [
+    {
+      role: "system",
+      content: `${systemPrompt}
+
+For this local Gemma runtime, tool calls are unavailable. Instead, return strict JSON only:
+{"reply":"<patient-facing next WAVE turn>","endConversation":null}
+or
+{"reply":"<brief closing hand-off>","endConversation":{"cravingScore":<1-10 integer>,"obstacleCategory":null}}
+
+The reply field is the only patient-facing text. It must still obey every conversation rule. Do not wrap the JSON in markdown.`,
+    },
+    {
+      role: "user",
+      content: `${contextBlock}
+
+<local_runtime_output_contract>
+Return one JSON object only. No markdown, no commentary, no leading or trailing prose.
+Set endConversation only when the original prompt says the endConversation tool should be called. Otherwise set it to null.
+Allowed obstacleCategory values: ${ALLOWED_OBSTACLES.join(", ")}, or null.
+</local_runtime_output_contract>`,
+    },
+  ];
+
+  for (const turn of history) {
+    messages.push({
+      role: turn.role === "agent" ? "assistant" : "user",
+      content: turn.content,
+    });
+  }
+
+  const text = await generateChatText(messages, {
+    ...options,
+    // The JSON wrapper adds a little overhead beyond the visible reply.
+    maxNewTokens: Math.max(options.maxNewTokens, 220),
+    onDelta: undefined,
+  });
+  const parsed = parseCheckInPayload(extractFirstJSONObject(text));
+  const endConversation =
+    parsed.endConversation ??
+    inferEndConversationFromHistory(history, context, parsed.reply);
+
+  options.onDelta?.(parsed.reply);
+  return { text: parsed.reply, endConversation };
+}
+
+export async function generateGemmaChunk(
+  context: ChunkGenerationContextPayload,
+  options: GenerateOptions,
+): Promise<LocalChunkResult> {
+  const prompt = buildChunkPrompt(context);
+  const text = await generateChatText(
+    [
+      { role: "system", content: prompt.systemPrompt },
+      { role: "user", content: prompt.userPrompt },
+    ],
+    options,
+  );
+
+  return { text: extractFirstJSONObject(text) };
+}
+
+export async function generateGemmaInsights(
+  sessions: readonly Session[],
+  options: GenerateOptions,
+): Promise<LocalInsightsResult> {
+  const prompt = buildInsightsPrompt([...sessions]);
+  const text = await generateChatText(
+    [
+      { role: "system", content: prompt.systemPrompt },
+      { role: "user", content: prompt.userPrompt },
+    ],
+    options,
+  );
+
+  return { text: extractFirstJSONObject(text) };
+}
+
+async function generateChatText(
+  messages: readonly ChatMessage[],
+  options: GenerateOptions,
+): Promise<string> {
+  throwIfAborted(options.signal);
+  const generator = await getGenerator();
+  throwIfAborted(options.signal);
+
+  const { TextStreamer } = await import("@huggingface/transformers");
+  let accumulated = "";
+  const streamer = new TextStreamer(generator.tokenizer, {
+    skip_prompt: true,
+    skip_special_tokens: true,
+    callback_function: (chunk: string) => {
+      accumulated += chunk;
+      options.onDelta?.(accumulated);
+    },
+  });
+
+  const output = await generator([...messages], {
+    max_new_tokens: options.maxNewTokens,
+    do_sample: false,
+    return_full_text: false,
+    streamer,
+  });
+
+  throwIfAborted(options.signal);
+  const finalText = extractGeneratedText(output).trim();
+  return finalText.length > 0 ? finalText : accumulated.trim();
+}
+
+async function getGenerator(): Promise<TextGenerationPipeline> {
+  if (generatorPromise) return generatorPromise;
+
+  generatorPromise = (async () => {
+    setModelLoadState({
+      phase: "loading",
+      status: "initializing",
+      file: null,
+      progress: null,
+      message: "Preparing the local Gemma runtime.",
+    });
+
+    const { env, LogLevel, pipeline } = await import("@huggingface/transformers");
+    env.logLevel = LogLevel.WARNING;
+    env.allowRemoteModels = true;
+    env.allowLocalModels = false;
+
+    if (typeof navigator !== "undefined" && navigator.storage?.persist) {
+      void navigator.storage.persist().catch(() => false);
+    }
+
+    const isBrowser = typeof window !== "undefined";
+    if (isBrowser) {
+      env.useBrowserCache = true;
+      env.useWasmCache = true;
+      env.cacheKey = GEMMA_CACHE_KEY;
+    } else {
+      // Node smoke tests use the same ignored cache directory as manual downloads.
+      env.useFSCache = true;
+      env.useBrowserCache = false;
+      env.cacheDir = "./.cache/transformers";
+    }
+
+    const device: DeviceType = isBrowser
+      ? "gpu" in navigator
+        ? "webgpu"
+        : "wasm"
+      : "cpu";
+
+    setModelLoadState({
+      phase: "loading",
+      status: "loading",
+      device,
+      message:
+        device === "webgpu"
+          ? "Downloading or reading Gemma from the browser cache with WebGPU enabled."
+          : "Downloading or reading Gemma from the browser cache.",
+    });
+
+    const generator = await pipeline("text-generation", GEMMA_MODEL_ID, {
+      dtype: GEMMA_DTYPE,
+      device,
+      progress_callback: logProgress,
+    });
+
+    setModelLoadState({
+      phase: "ready",
+      status: "ready",
+      file: null,
+      progress: 100,
+      device,
+      message: "Gemma is ready on this device.",
+    });
+
+    return generator;
+  })().catch((err) => {
+    generatorPromise = null;
+    setModelLoadState({
+      phase: "error",
+      status: "error",
+      file: null,
+      progress: null,
+      message:
+        err instanceof Error
+          ? err.message
+          : "Gemma could not be prepared on this device.",
+    });
+    throw err;
+  });
+
+  return generatorPromise;
+}
+
+function parseCheckInPayload(text: string): {
+  reply: string;
+  endConversation: EndConversationSignal | null;
+} {
+  const parsed = JSON.parse(text) as unknown;
+  if (!parsed || typeof parsed !== "object") {
+    throw new Error("Gemma returned non-object check-in payload");
+  }
+
+  const payload = parsed as {
+    reply?: unknown;
+    endConversation?: unknown;
+  };
+  if (typeof payload.reply !== "string" || payload.reply.trim().length === 0) {
+    throw new Error("Gemma check-in payload missing reply");
+  }
+
+  return {
+    reply: payload.reply.trim(),
+    endConversation: parseEndConversation(payload.endConversation),
+  };
+}
+
+function parseEndConversation(value: unknown): EndConversationSignal | null {
+  if (value === null || value === undefined) return null;
+  if (!value || typeof value !== "object") return null;
+
+  const obj = value as {
+    cravingScore?: unknown;
+    obstacleCategory?: unknown;
+  };
+  const cravingScore = Number(obj.cravingScore);
+  if (!Number.isInteger(cravingScore) || cravingScore < 1 || cravingScore > 10) {
+    return null;
+  }
+
+  const obstacleCategory =
+    typeof obj.obstacleCategory === "string" &&
+    (ALLOWED_OBSTACLES as readonly string[]).includes(obj.obstacleCategory)
+      ? (obj.obstacleCategory as ObstacleCategory)
+      : null;
+
+  return { cravingScore, obstacleCategory };
+}
+
+function inferEndConversationFromHistory(
+  history: readonly CheckInChatTurnPayload[],
+  context: CheckInContextPayload,
+  reply: string,
+): EndConversationSignal | null {
+  if (context.demoMode) return null;
+
+  const patientMessages = history.filter((turn) => turn.role === "patient");
+  if (patientMessages.length < 4) return null;
+
+  const lastPatient = patientMessages[patientMessages.length - 1];
+  const lastAgent = [...history].reverse().find((turn) => turn.role === "agent");
+  if (!lastPatient || !lastAgent) return null;
+
+  if (
+    isAffirmative(lastPatient.content) &&
+    isReadinessQuestion(lastAgent.content) &&
+    !reply.trim().endsWith("?")
+  ) {
+    return { cravingScore: context.cravingScore, obstacleCategory: null };
+  }
+
+  return null;
+}
+
+function isReadinessQuestion(text: string): boolean {
+  const normalized = text.toLowerCase();
+  return (
+    normalized.includes("ready to continue") ||
+    normalized.includes("ready to keep going") ||
+    normalized.includes("willing to try") ||
+    normalized.includes("before we continue") ||
+    normalized.includes("before continuing")
+  );
+}
+
+function extractGeneratedText(output: unknown): string {
+  const first = Array.isArray(output) ? output[0] : output;
+  if (!first || typeof first !== "object") return "";
+
+  const generatedText = (first as { generated_text?: unknown }).generated_text;
+  if (typeof generatedText === "string") return generatedText;
+
+  if (Array.isArray(generatedText)) {
+    const assistant = [...generatedText].reverse().find((message) => {
+      return (
+        message &&
+        typeof message === "object" &&
+        (message as { role?: unknown }).role === "assistant" &&
+        typeof (message as { content?: unknown }).content === "string"
+      );
+    });
+    if (assistant) {
+      return (assistant as { content: string }).content;
+    }
+  }
+
+  return "";
+}
+
+function extractFirstJSONObject(text: string): string {
+  const start = text.indexOf("{");
+  if (start === -1) {
+    throw new Error("Gemma output did not include a JSON object");
+  }
+
+  let depth = 0;
+  let inString = false;
+  let escaped = false;
+  for (let index = start; index < text.length; index += 1) {
+    const char = text[index];
+    if (escaped) {
+      escaped = false;
+      continue;
+    }
+    if (char === "\\") {
+      escaped = true;
+      continue;
+    }
+    if (char === "\"") {
+      inString = !inString;
+      continue;
+    }
+    if (inString) continue;
+    if (char === "{") {
+      depth += 1;
+    } else if (char === "}") {
+      depth -= 1;
+      if (depth === 0) {
+        return text.slice(start, index + 1);
+      }
+    }
+  }
+
+  throw new Error("Gemma output included incomplete JSON");
+}
+
+function throwIfAborted(signal: AbortSignal | undefined): void {
+  if (!signal?.aborted) return;
+  throw new DOMException("Generation aborted", "AbortError");
+}
+
+function logProgress(progress: ProgressInfo): void {
+  const file = "file" in progress ? progress.file : undefined;
+  const percent =
+    "progress" in progress && typeof progress.progress === "number"
+      ? ` ${Math.round(progress.progress)}%`
+      : "";
+  const label = file ? `${progress.status}: ${file}${percent}` : progress.status;
+  setModelLoadState({
+    phase: "loading",
+    status: progress.status,
+    file: file ?? null,
+    progress:
+      "progress" in progress && typeof progress.progress === "number"
+        ? Math.round(progress.progress)
+        : null,
+    message: file
+      ? `${progress.status} ${file}${percent}`
+      : `Gemma model load ${progress.status}`,
+  });
+
+  if (typeof console !== "undefined") {
+    console.info(`[wave] Gemma model load ${label}`);
+  }
+}
+
+function setModelLoadState(update: Partial<GemmaModelLoadState>): void {
+  const nextState = { ...modelLoadState, ...update };
+  if (isSameModelLoadState(modelLoadState, nextState)) return;
+
+  modelLoadState = nextState;
+  const shouldPublishImmediately =
+    modelLoadState.phase === "ready" ||
+    modelLoadState.phase === "error" ||
+    modelLoadState.status === "initializing";
+
+  if (shouldPublishImmediately) {
+    publishModelLoadState();
+    return;
+  }
+
+  const now = Date.now();
+  const elapsed = now - lastModelLoadPublishedAt;
+  if (elapsed >= MODEL_LOAD_NOTIFY_INTERVAL_MS) {
+    publishModelLoadState();
+    return;
+  }
+
+  if (pendingModelLoadPublish) return;
+  pendingModelLoadPublish = setTimeout(() => {
+    pendingModelLoadPublish = null;
+    publishModelLoadState();
+  }, MODEL_LOAD_NOTIFY_INTERVAL_MS - elapsed);
+}
+
+function publishModelLoadState(): void {
+  if (pendingModelLoadPublish) {
+    clearTimeout(pendingModelLoadPublish);
+    pendingModelLoadPublish = null;
+  }
+  lastModelLoadPublishedAt = Date.now();
+  for (const listener of modelLoadListeners) {
+    listener(modelLoadState);
+  }
+}
+
+function isSameModelLoadState(
+  a: GemmaModelLoadState,
+  b: GemmaModelLoadState,
+): boolean {
+  return (
+    a.phase === b.phase &&
+    a.status === b.status &&
+    a.file === b.file &&
+    a.progress === b.progress &&
+    a.device === b.device &&
+    a.message === b.message
+  );
+}

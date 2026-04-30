@@ -1,5 +1,9 @@
-import { outputContractFor, type ReflectionContext } from "./schemas";
-import type { BuiltPrompt } from "./medication-ack";
+import type { ReflectionContext } from "./schemas";
+
+interface BuiltPrompt {
+  systemPrompt: string;
+  userPrompt: string;
+}
 
 const SYSTEM_PROMPT = `<role>
 You write a one-screen reflection for WAVE after the patient finishes an urge-surfing session.
@@ -73,7 +77,7 @@ export function buildReflectionPrompt(input: ReflectionContext): BuiltPrompt {
     "</task>",
     "",
     "<output_shape>",
-    outputContractFor("reflection"),
+    `{"insight": "<string, 20-500 chars>", "nextSteps": ["<chip, 2-60 chars>", "<chip>", "<chip>", "<chip>"]}`,
     "</output_shape>",
   );
 

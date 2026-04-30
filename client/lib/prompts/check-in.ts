@@ -1,9 +1,8 @@
 /**
  * Check-in prompt builder.
  *
- * Assembles the per-conversation user-message block sent to the LLM
- * (gpt-5-mini today, in-browser Gemma 4 + check-in LoRA tomorrow).
- * The system prompt is the canonical WAVE_SYSTEM_PROMPT from
+ * Assembles the per-conversation user-message block sent to local
+ * Gemma. The system prompt is the canonical WAVE_SYSTEM_PROMPT from
  * wave-system.ts, augmented with check-in-specific instructions:
  *
  *   - The LLM drives EVERY agent turn. There are no scripted openers
@@ -11,10 +10,9 @@
  *     first message (their craving-score reply from the slider).
  *   - The LLM owns conversational flow: validate before technique,
  *     one technique max, normalize before normalizing-a-second-time.
- *   - When the LLM judges the check-in complete, it calls the
- *     `endConversation` tool. The route handler turns that tool call
- *     into an SSE `end_conversation` event the chat surface listens
- *     for. There is no regex-based readiness gate any more.
+ *   - When the LLM judges the check-in complete, it returns an
+ *     `endConversation` signal. There is no regex-based readiness gate
+ *     any more.
  *   - The LLM optionally classifies the patient's primary obstacle as
  *     part of the `endConversation` call so the chunk generator for
  *     the next chunk can ground its narration in it.
@@ -48,9 +46,7 @@ export interface BuildCheckInPromptMeta {
    * the model. The prompt uses this to tell the model exactly which
    * turn number it is about to produce, so the per-turn template can
    * be enforced without the model having to count its own replies in
-   * a long history (which gpt-5-mini at `low` reasoning effort was
-   * reliably miscounting, producing a warm close on turn 2 instead
-   * of asking a follow-up question).
+   * a long history.
    */
   agentTurnsInHistory: number;
 }

@@ -6,12 +6,9 @@
  * imported by both the player (chunk runtime) and the chat surface
  * (check-in runtime), so a single change here propagates to everything.
  *
- * Pause-duration invariant: every `pause` and `breath` segment's
- * `duration` field MUST equal the count spoken in the nearest preceding
- * `text` (for `pause`) or in the segment's own `instruction` (for
- * `breath`). The invariant is asserted by a unit test over CHUNKS in
- * client/lib/prompts/session-script.ts (PRD § Session Runtime
- * Requirements rule 1).
+ * Runtime invariant: Gemma chunk output is validated as plain text
+ * lines before it is wrapped into `Segment` objects. Any explicit
+ * timer/breath durations are owned by the client, not model output.
  */
 
 import type {
@@ -89,10 +86,9 @@ export interface Chunk {
 }
 
 /**
- * Trimmed intake context used by every check-in prompt and persisted
- * with the session. Mirrors the IntakeContext in
- * client/lib/prompts/schemas.ts but is duplicated here so the session
- * data model in this file is self-contained.
+ * Trimmed intake context used by every chunk/check-in prompt and
+ * persisted with the session. Duplicated here so the session data model
+ * in this file is self-contained.
  */
 export interface SessionUserProfile {
   matType: MatType;

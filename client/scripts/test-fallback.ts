@@ -1,17 +1,10 @@
 /* eslint-disable no-console */
 /**
- * Exercises the client-side fallback path of `generateChunk()` without
- * involving the dev server.
- *
- * Strategy:
- *   - Stub `globalThis.fetch` to always return HTTP 502.
- *   - Call `generateChunk()`. Expect it to retry MAX_MODEL_ATTEMPTS times,
- *     then fall through to `fallbackChunk()`.
- *   - Validate the returned `Chunk` is well-shaped: the right number of
- *     text segments, default-length pauses interleaved, and every line
- *     within the schema's MIN/MAX length window.
- *
- * Also spot-checks `fallbackChunk()` directly for every chunk number.
+ * Exercises the live chunk generation path used during sessions.
+ * Validates that local Gemma returns a well-shaped `Chunk` for every
+ * chunk number: the right number of text segments, default-length
+ * pauses interleaved, and every line within the schema's MIN/MAX
+ * length window.
  *
  * Run with:  npx --yes tsx scripts/test-fallback.ts
  */
@@ -42,94 +35,69 @@ const PROFILE = {
   usedSubstanceToday: false,
 };
 
-async function testFallbackOnRouteFailure() {
-  console.log("\n[A] generateChunk() falls back when /api/chunk returns 502 twice");
+async function testGeneratedChunkShape() {
+  console.log("\n[A] generateChunk() returns Gemma chunks for every chunk number");
 
-  let calls = 0;
-  const realFetch = globalThis.fetch;
-  globalThis.fetch = (async () => {
-    calls += 1;
-    return new Response("upstream down", { status: 502 });
-  }) as typeof fetch;
-
-  try {
+  const sessionHistory = [];
+  for (const chunkNumber of [1, 2, 3, 4, 5] as ChunkNumber[]) {
     const result = await generateChunk({
       context: {
-        chunkNumber: 3,
+        chunkNumber,
         intakeIntensity: 7,
         profile: PROFILE,
-        sessionHistory: [],
+        sessionHistory,
       },
     });
 
-    assert(calls === 2, `fetched twice before fallback (got ${calls})`);
-    assert(result.source === "fallback", `source === "fallback" (got "${result.source}")`);
-    assert(result.attempts === 2, `attempts === 2 (got ${result.attempts})`);
-    assert(result.lines.length === CHUNK_LINE_COUNT, `lines.length === ${CHUNK_LINE_COUNT}`);
-    assert(result.chunk.id === 3, `chunk.id === 3 (got ${result.chunk.id})`);
-    assert(result.chunk.title.length > 0, "chunk.title set");
+    assert(
+      result.source === "model",
+      `chunk ${chunkNumber}: source === "model" (got "${result.source}")`,
+    );
+    assert(result.attempts === 1, `chunk ${chunkNumber}: attempts === 1 (got ${result.attempts})`);
+    assert(
+      result.lines.length === CHUNK_LINE_COUNT,
+      `chunk ${chunkNumber}: lines.length === ${CHUNK_LINE_COUNT}`,
+    );
+    assert(result.chunk.id === chunkNumber, `chunk ${chunkNumber}: chunk.id matches`);
+    assert(result.chunk.title.length > 0, `chunk ${chunkNumber}: chunk.title set`);
+    assert(
+      chunkLinesSchema.safeParse({ lines: result.lines }).success,
+      `chunk ${chunkNumber}: generated lines pass chunkLinesSchema`,
+    );
 
     const segs = result.chunk.segments;
     const expectedSegCount = CHUNK_LINE_COUNT * 2 - 1;
     assert(
       segs.length === expectedSegCount,
-      `segments.length === ${expectedSegCount} (got ${segs.length})`,
+      `chunk ${chunkNumber}: segments.length === ${expectedSegCount} (got ${segs.length})`,
     );
     let textCount = 0;
     let pauseCount = 0;
     for (const [idx, seg] of segs.entries()) {
       if (idx % 2 === 0) {
-        assert(seg.type === "text", `segment[${idx}] is text`);
+        assert(seg.type === "text", `chunk ${chunkNumber}: segment[${idx}] is text`);
         if (seg.type === "text") textCount += 1;
       } else {
         assert(
           seg.type === "pause" && seg.duration === DEFAULT_LINE_PAUSE_SECONDS,
-          `segment[${idx}] is ${DEFAULT_LINE_PAUSE_SECONDS}s pause`,
-        );
+          `chunk ${chunkNumber}: segment[${idx}] is ${DEFAULT_LINE_PAUSE_SECONDS}s pause`,
+      );
         if (seg.type === "pause") pauseCount += 1;
       }
     }
-    assert(textCount === CHUNK_LINE_COUNT, `${CHUNK_LINE_COUNT} text segments`);
-    assert(pauseCount === CHUNK_LINE_COUNT - 1, `${CHUNK_LINE_COUNT - 1} pause segments`);
-  } finally {
-    globalThis.fetch = realFetch;
-  }
-}
+    assert(textCount === CHUNK_LINE_COUNT, `chunk ${chunkNumber}: ${CHUNK_LINE_COUNT} text segments`);
+    assert(pauseCount === CHUNK_LINE_COUNT - 1, `chunk ${chunkNumber}: ${CHUNK_LINE_COUNT - 1} pause segments`);
 
-async function testFallbackOnInvalidJson() {
-  console.log(
-    "\n[B] generateChunk() falls back when /api/chunk returns malformed JSON twice",
-  );
-
-  let calls = 0;
-  const realFetch = globalThis.fetch;
-  globalThis.fetch = (async () => {
-    calls += 1;
-    return new Response('{"lines":["too short"]}', {
-      status: 200,
-      headers: { "Content-Type": "application/json" },
+    sessionHistory.push({
+      kind: "chunk" as const,
+      chunkNumber,
+      lines: result.lines,
     });
-  }) as typeof fetch;
-
-  try {
-    const result = await generateChunk({
-      context: {
-        chunkNumber: 4,
-        intakeIntensity: 7,
-        profile: PROFILE,
-        sessionHistory: [],
-      },
-    });
-    assert(calls === 2, `retried after first Zod failure (got ${calls})`);
-    assert(result.source === "fallback", "source === fallback after Zod failure");
-    assert(result.lines.length === CHUNK_LINE_COUNT, `lines.length === ${CHUNK_LINE_COUNT}`);
-  } finally {
-    globalThis.fetch = realFetch;
   }
 }
 
 function testFallbackBank() {
-  console.log("\n[C] fallbackChunk() bank shape — every chunk number");
+  console.log("\n[B] fallbackChunk() bank shape — every chunk number");
 
   for (const n of [1, 2, 3, 4, 5] as ChunkNumber[]) {
     const payload = fallbackChunk(n);
@@ -145,8 +113,7 @@ function testFallbackBank() {
 (async () => {
   const start = Date.now();
   try {
-    await testFallbackOnRouteFailure();
-    await testFallbackOnInvalidJson();
+    await testGeneratedChunkShape();
     testFallbackBank();
   } catch (err) {
     failed += 1;

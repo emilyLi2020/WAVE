@@ -6,20 +6,18 @@ import { NarrationCard } from "./narration-card";
 
 interface Props {
   /**
-   * Reasoning-summary titles streamed in from /api/narrate/reflection,
-   * in arrival order. The latest item is shown as "active" and earlier
-   * items collapse to "done". Stable key is `index`, not array
-   * position.
+   * Local Gemma progress titles in arrival order. The latest item is
+   * shown as "active" and earlier items collapse to "done". Stable key
+   * is `index`, not array position.
    */
   titles: ReadonlyArray<ReflectionTitle>;
 }
 
 /**
  * Loading state for the reflection phase. While the model is
- * synthesising the closing insight (medium reasoning effort, ~5-10s),
- * we surface its reasoning-summary section titles as a small animated
- * checklist so the patient sees the model is making real progress
- * instead of staring at a static spinner.
+ * synthesising the closing insight, we surface small milestones as an
+ * animated checklist so the patient sees progress instead of staring
+ * at a static spinner.
  *
  * Pure presentation — no fetching. The parent
  * (`session-machine.tsx > ReflectionPhaseBlock`) drives the title list

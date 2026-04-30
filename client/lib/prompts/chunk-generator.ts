@@ -1,10 +1,11 @@
 /**
  * Chunk-generator prompt builder.
  *
- * Produces the system + user prompt pair for /api/chunk. The model
- * returns a strict JSON `{ lines: string[] }` payload — exactly
- * `CHUNK_LINE_COUNT` plain-text lines that the chunk player wraps as
- * text segments with default-length pauses between them.
+ * Produces the system + user prompt pair for a history-aware chunk
+ * generator. The model returns a strict JSON `{ lines: string[] }`
+ * payload — exactly `CHUNK_LINE_COUNT` plain-text lines that the chunk
+ * player wraps as text segments with default-length pauses between
+ * them.
  *
  * What the model sees
  *   - The canonical WAVE voice (trauma-informed, second-person,
@@ -15,8 +16,8 @@
  *   - A condensed transcript of every prior chunk + check-in this
  *     session, so each new chunk grounds itself in what the patient
  *     has already heard and said. This is the difference between the
- *     scripted bank (medication-agnostic, history-blind) and this
- *     route (history-aware).
+ *     scripted bank (medication-agnostic, history-blind) and the
+ *     model-generated chunk path (history-aware).
  *
  * What the model never does
  *   - Recommend dose changes, prescribe, or shame missed doses.
@@ -27,7 +28,10 @@
  *     only ever sees the narration.
  */
 
-import type { ChunkGenerationContextPayload } from "./schemas";
+import {
+  CHUNK_LINE_COUNT,
+  type ChunkGenerationContextPayload,
+} from "./schemas";
 import { WAVE_SYSTEM_PROMPT } from "./wave-system";
 import type { ChunkNumber } from "@/types/session";
 
@@ -179,7 +183,7 @@ Generate the narration for this chunk as a JSON object of the form:
 { "lines": [ "...", "...", ... ] }
 
 Requirements:
-- Exactly the number of lines the response schema requires.
+- Exactly ${CHUNK_LINE_COUNT} lines. Do not return ${CHUNK_LINE_COUNT - 1}, ${CHUNK_LINE_COUNT + 1}, or any other count.
 - Each line is plain text, one to three short sentences.
 - Never use square brackets. Do not include bracketed pauses, bracketed breath cues, or stage directions.
 - Lines flow as a meditation script — each one a beat the patient sits with for ~7 seconds before the next line.

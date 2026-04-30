@@ -124,11 +124,11 @@ vLLM, llama.cpp, and Transformers all parse this natively. The HF chat
 template (visible in the model card) handles the formatting — you do not hand-
 craft the tool grammar.
 
-**For WAVE:** tool calls are allowed only for narrow control-plane signals, not
-for clinical routing. The current temporary `/api/checkin` stand-in uses a
-single `endConversation` tool call to signal that the check-in is complete; the
-session state machine still owns the transition. The Adapter Manager chooses
-LoRAs with rule-based routing (see [`models.md`](./models.md)), so the model is
+**For WAVE:** tool-like signals are allowed only for narrow control-plane
+events, not for clinical routing. The local check-in runtime asks Gemma to
+return an `endConversation` JSON signal when the check-in is complete; the
+session state machine still owns the transition. Runtime routing chooses
+LoRAs by code (see [`models.md`](./models.md)), so the model is
 never given a tool that can change medication, pick a hotline, write storage, or
 route around the intake safety screen.
 
@@ -163,13 +163,10 @@ A few things that follow from this table:
   WebGPU), function calling is also the most portable option since the
   guarantee comes from the model, not the server.
 
-**For WAVE specifically:** the final web runtime ships via `transformers.js` +
+**For WAVE specifically:** the web runtime ships via `transformers.js` +
 WebGPU, which has no built-in JSON mode. Where we need structured output, the
-Gemma path will constrain on the prompt/tool shape, parse the output, validate
-with Zod, retry once, then fall back to scripted local copy. The current
-temporary OpenAI stand-ins use Responses API JSON Schema where useful
-(`/api/narrate`, `/api/narrate/reflection`, `/api/insights`) so the client-side
-contracts can stabilize before the Gemma swap.
+Gemma path constrains on the prompt/tool shape, parses the output, validates
+with Zod, retries once, then falls back to scripted local copy.
 
 ---
 
@@ -247,10 +244,8 @@ server in front of it.
 
 **For WAVE:** the settled architecture does not run an OpenAI-compatible server
 in the session path; it calls Gemma directly through `transformers.js` in the
-browser. The current checked-in web demo temporarily calls OpenAI `gpt-5-mini`
-from Next.js Route Handlers while that runtime is unfinished. Those routes are
-scaffolding, not the target serving architecture. The OpenAI Agents SDK is not
-in our stack.
+browser. The current checked-in web demo follows that shape for check-in,
+reflection, and insights. The OpenAI Agents SDK is not in our stack.
 
 ---
 
