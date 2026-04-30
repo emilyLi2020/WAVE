@@ -10,8 +10,6 @@ per LoRA is created on the first save:
 - `lora-check-in-4.json`
 - `lora-check-in-5.json`
 - `lora-reflection.json`
-- `lora-notification.json`
-- `lora-insights.json`
 
 Each file is a JSON array of seed records:
 
@@ -31,8 +29,10 @@ Each file is a JSON array of seed records:
 ]
 ```
 
-These files **are** the training dataset — commit them so the engineer
-running the QLoRA pipeline (`docs/model-training.md`) can pull them.
+These files are the specialized source sets. The export page can download them
+individually for demonstration adapters or combine them into
+`lora-wave-session.jsonl` for the browser demo fine-tune. Commit them so the
+engineer running the QLoRA pipeline (`docs/model-training.md`) can pull them.
 
 The Next.js dev server reads from and writes to this directory via
 `client/lib/training/storage.ts`. Override the location with

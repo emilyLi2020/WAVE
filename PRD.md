@@ -433,10 +433,10 @@ This is the clinical core of WAVE and the source of truth for every check-in pro
 ## Out of Scope (Save for Later)
 
 - Native iOS / Android React Native builds (the hackathon ships the web demo).
-- LiteRT port of the in-browser Gemma 4 + LoRA stack (the web demo runs base Gemma via transformers.js + WebGPU; the mobile swap keeps the same rule-based runtime routing post-hackathon).
+- LiteRT port of the in-browser Gemma 4 + LoRA stack (the web demo uses one merged `lora-wave-session` artifact because browser LoRA hot-swapping is not mature; the mobile swap keeps the same rule-based runtime routing post-hackathon).
 - V2 Kokoro TTS build (MVP ships on-screen text + wave animation + ambient audio bed; TTS drop-in swap happens after hackathon).
 - Voice input from the patient at check-ins (text chat only at MVP).
-- **Stretch LoRAs** (`lora-notification`, `lora-insights`) — MVP ships per-check-in LoRAs + `lora-reflection` per `docs/models.md`. Notification and insights LoRAs train through the same process in `docs/model-training.md` when time allows.
+- Runtime-mounted specialized LoRAs — the demo trains specialized check-in/reflection adapters for proof-of-concept evaluation, but ships one multitask `lora-wave-session` merged model per `docs/models.md`.
 - Per-user / on-device-trained LoRA personalization.
 - Apple Watch / Wear OS complications.
 - Siri / Google Assistant shortcuts.

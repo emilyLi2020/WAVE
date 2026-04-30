@@ -1,9 +1,9 @@
 /**
  * /api/training/export — download seeds as JSONL or CSV.
  *
- * - format=jsonl + loraId=<id> emits one Unsloth ShareGPT-style record
- *   per row, ready to feed to TRL's SFTTrainer with the `gemma-4` chat
- *   template (see docs/model-training.md §6 and Unsloth's Gemma 4 guide).
+ * - format=jsonl + loraId=<id> emits one specialized LoRA seed file.
+ * - format=jsonl without loraId emits the combined lora-wave-session dataset
+ *   used by the browser demo's single multitask LoRA.
  * - format=csv emits a flat dump of every seed across every LoRA. Useful
  *   for ad-hoc inspection in a spreadsheet.
  *
@@ -17,7 +17,7 @@ import { NextResponse } from "next/server";
 import { assertTrainingEnabled } from "@/lib/training/guard";
 import { isLoraId } from "@/lib/training/lora-specs";
 import { listAllSeeds, listSeedsForLora } from "@/lib/training/storage";
-import type { TrainingSeed } from "@/lib/training/types";
+import { DEMO_LORA_ID, type TrainingSeed } from "@/lib/training/types";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -31,11 +31,20 @@ function csvEscape(value: unknown): string {
   return str;
 }
 
-function toJsonl(seeds: readonly TrainingSeed[]): string {
+function toJsonl(
+  seeds: readonly TrainingSeed[],
+  options: { combined: boolean },
+): string {
   const lines: string[] = [];
   for (const seed of seeds) {
+    const input = options.combined
+      ? {
+          surface: seed.loraId,
+          input: seed.input,
+        }
+      : seed.input;
     const messages = [
-      { role: "user", content: JSON.stringify(seed.input) },
+      { role: "user", content: JSON.stringify(input) },
       { role: "assistant", content: JSON.stringify(seed.output) },
     ];
     lines.push(JSON.stringify({ messages }));
@@ -77,6 +86,7 @@ export async function GET(request: Request) {
   const format = (url.searchParams.get("format") ?? "jsonl").toLowerCase();
   const loraIdParam = url.searchParams.get("loraId");
   const includeDrafts = url.searchParams.get("includeDrafts") === "1";
+  const combinedJsonl = !loraIdParam && format === "jsonl";
 
   let seeds: TrainingSeed[];
   if (loraIdParam) {
@@ -113,22 +123,12 @@ export async function GET(request: Request) {
     );
   }
 
-  if (!loraIdParam) {
-    return NextResponse.json(
-      {
-        error: "loraId_required_for_jsonl",
-        message:
-          "JSONL export is per-LoRA so each file matches one Unsloth training run. Use ?format=csv for an all-LoRAs dump.",
-      },
-      { status: 400 },
-    );
-  }
-
-  const body = toJsonl(seeds);
+  const body = toJsonl(seeds, { combined: combinedJsonl });
+  const filename = combinedJsonl ? `${DEMO_LORA_ID}.jsonl` : `${loraIdParam}.jsonl`;
   return new Response(body, {
     headers: {
       "Content-Type": "application/jsonl; charset=utf-8",
-      "Content-Disposition": `attachment; filename="${loraIdParam}.jsonl"`,
+      "Content-Disposition": `attachment; filename="${filename}"`,
       "Cache-Control": "no-store",
     },
   });

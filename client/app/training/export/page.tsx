@@ -29,20 +29,43 @@ export default async function ExportPage() {
           Export training data
         </h1>
         <p className="mt-2 max-w-2xl text-sm text-foreground/70">
-          Download per-LoRA JSONL files in Unsloth&apos;s ShareGPT messages
-          format. Each file feeds directly into TRL&apos;s SFTTrainer with
-          the <code>gemma-4</code> chat template, per
-          <code> docs/model-training.md §6</code>. By default only{" "}
-          <em>ready</em> and <em>approved</em> seeds are exported — drafts
-          are excluded so half-finished thinking never enters a training
-          run.
+          Download specialized JSONL files for demonstration adapters, or one
+          combined JSONL file for the browser demo&apos;s multitask{" "}
+          <code>lora-wave-session</code> fine-tune. By default only{" "}
+          <em>ready</em> and <em>approved</em> seeds are exported, so drafts are
+          excluded from training runs.
         </p>
       </header>
 
+      <div className="rounded-2xl border border-accent/30 bg-accent-soft/30 p-5">
+        <h2 className="font-semibold">Demo multitask JSONL</h2>
+        <p className="mt-1 text-xs text-foreground/65">
+          Combines every ready specialized row into{" "}
+          <code>lora-wave-session.jsonl</code>. The user message wraps each row
+          with its source surface so one adapter can learn check-ins and
+          reflection together.
+        </p>
+        <div className="mt-4 flex flex-wrap items-center gap-3">
+          <a
+            href="/api/training/export?format=jsonl"
+            className="rounded-full border border-border bg-background px-4 py-1.5 text-xs font-medium hover:border-accent hover:text-accent transition"
+          >
+            Download lora-wave-session.jsonl
+          </a>
+          <a
+            href="/api/training/export?format=jsonl&includeDrafts=1"
+            className="text-[11px] text-foreground/50 hover:text-accent"
+          >
+            Include drafts
+          </a>
+        </div>
+      </div>
+
       <div className="rounded-2xl border border-border bg-surface p-5">
-        <h2 className="font-semibold">Per-LoRA JSONL</h2>
+        <h2 className="font-semibold">Specialized JSONL</h2>
         <p className="mt-1 text-xs text-foreground/55">
-          One file per LoRA. Filename is <code>{`<lora-id>.jsonl`}</code>.
+          One file per future specialized adapter. Filename is{" "}
+          <code>{`<lora-id>.jsonl`}</code>.
         </p>
         <ul className="mt-4 divide-y divide-border">
           {LORA_SPEC_LIST.map((spec) => {
@@ -136,8 +159,10 @@ export default async function ExportPage() {
         </p>
         <p>
           <strong>Pipeline integration.</strong> The JSONL downloads
-          above match Unsloth&apos;s ShareGPT messages format (one
-          conversation per line). From <code>models/</code>, load with{" "}
+          above match Unsloth&apos;s ShareGPT messages format (one conversation
+          per line). Use the combined file for the browser demo LoRA; use the
+          per-specialist files only for offline demonstration adapters. From{" "}
+          <code>models/</code>, load with{" "}
           <code>datasets.load_dataset(&quot;json&quot;, ...)</code> and
           pass the <code>messages</code> field to TRL&apos;s SFTTrainer
           with the <code>gemma-4</code> chat template

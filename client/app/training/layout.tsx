@@ -60,29 +60,9 @@ export default async function TrainingLayout({
           <SidebarLink href="/training/export" label="Export · for engineers" />
 
           <div className="pt-6 pb-2 text-xs uppercase tracking-wide text-foreground/50 px-2">
-            MVP LoRAs
+            Specialized sample sets
           </div>
-          {LORA_SPEC_LIST.filter((spec) => !spec.isStretch).map((spec) => {
-            const c = counts[spec.loraId];
-            return (
-              <SidebarLink
-                key={spec.loraId}
-                href={`/training/${spec.loraId}`}
-                label={spec.shortTitle}
-                badge={`${c.ready + c.approved}/${spec.targetCount}`}
-                badgeHint={
-                  c.draft > 0
-                    ? `${c.draft} draft${c.draft === 1 ? "" : "s"} not counted`
-                    : undefined
-                }
-              />
-            );
-          })}
-
-          <div className="pt-6 pb-2 text-xs uppercase tracking-wide text-foreground/50 px-2">
-            Stretch LoRAs
-          </div>
-          {LORA_SPEC_LIST.filter((spec) => spec.isStretch).map((spec) => {
+          {LORA_SPEC_LIST.map((spec) => {
             const c = counts[spec.loraId];
             return (
               <SidebarLink

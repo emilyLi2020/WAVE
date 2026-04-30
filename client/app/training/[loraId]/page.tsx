@@ -56,7 +56,7 @@ export default async function LoraIndexPage({ params }: PageProps) {
     <div className="space-y-8">
       <header className="space-y-3">
         <p className="text-xs uppercase tracking-wide text-foreground/50">
-          {spec.isStretch ? "Stretch LoRA" : "MVP LoRA"} · {spec.loraId}
+          Specialized sample set · {spec.loraId}
         </p>
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div>
@@ -78,7 +78,7 @@ export default async function LoraIndexPage({ params }: PageProps) {
 
       <div className="grid gap-4 lg:grid-cols-2">
         <div className="rounded-2xl border border-border bg-surface p-5">
-          <h2 className="font-semibold">Why this is its own LoRA</h2>
+          <h2 className="font-semibold">Why this set is separate</h2>
           <p className="mt-2 text-sm text-foreground/70 leading-relaxed">
             {spec.clinicalRationale}
           </p>
@@ -92,7 +92,7 @@ export default async function LoraIndexPage({ params }: PageProps) {
           </ul>
           <p className="mt-3 text-xs text-foreground/55">
             Every <em>ready</em> example is checked against these by the
-            eval harness. Drafts are exempt so you can think out loud.
+            dataset validators. Drafts are exempt so you can think out loud.
           </p>
         </div>
       </div>

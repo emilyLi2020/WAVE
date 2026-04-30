@@ -1,24 +1,23 @@
 import { z } from "zod";
 
 /**
- * The eight LoRAs documented in docs/models.md. Adding a 9th means
- * adding one entry here and one entry to LORA_SPECS in ./lora-specs.ts.
- * Each LoRA gets its own JSON file at
- * <repo-root>/data/training-seeds/<lora-id>.json the first time a seed
- * is saved.
+ * Specialized LoRA sample sets collected in the /training UI. The web demo
+ * ships one merged multitask LoRA (`DEMO_LORA_ID`), trained from the combined
+ * rows collected under these future specialized adapter IDs.
  */
+export const DEMO_LORA_ID = "lora-wave-session" as const;
+
 export const LORA_IDS = [
-  "lora-med-ack",
-  "lora-body-scan",
-  "lora-wave-rise",
-  "lora-wave-peak",
-  "lora-wave-fall",
+  "lora-check-in-1",
+  "lora-check-in-2",
+  "lora-check-in-3",
+  "lora-check-in-4",
+  "lora-check-in-5",
   "lora-reflection",
-  "lora-notification",
-  "lora-insights",
 ] as const;
 
 export type LoRAId = (typeof LORA_IDS)[number];
+export type DemoLoRAId = typeof DEMO_LORA_ID;
 
 export const SEED_STATUSES = ["draft", "ready", "approved"] as const;
 export type SeedStatus = (typeof SEED_STATUSES)[number];
@@ -80,7 +79,7 @@ export interface ObjectFieldSpec extends BaseField {
 
 /**
  * A field whose value is fixed and not user-editable (e.g.
- * lora-med-ack's `nextPhase: "body_scan"`). Renders as a read-only
+ * a check-in spec's fixed `chunkNumber`). Renders as a read-only
  * pill so the doctor sees the constraint without having to pick it.
  */
 export interface ConstFieldSpec extends BaseField {
@@ -119,7 +118,7 @@ export interface LoraFormSpec {
   invariants: readonly string[];
   /** Citation prompt — what clinical source the doctor should cite. */
   citationPrompt?: string;
-  /** Target seed count per docs/model-training.md §1 (15–40 typical). */
+  /** Target seed count per docs/model-training.md §1. */
   targetCount: number;
   isStretch: boolean;
   inputFields: readonly FieldSpec[];
