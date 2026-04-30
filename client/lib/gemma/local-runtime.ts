@@ -53,6 +53,14 @@ export interface LocalInsightsResult {
 
 export type GemmaModelLoadPhase = "idle" | "loading" | "ready" | "error";
 
+export interface GemmaModelFileLoadState {
+  file: string;
+  status: string;
+  progress: number | null;
+  loaded: number | null;
+  total: number | null;
+}
+
 export interface GemmaModelLoadState {
   phase: GemmaModelLoadPhase;
   status: string;
@@ -60,6 +68,7 @@ export interface GemmaModelLoadState {
   progress: number | null;
   device: DeviceType | null;
   message: string;
+  files: readonly GemmaModelFileLoadState[];
 }
 
 const ALLOWED_OBSTACLES: readonly ObstacleCategory[] = [
@@ -82,6 +91,7 @@ let modelLoadState: GemmaModelLoadState = {
   progress: null,
   device: null,
   message: "Waiting to prepare Gemma.",
+  files: [],
 };
 
 const modelLoadListeners = new Set<(state: GemmaModelLoadState) => void>();
@@ -258,6 +268,7 @@ async function getGenerator(): Promise<TextGenerationPipeline> {
       file: null,
       progress: null,
       message: "Preparing the local Gemma runtime.",
+      files: [],
     });
 
     const { env, LogLevel, pipeline } = await import("@huggingface/transformers");
@@ -310,6 +321,11 @@ async function getGenerator(): Promise<TextGenerationPipeline> {
       progress: 100,
       device,
       message: "Gemma is ready on this device.",
+      files: modelLoadState.files.map((fileState) => ({
+        ...fileState,
+        status: "ready",
+        progress: 100,
+      })),
     });
 
     return generator;
@@ -479,20 +495,18 @@ function throwIfAborted(signal: AbortSignal | undefined): void {
 }
 
 function logProgress(progress: ProgressInfo): void {
-  const file = "file" in progress ? progress.file : undefined;
-  const percent =
-    "progress" in progress && typeof progress.progress === "number"
-      ? ` ${Math.round(progress.progress)}%`
-      : "";
+  const progressRecord = progress as Record<string, unknown>;
+  const file =
+    typeof progressRecord.file === "string" ? progressRecord.file : undefined;
+  const fileProgress = getProgressPercent(progressRecord, progress.status);
+  const percent = fileProgress !== null ? ` ${fileProgress}%` : "";
   const label = file ? `${progress.status}: ${file}${percent}` : progress.status;
   setModelLoadState({
     phase: "loading",
     status: progress.status,
     file: file ?? null,
-    progress:
-      "progress" in progress && typeof progress.progress === "number"
-        ? Math.round(progress.progress)
-        : null,
+    progress: fileProgress,
+    files: updateModelFileLoadStates(progressRecord, progress.status),
     message: file
       ? `${progress.status} ${file}${percent}`
       : `Gemma model load ${progress.status}`,
@@ -501,6 +515,63 @@ function logProgress(progress: ProgressInfo): void {
   if (typeof console !== "undefined") {
     console.info(`[wave] Gemma model load ${label}`);
   }
+}
+
+function updateModelFileLoadStates(
+  progress: Record<string, unknown>,
+  status: string,
+): readonly GemmaModelFileLoadState[] {
+  const file = typeof progress.file === "string" ? progress.file : null;
+  if (!file) return modelLoadState.files;
+
+  const existingFileState = modelLoadState.files.find(
+    (fileState) => fileState.file === file,
+  );
+  const nextFileState: GemmaModelFileLoadState = {
+    file,
+    status,
+    progress: getProgressPercent(progress, status),
+    loaded: getNumber(progress.loaded) ?? existingFileState?.loaded ?? null,
+    total: getNumber(progress.total) ?? existingFileState?.total ?? null,
+  };
+
+  const existingIndex = modelLoadState.files.findIndex(
+    (fileState) => fileState.file === file,
+  );
+  if (existingIndex === -1) {
+    return [...modelLoadState.files, nextFileState];
+  }
+
+  return modelLoadState.files.map((fileState, index) =>
+    index === existingIndex ? nextFileState : fileState,
+  );
+}
+
+function getProgressPercent(
+  progress: Record<string, unknown>,
+  status: string,
+): number | null {
+  const rawProgress = getNumber(progress.progress);
+  if (rawProgress !== null) {
+    return Math.min(100, Math.max(0, Math.round(rawProgress)));
+  }
+
+  const loaded = getNumber(progress.loaded);
+  const total = getNumber(progress.total);
+  if (loaded !== null && total !== null && total > 0) {
+    return Math.min(100, Math.max(0, Math.round((loaded / total) * 100)));
+  }
+
+  const normalizedStatus = status.toLowerCase();
+  if (normalizedStatus === "done" || normalizedStatus === "ready") {
+    return 100;
+  }
+
+  return null;
+}
+
+function getNumber(value: unknown): number | null {
+  return typeof value === "number" && Number.isFinite(value) ? value : null;
 }
 
 function setModelLoadState(update: Partial<GemmaModelLoadState>): void {
@@ -553,6 +624,25 @@ function isSameModelLoadState(
     a.file === b.file &&
     a.progress === b.progress &&
     a.device === b.device &&
-    a.message === b.message
+    a.message === b.message &&
+    areSameModelLoadFiles(a.files, b.files)
   );
+}
+
+function areSameModelLoadFiles(
+  a: readonly GemmaModelFileLoadState[],
+  b: readonly GemmaModelFileLoadState[],
+): boolean {
+  if (a.length !== b.length) return false;
+  return a.every((fileState, index) => {
+    const other = b[index];
+    return (
+      other !== undefined &&
+      fileState.file === other.file &&
+      fileState.status === other.status &&
+      fileState.progress === other.progress &&
+      fileState.loaded === other.loaded &&
+      fileState.total === other.total
+    );
+  });
 }
