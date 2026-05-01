@@ -372,6 +372,11 @@ export function SeedForm({ spec, existing }: Props) {
         </div>
       ) : null}
 
+      <TrainingTip
+        invariants={spec.invariants}
+        citationPrompt={spec.citationPrompt}
+      />
+
       <div className="grid gap-6">
         <FieldSection
           title="Patient context (input)"
@@ -464,6 +469,32 @@ export function SeedForm({ spec, existing }: Props) {
         </div>
       ) : null}
     </form>
+  );
+}
+
+function TrainingTip({
+  invariants,
+  citationPrompt,
+}: {
+  invariants: readonly string[];
+  citationPrompt?: string;
+}) {
+  return (
+    <details className="rounded-2xl border border-warn/35 bg-warn-soft/35 p-4 text-sm">
+      <summary className="cursor-pointer font-medium text-warn">
+        Tip: check this set&apos;s rules before marking an example ready
+      </summary>
+      <ul className="mt-3 space-y-1.5 text-foreground/80 list-disc pl-5">
+        {invariants.map((invariant) => (
+          <li key={invariant}>{invariant}</li>
+        ))}
+      </ul>
+      {citationPrompt ? (
+        <p className="mt-3 rounded-lg border border-border bg-surface px-3 py-2 text-xs text-foreground/70">
+          <strong>Citation:</strong> {citationPrompt}
+        </p>
+      ) : null}
+    </details>
   );
 }
 
