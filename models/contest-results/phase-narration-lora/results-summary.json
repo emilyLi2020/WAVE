@@ -1,0 +1,81 @@
+{
+  "loraId": "lora-phase-narration",
+  "baseModel": "google/gemma-4-E2B-it",
+  "runPath": "models/runs/lora-phase-narration/contest-r8-a16-lr5e-5-0p5",
+  "dataset": {
+    "path": "models/datasets/lora-phase-narration-expanded.jsonl",
+    "totalExamples": 50,
+    "trainExamples": 40,
+    "heldOutExamples": 10,
+    "splitSeed": 7,
+    "testSize": 0.2,
+    "composition": {
+      "clinicianSeedRows": 10,
+      "syntheticDraftRows": 40
+    }
+  },
+  "training": {
+    "method": "PEFT LoRA / QLoRA with TRL SFTTrainer",
+    "promptStyle": "wave_chunk_json_wrapper",
+    "epochs": 0.5,
+    "optimizerStepsCompleted": 3,
+    "batchSize": 1,
+    "gradientAccumulationSteps": 8,
+    "learningRate": 0.00005,
+    "loraRank": 8,
+    "loraAlpha": 16,
+    "loraDropout": 0.05,
+    "maxSequenceLength": 2048,
+    "warmupSteps": 5,
+    "quantization": "4-bit NF4 QLoRA",
+    "targetModules": [
+      "model.language_model.layers.*.self_attn.q_proj",
+      "model.language_model.layers.*.self_attn.k_proj",
+      "model.language_model.layers.*.self_attn.v_proj",
+      "model.language_model.layers.*.self_attn.o_proj",
+      "model.language_model.layers.*.mlp.gate_proj",
+      "model.language_model.layers.*.mlp.up_proj",
+      "model.language_model.layers.*.mlp.down_proj"
+    ]
+  },
+  "metrics": {
+    "base": {
+      "completionNll": 4.767554969061482,
+      "completionPpl": 117.63127794974649,
+      "waveScore": 67.29,
+      "jsonValidityRate": 1.0,
+      "schemaPassRate": 1.0,
+      "stylePassRate": 1.0,
+      "safetyPassRate": 1.0,
+      "medicalDirectivePassRate": 1.0,
+      "meanTokenF1": 0.29240439696475173,
+      "meanRougeLF1": 0.1651047760992819
+    },
+    "lora": {
+      "completionNll": 4.709684080205589,
+      "completionPpl": 111.01708187138732,
+      "waveScore": 70.44,
+      "jsonValidityRate": 1.0,
+      "schemaPassRate": 1.0,
+      "stylePassRate": 1.0,
+      "safetyPassRate": 1.0,
+      "medicalDirectivePassRate": 1.0,
+      "meanTokenF1": 0.30515762976410177,
+      "meanRougeLF1": 0.17647896415640907
+    },
+    "delta": {
+      "completionNll": -0.0578708888558932,
+      "completionPpl": -6.614196078359171,
+      "completionNllImprovementRate": 0.012138483820625016,
+      "waveScore": 3.1499999999999915,
+      "meanTokenF1": 0.012753232799350034,
+      "meanRougeLF1": 0.011374188057127171
+    }
+  },
+  "adapterUpdateCheck": {
+    "B_total_norm": 0.885096289566718,
+    "B_zero": 0,
+    "tensor_count": 410
+  },
+  "contestClaim": "Fine-tuning improved held-out completion likelihood and reference similarity versus base Gemma while preserving 100% JSON validity, schema adherence, patient-facing style, safety, and medication directive pass rates."
+}

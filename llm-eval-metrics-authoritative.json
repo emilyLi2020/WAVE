@@ -1,0 +1,87 @@
+{
+  "search_id": "search_e725ed012f1646128441a5e38e30b8a3",
+  "status": "ok",
+  "results": [
+    {
+      "url": "https://huggingface.co/metrics",
+      "title": "Hugging Face \u2013 The AI community building the future.",
+      "publish_date": null,
+      "excerpts": [
+        "Moreover, BERTScore computes precision, recall, and F1 measure, which can be useful for evaluating different language generation tasks. See the project&#x27;s README at https://github.com/Tiiiger/bert_score#readme for more information. Perplexity (PPL) is one of the most common metrics for evaluating language models."
+      ]
+    },
+    {
+      "url": "https://arxiv.org/abs/2211.09110",
+      "title": "[2211.09110] Holistic Evaluation of Language Models",
+      "publish_date": null,
+      "excerpts": [
+        "Second, we adopt a multi-metric approach: <strong>We measure 7 metrics (accuracy, calibration, robustness, fairness, bias, toxicity, and efficiency) for each of 16 core scenarios when possible (87.5% of the time).</strong>"
+      ]
+    },
+    {
+      "url": "https://developers.openai.com/api/docs/guides/evals",
+      "title": "Working with evals | OpenAI API",
+      "publish_date": null,
+      "excerpts": [
+        "In this case, we just want the model to output one of three category strings based on the input ticket. The string it outputs should exactly match the human-labeled correct_label field in our test data. So in this case, we will want to use a string_check grader to evaluate the output."
+      ]
+    },
+    {
+      "url": "https://deepwiki.com/huggingface/evaluate",
+      "title": "huggingface/evaluate | DeepWiki",
+      "publish_date": null,
+      "excerpts": [
+        "They form the largest category with 300+ implementations covering tasks like classification (accuracy, F1), generation (BLEU, ROUGE), and advanced semantic metrics (BERTScore, BLEURT). Sources: docs/source/a_quick_tour.mdx9 README.md35 \u00b7 Comparisons enable statistical testing between models, determining whether performance differences are significant. Examples include McNemar&#x27;s test and exact match comparisons. ... Measurements analyze datasets or model outputs without requiring reference labels. They assess properties like text length, perplexity, or content quality (e.g., toxicity)."
+      ]
+    },
+    {
+      "url": "https://developers.openai.com/api/docs/guides/evaluation-best-practices",
+      "title": "Evaluation best practices | OpenAI API",
+      "publish_date": null,
+      "excerpts": [
+        "Quantitative evals provide a numerical score you can use to filter and rank results. They provide useful benchmarks for automated regression testing. Examples: Exact match, string match, ROUGE/BLEU scoring, function call accuracy, executable evals (executed to assess functionality or behavior\u2014e.g., text2sql)"
+      ]
+    },
+    {
+      "url": "https://portkey.ai/blog/decoding-openai-evals/",
+      "title": "Decoding OpenAI Evals - what is eval, templates,",
+      "publish_date": null,
+      "excerpts": [
+        "OpenAI has defined 2 types of eval ... ideal_answers \u00b7 Model-Graded Templates <strong>These contain functions where an LLM compares the output to the ideal_answers and attempts to judge the accuracy</strong>."
+      ]
+    },
+    {
+      "url": "https://crfm.stanford.edu/2023/12/19/helm-lite.html",
+      "title": "HELM Lite: Lightweight and Broad Capabilities Evaluation",
+      "publish_date": null,
+      "excerpts": [
+        "The original goal of HELM was to holistically evaluate all the language models we had access to on a set of representative scenarios (capturing language abilities, reasoning abilities, knowledge, etc.) and multiple metrics (<strong>accuracy, calibration, robustness, fairness, bias, toxicity, efficiency).</strong>"
+      ]
+    },
+    {
+      "url": "https://github.com/stanford-crfm/helm",
+      "title": "GitHub - stanford-crfm/helm: Holistic Evaluation of Language Models (HELM) is an open source Python framework created by the Center for Research on Foundation Models (CRFM) at Stanford for holistic, reproducible and transparent evaluation of foundation models, including large language models (LLMs) and multimodal models. \u00b7 GitHub",
+      "publish_date": null,
+      "excerpts": [
+        "Holistic Evaluation of Language Models (HELM) is an open source Python framework created by the Center for Research on Foundation Models (CRFM) at Stanford for holistic, reproducible and transparent evaluation of foundation models, including large language models (LLMs) and multimodal models."
+      ]
+    },
+    {
+      "url": "https://developers.openai.com/cookbook/examples/evaluation/getting_started_with_openai_evals",
+      "title": "Getting Started with OpenAI Evals",
+      "publish_date": null,
+      "excerpts": [
+        "For example, we can have an eval ... \u201c2008\u201d. We feed the input to a model and get the completion. <strong>If the model says \u201c2008\u201d, it is then graded as correct</strong>. We can write a string match ..."
+      ]
+    },
+    {
+      "url": "https://www.comet.com/site/blog/bertscore-for-llm-evaluation/",
+      "title": "BERTScore For LLM Evaluation - Comet",
+      "publish_date": null,
+      "excerpts": [
+        "To do this, we\u2019ll implement BERTScore in Opik, Comet\u2019s open-source LLM evaluation framework. We\u2019ll leverage Hugging Face\u2019s evaluate implementation of BERTScore, modifying it slightly to create a custom Opik metric with a score method that returns a ScoreResult object:"
+      ]
+    }
+  ],
+  "warnings": []
+}

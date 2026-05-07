@@ -137,6 +137,75 @@ conda env remove -n wave-models
 
 Gemma weights are gated — accept the license at <https://huggingface.co/google/gemma-4-E2B-it> once and either run `huggingface-cli login` in your shell or paste a token in the notebook's auth cell.
 
+## LoRA Experiments
+
+### Phase narration
+
+Generate draft synthetic rows from the first clinician seed file:
+
+```powershell
+cd models
+uv run python generate_phase_narration_synthetic.py --source "C:\Users\Bill\Downloads\lora-phase-narration-clinician.jsonl"
+```
+
+This writes:
+
+- `datasets/lora-phase-narration-synthetic-draft.jsonl` - 40 synthetic draft
+  rows only.
+- `datasets/lora-phase-narration-expanded.jsonl` - the 10 source rows plus the
+  40 synthetic draft rows.
+
+Synthetic rows are deterministic for the same `--seed`, marked `draft`, and
+carry provenance notes because they need clinician review before they should be
+treated as ready training data.
+
+`train_phase_narration_lora.py` trains the future `lora-phase-narration`
+adapter from clinician seed JSONL and writes a frozen split plus eval report
+under `models/runs/lora-phase-narration/<timestamp>/`.
+
+The trainer does not feed bare JSON inputs to Gemma. It wraps every example in
+the same shape the app uses for chunk generation: a WAVE system prompt, a
+chunk-specific user task, and an assistant response that is strict
+`{"lines":[...]}` JSON. That mirrors the production JSON-mode contract
+(`generateText` + `Output.object()` / schema validation in AI SDK terminology)
+instead of teaching the model to analyze raw clinical data.
+
+First validate the dataset and split without loading Gemma:
+
+```powershell
+cd models
+uv run python train_phase_narration_lora.py --data "C:\Users\Bill\Downloads\lora-phase-narration-clinician.jsonl" --dry-run
+```
+
+To run an experimental split that includes synthetic draft rows:
+
+```powershell
+uv run python train_phase_narration_lora.py --data "datasets\lora-phase-narration-expanded.jsonl" --include-drafts --dry-run
+```
+
+Then run the full QLoRA experiment against whichever dataset you want to test:
+
+```powershell
+uv run python train_phase_narration_lora.py --data "C:\Users\Bill\Downloads\lora-phase-narration-clinician.jsonl"
+```
+
+The script accepts both raw training-seed JSONL and the ShareGPT-style
+`messages` JSONL emitted by `/api/training/export`. It records:
+
+- `train.jsonl` and `test.jsonl` - the reproducible held-out split.
+- `adapter/` - the PEFT LoRA adapter and tokenizer files.
+- `eval.json` - generation metrics on the held-out set: JSON validity, six-line
+  schema pass rate, patient-facing style pass rate, safety pass rate,
+  medication-directive pass rate, p95 latency, token F1, and ROUGE-L. It also
+  evaluates base Gemma on the same held-out prompts and records base-vs-LoRA
+  deltas for completion NLL, perplexity, schema/style/safety pass rates, and a
+  composite `loraWaveScore` out of 100.
+- `run-config.json` - model, split seed, data counts, and hyperparameters.
+
+On Windows, the script automatically re-launches itself in Python UTF-8 mode
+before importing TRL. That avoids a known `cp1252` import crash in TRL's bundled
+chat-template files.
+
 ## Notebooks
 
 - `01_gemma4_smoke_test.ipynb` — downloads the smallest Gemma 4 (`google/gemma-4-E2B-it`) and runs one generic and one WAVE-style prompt to confirm the base model works on this machine before any LoRA work begins.

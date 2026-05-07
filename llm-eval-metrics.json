@@ -1,0 +1,87 @@
+{
+  "search_id": "search_2d4bb3c3b09546818ad05feb3e58091a",
+  "status": "ok",
+  "results": [
+    {
+      "url": "https://medium.com/data-science-in-your-pocket/llm-evaluation-metrics-explained-af14f26536d2",
+      "title": "LLM Evaluation metrics explained. ROUGE score, BLEU, Perplexity, MRR\u2026 | by Mehul Gupta | Data Science in Your Pocket | Medium",
+      "publish_date": null,
+      "excerpts": [
+        "LLM Evaluation metrics explained ROUGE score, BLEU, Perplexity, MRR, BERTScore maths and example Evaluating LLMs has always been an important point of discussion ever since Generative AI has come"
+      ]
+    },
+    {
+      "url": "https://datanorth.ai/blog/evals-openais-framework-for-evaluating-llms",
+      "title": "OpenAI Evals: Mastering LLM Evaluation - DataNorth",
+      "publish_date": "2026-01-29",
+      "excerpts": [
+        "Before any change enters production, the entire LLM application must be re-evaluated end-to-end to catch potential failures. Evals facilitate this by making the quality assurance process automated and scalable. They are essential for:\n\n* Ensuring application stability as underlying models evolve\n* Catching regressions before deployment through CI/CD integration\n* Reducing the risk of hallucinations in user-facing products\n\n> _\u201cEvals are surprisingly often all you need.\u201d_ _  \n> _ _Greg Brockman, OpenAI President_\n> \n> \n\n## Understanding model behavior\n\nEvals enable systematic comparison of different models by running standardized test cases and producing quantitative results. They can measure:\n\n* **Factual accuracy:** Verifying if the AI provides correct information.\n* **Reasoning quality:** Assessing the \u201cchain-of-thought\u201d logic.\n* **Instruction following:** Ensuring the model adheres to specific formats like valid JSON output.\n\nThe [OpenAI Evals registry](https://platform.\nopenai.com/docs/guides/evals/registry) includes pre-built tests for complex tasks including logic puzzles, code generation, and content safety compliance.\n\n## Types of Evals\n\n* **Basic (Ground-Truth) Evals:** These compare model outputs to known correct answers using deterministic checks. They are ideal for tasks with clear, verifiable answers such as mathematical problems or multiple-choice exams.\n* **Model-graded Evals:** These leverage [another AI model](https://developers.openai.com/cookbook/examples/evaluation/getting_started_with_openai_evals) to judge the quality of a response. Typically, a stronger model is used to evaluate subjective qualities like humor, tone, or the quality of a summary. While scalable, it is recommended that human experts periodically audit these graders to ensure accuracy.\n\nThe model-graded approach is especially vital for open-ended or qualitative tasks. OpenAI provides [eval templates](https://developers.openai.\ncom/cookbook/examples/evaluation/getting_started_with_openai_evals) for both approaches, allowing developers to start measuring performance without writing extensive code.\n\n## Using the Evals registry\n\nThe registry offers standardized datasets and evaluation logic for a wide variety of industries:\n\n* Question answering (e.g., [CoQA](https://stanfordnlp.github.io/coqa/) )\n* Logic and math puzzles\n* Code understanding (e.g., [HumanEval](https://github.com/openai/human-eval) )\n* Content compliance and safety\n\nEach eval is defined by a YAML config and (optionally) reference data files. Running an eval is as simple as installing the [openai-evals package](https://github.com/openai/evals#:~:text=OpenAI%20Evals) and launching a command or using the API.\n\n## Creating custom Evals\n\nCustom evals allow organizations to test their own proprietary data:\n\n1. **Prepare a dataset:** Collect sample prompts and expected answers in a JSONL format.\n2."
+      ]
+    },
+    {
+      "url": "https://medium.com/better-ml/metrics-for-evaluating-llms-2c9d86acdbf6",
+      "title": "Metrics for evaluating LLMs. ELO Rating, BLEU, Perplexity and Cross\u2026 | by Jaideep Ray | Better ML | Medium",
+      "publish_date": null,
+      "excerpts": [
+        "Note, <strong>perplexity is always greater or equal to 1 where 1 is the perfect score</strong>. Lower scores are preferred over larger scores. Cross entropy is a loss function widely employed in machine learning, including the training of LLMs."
+      ]
+    },
+    {
+      "url": "https://dagshub.com/blog/llm-evaluation-metrics/",
+      "title": "LLM Evaluation Metrics: Benchmarks, Protocols & Best Practices",
+      "publish_date": null,
+      "excerpts": [
+        "It is critical to assess the fluency, ... a monolithic evaluation metric. <strong>Use multiple metrics, such as accuracy, F1 score, BLEU, ROUGE, and perplexity, to capture different aspects of performance</strong>."
+      ]
+    },
+    {
+      "url": "https://machinelearningmastery.com/llm-evaluation-metrics-made-easy/",
+      "title": "LLM Evaluation Metrics Made Easy - MachineLearningMastery.com",
+      "publish_date": null,
+      "excerpts": [
+        "This example code shows both metrics in action, using Hugging Face libraries, pre-trained LLMs, and the aforesaid metrics to evaluate the classification of several texts into related vs non-related to the Japanese Tea Ceremony or \u8336\u306e\u6e6f (Cha no Yu). For now, no actual LLM is loaded and we suppose we already have its classification outputs in a list called pred_labels."
+      ]
+    },
+    {
+      "url": "https://arxiv.org/html/2404.09135v1",
+      "title": "Unveiling LLM Evaluation Focused on Metrics: Challenges and Solutions11footnote 1This research was funded by supported by National Key R&D Program of China (No. 2021YFF0901400)",
+      "publish_date": null,
+      "excerpts": [
+        "LLMs frequently employ these metrics ... summarization. Key metrics in this category include <strong>Perplexity, BLEU (Bilingual Evaluation Understudy), ROUGE (Recall-Oriented Understudy for Gisting Evaluation)-1 or 2, ROUGE-L, and BertScore</strong>, METEOR (Metric for Evaluation of Translation with"
+      ]
+    },
+    {
+      "url": "https://huggingface.co/metrics",
+      "title": "Hugging Face \u2013 The AI community building the future.",
+      "publish_date": null,
+      "excerpts": [
+        "Moreover, BERTScore computes precision, ...b.com/Tiiiger/bert_score#readme for more information. <strong>Perplexity (PPL) is one of the most common metrics for evaluating language models</strong>."
+      ]
+    },
+    {
+      "url": "https://machinelearningplus.com/gen-ai/llm-evaluation-guide/",
+      "title": "How to Evaluate LLMs - Metrics, Benchmarks & Python Code - machinelearningplus",
+      "publish_date": null,
+      "excerpts": [
+        "Key Insight: **No single metric captures LLM quality.** Perplexity measures fluency, BLEU/ROUGE measure surface overlap, and BERTScore measures meaning. Use 2-3 complementary metrics, not just one. The best practice is 1-2 task-specific metrics plus 1 general quality metric. ... Exercise 1: Compute ROUGE-1 for a summarization task. Given a reference summary and three candidate summaries, compute the ROUGE-1 F1 score for each."
+      ]
+    },
+    {
+      "url": "https://www.comet.com/site/blog/llm-evaluation-metrics-every-developer-should-know/",
+      "title": "LLM Evaluation Metrics Every Developer Should Know - Comet",
+      "publish_date": null,
+      "excerpts": [
+        "To balance these trade offs, we calculate the f1 score of the Rouge Precision and Recall and use that for our metric for evaluation. ... G-eval is a LLM-as-a-judge metric that uses the GPT-4 and Chain-of-Thought prompting to create evaluation steps to return a score."
+      ]
+    },
+    {
+      "url": "https://developers.openai.com/cookbook/topic/evals",
+      "title": "Evals \u2022 Cookbook",
+      "publish_date": null,
+      "excerpts": [
+        "## Search the cookbook\n\nSearch docs\n\n### Suggested\n\nagents realtime vision prompt caching"
+      ]
+    }
+  ],
+  "warnings": []
+}
