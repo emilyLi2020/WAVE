@@ -27,8 +27,7 @@ We still collect data under specialized future adapter IDs:
 - `lora-check-in-5`
 - `lora-reflection`
 
-Each specialized set gets **20 clinician-written examples**. Those same rows
-feed two paths:
+Each specialized set has a **target** row count in `client/lib/training/lora-specs.ts` (phase narration: 10; each check-in and reflection: 20). Those same rows
 
 1. **Demo path:** combine all ready/approved rows into
    `lora-wave-session.jsonl` and fine-tune one multitask LoRA.
@@ -46,12 +45,11 @@ human-written seed examples.
 
 Per specialized set:
 
-- Target: 20 ready/approved examples.
+- Target: see per-LoRA `targetCount` in `lora-specs.ts` (10 for `lora-phase-narration`, 20 for each check-in and reflection).
 - Draft rows are allowed but are never exported by default.
 - Inputs and outputs are validated by the Zod schemas in
   `client/lib/training/lora-specs.ts`.
-- Coverage is tracked across `medicationStatus x trigger` so the seed set does
-  not collapse into only one medication or trigger scenario.
+- Coverage is tracked on a per-LoRA grid: **phase narration** uses `chunkNumber × startingIntensityBand` (5 phases × two intake bands: 7-10 vs 1-6). **Check-ins and reflection** use `medicationStatus × trigger` so the seed set does not collapse into only one medication or trigger scenario.
 
 The UI stores rows as JSON files under:
 
@@ -119,11 +117,14 @@ They are not mounted in the browser demo.
 
 ## 3. Optional Synthetic Expansion
 
-For the hackathon demo, the minimum training source is the 140 human-written
+For the hackathon demo, the minimum training source is the **130** human-written
 rows:
 
 ```
-7 specialized sets x 20 examples = 140 examples
+lora-phase-narration: 10 (5 chunks × 2 intake bands)
++ 5 check-in sets × 20 = 100
++ lora-reflection: 20
+= 130 examples
 ```
 
 If time allows, a larger Gemma model running on a developer workstation can
@@ -146,14 +147,14 @@ For the demo LoRA:
 
 - Input file: `lora-wave-session.jsonl`.
 - Split: 80 / 20.
-- Stratify by `surface`, `medicationStatus`, and `trigger` when possible.
+- Stratify by `surface`, `medicationStatus`, and `trigger` when possible; for rows with `surface: "phase_narration"`, also stratify by `chunkNumber` and `startingIntensityBand`.
 - Freeze the test split before training.
 
 For specialized demonstration LoRAs:
 
 - Input file: `<lora-id>.jsonl`.
 - Split: 80 / 20.
-- Stratify by `medicationStatus` and `trigger`.
+- Stratify by `medicationStatus` and `trigger` for check-in and reflection rows; for `lora-phase-narration` exports, stratify by `chunkNumber` and `startingIntensityBand`.
 
 There is no dev split for the MVP process. The human seed review covers the
 clinical side; the held-out test set covers output validity and invariants.

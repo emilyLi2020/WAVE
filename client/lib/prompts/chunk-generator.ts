@@ -126,8 +126,7 @@ const TRIGGER_LABEL: Record<
   social: "a social situation",
   stress: "stress / emotions",
   physical: "a physical sensation",
-  unknown: "an unknown trigger",
-  other: "something else",
+  unknown_or_other: "don't know / something else",
 };
 
 export interface BuiltChunkPrompt {
@@ -207,8 +206,9 @@ function renderIntakeBlock(
   context: ChunkGenerationContextPayload,
 ): string {
   const triggerWording =
-    context.profile.trigger === "other" && context.profile.triggerOther
-      ? `something else (${context.profile.triggerOther})`
+    context.profile.trigger === "unknown_or_other" &&
+    context.profile.triggerOther
+      ? `don't know / other (${context.profile.triggerOther})`
       : TRIGGER_LABEL[context.profile.trigger];
   const usedToday = context.profile.usedSubstanceToday
     ? "Yes, used a substance today (continued the session per protocol)."

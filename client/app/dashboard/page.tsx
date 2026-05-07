@@ -37,8 +37,7 @@ const TRIGGER_INLINE_LABEL: Record<keyof typeof TRIGGER_LABEL, string> = {
   stress: "stress",
   social: "a social situation",
   physical: "a physical sensation",
-  unknown: "an unknown trigger",
-  other: "another trigger",
+  unknown_or_other: "don't know / other",
 };
 
 export default function DashboardPage() {

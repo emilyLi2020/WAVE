@@ -64,7 +64,7 @@ const reflectionContextSchema = z.object({
     "none",
   ]),
   medicationStatus: z.enum(["on_time", "late", "missed", "none"]),
-  trigger: z.enum(["social", "stress", "physical", "unknown", "other"]),
+  trigger: z.enum(["social", "stress", "physical", "unknown_or_other"]),
   usedSubstanceToday: z.boolean(),
   bodyLocation: z.enum([
     "chest",
@@ -138,7 +138,7 @@ const sessionSchema = z.object({
   intakeIntensity: z.number().int().min(1).max(10),
   endingIntensity: z.number().int().min(1).max(10).optional(),
   medicationStatus: z.enum(["on_time", "late", "missed", "none"]),
-  trigger: z.enum(["social", "stress", "physical", "unknown", "other"]),
+  trigger: z.enum(["social", "stress", "physical", "unknown_or_other"]),
   bodyScanLocation: z
     .enum(["chest", "jaw", "shoulders", "legs", "stomach", "other"])
     .optional(),
@@ -195,7 +195,7 @@ const sessionUserProfileSchema = z.object({
     "none",
   ]),
   medicationStatus: z.enum(["on_time", "late", "missed", "none"]),
-  trigger: z.enum(["social", "stress", "physical", "unknown", "other"]),
+  trigger: z.enum(["social", "stress", "physical", "unknown_or_other"]),
   triggerOther: z.string().max(120).nullable(),
   usedSubstanceToday: z.boolean(),
 });

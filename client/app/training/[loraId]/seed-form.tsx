@@ -11,6 +11,15 @@ import type {
   TrainingSeed,
 } from "@/lib/training/types";
 import { SEED_STATUSES } from "@/lib/training/types";
+import { CHECK_IN_CHUNK2_SCORE_PROMPT, CHECK_IN_CURRENT_URGE_SCALE_PROMPT } from "@/lib/training/check-in-dialogue";
+
+import { CheckInDialogueEditor } from "./check-in-dialogue-editor";
+
+function checkInScorePromptFor(loraId: string): string {
+  return loraId === "lora-check-in-2" ?
+      CHECK_IN_CHUNK2_SCORE_PROMPT
+    : CHECK_IN_CURRENT_URGE_SCALE_PROMPT;
+}
 
 type Json = Record<string, unknown>;
 
@@ -200,10 +209,39 @@ export function SeedForm({ spec, existing }: Props) {
     () => rehydrateForState(spec.inputFields, existing?.input as Json),
     [spec.inputFields, existing?.input],
   );
-  const initialOutput = useMemo(
-    () => rehydrateForState(spec.outputFields, existing?.output as Json),
-    [spec.outputFields, existing?.output],
-  );
+  const initialOutput = useMemo(() => {
+    const base = rehydrateForState(
+      spec.outputFields,
+      existing?.output as Json,
+    ) as Json;
+    if (!spec.loraId.startsWith("lora-check-in-")) {
+      return base;
+    }
+    const existingOut = existing?.output as Json | undefined;
+    const priorTurns = existingOut?.dialogueTurns;
+    if (Array.isArray(priorTurns) && priorTurns.length >= 2) {
+      base.dialogueTurns = priorTurns;
+      return base;
+    }
+    const inp = existing?.input as Json | undefined;
+    const intakeIntensity = inp?.intakeIntensity;
+    const currentIntensity = inp?.currentIntensity;
+    const intakeNum =
+      typeof intakeIntensity === "number" ? intakeIntensity : 7;
+    const currentNum =
+      typeof currentIntensity === "number" ? currentIntensity : intakeNum;
+    const fallbackReply =
+      typeof existingOut?.reply === "string" && existingOut.reply.length >= 12 ?
+        existingOut.reply
+      : "You are naming an urge score, and that already takes courage. What showed up in your body during that opening, even a small detail?";
+    base.dialogueTurns = [
+      { role: "agent", content: checkInScorePromptFor(spec.loraId) },
+      { role: "patient", content: String(currentNum) },
+      { role: "agent", content: fallbackReply },
+    ];
+    base.reply = fallbackReply;
+    return base;
+  }, [spec.loraId, spec.outputFields, existing]);
 
   const [inputState, setInputState] = useState<Json>(initialInput);
   const [outputState, setOutputState] = useState<Json>(initialOutput);
@@ -225,18 +263,53 @@ export function SeedForm({ spec, existing }: Props) {
           const lastInput = window.localStorage.getItem(lastInputKey);
           if (lastInput) {
             const payload = JSON.parse(lastInput) as Json;
-            setInputState(rehydrateForState(spec.inputFields, payload));
+            queueMicrotask(() => {
+              setInputState(rehydrateForState(spec.inputFields, payload));
+            });
           }
         }
         return;
       }
       const draft = JSON.parse(raw) as DraftSnapshot;
-      setInputState(rehydrateForState(spec.inputFields, draft.input));
-      setOutputState(rehydrateForState(spec.outputFields, draft.output));
-      setAuthorInitials(draft.authorInitials ?? "");
-      setNotes(draft.notes ?? "");
-      setStatus(draft.status ?? "draft");
-      setRestoredAt(draft.savedAt);
+      queueMicrotask(() => {
+        setInputState(rehydrateForState(spec.inputFields, draft.input));
+        setOutputState(() => {
+          const base = rehydrateForState(
+            spec.outputFields,
+            draft.output as Json,
+          ) as Json;
+          if (!spec.loraId.startsWith("lora-check-in-")) {
+            return base;
+          }
+          const draftOut = draft.output as Json;
+          const prior = draftOut.dialogueTurns;
+          if (Array.isArray(prior) && prior.length >= 2) {
+            base.dialogueTurns = prior;
+            return base;
+          }
+          const inp = draft.input as Json | undefined;
+          const intakeNum =
+            typeof inp?.intakeIntensity === "number" ? inp.intakeIntensity : 7;
+          const currentNum =
+            typeof inp?.currentIntensity === "number" ? inp.currentIntensity
+            : intakeNum;
+          const fallbackReply =
+            typeof draftOut.reply === "string" && draftOut.reply.length >= 12 ?
+              draftOut.reply
+            : "You are naming an urge score, and that already takes courage. What showed up in your body during that opening, even a small detail?";
+          base.dialogueTurns = [
+            { role: "agent", content: checkInScorePromptFor(spec.loraId) },
+            { role: "patient", content: String(currentNum) },
+            { role: "agent", content: fallbackReply },
+          ];
+          base.reply = fallbackReply;
+          return base;
+        });
+        setAuthorInitials(draft.authorInitials ?? "");
+        setNotes(draft.notes ?? "");
+        setStatus(draft.status ?? "draft");
+        setRestoredAt(draft.savedAt);
+      });
     } catch {
       // ignore malformed drafts
     }
@@ -285,10 +358,36 @@ export function SeedForm({ spec, existing }: Props) {
     setServerError(null);
 
     const coercedInput = coerce(spec.inputFields, inputState);
+    const coercedOutput = coerce(spec.outputFields, outputState) as Json;
+    const mergedOutput: Json = { ...coercedOutput };
+    if (spec.loraId.startsWith("lora-check-in-")) {
+      const rawTurns = outputState.dialogueTurns;
+      if (Array.isArray(rawTurns) && rawTurns.length > 0) {
+        const cleaned = rawTurns
+          .filter((row) => row && typeof row === "object")
+          .map((row) => {
+            const record = row as { role?: string; content?: string };
+            return {
+              role: record.role === "agent" ? "agent" : "patient",
+              content:
+                typeof record.content === "string" ? record.content : "",
+            };
+          })
+          .filter((row) => row.content.trim() !== "");
+        if (cleaned.length > 0) {
+          mergedOutput.dialogueTurns = cleaned;
+          const lastAgent = [...cleaned].reverse().find((r) => r.role === "agent");
+          if (lastAgent) {
+            mergedOutput.reply = lastAgent.content.trim();
+          }
+        }
+      }
+    }
+
     const body = {
       loraId: spec.loraId,
       input: coercedInput,
-      output: coerce(spec.outputFields, outputState),
+      output: mergedOutput,
       authorInitials: authorInitials.trim() || null,
       notes: notes.trim() || null,
       status,
@@ -387,9 +486,30 @@ export function SeedForm({ spec, existing }: Props) {
           side="input"
           onChange={update}
         />
+        {spec.loraId.startsWith("lora-check-in-") &&
+        Array.isArray(outputState.dialogueTurns) ? (
+          <CheckInDialogueEditor
+            dialoguePack={
+              spec.loraId === "lora-check-in-2" ? "check-in-2" : "check-in-1"
+            }
+            turns={outputState.dialogueTurns as { role: "patient" | "agent"; content: string }[]}
+            onChange={(next) => {
+              setOutputState((prev) => {
+                const lastAgent = [...next].reverse().find((r) => r.role === "agent");
+                return {
+                  ...prev,
+                  dialogueTurns: next,
+                  ...(lastAgent ?
+                    { reply: lastAgent.content.trim() }
+                  : {}),
+                };
+              });
+            }}
+          />
+        ) : null}
         <FieldSection
           title="Response WAVE should produce (output)"
-          description="The exact JSON shape the LoRA must emit."
+          description="Structured fields the runtime validates. The patient-facing reply stays synced with the last WAVE line in the dialogue above."
           fields={spec.outputFields}
           state={outputState}
           path={[]}

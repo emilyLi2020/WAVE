@@ -4,6 +4,11 @@
  * One JSON-array file per LoRA at:
  *   <repo-root>/data/training-seeds/<lora-id>.json
  *
+ * Per-LoRA clinician LLM instructions live at:
+ *   <repo-root>/data/training-seeds/clinician-llm-instructions.json
+ * Legacy single-file rules (migrated into lora-phase-narration on first read):
+ *   <repo-root>/data/training-seeds/clinician-llm-rules.json
+ *
  * The directory lives OUTSIDE the Next.js project root so Next's dev
  * watcher doesn't trigger a rebuild every time the doctor saves a seed.
  * Override the location with WAVE_TRAINING_DATA_DIR if you run the dev
@@ -33,6 +38,7 @@ import path from "node:path";
 
 import { LORA_IDS } from "./types";
 import type {
+  ClinicianLlmInstructionsState,
   LoRAId,
   SeedStatus,
   TrainingSeed,
@@ -52,6 +58,16 @@ function dataDir(): string {
 function fileFor(loraId: LoRAId): string {
   return path.join(dataDir(), `${loraId}.json`);
 }
+
+const CLINICIAN_LLM_INSTRUCTIONS_FILE = path.join(
+  dataDir(),
+  "clinician-llm-instructions.json",
+);
+/** Pre–per-LoRA format; migrated once into `lora-phase-narration` instructions. */
+const CLINICIAN_LLM_RULES_LEGACY_FILE = path.join(
+  dataDir(),
+  "clinician-llm-rules.json",
+);
 
 const writeLocks: Map<string, Promise<unknown>> = new Map();
 
@@ -272,6 +288,13 @@ export async function countSeedsByLora(): Promise<Record<LoRAId, SeedCounts>> {
  */
 export type StackCoverage = Record<string, Record<string, number>>;
 
+function stackKey(value: unknown): string | null {
+  if (typeof value === "string") return value;
+  if (typeof value === "number" && Number.isFinite(value)) return String(value);
+  if (typeof value === "boolean") return value ? "true" : "false";
+  return null;
+}
+
 export function computeStackCoverage(
   seeds: readonly TrainingSeed[],
   rowKey: string,
@@ -285,9 +308,9 @@ export function computeStackCoverage(
     for (const c of colOptions) grid[r][c] = 0;
   }
   for (const seed of seeds) {
-    const r = seed.input[rowKey];
-    const c = seed.input[colKey];
-    if (typeof r === "string" && typeof c === "string" && grid[r] && c in grid[r]) {
+    const r = stackKey(seed.input[rowKey]);
+    const c = stackKey(seed.input[colKey]);
+    if (r && c && grid[r] && c in grid[r]) {
       grid[r][c] += 1;
     }
   }
@@ -317,4 +340,133 @@ export async function describeDataLocation(): Promise<{
     }
     throw err;
   }
+}
+
+function emptyInstructionsSlot(): ClinicianLlmInstructionsState {
+  return { instructionsText: "", updatedAt: null };
+}
+
+function emptyInstructionsMap(): Record<
+  LoRAId,
+  ClinicianLlmInstructionsState
+> {
+  return Object.fromEntries(
+    LORA_IDS.map((id) => [id, emptyInstructionsSlot()]),
+  ) as Record<LoRAId, ClinicianLlmInstructionsState>;
+}
+
+function normalizeInstructionsPayload(
+  parsed: unknown,
+): Record<LoRAId, ClinicianLlmInstructionsState> {
+  const out = emptyInstructionsMap();
+  if (!parsed || typeof parsed !== "object") return out;
+  const obj = parsed as Record<string, unknown>;
+  for (const id of LORA_IDS) {
+    const row = obj[id];
+    if (!row || typeof row !== "object") continue;
+    const record = row as Record<string, unknown>;
+    const instructionsText =
+      typeof record.instructionsText === "string" ? record.instructionsText : "";
+    const updatedAt =
+      typeof record.updatedAt === "string" ? record.updatedAt : null;
+    out[id] = { instructionsText, updatedAt };
+  }
+  return out;
+}
+
+function instructionsToDiskPayload(
+  map: Record<LoRAId, ClinicianLlmInstructionsState>,
+): Record<string, ClinicianLlmInstructionsState> {
+  const payload: Record<string, ClinicianLlmInstructionsState> = {};
+  for (const id of LORA_IDS) {
+    const slot = map[id];
+    if (slot.instructionsText.trim() !== "") {
+      payload[id] = {
+        instructionsText: slot.instructionsText,
+        updatedAt: slot.updatedAt,
+      };
+    }
+  }
+  return payload;
+}
+
+async function writeInstructionsMapToDisk(
+  map: Record<LoRAId, ClinicianLlmInstructionsState>,
+): Promise<void> {
+  await ensureDir();
+  const target = CLINICIAN_LLM_INSTRUCTIONS_FILE;
+  const tmp = `${target}.tmp-${process.pid}-${randomUUID()}`;
+  const serializable = instructionsToDiskPayload(map);
+  await writeFile(tmp, `${JSON.stringify(serializable, null, 2)}\n`, "utf8");
+  await rename(tmp, target);
+}
+
+/**
+ * Load per-LoRA instructions. If `clinician-llm-instructions.json` is missing
+ * but legacy `clinician-llm-rules.json` exists, migrate its text into
+ * `lora-phase-narration` and persist the new file once.
+ */
+export async function getAllClinicianLlmInstructions(): Promise<
+  Record<LoRAId, ClinicianLlmInstructionsState>
+> {
+  try {
+    const raw = await readFile(CLINICIAN_LLM_INSTRUCTIONS_FILE, "utf8");
+    if (raw.trim()) {
+      return normalizeInstructionsPayload(JSON.parse(raw) as unknown);
+    }
+  } catch (err) {
+    if ((err as NodeJS.ErrnoException).code !== "ENOENT") throw err;
+  }
+
+  try {
+    const legacyRaw = await readFile(CLINICIAN_LLM_RULES_LEGACY_FILE, "utf8");
+    const legacy = JSON.parse(legacyRaw) as {
+      rulesText?: string;
+      updatedAt?: string;
+    };
+    const map = emptyInstructionsMap();
+    if (typeof legacy.rulesText === "string" && legacy.rulesText.trim() !== "") {
+      map["lora-phase-narration"] = {
+        instructionsText: legacy.rulesText.replace(/\r\n/g, "\n").trimEnd(),
+        updatedAt:
+          typeof legacy.updatedAt === "string" ?
+            legacy.updatedAt
+          : new Date().toISOString(),
+      };
+      await writeInstructionsMapToDisk(map);
+    }
+    return map;
+  } catch (err) {
+    if ((err as NodeJS.ErrnoException).code === "ENOENT") {
+      return emptyInstructionsMap();
+    }
+    throw err;
+  }
+}
+
+export async function getClinicianLlmInstructions(
+  loraId: LoRAId,
+): Promise<ClinicianLlmInstructionsState> {
+  const map = await getAllClinicianLlmInstructions();
+  return map[loraId];
+}
+
+export async function setClinicianLlmInstructions(
+  loraId: LoRAId,
+  instructionsText: string,
+): Promise<ClinicianLlmInstructionsState> {
+  return withLock("__clinician_llm_instructions__", async () => {
+    const map = await getAllClinicianLlmInstructions();
+    const normalized = instructionsText.replace(/\r\n/g, "\n").trimEnd();
+    const next: ClinicianLlmInstructionsState =
+      normalized === "" ?
+        { instructionsText: "", updatedAt: null }
+      : {
+          instructionsText: normalized,
+          updatedAt: new Date().toISOString(),
+        };
+    const merged = { ...map, [loraId]: next };
+    await writeInstructionsMapToDisk(merged);
+    return next;
+  });
 }

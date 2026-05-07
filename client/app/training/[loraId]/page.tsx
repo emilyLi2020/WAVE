@@ -1,10 +1,12 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
 
+import { ClinicianLlmInstructionsPanel } from "@/app/training/_components/clinician-llm-instructions-panel";
 import { assertTrainingEnabled } from "@/lib/training/guard";
-import { getSpec, isLoraId } from "@/lib/training/lora-specs";
+import { getSpec } from "@/lib/training/lora-specs";
+import { resolveTrainingLoraRouteParam } from "@/lib/training/resolve-lora-route";
 import {
   computeStackCoverage,
+  getClinicianLlmInstructions,
   listSeedsForLora,
 } from "@/lib/training/storage";
 import type { SeedStatus } from "@/lib/training/types";
@@ -32,11 +34,13 @@ function shorten(value: unknown, max = 110): string {
 
 export default async function LoraIndexPage({ params }: PageProps) {
   assertTrainingEnabled();
-  const { loraId } = await params;
-  if (!isLoraId(loraId)) notFound();
-
+  const { loraId: raw } = await params;
+  const loraId = resolveTrainingLoraRouteParam(raw);
   const spec = getSpec(loraId);
-  const seeds = await listSeedsForLora(loraId);
+  const [seeds, instructionsState] = await Promise.all([
+    listSeedsForLora(loraId),
+    getClinicianLlmInstructions(loraId),
+  ]);
   const coverage = computeStackCoverage(
     seeds,
     spec.stackAxes.rowKey,
@@ -67,12 +71,21 @@ export default async function LoraIndexPage({ params }: PageProps) {
               {spec.whereUsed}
             </p>
           </div>
-          <Link
-            href={`/training/${spec.loraId}/new`}
-            className="inline-flex items-center gap-2 rounded-full bg-accent px-5 py-2.5 text-sm font-medium text-accent-foreground hover:opacity-90 transition"
-          >
-            + Add new example
-          </Link>
+          <div className="flex flex-wrap items-center gap-2">
+            <a
+              href={`/api/training/export?format=clinician-jsonl&loraId=${spec.loraId}&includeDrafts=1`}
+              className="inline-flex items-center gap-2 rounded-full border border-border bg-background px-4 py-2.5 text-sm font-medium text-foreground/85 hover:border-accent hover:text-accent transition"
+              title="Plain JSON per line: input, output, notes — for LLM review or handoff"
+            >
+              Export for LLM
+            </a>
+            <Link
+              href={`/training/${spec.loraId}/new`}
+              className="inline-flex items-center gap-2 rounded-full bg-accent px-5 py-2.5 text-sm font-medium text-accent-foreground hover:opacity-90 transition"
+            >
+              + Add new example
+            </Link>
+          </div>
         </div>
       </header>
 
@@ -98,6 +111,13 @@ export default async function LoraIndexPage({ params }: PageProps) {
       </div>
 
       <CoverageGrid axes={spec.stackAxes} coverage={coverage} />
+
+      <ClinicianLlmInstructionsPanel
+        loraId={spec.loraId}
+        loraTitle={spec.title}
+        shortTitle={spec.shortTitle}
+        initialState={instructionsState}
+      />
 
       <section>
         <div className="flex items-baseline justify-between">

@@ -65,7 +65,7 @@ const RAW: SessionInput[] = [
 
   // ── Week of 3/28 ────────────────────────────────────────────
   { date: "2026-03-28", time: "10:00", intake: 5, ending: 3, trigger: "stress", med: "on_time", body: "chest" },
-  { date: "2026-03-28", time: "11:00", intake: 6, ending: 2, trigger: "unknown", med: "on_time", body: "legs" },
+  { date: "2026-03-28", time: "11:00", intake: 6, ending: 2, trigger: "unknown_or_other", med: "on_time", body: "legs" },
   { date: "2026-03-28", time: "22:00", intake: 8, ending: 3, trigger: "social", med: "on_time", body: "chest" },
   { date: "2026-03-29", time: "07:30", intake: 4, ending: 2, trigger: "physical", med: "missed", body: "stomach" },
   { date: "2026-03-29", time: "09:45", intake: 6, ending: 3, trigger: "physical", med: "missed", body: "stomach" },
@@ -111,7 +111,7 @@ const RAW: SessionInput[] = [
   { date: "2026-04-14", time: "12:30", intake: 4, ending: 2, trigger: "stress", med: "on_time", body: "jaw" },
   { date: "2026-04-14", time: "19:30", intake: 7, ending: 2, trigger: "stress", med: "on_time", body: "chest" },
   { date: "2026-04-15", time: "10:00", intake: 5, ending: 3, trigger: "stress", med: "on_time", body: "chest" },
-  { date: "2026-04-15", time: "14:30", intake: 6, ending: 2, trigger: "unknown", med: "on_time", body: "jaw" },
+  { date: "2026-04-15", time: "14:30", intake: 6, ending: 2, trigger: "unknown_or_other", med: "on_time", body: "jaw" },
   { date: "2026-04-15", time: "21:14", intake: 7, ending: 2, trigger: "stress", med: "on_time", body: "jaw" },
   { date: "2026-04-16", time: "07:15", intake: 4, ending: 2, trigger: "physical", med: "late", body: "stomach" },
   { date: "2026-04-16", time: "12:00", intake: 6, ending: 2, trigger: "stress", med: "on_time", body: "jaw" },
@@ -162,8 +162,7 @@ export const TRIGGER_LABEL: Record<Session["trigger"], string> = {
   stress: "Stress / emotions",
   social: "Social situation",
   physical: "Physical sensation",
-  unknown: "Unknown trigger",
-  other: "Other trigger",
+  unknown_or_other: "Don't know / other",
 };
 
 export const MEDICATION_LABEL: Record<Session["medicationStatus"], string> = {

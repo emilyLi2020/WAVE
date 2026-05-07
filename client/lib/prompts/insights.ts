@@ -39,8 +39,7 @@ const TRIGGER_LINE: Record<Session["trigger"], string> = {
   stress: "stress",
   social: "social",
   physical: "physical",
-  unknown: "unknown",
-  other: "other",
+  unknown_or_other: "unknown_or_other",
 };
 
 const STATUS_LINE: Record<Session["medicationStatus"], string> = {

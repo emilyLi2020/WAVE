@@ -238,7 +238,7 @@ export function SessionMachine() {
       matType: state.intake.matType,
       medicationStatus: state.intake.medicationStatus,
       trigger: state.intake.trigger,
-      triggerOther: null,
+      triggerOther: state.intake.triggerOther,
       usedSubstanceToday: state.usedSubstanceToday,
     };
   }, [state.intake, state.usedSubstanceToday]);

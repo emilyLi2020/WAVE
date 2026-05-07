@@ -102,10 +102,9 @@ export interface ConstFieldSpec extends BaseField {
 
 /**
  * Stack-axis configuration. The stratification grid on the LoRA index
- * page is computed from this — by default, rows × cols with `count` per
- * cell, drawn from the seed's `input` payload. Picking matType ×
- * medicationStatus matches the train/test split in
- * docs/model-training.md §5.
+ * page is computed from this. Check-in and reflection sets use
+ * medicationStatus × trigger; phase narration uses chunkNumber ×
+ * startingIntensityBand (see docs/model-training.md §4–5).
  */
 export interface StackAxes {
   rowKey: string; // path into input, e.g. "matType"
@@ -139,6 +138,15 @@ export interface LoraFormSpec {
   inputSchema: z.ZodType;
   outputSchema: z.ZodType;
   stackAxes: StackAxes;
+}
+
+/**
+ * Per-LoRA instructions for LLM expansion / review, embedded in exports for
+ * that surface only. Persisted in clinician-llm-instructions.json (see storage.ts).
+ */
+export interface ClinicianLlmInstructionsState {
+  instructionsText: string;
+  updatedAt: string | null;
 }
 
 /**
@@ -182,9 +190,15 @@ export const TRIGGER_CATEGORIES = [
   "social",
   "stress",
   "physical",
-  "unknown",
-  "other",
+  "unknown_or_other",
 ] as const;
+
+/**
+ * Intake craving band for phase-narration seeds only. Meditation lines are
+ * generalized to this scale; check-in LoRAs still use full MAT + trigger context.
+ */
+export const STARTING_INTENSITY_BANDS = ["7-10", "1-6"] as const;
+export type StartingIntensityBand = (typeof STARTING_INTENSITY_BANDS)[number];
 
 export const TIME_OF_DAY = [
   "morning",

@@ -1,12 +1,13 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
 
+import { ClinicianLlmInstructionsPanel } from "@/app/training/_components/clinician-llm-instructions-panel";
 import { toClientSpec } from "@/lib/training/client-spec";
 import { assertTrainingEnabled } from "@/lib/training/guard";
-import { getSpec, isLoraId } from "@/lib/training/lora-specs";
+import { getSpec } from "@/lib/training/lora-specs";
+import { resolveTrainingLoraRouteParam } from "@/lib/training/resolve-lora-route";
+import { getClinicianLlmInstructions } from "@/lib/training/storage";
 
 import { SeedForm } from "../seed-form";
-
 export const dynamic = "force-dynamic";
 
 interface PageProps {
@@ -15,10 +16,11 @@ interface PageProps {
 
 export default async function NewSeedPage({ params }: PageProps) {
   assertTrainingEnabled();
-  const { loraId } = await params;
-  if (!isLoraId(loraId)) notFound();
+  const { loraId: raw } = await params;
+  const loraId = resolveTrainingLoraRouteParam(raw, { pathSuffix: "/new" });
 
   const spec = getSpec(loraId);
+  const instructionsState = await getClinicianLlmInstructions(loraId);
 
   return (
     <div className="space-y-6">
@@ -37,6 +39,14 @@ export default async function NewSeedPage({ params }: PageProps) {
           </h1>
         </div>
       </header>
+
+      <ClinicianLlmInstructionsPanel
+        loraId={spec.loraId}
+        loraTitle={spec.title}
+        shortTitle={spec.shortTitle}
+        initialState={instructionsState}
+        compact
+      />
 
       <SeedForm spec={toClientSpec(spec)} existing={null} />
     </div>

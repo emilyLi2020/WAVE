@@ -57,7 +57,7 @@ export default async function TrainingLayout({
       <div className="mx-auto max-w-7xl px-6 py-8 grid gap-8 lg:grid-cols-[260px_minmax(0,1fr)]">
         <aside className="space-y-1">
           <SidebarLink href="/training" label="Overview" />
-          <SidebarLink href="/training/export" label="Export · for engineers" />
+          <SidebarLink href="/training/export" label="Export · JSONL / LLM" />
 
           <div className="pt-6 pb-2 text-xs uppercase tracking-wide text-foreground/50 px-2">
             Specialized sample sets
@@ -69,10 +69,10 @@ export default async function TrainingLayout({
                 key={spec.loraId}
                 href={`/training/${spec.loraId}`}
                 label={spec.shortTitle}
-                badge={`${c.ready + c.approved}/${spec.targetCount}`}
+                badge={`${c.total}/${spec.targetCount}`}
                 badgeHint={
                   c.draft > 0
-                    ? `${c.draft} draft${c.draft === 1 ? "" : "s"} not counted`
+                    ? `${c.ready + c.approved} ready/approved · ${c.draft} draft`
                     : undefined
                 }
               />

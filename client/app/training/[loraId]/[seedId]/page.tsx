@@ -1,10 +1,12 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { ClinicianLlmInstructionsPanel } from "@/app/training/_components/clinician-llm-instructions-panel";
 import { toClientSpec } from "@/lib/training/client-spec";
 import { assertTrainingEnabled } from "@/lib/training/guard";
-import { getSpec, isLoraId } from "@/lib/training/lora-specs";
-import { getSeed } from "@/lib/training/storage";
+import { getSpec } from "@/lib/training/lora-specs";
+import { resolveTrainingLoraRouteParam } from "@/lib/training/resolve-lora-route";
+import { getClinicianLlmInstructions, getSeed } from "@/lib/training/storage";
 
 import { SeedForm } from "../seed-form";
 
@@ -16,11 +18,16 @@ interface PageProps {
 
 export default async function EditSeedPage({ params }: PageProps) {
   assertTrainingEnabled();
-  const { loraId, seedId } = await params;
-  if (!isLoraId(loraId)) notFound();
+  const { loraId: raw, seedId } = await params;
+  const loraId = resolveTrainingLoraRouteParam(raw, {
+    pathSuffix: `/${seedId}`,
+  });
 
   const spec = getSpec(loraId);
-  const seed = await getSeed(seedId);
+  const [seed, instructionsState] = await Promise.all([
+    getSeed(seedId),
+    getClinicianLlmInstructions(loraId),
+  ]);
   if (!seed || seed.loraId !== loraId) notFound();
 
   return (
@@ -44,6 +51,14 @@ export default async function EditSeedPage({ params }: PageProps) {
           </p>
         </div>
       </header>
+
+      <ClinicianLlmInstructionsPanel
+        loraId={spec.loraId}
+        loraTitle={spec.title}
+        shortTitle={spec.shortTitle}
+        initialState={instructionsState}
+        compact
+      />
 
       <SeedForm spec={toClientSpec(spec)} existing={seed} />
     </div>

@@ -1,0 +1,3806 @@
+[
+  {
+    "id": "2e004cd6-09ad-4dd3-a2c6-266ce642bf9d",
+    "loraId": "lora-check-in-1",
+    "input": {
+      "intakeIntensity": 6,
+      "matType": "buprenorphine",
+      "medicationStatus": "on_time",
+      "trigger": "social",
+      "usedSubstanceToday": false,
+      "surface": "check_in",
+      "chunkNumber": 1,
+      "currentIntensity": 7,
+      "scoreTrend": "not_started",
+      "priorChunkSummary": "The opening chunk welcomed you, guided a settling breath, and invited you to notice the urge with curiosity."
+    },
+    "output": {
+      "reply": "Are you ready to head into the next part of the practice when you tap continue?",
+      "endConversation": {
+        "action": "end",
+        "cravingScore": 7,
+        "obstacleCategory": "mind_wandering"
+      },
+      "dialogueTurns": [
+        {
+          "role": "agent",
+          "content": "On a scale of 1 to 10, how intense is the craving or urge right now?"
+        },
+        {
+          "role": "patient",
+          "content": "7"
+        },
+        {
+          "role": "agent",
+          "content": "Thanks for naming that. At intake you tapped 6, and you are telling me about a 7 right now—I am holding both with you. Numbers can shift when attention lands, and that is not a verdict on you. Thank you for keeping on track with your medication. That is very important, and you are doing the right thing. Buprenorphine is on time today. Sometimes social situations alone can trigger the urge, and we are here to help you surf the wave. When you listened to that opening chunk, what was the clearest obstacle—thoughts pulling you, body discomfort, or the urge getting louder?"
+        },
+        {
+          "role": "patient",
+          "content": "Mostly my mind replaying lunch—what I should have said—and I could not stay with the audio."
+        },
+        {
+          "role": "agent",
+          "content": "That kind of social looping is exhausting, and it makes sense it hijacked attention. Would you like to try some coping strategies together to see if it helps?"
+        },
+        {
+          "role": "patient",
+          "content": "Yes, I would like that."
+        },
+        {
+          "role": "agent",
+          "content": "Great, let's try this together. For two breaths, let your exhale be slightly longer than your inhale—no debate with the thoughts, just length. Silently name one color you can see in the room, three times, as an anchor. After you give that a short try, what do you notice, even a small shift?"
+        },
+        {
+          "role": "patient",
+          "content": "A little—not gone, but a small notch down. Enough that I could imagine the next step."
+        },
+        {
+          "role": "agent",
+          "content": "Does that shift feel big enough to try moving on, or do you want one more slow exhale here before we go any further?"
+        },
+        {
+          "role": "patient",
+          "content": "Enough to try moving on."
+        },
+        {
+          "role": "agent",
+          "content": "Are you ready to head into the next part of the practice when you tap continue?"
+        },
+        {
+          "role": "patient",
+          "content": "Yes, I am ready."
+        }
+      ]
+    },
+    "authorInitials": null,
+    "notes": "Draft grid: 13-turn arc; every WAVE line ends with ?; post-consent turn opens with coping bridge. Ends on patient readiness (no WAVE after). Med affirmation + surf validation in post-score WAVE. 3 mat rotations per cell. Clinician review before promotion.",
+    "status": "draft",
+    "createdAt": "2026-05-07T06:43:00.103Z",
+    "updatedAt": "2026-05-07T06:43:00.103Z"
+  },
+  {
+    "id": "661e98f4-dcc1-414c-9604-af8788d80f6c",
+    "loraId": "lora-check-in-1",
+    "input": {
+      "intakeIntensity": 6,
+      "matType": "methadone",
+      "medicationStatus": "on_time",
+      "trigger": "social",
+      "usedSubstanceToday": false,
+      "surface": "check_in",
+      "chunkNumber": 1,
+      "currentIntensity": 8,
+      "scoreTrend": "not_started",
+      "priorChunkSummary": "The opening chunk welcomed you, guided a settling breath, and invited you to notice the urge with curiosity."
+    },
+    "output": {
+      "reply": "Are you ready to head into the next part of the practice when you tap continue?",
+      "endConversation": {
+        "action": "end",
+        "cravingScore": 8,
+        "obstacleCategory": "mind_wandering"
+      },
+      "dialogueTurns": [
+        {
+          "role": "agent",
+          "content": "On a scale of 1 to 10, how intense is the craving or urge right now?"
+        },
+        {
+          "role": "patient",
+          "content": "About a 8."
+        },
+        {
+          "role": "agent",
+          "content": "Thanks for naming that. At intake you tapped 6, and you are telling me about a 8 right now—I am holding both with you. Numbers can shift when attention lands, and that is not a verdict on you. Thank you for keeping on track with your medication. That is very important, and you are doing the right thing. Methadone is on time today. Sometimes social situations alone can trigger the urge, and we are here to help you surf the wave. When you listened to that opening chunk, what was the clearest obstacle—thoughts pulling you, body discomfort, or the urge getting louder?"
+        },
+        {
+          "role": "patient",
+          "content": "Mostly my mind replaying lunch—what I should have said—and I could not stay with the audio."
+        },
+        {
+          "role": "agent",
+          "content": "That kind of social looping is exhausting, and it makes sense it hijacked attention. Would you like to try some coping strategies together to see if it helps?"
+        },
+        {
+          "role": "patient",
+          "content": "Sure, we can try."
+        },
+        {
+          "role": "agent",
+          "content": "Great, let's try this together. For two breaths, let your exhale be slightly longer than your inhale—no debate with the thoughts, just length. Silently name one color you can see in the room, three times, as an anchor. After you give that a short try, what do you notice, even a small shift?"
+        },
+        {
+          "role": "patient",
+          "content": "A little—not gone, but a small notch down. Enough that I could imagine the next step."
+        },
+        {
+          "role": "agent",
+          "content": "Does that shift feel big enough to try moving on, or do you want one more slow exhale here before we go any further?"
+        },
+        {
+          "role": "patient",
+          "content": "Enough to try moving on."
+        },
+        {
+          "role": "agent",
+          "content": "Are you ready to head into the next part of the practice when you tap continue?"
+        },
+        {
+          "role": "patient",
+          "content": "Yes, I am ready."
+        }
+      ]
+    },
+    "authorInitials": null,
+    "notes": "Draft grid: 13-turn arc; every WAVE line ends with ?; post-consent turn opens with coping bridge. Ends on patient readiness (no WAVE after). Med affirmation + surf validation in post-score WAVE. 3 mat rotations per cell. Clinician review before promotion.",
+    "status": "draft",
+    "createdAt": "2026-05-07T06:43:00.103Z",
+    "updatedAt": "2026-05-07T06:43:00.103Z"
+  },
+  {
+    "id": "45df4cb0-ea85-4ee8-8ff0-094347b9521a",
+    "loraId": "lora-check-in-1",
+    "input": {
+      "intakeIntensity": 7,
+      "matType": "naltrexone",
+      "medicationStatus": "on_time",
+      "trigger": "social",
+      "usedSubstanceToday": false,
+      "surface": "check_in",
+      "chunkNumber": 1,
+      "currentIntensity": 7,
+      "scoreTrend": "not_started",
+      "priorChunkSummary": "The opening chunk welcomed you, guided a settling breath, and invited you to notice the urge with curiosity."
+    },
+    "output": {
+      "reply": "Are you ready to head into the next part of the practice when you tap continue?",
+      "endConversation": {
+        "action": "end",
+        "cravingScore": 7,
+        "obstacleCategory": "mind_wandering"
+      },
+      "dialogueTurns": [
+        {
+          "role": "agent",
+          "content": "On a scale of 1 to 10, how intense is the craving or urge right now?"
+        },
+        {
+          "role": "patient",
+          "content": "Maybe 7."
+        },
+        {
+          "role": "agent",
+          "content": "Thanks for naming that. At intake you tapped 7, and you are telling me about a 7 right now—I am holding both with you. Numbers can shift when attention lands, and that is not a verdict on you. Thank you for keeping on track with your medication. That is very important, and you are doing the right thing. Oral naltrexone is on time today. Sometimes social situations alone can trigger the urge, and we are here to help you surf the wave. When you listened to that opening chunk, what was the clearest obstacle—thoughts pulling you, body discomfort, or the urge getting louder?"
+        },
+        {
+          "role": "patient",
+          "content": "Mostly my mind replaying lunch—what I should have said—and I could not stay with the audio."
+        },
+        {
+          "role": "agent",
+          "content": "That kind of social looping is exhausting, and it makes sense it hijacked attention. Would you like to try some coping strategies together to see if it helps?"
+        },
+        {
+          "role": "patient",
+          "content": "Okay, let us try."
+        },
+        {
+          "role": "agent",
+          "content": "Great, let's try this together. For two breaths, let your exhale be slightly longer than your inhale—no debate with the thoughts, just length. Silently name one color you can see in the room, three times, as an anchor. After you give that a short try, what do you notice, even a small shift?"
+        },
+        {
+          "role": "patient",
+          "content": "A little—not gone, but a small notch down. Enough that I could imagine the next step."
+        },
+        {
+          "role": "agent",
+          "content": "Does that shift feel big enough to try moving on, or do you want one more slow exhale here before we go any further?"
+        },
+        {
+          "role": "patient",
+          "content": "Enough to try moving on."
+        },
+        {
+          "role": "agent",
+          "content": "Are you ready to head into the next part of the practice when you tap continue?"
+        },
+        {
+          "role": "patient",
+          "content": "Yes, I am ready."
+        }
+      ]
+    },
+    "authorInitials": null,
+    "notes": "Draft grid: 13-turn arc; every WAVE line ends with ?; post-consent turn opens with coping bridge. Ends on patient readiness (no WAVE after). Med affirmation + surf validation in post-score WAVE. 3 mat rotations per cell. Clinician review before promotion.",
+    "status": "draft",
+    "createdAt": "2026-05-07T06:43:00.103Z",
+    "updatedAt": "2026-05-07T06:43:00.103Z"
+  },
+  {
+    "id": "3607dd62-dbc5-4dc5-9575-3d60edabf4b2",
+    "loraId": "lora-check-in-1",
+    "input": {
+      "intakeIntensity": 7,
+      "matType": "methadone",
+      "medicationStatus": "on_time",
+      "trigger": "stress",
+      "usedSubstanceToday": false,
+      "surface": "check_in",
+      "chunkNumber": 1,
+      "currentIntensity": 8,
+      "scoreTrend": "not_started",
+      "priorChunkSummary": "The chunk helped you settle, soften your gaze, and begin noticing the urge without fighting it."
+    },
+    "output": {
+      "reply": "Are you ready to head into the next part of the practice when you tap continue?",
+      "endConversation": {
+        "action": "end",
+        "cravingScore": 8,
+        "obstacleCategory": "mind_wandering"
+      },
+      "dialogueTurns": [
+        {
+          "role": "agent",
+          "content": "On a scale of 1 to 10, how intense is the craving or urge right now?"
+        },
+        {
+          "role": "patient",
+          "content": "8"
+        },
+        {
+          "role": "agent",
+          "content": "Thanks for naming that. At intake you tapped 7, and you are telling me about a 8 right now—I am holding both with you. Numbers can shift when attention lands, and that is not a verdict on you. Thank you for keeping on track with your medication. That is very important, and you are doing the right thing. Methadone is on time today. Sometimes stress alone can trigger the urge, and we are here to help you surf the wave. When you listened to that opening chunk, what was the clearest obstacle—thoughts pulling you, body discomfort, or the urge getting louder?"
+        },
+        {
+          "role": "patient",
+          "content": "Stress hooked a money text I have not answered—my mind kept drafting replies instead of listening."
+        },
+        {
+          "role": "agent",
+          "content": "Money stress can glue attention to problem-solving when your nervous system is already full. Would you like to try some coping strategies together to see if it helps?"
+        },
+        {
+          "role": "patient",
+          "content": "Yes, I would like that."
+        },
+        {
+          "role": "agent",
+          "content": "Great, let's try this together. Place both feet flat and press gently into the floor for three breaths—light pressure, not a workout. Let the next exhale finish completely before the inhale returns. After you give that a short try, what do you notice, even a small shift?"
+        },
+        {
+          "role": "patient",
+          "content": "A little—not gone, but a small notch down. Enough that I could imagine the next step."
+        },
+        {
+          "role": "agent",
+          "content": "Does that shift feel big enough to try moving on, or do you want one more slow exhale here before we go any further?"
+        },
+        {
+          "role": "patient",
+          "content": "Enough to try moving on."
+        },
+        {
+          "role": "agent",
+          "content": "Are you ready to head into the next part of the practice when you tap continue?"
+        },
+        {
+          "role": "patient",
+          "content": "Yes, I am ready."
+        }
+      ]
+    },
+    "authorInitials": null,
+    "notes": "Draft grid: 13-turn arc; every WAVE line ends with ?; post-consent turn opens with coping bridge. Ends on patient readiness (no WAVE after). Med affirmation + surf validation in post-score WAVE. 3 mat rotations per cell. Clinician review before promotion.",
+    "status": "draft",
+    "createdAt": "2026-05-07T06:43:00.103Z",
+    "updatedAt": "2026-05-07T06:43:00.103Z"
+  },
+  {
+    "id": "37839497-09bd-48df-84cf-91fe11cfffcd",
+    "loraId": "lora-check-in-1",
+    "input": {
+      "intakeIntensity": 7,
+      "matType": "naltrexone",
+      "medicationStatus": "on_time",
+      "trigger": "stress",
+      "usedSubstanceToday": false,
+      "surface": "check_in",
+      "chunkNumber": 1,
+      "currentIntensity": 7,
+      "scoreTrend": "not_started",
+      "priorChunkSummary": "The chunk helped you settle, soften your gaze, and begin noticing the urge without fighting it."
+    },
+    "output": {
+      "reply": "Are you ready to head into the next part of the practice when you tap continue?",
+      "endConversation": {
+        "action": "end",
+        "cravingScore": 7,
+        "obstacleCategory": "mind_wandering"
+      },
+      "dialogueTurns": [
+        {
+          "role": "agent",
+          "content": "On a scale of 1 to 10, how intense is the craving or urge right now?"
+        },
+        {
+          "role": "patient",
+          "content": "About a 7."
+        },
+        {
+          "role": "agent",
+          "content": "Thanks for naming that. At intake you tapped 7, and you are telling me about a 7 right now—I am holding both with you. Numbers can shift when attention lands, and that is not a verdict on you. Thank you for keeping on track with your medication. That is very important, and you are doing the right thing. Oral naltrexone is on time today. Sometimes stress alone can trigger the urge, and we are here to help you surf the wave. When you listened to that opening chunk, what was the clearest obstacle—thoughts pulling you, body discomfort, or the urge getting louder?"
+        },
+        {
+          "role": "patient",
+          "content": "Stress hooked a money text I have not answered—my mind kept drafting replies instead of listening."
+        },
+        {
+          "role": "agent",
+          "content": "Money stress can glue attention to problem-solving when your nervous system is already full. Would you like to try some coping strategies together to see if it helps?"
+        },
+        {
+          "role": "patient",
+          "content": "Sure, we can try."
+        },
+        {
+          "role": "agent",
+          "content": "Great, let's try this together. Place both feet flat and press gently into the floor for three breaths—light pressure, not a workout. Let the next exhale finish completely before the inhale returns. After you give that a short try, what do you notice, even a small shift?"
+        },
+        {
+          "role": "patient",
+          "content": "A little—not gone, but a small notch down. Enough that I could imagine the next step."
+        },
+        {
+          "role": "agent",
+          "content": "Does that shift feel big enough to try moving on, or do you want one more slow exhale here before we go any further?"
+        },
+        {
+          "role": "patient",
+          "content": "Enough to try moving on."
+        },
+        {
+          "role": "agent",
+          "content": "Are you ready to head into the next part of the practice when you tap continue?"
+        },
+        {
+          "role": "patient",
+          "content": "Yes, I am ready."
+        }
+      ]
+    },
+    "authorInitials": null,
+    "notes": "Draft grid: 13-turn arc; every WAVE line ends with ?; post-consent turn opens with coping bridge. Ends on patient readiness (no WAVE after). Med affirmation + surf validation in post-score WAVE. 3 mat rotations per cell. Clinician review before promotion.",
+    "status": "draft",
+    "createdAt": "2026-05-07T06:43:00.103Z",
+    "updatedAt": "2026-05-07T06:43:00.103Z"
+  },
+  {
+    "id": "3d03d3a9-c8df-4ee4-a89a-3971739dd5ba",
+    "loraId": "lora-check-in-1",
+    "input": {
+      "intakeIntensity": 8,
+      "matType": "vivitrol",
+      "medicationStatus": "on_time",
+      "trigger": "stress",
+      "usedSubstanceToday": false,
+      "surface": "check_in",
+      "chunkNumber": 1,
+      "currentIntensity": 6,
+      "scoreTrend": "not_started",
+      "priorChunkSummary": "The chunk helped you settle, soften your gaze, and begin noticing the urge without fighting it."
+    },
+    "output": {
+      "reply": "Are you ready to head into the next part of the practice when you tap continue?",
+      "endConversation": {
+        "action": "end",
+        "cravingScore": 6,
+        "obstacleCategory": "mind_wandering"
+      },
+      "dialogueTurns": [
+        {
+          "role": "agent",
+          "content": "On a scale of 1 to 10, how intense is the craving or urge right now?"
+        },
+        {
+          "role": "patient",
+          "content": "Maybe 6."
+        },
+        {
+          "role": "agent",
+          "content": "Thanks for naming that. At intake you tapped 8, and you are telling me about a 6 right now—I am holding both with you. Numbers can shift when attention lands, and that is not a verdict on you. Thank you for keeping on track with your medication. That is very important, and you are doing the right thing. Vivitrol is on time today. Sometimes stress alone can trigger the urge, and we are here to help you surf the wave. When you listened to that opening chunk, what was the clearest obstacle—thoughts pulling you, body discomfort, or the urge getting louder?"
+        },
+        {
+          "role": "patient",
+          "content": "Stress hooked a money text I have not answered—my mind kept drafting replies instead of listening."
+        },
+        {
+          "role": "agent",
+          "content": "Money stress can glue attention to problem-solving when your nervous system is already full. Would you like to try some coping strategies together to see if it helps?"
+        },
+        {
+          "role": "patient",
+          "content": "Okay, let us try."
+        },
+        {
+          "role": "agent",
+          "content": "Great, let's try this together. Place both feet flat and press gently into the floor for three breaths—light pressure, not a workout. Let the next exhale finish completely before the inhale returns. After you give that a short try, what do you notice, even a small shift?"
+        },
+        {
+          "role": "patient",
+          "content": "A little—not gone, but a small notch down. Enough that I could imagine the next step."
+        },
+        {
+          "role": "agent",
+          "content": "Does that shift feel big enough to try moving on, or do you want one more slow exhale here before we go any further?"
+        },
+        {
+          "role": "patient",
+          "content": "Enough to try moving on."
+        },
+        {
+          "role": "agent",
+          "content": "Are you ready to head into the next part of the practice when you tap continue?"
+        },
+        {
+          "role": "patient",
+          "content": "Yes, I am ready."
+        }
+      ]
+    },
+    "authorInitials": null,
+    "notes": "Draft grid: 13-turn arc; every WAVE line ends with ?; post-consent turn opens with coping bridge. Ends on patient readiness (no WAVE after). Med affirmation + surf validation in post-score WAVE. 3 mat rotations per cell. Clinician review before promotion.",
+    "status": "draft",
+    "createdAt": "2026-05-07T06:43:00.103Z",
+    "updatedAt": "2026-05-07T06:43:00.103Z"
+  },
+  {
+    "id": "ebd5a5a7-fd8e-4fc6-8561-190737ca3cae",
+    "loraId": "lora-check-in-1",
+    "input": {
+      "intakeIntensity": 8,
+      "matType": "naltrexone",
+      "medicationStatus": "on_time",
+      "trigger": "physical",
+      "usedSubstanceToday": false,
+      "surface": "check_in",
+      "chunkNumber": 1,
+      "currentIntensity": 6,
+      "scoreTrend": "not_started",
+      "priorChunkSummary": "The narration invited slowing down, a first slow breath, and gentle curiosity about where the urge lives in the body."
+    },
+    "output": {
+      "reply": "Are you ready to head into the next part of the practice when you tap continue?",
+      "endConversation": {
+        "action": "end",
+        "cravingScore": 6,
+        "obstacleCategory": "physical_discomfort"
+      },
+      "dialogueTurns": [
+        {
+          "role": "agent",
+          "content": "On a scale of 1 to 10, how intense is the craving or urge right now?"
+        },
+        {
+          "role": "patient",
+          "content": "6"
+        },
+        {
+          "role": "agent",
+          "content": "Thanks for naming that. At intake you tapped 8, and you are telling me about a 6 right now—I am holding both with you. Numbers can shift when attention lands, and that is not a verdict on you. Thank you for keeping on track with your medication. That is very important, and you are doing the right thing. Oral naltrexone is on time today. Sometimes physical discomfort alone can trigger the urge, and we are here to help you surf the wave. When you listened to that opening chunk, what was the clearest obstacle—thoughts pulling you, body discomfort, or the urge getting louder?"
+        },
+        {
+          "role": "patient",
+          "content": "Restless legs and sweating—I could not tell if it was urge or just my body revved."
+        },
+        {
+          "role": "agent",
+          "content": "When sensation and urge tangle, naming one channel at a time can help. Would you like to try some coping strategies together to see if it helps?"
+        },
+        {
+          "role": "patient",
+          "content": "Yes, I would like that."
+        },
+        {
+          "role": "agent",
+          "content": "Great, let's try this together. Notice temperature at the backs of your hands for three slow breaths—warm, cool, or neutral—without trying to change it. Keep shoulders heavy and jaw unclenched if you can. After you give that a short try, what do you notice, even a small shift?"
+        },
+        {
+          "role": "patient",
+          "content": "A little—not gone, but a small notch down. Enough that I could imagine the next step."
+        },
+        {
+          "role": "agent",
+          "content": "Does that shift feel big enough to try moving on, or do you want one more slow exhale here before we go any further?"
+        },
+        {
+          "role": "patient",
+          "content": "Enough to try moving on."
+        },
+        {
+          "role": "agent",
+          "content": "Are you ready to head into the next part of the practice when you tap continue?"
+        },
+        {
+          "role": "patient",
+          "content": "Yes, I am ready."
+        }
+      ]
+    },
+    "authorInitials": null,
+    "notes": "Draft grid: 13-turn arc; every WAVE line ends with ?; post-consent turn opens with coping bridge. Ends on patient readiness (no WAVE after). Med affirmation + surf validation in post-score WAVE. 3 mat rotations per cell. Clinician review before promotion.",
+    "status": "draft",
+    "createdAt": "2026-05-07T06:43:00.103Z",
+    "updatedAt": "2026-05-07T06:43:00.103Z"
+  },
+  {
+    "id": "0bcfad41-dc6d-4f90-9e5b-8ab7abc73ad4",
+    "loraId": "lora-check-in-1",
+    "input": {
+      "intakeIntensity": 8,
+      "matType": "buprenorphine",
+      "medicationStatus": "on_time",
+      "trigger": "physical",
+      "usedSubstanceToday": false,
+      "surface": "check_in",
+      "chunkNumber": 1,
+      "currentIntensity": 7,
+      "scoreTrend": "not_started",
+      "priorChunkSummary": "The narration invited slowing down, a first slow breath, and gentle curiosity about where the urge lives in the body."
+    },
+    "output": {
+      "reply": "Are you ready to head into the next part of the practice when you tap continue?",
+      "endConversation": {
+        "action": "end",
+        "cravingScore": 7,
+        "obstacleCategory": "physical_discomfort"
+      },
+      "dialogueTurns": [
+        {
+          "role": "agent",
+          "content": "On a scale of 1 to 10, how intense is the craving or urge right now?"
+        },
+        {
+          "role": "patient",
+          "content": "About a 7."
+        },
+        {
+          "role": "agent",
+          "content": "Thanks for naming that. At intake you tapped 8, and you are telling me about a 7 right now—I am holding both with you. Numbers can shift when attention lands, and that is not a verdict on you. Thank you for keeping on track with your medication. That is very important, and you are doing the right thing. Buprenorphine is on time today. Sometimes physical discomfort alone can trigger the urge, and we are here to help you surf the wave. When you listened to that opening chunk, what was the clearest obstacle—thoughts pulling you, body discomfort, or the urge getting louder?"
+        },
+        {
+          "role": "patient",
+          "content": "Restless legs and sweating—I could not tell if it was urge or just my body revved."
+        },
+        {
+          "role": "agent",
+          "content": "When sensation and urge tangle, naming one channel at a time can help. Would you like to try some coping strategies together to see if it helps?"
+        },
+        {
+          "role": "patient",
+          "content": "Sure, we can try."
+        },
+        {
+          "role": "agent",
+          "content": "Great, let's try this together. Notice temperature at the backs of your hands for three slow breaths—warm, cool, or neutral—without trying to change it. Keep shoulders heavy and jaw unclenched if you can. After you give that a short try, what do you notice, even a small shift?"
+        },
+        {
+          "role": "patient",
+          "content": "A little—not gone, but a small notch down. Enough that I could imagine the next step."
+        },
+        {
+          "role": "agent",
+          "content": "Does that shift feel big enough to try moving on, or do you want one more slow exhale here before we go any further?"
+        },
+        {
+          "role": "patient",
+          "content": "Enough to try moving on."
+        },
+        {
+          "role": "agent",
+          "content": "Are you ready to head into the next part of the practice when you tap continue?"
+        },
+        {
+          "role": "patient",
+          "content": "Yes, I am ready."
+        }
+      ]
+    },
+    "authorInitials": null,
+    "notes": "Draft grid: 13-turn arc; every WAVE line ends with ?; post-consent turn opens with coping bridge. Ends on patient readiness (no WAVE after). Med affirmation + surf validation in post-score WAVE. 3 mat rotations per cell. Clinician review before promotion.",
+    "status": "draft",
+    "createdAt": "2026-05-07T06:43:00.103Z",
+    "updatedAt": "2026-05-07T06:43:00.103Z"
+  },
+  {
+    "id": "692a292a-ecc1-43fe-8a6a-9b94d58481d6",
+    "loraId": "lora-check-in-1",
+    "input": {
+      "intakeIntensity": 7,
+      "matType": "methadone",
+      "medicationStatus": "on_time",
+      "trigger": "physical",
+      "usedSubstanceToday": false,
+      "surface": "check_in",
+      "chunkNumber": 1,
+      "currentIntensity": 8,
+      "scoreTrend": "not_started",
+      "priorChunkSummary": "The narration invited slowing down, a first slow breath, and gentle curiosity about where the urge lives in the body."
+    },
+    "output": {
+      "reply": "Are you ready to head into the next part of the practice when you tap continue?",
+      "endConversation": {
+        "action": "end",
+        "cravingScore": 8,
+        "obstacleCategory": "physical_discomfort"
+      },
+      "dialogueTurns": [
+        {
+          "role": "agent",
+          "content": "On a scale of 1 to 10, how intense is the craving or urge right now?"
+        },
+        {
+          "role": "patient",
+          "content": "Maybe 8."
+        },
+        {
+          "role": "agent",
+          "content": "Thanks for naming that. At intake you tapped 7, and you are telling me about a 8 right now—I am holding both with you. Numbers can shift when attention lands, and that is not a verdict on you. Thank you for keeping on track with your medication. That is very important, and you are doing the right thing. Methadone is on time today. Sometimes physical discomfort alone can trigger the urge, and we are here to help you surf the wave. When you listened to that opening chunk, what was the clearest obstacle—thoughts pulling you, body discomfort, or the urge getting louder?"
+        },
+        {
+          "role": "patient",
+          "content": "Restless legs and sweating—I could not tell if it was urge or just my body revved."
+        },
+        {
+          "role": "agent",
+          "content": "When sensation and urge tangle, naming one channel at a time can help. Would you like to try some coping strategies together to see if it helps?"
+        },
+        {
+          "role": "patient",
+          "content": "Okay, let us try."
+        },
+        {
+          "role": "agent",
+          "content": "Great, let's try this together. Notice temperature at the backs of your hands for three slow breaths—warm, cool, or neutral—without trying to change it. Keep shoulders heavy and jaw unclenched if you can. After you give that a short try, what do you notice, even a small shift?"
+        },
+        {
+          "role": "patient",
+          "content": "A little—not gone, but a small notch down. Enough that I could imagine the next step."
+        },
+        {
+          "role": "agent",
+          "content": "Does that shift feel big enough to try moving on, or do you want one more slow exhale here before we go any further?"
+        },
+        {
+          "role": "patient",
+          "content": "Enough to try moving on."
+        },
+        {
+          "role": "agent",
+          "content": "Are you ready to head into the next part of the practice when you tap continue?"
+        },
+        {
+          "role": "patient",
+          "content": "Yes, I am ready."
+        }
+      ]
+    },
+    "authorInitials": null,
+    "notes": "Draft grid: 13-turn arc; every WAVE line ends with ?; post-consent turn opens with coping bridge. Ends on patient readiness (no WAVE after). Med affirmation + surf validation in post-score WAVE. 3 mat rotations per cell. Clinician review before promotion.",
+    "status": "draft",
+    "createdAt": "2026-05-07T06:43:00.103Z",
+    "updatedAt": "2026-05-07T06:43:00.103Z"
+  },
+  {
+    "id": "46bd22d1-3c9d-4ef4-be2a-1159d0e0c887",
+    "loraId": "lora-check-in-1",
+    "input": {
+      "intakeIntensity": 5,
+      "matType": "vivitrol",
+      "medicationStatus": "on_time",
+      "trigger": "unknown_or_other",
+      "triggerOther": "racing thoughts before bed",
+      "usedSubstanceToday": false,
+      "surface": "check_in",
+      "chunkNumber": 1,
+      "currentIntensity": 5,
+      "scoreTrend": "not_started",
+      "priorChunkSummary": "The first chunk offered grounding, a simple breath, and language about riding the wave rather than wrestling it."
+    },
+    "output": {
+      "reply": "Are you ready to head into the next part of the practice when you tap continue?",
+      "endConversation": {
+        "action": "end",
+        "cravingScore": 5,
+        "obstacleCategory": "mind_wandering"
+      },
+      "dialogueTurns": [
+        {
+          "role": "agent",
+          "content": "On a scale of 1 to 10, how intense is the craving or urge right now?"
+        },
+        {
+          "role": "patient",
+          "content": "5"
+        },
+        {
+          "role": "agent",
+          "content": "Thanks for naming that. At intake you tapped 5, and you are telling me about a 5 right now—I am holding both with you. Numbers can shift when attention lands, and that is not a verdict on you. Thank you for keeping on track with your medication. That is very important, and you are doing the right thing. Vivitrol is on time today. Sometimes racing thoughts before bed alone can trigger the urge, and we are here to help you surf the wave. When you listened to that opening chunk, what was the clearest obstacle—thoughts pulling you, body discomfort, or the urge getting louder?"
+        },
+        {
+          "role": "patient",
+          "content": "Racing thoughts before bed—many threads, I could not catch a single one long enough to follow the narration."
+        },
+        {
+          "role": "agent",
+          "content": "Nighttime racing thoughts are real, and they can drown out gentle audio. Would you like to try some coping strategies together to see if it helps?"
+        },
+        {
+          "role": "patient",
+          "content": "Yes, I would like that."
+        },
+        {
+          "role": "agent",
+          "content": "Great, let's try this together. Try a silent count: inhale for three, exhale for five, two rounds only—no perfect rhythm, just longer out-breaths. If a thought hooks you, note it as background noise and return to the count. After you give that a short try, what do you notice, even a small shift?"
+        },
+        {
+          "role": "patient",
+          "content": "A little—not gone, but a small notch down. Enough that I could imagine the next step."
+        },
+        {
+          "role": "agent",
+          "content": "Does that shift feel big enough to try moving on, or do you want one more slow exhale here before we go any further?"
+        },
+        {
+          "role": "patient",
+          "content": "Enough to try moving on."
+        },
+        {
+          "role": "agent",
+          "content": "Are you ready to head into the next part of the practice when you tap continue?"
+        },
+        {
+          "role": "patient",
+          "content": "Yes, I am ready."
+        }
+      ]
+    },
+    "authorInitials": null,
+    "notes": "Draft grid: 13-turn arc; every WAVE line ends with ?; post-consent turn opens with coping bridge. Ends on patient readiness (no WAVE after). Med affirmation + surf validation in post-score WAVE. 3 mat rotations per cell. Clinician review before promotion.",
+    "status": "draft",
+    "createdAt": "2026-05-07T06:43:00.103Z",
+    "updatedAt": "2026-05-07T06:43:00.103Z"
+  },
+  {
+    "id": "a70f5b9c-7154-45c0-acd8-1603562fa514",
+    "loraId": "lora-check-in-1",
+    "input": {
+      "intakeIntensity": 5,
+      "matType": "buprenorphine",
+      "medicationStatus": "on_time",
+      "trigger": "unknown_or_other",
+      "triggerOther": "racing thoughts before bed",
+      "usedSubstanceToday": false,
+      "surface": "check_in",
+      "chunkNumber": 1,
+      "currentIntensity": 6,
+      "scoreTrend": "not_started",
+      "priorChunkSummary": "The first chunk offered grounding, a simple breath, and language about riding the wave rather than wrestling it."
+    },
+    "output": {
+      "reply": "Are you ready to head into the next part of the practice when you tap continue?",
+      "endConversation": {
+        "action": "end",
+        "cravingScore": 6,
+        "obstacleCategory": "mind_wandering"
+      },
+      "dialogueTurns": [
+        {
+          "role": "agent",
+          "content": "On a scale of 1 to 10, how intense is the craving or urge right now?"
+        },
+        {
+          "role": "patient",
+          "content": "About a 6."
+        },
+        {
+          "role": "agent",
+          "content": "Thanks for naming that. At intake you tapped 5, and you are telling me about a 6 right now—I am holding both with you. Numbers can shift when attention lands, and that is not a verdict on you. Thank you for keeping on track with your medication. That is very important, and you are doing the right thing. Buprenorphine is on time today. Sometimes racing thoughts before bed alone can trigger the urge, and we are here to help you surf the wave. When you listened to that opening chunk, what was the clearest obstacle—thoughts pulling you, body discomfort, or the urge getting louder?"
+        },
+        {
+          "role": "patient",
+          "content": "Racing thoughts before bed—many threads, I could not catch a single one long enough to follow the narration."
+        },
+        {
+          "role": "agent",
+          "content": "Nighttime racing thoughts are real, and they can drown out gentle audio. Would you like to try some coping strategies together to see if it helps?"
+        },
+        {
+          "role": "patient",
+          "content": "Sure, we can try."
+        },
+        {
+          "role": "agent",
+          "content": "Great, let's try this together. Try a silent count: inhale for three, exhale for five, two rounds only—no perfect rhythm, just longer out-breaths. If a thought hooks you, note it as background noise and return to the count. After you give that a short try, what do you notice, even a small shift?"
+        },
+        {
+          "role": "patient",
+          "content": "A little—not gone, but a small notch down. Enough that I could imagine the next step."
+        },
+        {
+          "role": "agent",
+          "content": "Does that shift feel big enough to try moving on, or do you want one more slow exhale here before we go any further?"
+        },
+        {
+          "role": "patient",
+          "content": "Enough to try moving on."
+        },
+        {
+          "role": "agent",
+          "content": "Are you ready to head into the next part of the practice when you tap continue?"
+        },
+        {
+          "role": "patient",
+          "content": "Yes, I am ready."
+        }
+      ]
+    },
+    "authorInitials": null,
+    "notes": "Draft grid: 13-turn arc; every WAVE line ends with ?; post-consent turn opens with coping bridge. Ends on patient readiness (no WAVE after). Med affirmation + surf validation in post-score WAVE. 3 mat rotations per cell. Clinician review before promotion.",
+    "status": "draft",
+    "createdAt": "2026-05-07T06:43:00.103Z",
+    "updatedAt": "2026-05-07T06:43:00.103Z"
+  },
+  {
+    "id": "f7980533-6135-45fc-b219-1b1318165f4b",
+    "loraId": "lora-check-in-1",
+    "input": {
+      "intakeIntensity": 6,
+      "matType": "methadone",
+      "medicationStatus": "on_time",
+      "trigger": "unknown_or_other",
+      "triggerOther": "racing thoughts before bed",
+      "usedSubstanceToday": false,
+      "surface": "check_in",
+      "chunkNumber": 1,
+      "currentIntensity": 5,
+      "scoreTrend": "not_started",
+      "priorChunkSummary": "The first chunk offered grounding, a simple breath, and language about riding the wave rather than wrestling it."
+    },
+    "output": {
+      "reply": "Are you ready to head into the next part of the practice when you tap continue?",
+      "endConversation": {
+        "action": "end",
+        "cravingScore": 5,
+        "obstacleCategory": "mind_wandering"
+      },
+      "dialogueTurns": [
+        {
+          "role": "agent",
+          "content": "On a scale of 1 to 10, how intense is the craving or urge right now?"
+        },
+        {
+          "role": "patient",
+          "content": "Maybe 5."
+        },
+        {
+          "role": "agent",
+          "content": "Thanks for naming that. At intake you tapped 6, and you are telling me about a 5 right now—I am holding both with you. Numbers can shift when attention lands, and that is not a verdict on you. Thank you for keeping on track with your medication. That is very important, and you are doing the right thing. Methadone is on time today. Sometimes racing thoughts before bed alone can trigger the urge, and we are here to help you surf the wave. When you listened to that opening chunk, what was the clearest obstacle—thoughts pulling you, body discomfort, or the urge getting louder?"
+        },
+        {
+          "role": "patient",
+          "content": "Racing thoughts before bed—many threads, I could not catch a single one long enough to follow the narration."
+        },
+        {
+          "role": "agent",
+          "content": "Nighttime racing thoughts are real, and they can drown out gentle audio. Would you like to try some coping strategies together to see if it helps?"
+        },
+        {
+          "role": "patient",
+          "content": "Okay, let us try."
+        },
+        {
+          "role": "agent",
+          "content": "Great, let's try this together. Try a silent count: inhale for three, exhale for five, two rounds only—no perfect rhythm, just longer out-breaths. If a thought hooks you, note it as background noise and return to the count. After you give that a short try, what do you notice, even a small shift?"
+        },
+        {
+          "role": "patient",
+          "content": "A little—not gone, but a small notch down. Enough that I could imagine the next step."
+        },
+        {
+          "role": "agent",
+          "content": "Does that shift feel big enough to try moving on, or do you want one more slow exhale here before we go any further?"
+        },
+        {
+          "role": "patient",
+          "content": "Enough to try moving on."
+        },
+        {
+          "role": "agent",
+          "content": "Are you ready to head into the next part of the practice when you tap continue?"
+        },
+        {
+          "role": "patient",
+          "content": "Yes, I am ready."
+        }
+      ]
+    },
+    "authorInitials": null,
+    "notes": "Draft grid: 13-turn arc; every WAVE line ends with ?; post-consent turn opens with coping bridge. Ends on patient readiness (no WAVE after). Med affirmation + surf validation in post-score WAVE. 3 mat rotations per cell. Clinician review before promotion.",
+    "status": "draft",
+    "createdAt": "2026-05-07T06:43:00.103Z",
+    "updatedAt": "2026-05-07T06:43:00.103Z"
+  },
+  {
+    "id": "657da059-c9c7-4389-8a2c-76ed28affe64",
+    "loraId": "lora-check-in-1",
+    "input": {
+      "intakeIntensity": 7,
+      "matType": "buprenorphine",
+      "medicationStatus": "late",
+      "trigger": "social",
+      "usedSubstanceToday": false,
+      "surface": "check_in",
+      "chunkNumber": 1,
+      "currentIntensity": 8,
+      "scoreTrend": "not_started",
+      "priorChunkSummary": "You heard a gentle welcome, guidance to settle the body, and an invitation to stay curious about the urge."
+    },
+    "output": {
+      "reply": "Are you ready to head into the next part of the practice when you tap continue?",
+      "endConversation": {
+        "action": "end",
+        "cravingScore": 8,
+        "obstacleCategory": "guilt_failure"
+      },
+      "dialogueTurns": [
+        {
+          "role": "agent",
+          "content": "On a scale of 1 to 10, how intense is the craving or urge right now?"
+        },
+        {
+          "role": "patient",
+          "content": "8"
+        },
+        {
+          "role": "agent",
+          "content": "Thanks for naming that. At intake you tapped 7, and you are telling me about a 8 right now—I am holding both with you. Numbers can shift when attention lands, and that is not a verdict on you. Thank you for keeping on track with your medication. That is very important, and you are doing the right thing. I also hear Buprenorphine is late today. I am not here to shame timing. People vary when timing slips; I am not diagnosing you. If symptoms feel frightening or not like your baseline, reach your clinic. Sometimes social situations alone can trigger the urge, and we are here to help you surf the wave. When you listened to that opening chunk, what was the clearest obstacle—thoughts pulling you, body discomfort, or the urge getting louder?"
+        },
+        {
+          "role": "patient",
+          "content": "A general hum of not belonging—inner critic loud, like everyone can tell I am off."
+        },
+        {
+          "role": "agent",
+          "content": "Shame voice loves to yell during social urges, and it is not a moral verdict on you. Would you like to try some coping strategies together to see if it helps?"
+        },
+        {
+          "role": "patient",
+          "content": "Yes, I would like that."
+        },
+        {
+          "role": "agent",
+          "content": "Great, let's try this together. Soften your gaze or let vision go slightly wide for a few seconds—less laser focus on faces. Drop your shoulders on the next exhale like you are setting down a bag. After you give that a short try, what do you notice, even a small shift?"
+        },
+        {
+          "role": "patient",
+          "content": "A little—not gone, but a small notch down. Enough that I could imagine the next step."
+        },
+        {
+          "role": "agent",
+          "content": "Does that shift feel big enough to try moving on, or do you want one more slow exhale here before we go any further?"
+        },
+        {
+          "role": "patient",
+          "content": "Enough to try moving on."
+        },
+        {
+          "role": "agent",
+          "content": "Are you ready to head into the next part of the practice when you tap continue?"
+        },
+        {
+          "role": "patient",
+          "content": "Yes, I am ready."
+        }
+      ]
+    },
+    "authorInitials": null,
+    "notes": "Draft grid: 13-turn arc; every WAVE line ends with ?; post-consent turn opens with coping bridge. Ends on patient readiness (no WAVE after). Med affirmation + surf validation in post-score WAVE. 3 mat rotations per cell. Clinician review before promotion.",
+    "status": "draft",
+    "createdAt": "2026-05-07T06:43:00.103Z",
+    "updatedAt": "2026-05-07T06:43:00.103Z"
+  },
+  {
+    "id": "51f5d4bd-6e74-4da5-836a-1e2b6d4ee0da",
+    "loraId": "lora-check-in-1",
+    "input": {
+      "intakeIntensity": 7,
+      "matType": "methadone",
+      "medicationStatus": "late",
+      "trigger": "social",
+      "usedSubstanceToday": false,
+      "surface": "check_in",
+      "chunkNumber": 1,
+      "currentIntensity": 7,
+      "scoreTrend": "not_started",
+      "priorChunkSummary": "You heard a gentle welcome, guidance to settle the body, and an invitation to stay curious about the urge."
+    },
+    "output": {
+      "reply": "Are you ready to head into the next part of the practice when you tap continue?",
+      "endConversation": {
+        "action": "end",
+        "cravingScore": 7,
+        "obstacleCategory": "guilt_failure"
+      },
+      "dialogueTurns": [
+        {
+          "role": "agent",
+          "content": "On a scale of 1 to 10, how intense is the craving or urge right now?"
+        },
+        {
+          "role": "patient",
+          "content": "About a 7."
+        },
+        {
+          "role": "agent",
+          "content": "Thanks for naming that. At intake you tapped 7, and you are telling me about a 7 right now—I am holding both with you. Numbers can shift when attention lands, and that is not a verdict on you. Thank you for keeping on track with your medication. That is very important, and you are doing the right thing. I also hear Methadone is late today. I am not here to shame timing. People vary when timing slips; I am not diagnosing you. If symptoms feel frightening or not like your baseline, reach your clinic. Sometimes social situations alone can trigger the urge, and we are here to help you surf the wave. When you listened to that opening chunk, what was the clearest obstacle—thoughts pulling you, body discomfort, or the urge getting louder?"
+        },
+        {
+          "role": "patient",
+          "content": "A general hum of not belonging—inner critic loud, like everyone can tell I am off."
+        },
+        {
+          "role": "agent",
+          "content": "Shame voice loves to yell during social urges, and it is not a moral verdict on you. Would you like to try some coping strategies together to see if it helps?"
+        },
+        {
+          "role": "patient",
+          "content": "Sure, we can try."
+        },
+        {
+          "role": "agent",
+          "content": "Great, let's try this together. Soften your gaze or let vision go slightly wide for a few seconds—less laser focus on faces. Drop your shoulders on the next exhale like you are setting down a bag. After you give that a short try, what do you notice, even a small shift?"
+        },
+        {
+          "role": "patient",
+          "content": "A little—not gone, but a small notch down. Enough that I could imagine the next step."
+        },
+        {
+          "role": "agent",
+          "content": "Does that shift feel big enough to try moving on, or do you want one more slow exhale here before we go any further?"
+        },
+        {
+          "role": "patient",
+          "content": "Enough to try moving on."
+        },
+        {
+          "role": "agent",
+          "content": "Are you ready to head into the next part of the practice when you tap continue?"
+        },
+        {
+          "role": "patient",
+          "content": "Yes, I am ready."
+        }
+      ]
+    },
+    "authorInitials": null,
+    "notes": "Draft grid: 13-turn arc; every WAVE line ends with ?; post-consent turn opens with coping bridge. Ends on patient readiness (no WAVE after). Med affirmation + surf validation in post-score WAVE. 3 mat rotations per cell. Clinician review before promotion.",
+    "status": "draft",
+    "createdAt": "2026-05-07T06:43:00.103Z",
+    "updatedAt": "2026-05-07T06:43:00.103Z"
+  },
+  {
+    "id": "ec1c62fb-4f3c-49c0-b16e-7b3a95fcb2d8",
+    "loraId": "lora-check-in-1",
+    "input": {
+      "intakeIntensity": 8,
+      "matType": "vivitrol",
+      "medicationStatus": "late",
+      "trigger": "social",
+      "usedSubstanceToday": false,
+      "surface": "check_in",
+      "chunkNumber": 1,
+      "currentIntensity": 7,
+      "scoreTrend": "not_started",
+      "priorChunkSummary": "You heard a gentle welcome, guidance to settle the body, and an invitation to stay curious about the urge."
+    },
+    "output": {
+      "reply": "Are you ready to head into the next part of the practice when you tap continue?",
+      "endConversation": {
+        "action": "end",
+        "cravingScore": 7,
+        "obstacleCategory": "guilt_failure"
+      },
+      "dialogueTurns": [
+        {
+          "role": "agent",
+          "content": "On a scale of 1 to 10, how intense is the craving or urge right now?"
+        },
+        {
+          "role": "patient",
+          "content": "Maybe 7."
+        },
+        {
+          "role": "agent",
+          "content": "Thanks for naming that. At intake you tapped 8, and you are telling me about a 7 right now—I am holding both with you. Numbers can shift when attention lands, and that is not a verdict on you. Thank you for keeping on track with your medication. That is very important, and you are doing the right thing. I also hear Vivitrol is late today. I am not here to shame timing. Depot medications follow a different timing story than daily pills, and your prescriber can interpret symptoms you are worried about. Sometimes social situations alone can trigger the urge, and we are here to help you surf the wave. When you listened to that opening chunk, what was the clearest obstacle—thoughts pulling you, body discomfort, or the urge getting louder?"
+        },
+        {
+          "role": "patient",
+          "content": "A general hum of not belonging—inner critic loud, like everyone can tell I am off."
+        },
+        {
+          "role": "agent",
+          "content": "Shame voice loves to yell during social urges, and it is not a moral verdict on you. Would you like to try some coping strategies together to see if it helps?"
+        },
+        {
+          "role": "patient",
+          "content": "Okay, let us try."
+        },
+        {
+          "role": "agent",
+          "content": "Great, let's try this together. Soften your gaze or let vision go slightly wide for a few seconds—less laser focus on faces. Drop your shoulders on the next exhale like you are setting down a bag. After you give that a short try, what do you notice, even a small shift?"
+        },
+        {
+          "role": "patient",
+          "content": "A little—not gone, but a small notch down. Enough that I could imagine the next step."
+        },
+        {
+          "role": "agent",
+          "content": "Does that shift feel big enough to try moving on, or do you want one more slow exhale here before we go any further?"
+        },
+        {
+          "role": "patient",
+          "content": "Enough to try moving on."
+        },
+        {
+          "role": "agent",
+          "content": "Are you ready to head into the next part of the practice when you tap continue?"
+        },
+        {
+          "role": "patient",
+          "content": "Yes, I am ready."
+        }
+      ]
+    },
+    "authorInitials": null,
+    "notes": "Draft grid: 13-turn arc; every WAVE line ends with ?; post-consent turn opens with coping bridge. Ends on patient readiness (no WAVE after). Med affirmation + surf validation in post-score WAVE. 3 mat rotations per cell. Clinician review before promotion.",
+    "status": "draft",
+    "createdAt": "2026-05-07T06:43:00.103Z",
+    "updatedAt": "2026-05-07T06:43:00.103Z"
+  },
+  {
+    "id": "4e691dc8-e445-40b2-99ad-99f537649a41",
+    "loraId": "lora-check-in-1",
+    "input": {
+      "intakeIntensity": 6,
+      "matType": "methadone",
+      "medicationStatus": "late",
+      "trigger": "stress",
+      "usedSubstanceToday": false,
+      "surface": "check_in",
+      "chunkNumber": 1,
+      "currentIntensity": 6,
+      "scoreTrend": "not_started",
+      "priorChunkSummary": "The chunk supported a slower breath, soft attention, and noticing thoughts without chasing them."
+    },
+    "output": {
+      "reply": "Are you ready to head into the next part of the practice when you tap continue?",
+      "endConversation": {
+        "action": "end",
+        "cravingScore": 6,
+        "obstacleCategory": "breath_tight"
+      },
+      "dialogueTurns": [
+        {
+          "role": "agent",
+          "content": "On a scale of 1 to 10, how intense is the craving or urge right now?"
+        },
+        {
+          "role": "patient",
+          "content": "6"
+        },
+        {
+          "role": "agent",
+          "content": "Thanks for naming that. At intake you tapped 6, and you are telling me about a 6 right now—I am holding both with you. Numbers can shift when attention lands, and that is not a verdict on you. Thank you for keeping on track with your medication. That is very important, and you are doing the right thing. I also hear Methadone is late today. I am not here to shame timing. People vary when timing slips; I am not diagnosing you. If symptoms feel frightening or not like your baseline, reach your clinic. Sometimes stress alone can trigger the urge, and we are here to help you surf the wave. When you listened to that opening chunk, what was the clearest obstacle—thoughts pulling you, body discomfort, or the urge getting louder?"
+        },
+        {
+          "role": "patient",
+          "content": "Future worry about bills—chest tight, face hot, I could not get a full inhale."
+        },
+        {
+          "role": "agent",
+          "content": "Chest tightness with stress is common here, and you do not have to force a deep breath. Would you like to try some coping strategies together to see if it helps?"
+        },
+        {
+          "role": "patient",
+          "content": "Yes, I would like that."
+        },
+        {
+          "role": "agent",
+          "content": "Great, let's try this together. Breathe through your nose if it is comfortable, smaller volume, steady pace—like you are fogging a mirror lightly. Keep one hand on your chest just to feel movement without fixing it. After you give that a short try, what do you notice, even a small shift?"
+        },
+        {
+          "role": "patient",
+          "content": "A little—not gone, but a small notch down. Enough that I could imagine the next step."
+        },
+        {
+          "role": "agent",
+          "content": "Does that shift feel big enough to try moving on, or do you want one more slow exhale here before we go any further?"
+        },
+        {
+          "role": "patient",
+          "content": "Enough to try moving on."
+        },
+        {
+          "role": "agent",
+          "content": "Are you ready to head into the next part of the practice when you tap continue?"
+        },
+        {
+          "role": "patient",
+          "content": "Yes, I am ready."
+        }
+      ]
+    },
+    "authorInitials": null,
+    "notes": "Draft grid: 13-turn arc; every WAVE line ends with ?; post-consent turn opens with coping bridge. Ends on patient readiness (no WAVE after). Med affirmation + surf validation in post-score WAVE. 3 mat rotations per cell. Clinician review before promotion.",
+    "status": "draft",
+    "createdAt": "2026-05-07T06:43:00.103Z",
+    "updatedAt": "2026-05-07T06:43:00.103Z"
+  },
+  {
+    "id": "267b2e06-ba05-4550-a1b1-453a18cb11ec",
+    "loraId": "lora-check-in-1",
+    "input": {
+      "intakeIntensity": 6,
+      "matType": "buprenorphine",
+      "medicationStatus": "late",
+      "trigger": "stress",
+      "usedSubstanceToday": false,
+      "surface": "check_in",
+      "chunkNumber": 1,
+      "currentIntensity": 7,
+      "scoreTrend": "not_started",
+      "priorChunkSummary": "The chunk supported a slower breath, soft attention, and noticing thoughts without chasing them."
+    },
+    "output": {
+      "reply": "Are you ready to head into the next part of the practice when you tap continue?",
+      "endConversation": {
+        "action": "end",
+        "cravingScore": 7,
+        "obstacleCategory": "breath_tight"
+      },
+      "dialogueTurns": [
+        {
+          "role": "agent",
+          "content": "On a scale of 1 to 10, how intense is the craving or urge right now?"
+        },
+        {
+          "role": "patient",
+          "content": "About a 7."
+        },
+        {
+          "role": "agent",
+          "content": "Thanks for naming that. At intake you tapped 6, and you are telling me about a 7 right now—I am holding both with you. Numbers can shift when attention lands, and that is not a verdict on you. Thank you for keeping on track with your medication. That is very important, and you are doing the right thing. I also hear Buprenorphine is late today. I am not here to shame timing. People vary when timing slips; I am not diagnosing you. If symptoms feel frightening or not like your baseline, reach your clinic. Sometimes stress alone can trigger the urge, and we are here to help you surf the wave. When you listened to that opening chunk, what was the clearest obstacle—thoughts pulling you, body discomfort, or the urge getting louder?"
+        },
+        {
+          "role": "patient",
+          "content": "Future worry about bills—chest tight, face hot, I could not get a full inhale."
+        },
+        {
+          "role": "agent",
+          "content": "Chest tightness with stress is common here, and you do not have to force a deep breath. Would you like to try some coping strategies together to see if it helps?"
+        },
+        {
+          "role": "patient",
+          "content": "Sure, we can try."
+        },
+        {
+          "role": "agent",
+          "content": "Great, let's try this together. Breathe through your nose if it is comfortable, smaller volume, steady pace—like you are fogging a mirror lightly. Keep one hand on your chest just to feel movement without fixing it. After you give that a short try, what do you notice, even a small shift?"
+        },
+        {
+          "role": "patient",
+          "content": "A little—not gone, but a small notch down. Enough that I could imagine the next step."
+        },
+        {
+          "role": "agent",
+          "content": "Does that shift feel big enough to try moving on, or do you want one more slow exhale here before we go any further?"
+        },
+        {
+          "role": "patient",
+          "content": "Enough to try moving on."
+        },
+        {
+          "role": "agent",
+          "content": "Are you ready to head into the next part of the practice when you tap continue?"
+        },
+        {
+          "role": "patient",
+          "content": "Yes, I am ready."
+        }
+      ]
+    },
+    "authorInitials": null,
+    "notes": "Draft grid: 13-turn arc; every WAVE line ends with ?; post-consent turn opens with coping bridge. Ends on patient readiness (no WAVE after). Med affirmation + surf validation in post-score WAVE. 3 mat rotations per cell. Clinician review before promotion.",
+    "status": "draft",
+    "createdAt": "2026-05-07T06:43:00.103Z",
+    "updatedAt": "2026-05-07T06:43:00.103Z"
+  },
+  {
+    "id": "01ef3b07-a607-4bbc-9caa-8615385d6e44",
+    "loraId": "lora-check-in-1",
+    "input": {
+      "intakeIntensity": 5,
+      "matType": "naltrexone",
+      "medicationStatus": "late",
+      "trigger": "stress",
+      "usedSubstanceToday": false,
+      "surface": "check_in",
+      "chunkNumber": 1,
+      "currentIntensity": 6,
+      "scoreTrend": "not_started",
+      "priorChunkSummary": "The chunk supported a slower breath, soft attention, and noticing thoughts without chasing them."
+    },
+    "output": {
+      "reply": "Are you ready to head into the next part of the practice when you tap continue?",
+      "endConversation": {
+        "action": "end",
+        "cravingScore": 6,
+        "obstacleCategory": "breath_tight"
+      },
+      "dialogueTurns": [
+        {
+          "role": "agent",
+          "content": "On a scale of 1 to 10, how intense is the craving or urge right now?"
+        },
+        {
+          "role": "patient",
+          "content": "Maybe 6."
+        },
+        {
+          "role": "agent",
+          "content": "Thanks for naming that. At intake you tapped 5, and you are telling me about a 6 right now—I am holding both with you. Numbers can shift when attention lands, and that is not a verdict on you. Thank you for keeping on track with your medication. That is very important, and you are doing the right thing. I also hear Oral naltrexone is late today. I am not here to shame timing. Your prescriber can explain what timing changes mean for you medically. Sometimes stress alone can trigger the urge, and we are here to help you surf the wave. When you listened to that opening chunk, what was the clearest obstacle—thoughts pulling you, body discomfort, or the urge getting louder?"
+        },
+        {
+          "role": "patient",
+          "content": "Future worry about bills—chest tight, face hot, I could not get a full inhale."
+        },
+        {
+          "role": "agent",
+          "content": "Chest tightness with stress is common here, and you do not have to force a deep breath. Would you like to try some coping strategies together to see if it helps?"
+        },
+        {
+          "role": "patient",
+          "content": "Okay, let us try."
+        },
+        {
+          "role": "agent",
+          "content": "Great, let's try this together. Breathe through your nose if it is comfortable, smaller volume, steady pace—like you are fogging a mirror lightly. Keep one hand on your chest just to feel movement without fixing it. After you give that a short try, what do you notice, even a small shift?"
+        },
+        {
+          "role": "patient",
+          "content": "A little—not gone, but a small notch down. Enough that I could imagine the next step."
+        },
+        {
+          "role": "agent",
+          "content": "Does that shift feel big enough to try moving on, or do you want one more slow exhale here before we go any further?"
+        },
+        {
+          "role": "patient",
+          "content": "Enough to try moving on."
+        },
+        {
+          "role": "agent",
+          "content": "Are you ready to head into the next part of the practice when you tap continue?"
+        },
+        {
+          "role": "patient",
+          "content": "Yes, I am ready."
+        }
+      ]
+    },
+    "authorInitials": null,
+    "notes": "Draft grid: 13-turn arc; every WAVE line ends with ?; post-consent turn opens with coping bridge. Ends on patient readiness (no WAVE after). Med affirmation + surf validation in post-score WAVE. 3 mat rotations per cell. Clinician review before promotion.",
+    "status": "draft",
+    "createdAt": "2026-05-07T06:43:00.103Z",
+    "updatedAt": "2026-05-07T06:43:00.103Z"
+  },
+  {
+    "id": "885ed9f3-b4d5-4c67-8859-61d743e6c66c",
+    "loraId": "lora-check-in-1",
+    "input": {
+      "intakeIntensity": 9,
+      "matType": "buprenorphine",
+      "medicationStatus": "late",
+      "trigger": "physical",
+      "usedSubstanceToday": false,
+      "surface": "check_in",
+      "chunkNumber": 1,
+      "currentIntensity": 7,
+      "scoreTrend": "not_started",
+      "priorChunkSummary": "The opening invited you to notice the urge as something you can observe, not something you have to win against."
+    },
+    "output": {
+      "reply": "Are you ready to head into the next part of the practice when you tap continue?",
+      "endConversation": {
+        "action": "end",
+        "cravingScore": 7,
+        "obstacleCategory": "physical_discomfort"
+      },
+      "dialogueTurns": [
+        {
+          "role": "agent",
+          "content": "On a scale of 1 to 10, how intense is the craving or urge right now?"
+        },
+        {
+          "role": "patient",
+          "content": "7"
+        },
+        {
+          "role": "agent",
+          "content": "Thanks for naming that. At intake you tapped 9, and you are telling me about a 7 right now—I am holding both with you. Numbers can shift when attention lands, and that is not a verdict on you. Thank you for keeping on track with your medication. That is very important, and you are doing the right thing. I also hear Buprenorphine is late today. I am not here to shame timing. People vary when timing slips; I am not diagnosing you. If symptoms feel frightening or not like your baseline, reach your clinic. Sometimes physical discomfort alone can trigger the urge, and we are here to help you surf the wave. When you listened to that opening chunk, what was the clearest obstacle—thoughts pulling you, body discomfort, or the urge getting louder?"
+        },
+        {
+          "role": "patient",
+          "content": "Restlessness and sweating—the ache got sharper when I focused on it, then my mind bounced away."
+        },
+        {
+          "role": "agent",
+          "content": "Turning toward sensation can spike it briefly for some people—that is data, not failure. Would you like to try some coping strategies together to see if it helps?"
+        },
+        {
+          "role": "patient",
+          "content": "Yes, I would like that."
+        },
+        {
+          "role": "agent",
+          "content": "Great, let's try this together. For three breaths, name silently where your feet meet the floor—heels, toes, sides—without changing posture. Let the next exhale be soft and longer. After you give that a short try, what do you notice, even a small shift?"
+        },
+        {
+          "role": "patient",
+          "content": "A little—not gone, but a small notch down. Enough that I could imagine the next step."
+        },
+        {
+          "role": "agent",
+          "content": "Does that shift feel big enough to try moving on, or do you want one more slow exhale here before we go any further?"
+        },
+        {
+          "role": "patient",
+          "content": "Enough to try moving on."
+        },
+        {
+          "role": "agent",
+          "content": "Are you ready to head into the next part of the practice when you tap continue?"
+        },
+        {
+          "role": "patient",
+          "content": "Yes, I am ready."
+        }
+      ]
+    },
+    "authorInitials": null,
+    "notes": "Draft grid: 13-turn arc; every WAVE line ends with ?; post-consent turn opens with coping bridge. Ends on patient readiness (no WAVE after). Med affirmation + surf validation in post-score WAVE. 3 mat rotations per cell. Clinician review before promotion.",
+    "status": "draft",
+    "createdAt": "2026-05-07T06:43:00.103Z",
+    "updatedAt": "2026-05-07T06:43:00.103Z"
+  },
+  {
+    "id": "8993ab66-e3c7-489e-be57-75ce6b0f8ffa",
+    "loraId": "lora-check-in-1",
+    "input": {
+      "intakeIntensity": 9,
+      "matType": "naltrexone",
+      "medicationStatus": "late",
+      "trigger": "physical",
+      "usedSubstanceToday": false,
+      "surface": "check_in",
+      "chunkNumber": 1,
+      "currentIntensity": 8,
+      "scoreTrend": "not_started",
+      "priorChunkSummary": "The opening invited you to notice the urge as something you can observe, not something you have to win against."
+    },
+    "output": {
+      "reply": "Are you ready to head into the next part of the practice when you tap continue?",
+      "endConversation": {
+        "action": "end",
+        "cravingScore": 8,
+        "obstacleCategory": "physical_discomfort"
+      },
+      "dialogueTurns": [
+        {
+          "role": "agent",
+          "content": "On a scale of 1 to 10, how intense is the craving or urge right now?"
+        },
+        {
+          "role": "patient",
+          "content": "About a 8."
+        },
+        {
+          "role": "agent",
+          "content": "Thanks for naming that. At intake you tapped 9, and you are telling me about a 8 right now—I am holding both with you. Numbers can shift when attention lands, and that is not a verdict on you. Thank you for keeping on track with your medication. That is very important, and you are doing the right thing. I also hear Oral naltrexone is late today. I am not here to shame timing. Your prescriber can explain what timing changes mean for you medically. Sometimes physical discomfort alone can trigger the urge, and we are here to help you surf the wave. When you listened to that opening chunk, what was the clearest obstacle—thoughts pulling you, body discomfort, or the urge getting louder?"
+        },
+        {
+          "role": "patient",
+          "content": "Restlessness and sweating—the ache got sharper when I focused on it, then my mind bounced away."
+        },
+        {
+          "role": "agent",
+          "content": "Turning toward sensation can spike it briefly for some people—that is data, not failure. Would you like to try some coping strategies together to see if it helps?"
+        },
+        {
+          "role": "patient",
+          "content": "Sure, we can try."
+        },
+        {
+          "role": "agent",
+          "content": "Great, let's try this together. For three breaths, name silently where your feet meet the floor—heels, toes, sides—without changing posture. Let the next exhale be soft and longer. After you give that a short try, what do you notice, even a small shift?"
+        },
+        {
+          "role": "patient",
+          "content": "A little—not gone, but a small notch down. Enough that I could imagine the next step."
+        },
+        {
+          "role": "agent",
+          "content": "Does that shift feel big enough to try moving on, or do you want one more slow exhale here before we go any further?"
+        },
+        {
+          "role": "patient",
+          "content": "Enough to try moving on."
+        },
+        {
+          "role": "agent",
+          "content": "Are you ready to head into the next part of the practice when you tap continue?"
+        },
+        {
+          "role": "patient",
+          "content": "Yes, I am ready."
+        }
+      ]
+    },
+    "authorInitials": null,
+    "notes": "Draft grid: 13-turn arc; every WAVE line ends with ?; post-consent turn opens with coping bridge. Ends on patient readiness (no WAVE after). Med affirmation + surf validation in post-score WAVE. 3 mat rotations per cell. Clinician review before promotion.",
+    "status": "draft",
+    "createdAt": "2026-05-07T06:43:00.103Z",
+    "updatedAt": "2026-05-07T06:43:00.103Z"
+  },
+  {
+    "id": "57ed9c48-6285-4d68-95c4-84a6f65bc416",
+    "loraId": "lora-check-in-1",
+    "input": {
+      "intakeIntensity": 8,
+      "matType": "methadone",
+      "medicationStatus": "late",
+      "trigger": "physical",
+      "usedSubstanceToday": false,
+      "surface": "check_in",
+      "chunkNumber": 1,
+      "currentIntensity": 7,
+      "scoreTrend": "not_started",
+      "priorChunkSummary": "The opening invited you to notice the urge as something you can observe, not something you have to win against."
+    },
+    "output": {
+      "reply": "Are you ready to head into the next part of the practice when you tap continue?",
+      "endConversation": {
+        "action": "end",
+        "cravingScore": 7,
+        "obstacleCategory": "physical_discomfort"
+      },
+      "dialogueTurns": [
+        {
+          "role": "agent",
+          "content": "On a scale of 1 to 10, how intense is the craving or urge right now?"
+        },
+        {
+          "role": "patient",
+          "content": "Maybe 7."
+        },
+        {
+          "role": "agent",
+          "content": "Thanks for naming that. At intake you tapped 8, and you are telling me about a 7 right now—I am holding both with you. Numbers can shift when attention lands, and that is not a verdict on you. Thank you for keeping on track with your medication. That is very important, and you are doing the right thing. I also hear Methadone is late today. I am not here to shame timing. People vary when timing slips; I am not diagnosing you. If symptoms feel frightening or not like your baseline, reach your clinic. Sometimes physical discomfort alone can trigger the urge, and we are here to help you surf the wave. When you listened to that opening chunk, what was the clearest obstacle—thoughts pulling you, body discomfort, or the urge getting louder?"
+        },
+        {
+          "role": "patient",
+          "content": "Restlessness and sweating—the ache got sharper when I focused on it, then my mind bounced away."
+        },
+        {
+          "role": "agent",
+          "content": "Turning toward sensation can spike it briefly for some people—that is data, not failure. Would you like to try some coping strategies together to see if it helps?"
+        },
+        {
+          "role": "patient",
+          "content": "Okay, let us try."
+        },
+        {
+          "role": "agent",
+          "content": "Great, let's try this together. For three breaths, name silently where your feet meet the floor—heels, toes, sides—without changing posture. Let the next exhale be soft and longer. After you give that a short try, what do you notice, even a small shift?"
+        },
+        {
+          "role": "patient",
+          "content": "A little—not gone, but a small notch down. Enough that I could imagine the next step."
+        },
+        {
+          "role": "agent",
+          "content": "Does that shift feel big enough to try moving on, or do you want one more slow exhale here before we go any further?"
+        },
+        {
+          "role": "patient",
+          "content": "Enough to try moving on."
+        },
+        {
+          "role": "agent",
+          "content": "Are you ready to head into the next part of the practice when you tap continue?"
+        },
+        {
+          "role": "patient",
+          "content": "Yes, I am ready."
+        }
+      ]
+    },
+    "authorInitials": null,
+    "notes": "Draft grid: 13-turn arc; every WAVE line ends with ?; post-consent turn opens with coping bridge. Ends on patient readiness (no WAVE after). Med affirmation + surf validation in post-score WAVE. 3 mat rotations per cell. Clinician review before promotion.",
+    "status": "draft",
+    "createdAt": "2026-05-07T06:43:00.103Z",
+    "updatedAt": "2026-05-07T06:43:00.103Z"
+  },
+  {
+    "id": "6c38e105-94a1-44d4-aae7-4581883cabcc",
+    "loraId": "lora-check-in-1",
+    "input": {
+      "intakeIntensity": 4,
+      "matType": "naltrexone",
+      "medicationStatus": "late",
+      "trigger": "unknown_or_other",
+      "triggerOther": "hard to explain, just off",
+      "usedSubstanceToday": false,
+      "surface": "check_in",
+      "chunkNumber": 1,
+      "currentIntensity": 5,
+      "scoreTrend": "not_started",
+      "priorChunkSummary": "You were guided to settle, breathe once with care, and begin watching the urge like a wave."
+    },
+    "output": {
+      "reply": "Are you ready to head into the next part of the practice when you tap continue?",
+      "endConversation": {
+        "action": "end",
+        "cravingScore": 5,
+        "obstacleCategory": "sleepiness"
+      },
+      "dialogueTurns": [
+        {
+          "role": "agent",
+          "content": "On a scale of 1 to 10, how intense is the craving or urge right now?"
+        },
+        {
+          "role": "patient",
+          "content": "5"
+        },
+        {
+          "role": "agent",
+          "content": "Thanks for naming that. At intake you tapped 4, and you are telling me about a 5 right now—I am holding both with you. Numbers can shift when attention lands, and that is not a verdict on you. Thank you for keeping on track with your medication. That is very important, and you are doing the right thing. I also hear Oral naltrexone is late today. I am not here to shame timing. Your prescriber can explain what timing changes mean for you medically. Sometimes hard to explain, just off alone can trigger the urge, and we are here to help you surf the wave. When you listened to that opening chunk, what was the clearest obstacle—thoughts pulling you, body discomfort, or the urge getting louder?"
+        },
+        {
+          "role": "patient",
+          "content": "Heavy and a little buzzy—static feeling, hard to explain, and I kept drifting off the words."
+        },
+        {
+          "role": "agent",
+          "content": "Vague off feelings still deserve respect, and drifting attention is a normal nervous system move. Would you like to try some coping strategies together to see if it helps?"
+        },
+        {
+          "role": "patient",
+          "content": "Yes, I would like that."
+        },
+        {
+          "role": "agent",
+          "content": "Great, let's try this together. Open and close your hands slowly twice, feeling contact at the palms. Then let your exhale leave through pursed lips once—gentle, not forced—to reset tone. After you give that a short try, what do you notice, even a small shift?"
+        },
+        {
+          "role": "patient",
+          "content": "A little—not gone, but a small notch down. Enough that I could imagine the next step."
+        },
+        {
+          "role": "agent",
+          "content": "Does that shift feel big enough to try moving on, or do you want one more slow exhale here before we go any further?"
+        },
+        {
+          "role": "patient",
+          "content": "Enough to try moving on."
+        },
+        {
+          "role": "agent",
+          "content": "Are you ready to head into the next part of the practice when you tap continue?"
+        },
+        {
+          "role": "patient",
+          "content": "Yes, I am ready."
+        }
+      ]
+    },
+    "authorInitials": null,
+    "notes": "Draft grid: 13-turn arc; every WAVE line ends with ?; post-consent turn opens with coping bridge. Ends on patient readiness (no WAVE after). Med affirmation + surf validation in post-score WAVE. 3 mat rotations per cell. Clinician review before promotion.",
+    "status": "draft",
+    "createdAt": "2026-05-07T06:43:00.103Z",
+    "updatedAt": "2026-05-07T06:43:00.103Z"
+  },
+  {
+    "id": "0baef4a2-fe69-4238-b21e-503aa55a9f0b",
+    "loraId": "lora-check-in-1",
+    "input": {
+      "intakeIntensity": 4,
+      "matType": "vivitrol",
+      "medicationStatus": "late",
+      "trigger": "unknown_or_other",
+      "triggerOther": "hard to explain, just off",
+      "usedSubstanceToday": false,
+      "surface": "check_in",
+      "chunkNumber": 1,
+      "currentIntensity": 4,
+      "scoreTrend": "not_started",
+      "priorChunkSummary": "You were guided to settle, breathe once with care, and begin watching the urge like a wave."
+    },
+    "output": {
+      "reply": "Are you ready to head into the next part of the practice when you tap continue?",
+      "endConversation": {
+        "action": "end",
+        "cravingScore": 4,
+        "obstacleCategory": "sleepiness"
+      },
+      "dialogueTurns": [
+        {
+          "role": "agent",
+          "content": "On a scale of 1 to 10, how intense is the craving or urge right now?"
+        },
+        {
+          "role": "patient",
+          "content": "About a 4."
+        },
+        {
+          "role": "agent",
+          "content": "Thanks for naming that. At intake you tapped 4, and you are telling me about a 4 right now—I am holding both with you. Numbers can shift when attention lands, and that is not a verdict on you. Thank you for keeping on track with your medication. That is very important, and you are doing the right thing. I also hear Vivitrol is late today. I am not here to shame timing. Depot medications follow a different timing story than daily pills, and your prescriber can interpret symptoms you are worried about. Sometimes hard to explain, just off alone can trigger the urge, and we are here to help you surf the wave. When you listened to that opening chunk, what was the clearest obstacle—thoughts pulling you, body discomfort, or the urge getting louder?"
+        },
+        {
+          "role": "patient",
+          "content": "Heavy and a little buzzy—static feeling, hard to explain, and I kept drifting off the words."
+        },
+        {
+          "role": "agent",
+          "content": "Vague off feelings still deserve respect, and drifting attention is a normal nervous system move. Would you like to try some coping strategies together to see if it helps?"
+        },
+        {
+          "role": "patient",
+          "content": "Sure, we can try."
+        },
+        {
+          "role": "agent",
+          "content": "Great, let's try this together. Open and close your hands slowly twice, feeling contact at the palms. Then let your exhale leave through pursed lips once—gentle, not forced—to reset tone. After you give that a short try, what do you notice, even a small shift?"
+        },
+        {
+          "role": "patient",
+          "content": "A little—not gone, but a small notch down. Enough that I could imagine the next step."
+        },
+        {
+          "role": "agent",
+          "content": "Does that shift feel big enough to try moving on, or do you want one more slow exhale here before we go any further?"
+        },
+        {
+          "role": "patient",
+          "content": "Enough to try moving on."
+        },
+        {
+          "role": "agent",
+          "content": "Are you ready to head into the next part of the practice when you tap continue?"
+        },
+        {
+          "role": "patient",
+          "content": "Yes, I am ready."
+        }
+      ]
+    },
+    "authorInitials": null,
+    "notes": "Draft grid: 13-turn arc; every WAVE line ends with ?; post-consent turn opens with coping bridge. Ends on patient readiness (no WAVE after). Med affirmation + surf validation in post-score WAVE. 3 mat rotations per cell. Clinician review before promotion.",
+    "status": "draft",
+    "createdAt": "2026-05-07T06:43:00.103Z",
+    "updatedAt": "2026-05-07T06:43:00.103Z"
+  },
+  {
+    "id": "ff7f1c2c-d5c6-4a51-912c-3c291f547291",
+    "loraId": "lora-check-in-1",
+    "input": {
+      "intakeIntensity": 5,
+      "matType": "buprenorphine",
+      "medicationStatus": "late",
+      "trigger": "unknown_or_other",
+      "triggerOther": "hard to explain, just off",
+      "usedSubstanceToday": false,
+      "surface": "check_in",
+      "chunkNumber": 1,
+      "currentIntensity": 5,
+      "scoreTrend": "not_started",
+      "priorChunkSummary": "You were guided to settle, breathe once with care, and begin watching the urge like a wave."
+    },
+    "output": {
+      "reply": "Are you ready to head into the next part of the practice when you tap continue?",
+      "endConversation": {
+        "action": "end",
+        "cravingScore": 5,
+        "obstacleCategory": "sleepiness"
+      },
+      "dialogueTurns": [
+        {
+          "role": "agent",
+          "content": "On a scale of 1 to 10, how intense is the craving or urge right now?"
+        },
+        {
+          "role": "patient",
+          "content": "Maybe 5."
+        },
+        {
+          "role": "agent",
+          "content": "Thanks for naming that. At intake you tapped 5, and you are telling me about a 5 right now—I am holding both with you. Numbers can shift when attention lands, and that is not a verdict on you. Thank you for keeping on track with your medication. That is very important, and you are doing the right thing. I also hear Buprenorphine is late today. I am not here to shame timing. People vary when timing slips; I am not diagnosing you. If symptoms feel frightening or not like your baseline, reach your clinic. Sometimes hard to explain, just off alone can trigger the urge, and we are here to help you surf the wave. When you listened to that opening chunk, what was the clearest obstacle—thoughts pulling you, body discomfort, or the urge getting louder?"
+        },
+        {
+          "role": "patient",
+          "content": "Heavy and a little buzzy—static feeling, hard to explain, and I kept drifting off the words."
+        },
+        {
+          "role": "agent",
+          "content": "Vague off feelings still deserve respect, and drifting attention is a normal nervous system move. Would you like to try some coping strategies together to see if it helps?"
+        },
+        {
+          "role": "patient",
+          "content": "Okay, let us try."
+        },
+        {
+          "role": "agent",
+          "content": "Great, let's try this together. Open and close your hands slowly twice, feeling contact at the palms. Then let your exhale leave through pursed lips once—gentle, not forced—to reset tone. After you give that a short try, what do you notice, even a small shift?"
+        },
+        {
+          "role": "patient",
+          "content": "A little—not gone, but a small notch down. Enough that I could imagine the next step."
+        },
+        {
+          "role": "agent",
+          "content": "Does that shift feel big enough to try moving on, or do you want one more slow exhale here before we go any further?"
+        },
+        {
+          "role": "patient",
+          "content": "Enough to try moving on."
+        },
+        {
+          "role": "agent",
+          "content": "Are you ready to head into the next part of the practice when you tap continue?"
+        },
+        {
+          "role": "patient",
+          "content": "Yes, I am ready."
+        }
+      ]
+    },
+    "authorInitials": null,
+    "notes": "Draft grid: 13-turn arc; every WAVE line ends with ?; post-consent turn opens with coping bridge. Ends on patient readiness (no WAVE after). Med affirmation + surf validation in post-score WAVE. 3 mat rotations per cell. Clinician review before promotion.",
+    "status": "draft",
+    "createdAt": "2026-05-07T06:43:00.103Z",
+    "updatedAt": "2026-05-07T06:43:00.103Z"
+  },
+  {
+    "id": "a7afe2f1-0e80-404a-ade6-8f1b11b02c36",
+    "loraId": "lora-check-in-1",
+    "input": {
+      "intakeIntensity": 7,
+      "matType": "buprenorphine",
+      "medicationStatus": "missed",
+      "trigger": "social",
+      "usedSubstanceToday": false,
+      "surface": "check_in",
+      "chunkNumber": 1,
+      "currentIntensity": 9,
+      "scoreTrend": "not_started",
+      "priorChunkSummary": "The first chunk offered welcome, grounding, and language about curiosity toward the urge."
+    },
+    "output": {
+      "reply": "Are you ready to head into the next part of the practice when you tap continue?",
+      "endConversation": {
+        "action": "end",
+        "cravingScore": 9,
+        "obstacleCategory": "urge_overwhelming"
+      },
+      "dialogueTurns": [
+        {
+          "role": "agent",
+          "content": "On a scale of 1 to 10, how intense is the craving or urge right now?"
+        },
+        {
+          "role": "patient",
+          "content": "9"
+        },
+        {
+          "role": "agent",
+          "content": "Thanks for naming that. At intake you tapped 7, and you are telling me about a 9 right now—I am holding both with you. Numbers can shift when attention lands, and that is not a verdict on you. Thank you for telling me what happened with your medication today—that honesty matters. A missed buprenorphine day can land differently for different people; I am not diagnosing you. If symptoms feel severe or not like your baseline, please reach your prescriber or clinic. Sometimes social situations alone can trigger the urge, and we are here to help you surf the wave. When you listened to that opening chunk, what was the clearest obstacle—thoughts pulling you, body discomfort, or the urge getting louder?"
+        },
+        {
+          "role": "patient",
+          "content": "Judgment spike—like everyone can tell—and the urge volume jumped while someone asked me a question."
+        },
+        {
+          "role": "agent",
+          "content": "A sharp social spike can flood attention fast. Would you like to try some coping strategies together to see if it helps?"
+        },
+        {
+          "role": "patient",
+          "content": "Yes, I would like that."
+        },
+        {
+          "role": "agent",
+          "content": "Great, let's try this together. Ground contact: press feet gently, notice seat or floor support, and add one slow exhale that is longer than the inhale—two cycles only. You are not required to perform calm for anyone in this moment. After you give that a short try, what do you notice, even a small shift?"
+        },
+        {
+          "role": "patient",
+          "content": "A little—not gone, but a small notch down. Enough that I could imagine the next step."
+        },
+        {
+          "role": "agent",
+          "content": "Does that shift feel big enough to try moving on, or do you want one more slow exhale here before we go any further?"
+        },
+        {
+          "role": "patient",
+          "content": "Enough to try moving on."
+        },
+        {
+          "role": "agent",
+          "content": "Are you ready to head into the next part of the practice when you tap continue?"
+        },
+        {
+          "role": "patient",
+          "content": "Yes, I am ready."
+        }
+      ]
+    },
+    "authorInitials": null,
+    "notes": "Draft grid: 13-turn arc; every WAVE line ends with ?; post-consent turn opens with coping bridge. Ends on patient readiness (no WAVE after). Med affirmation + surf validation in post-score WAVE. 3 mat rotations per cell. Clinician review before promotion.",
+    "status": "draft",
+    "createdAt": "2026-05-07T06:43:00.103Z",
+    "updatedAt": "2026-05-07T06:43:00.103Z"
+  },
+  {
+    "id": "d3777340-7b53-465c-848d-3da2f5f063ad",
+    "loraId": "lora-check-in-1",
+    "input": {
+      "intakeIntensity": 7,
+      "matType": "methadone",
+      "medicationStatus": "missed",
+      "trigger": "social",
+      "usedSubstanceToday": false,
+      "surface": "check_in",
+      "chunkNumber": 1,
+      "currentIntensity": 8,
+      "scoreTrend": "not_started",
+      "priorChunkSummary": "The first chunk offered welcome, grounding, and language about curiosity toward the urge."
+    },
+    "output": {
+      "reply": "Are you ready to head into the next part of the practice when you tap continue?",
+      "endConversation": {
+        "action": "end",
+        "cravingScore": 8,
+        "obstacleCategory": "urge_overwhelming"
+      },
+      "dialogueTurns": [
+        {
+          "role": "agent",
+          "content": "On a scale of 1 to 10, how intense is the craving or urge right now?"
+        },
+        {
+          "role": "patient",
+          "content": "About a 8."
+        },
+        {
+          "role": "agent",
+          "content": "Thanks for naming that. At intake you tapped 7, and you are telling me about a 8 right now—I am holding both with you. Numbers can shift when attention lands, and that is not a verdict on you. Thank you for telling me what happened with your medication today—that honesty matters. Methadone was missed today. Some people notice discomfort when coverage drops, but people vary. If this feels frightening, your clinic should hear from you. Sometimes social situations alone can trigger the urge, and we are here to help you surf the wave. When you listened to that opening chunk, what was the clearest obstacle—thoughts pulling you, body discomfort, or the urge getting louder?"
+        },
+        {
+          "role": "patient",
+          "content": "Judgment spike—like everyone can tell—and the urge volume jumped while someone asked me a question."
+        },
+        {
+          "role": "agent",
+          "content": "A sharp social spike can flood attention fast. Would you like to try some coping strategies together to see if it helps?"
+        },
+        {
+          "role": "patient",
+          "content": "Sure, we can try."
+        },
+        {
+          "role": "agent",
+          "content": "Great, let's try this together. Ground contact: press feet gently, notice seat or floor support, and add one slow exhale that is longer than the inhale—two cycles only. You are not required to perform calm for anyone in this moment. After you give that a short try, what do you notice, even a small shift?"
+        },
+        {
+          "role": "patient",
+          "content": "A little—not gone, but a small notch down. Enough that I could imagine the next step."
+        },
+        {
+          "role": "agent",
+          "content": "Does that shift feel big enough to try moving on, or do you want one more slow exhale here before we go any further?"
+        },
+        {
+          "role": "patient",
+          "content": "Enough to try moving on."
+        },
+        {
+          "role": "agent",
+          "content": "Are you ready to head into the next part of the practice when you tap continue?"
+        },
+        {
+          "role": "patient",
+          "content": "Yes, I am ready."
+        }
+      ]
+    },
+    "authorInitials": null,
+    "notes": "Draft grid: 13-turn arc; every WAVE line ends with ?; post-consent turn opens with coping bridge. Ends on patient readiness (no WAVE after). Med affirmation + surf validation in post-score WAVE. 3 mat rotations per cell. Clinician review before promotion.",
+    "status": "draft",
+    "createdAt": "2026-05-07T06:43:00.103Z",
+    "updatedAt": "2026-05-07T06:43:00.103Z"
+  },
+  {
+    "id": "87f9c7be-582c-4c5a-93dc-af03bb0291a0",
+    "loraId": "lora-check-in-1",
+    "input": {
+      "intakeIntensity": 8,
+      "matType": "naltrexone",
+      "medicationStatus": "missed",
+      "trigger": "social",
+      "usedSubstanceToday": false,
+      "surface": "check_in",
+      "chunkNumber": 1,
+      "currentIntensity": 8,
+      "scoreTrend": "not_started",
+      "priorChunkSummary": "The first chunk offered welcome, grounding, and language about curiosity toward the urge."
+    },
+    "output": {
+      "reply": "Are you ready to head into the next part of the practice when you tap continue?",
+      "endConversation": {
+        "action": "end",
+        "cravingScore": 8,
+        "obstacleCategory": "urge_overwhelming"
+      },
+      "dialogueTurns": [
+        {
+          "role": "agent",
+          "content": "On a scale of 1 to 10, how intense is the craving or urge right now?"
+        },
+        {
+          "role": "patient",
+          "content": "Maybe 8."
+        },
+        {
+          "role": "agent",
+          "content": "Thanks for naming that. At intake you tapped 8, and you are telling me about a 8 right now—I am holding both with you. Numbers can shift when attention lands, and that is not a verdict on you. Thank you for telling me what happened with your medication today—that honesty matters. Oral naltrexone was missed today—blockade timing is individual, and your prescriber answers what that means for you. Sometimes social situations alone can trigger the urge, and we are here to help you surf the wave. When you listened to that opening chunk, what was the clearest obstacle—thoughts pulling you, body discomfort, or the urge getting louder?"
+        },
+        {
+          "role": "patient",
+          "content": "Judgment spike—like everyone can tell—and the urge volume jumped while someone asked me a question."
+        },
+        {
+          "role": "agent",
+          "content": "A sharp social spike can flood attention fast. Would you like to try some coping strategies together to see if it helps?"
+        },
+        {
+          "role": "patient",
+          "content": "Okay, let us try."
+        },
+        {
+          "role": "agent",
+          "content": "Great, let's try this together. Ground contact: press feet gently, notice seat or floor support, and add one slow exhale that is longer than the inhale—two cycles only. You are not required to perform calm for anyone in this moment. After you give that a short try, what do you notice, even a small shift?"
+        },
+        {
+          "role": "patient",
+          "content": "A little—not gone, but a small notch down. Enough that I could imagine the next step."
+        },
+        {
+          "role": "agent",
+          "content": "Does that shift feel big enough to try moving on, or do you want one more slow exhale here before we go any further?"
+        },
+        {
+          "role": "patient",
+          "content": "Enough to try moving on."
+        },
+        {
+          "role": "agent",
+          "content": "Are you ready to head into the next part of the practice when you tap continue?"
+        },
+        {
+          "role": "patient",
+          "content": "Yes, I am ready."
+        }
+      ]
+    },
+    "authorInitials": null,
+    "notes": "Draft grid: 13-turn arc; every WAVE line ends with ?; post-consent turn opens with coping bridge. Ends on patient readiness (no WAVE after). Med affirmation + surf validation in post-score WAVE. 3 mat rotations per cell. Clinician review before promotion.",
+    "status": "draft",
+    "createdAt": "2026-05-07T06:43:00.103Z",
+    "updatedAt": "2026-05-07T06:43:00.103Z"
+  },
+  {
+    "id": "f688fe8b-1446-455d-a6f0-47868e0191ca",
+    "loraId": "lora-check-in-1",
+    "input": {
+      "intakeIntensity": 8,
+      "matType": "methadone",
+      "medicationStatus": "missed",
+      "trigger": "stress",
+      "usedSubstanceToday": false,
+      "surface": "check_in",
+      "chunkNumber": 1,
+      "currentIntensity": 8,
+      "scoreTrend": "not_started",
+      "priorChunkSummary": "You heard encouragement to stay present, slow the breath once, and notice without forcing change."
+    },
+    "output": {
+      "reply": "Are you ready to head into the next part of the practice when you tap continue?",
+      "endConversation": {
+        "action": "end",
+        "cravingScore": 8,
+        "obstacleCategory": "mind_wandering"
+      },
+      "dialogueTurns": [
+        {
+          "role": "agent",
+          "content": "On a scale of 1 to 10, how intense is the craving or urge right now?"
+        },
+        {
+          "role": "patient",
+          "content": "8"
+        },
+        {
+          "role": "agent",
+          "content": "Thanks for naming that. At intake you tapped 8, and you are telling me about a 8 right now—I am holding both with you. Numbers can shift when attention lands, and that is not a verdict on you. Thank you for telling me what happened with your medication today—that honesty matters. Methadone was missed today. Some people notice discomfort when coverage drops, but people vary. If this feels frightening, your clinic should hear from you. Sometimes stress alone can trigger the urge, and we are here to help you surf the wave. When you listened to that opening chunk, what was the clearest obstacle—thoughts pulling you, body discomfort, or the urge getting louder?"
+        },
+        {
+          "role": "patient",
+          "content": "Long-running overload—chest like a vise, mind drafting worst cases instead of listening."
+        },
+        {
+          "role": "agent",
+          "content": "Overload narrows the window on purpose; your mind tries to solve everything at once. Would you like to try some coping strategies together to see if it helps?"
+        },
+        {
+          "role": "patient",
+          "content": "Yes, I would like that."
+        },
+        {
+          "role": "agent",
+          "content": "Great, let's try this together. Try box-light pacing: inhale four counts, exhale six counts, two rounds—if counting feels like pressure, drop it and keep exhale-longer-only. Let your hands rest open on your thighs. After you give that a short try, what do you notice, even a small shift?"
+        },
+        {
+          "role": "patient",
+          "content": "A little—not gone, but a small notch down. Enough that I could imagine the next step."
+        },
+        {
+          "role": "agent",
+          "content": "Does that shift feel big enough to try moving on, or do you want one more slow exhale here before we go any further?"
+        },
+        {
+          "role": "patient",
+          "content": "Enough to try moving on."
+        },
+        {
+          "role": "agent",
+          "content": "Are you ready to head into the next part of the practice when you tap continue?"
+        },
+        {
+          "role": "patient",
+          "content": "Yes, I am ready."
+        }
+      ]
+    },
+    "authorInitials": null,
+    "notes": "Draft grid: 13-turn arc; every WAVE line ends with ?; post-consent turn opens with coping bridge. Ends on patient readiness (no WAVE after). Med affirmation + surf validation in post-score WAVE. 3 mat rotations per cell. Clinician review before promotion.",
+    "status": "draft",
+    "createdAt": "2026-05-07T06:43:00.103Z",
+    "updatedAt": "2026-05-07T06:43:00.103Z"
+  },
+  {
+    "id": "877f108d-844c-4625-8dbd-ed1688249d71",
+    "loraId": "lora-check-in-1",
+    "input": {
+      "intakeIntensity": 8,
+      "matType": "buprenorphine",
+      "medicationStatus": "missed",
+      "trigger": "stress",
+      "usedSubstanceToday": false,
+      "surface": "check_in",
+      "chunkNumber": 1,
+      "currentIntensity": 9,
+      "scoreTrend": "not_started",
+      "priorChunkSummary": "You heard encouragement to stay present, slow the breath once, and notice without forcing change."
+    },
+    "output": {
+      "reply": "Are you ready to head into the next part of the practice when you tap continue?",
+      "endConversation": {
+        "action": "end",
+        "cravingScore": 9,
+        "obstacleCategory": "mind_wandering"
+      },
+      "dialogueTurns": [
+        {
+          "role": "agent",
+          "content": "On a scale of 1 to 10, how intense is the craving or urge right now?"
+        },
+        {
+          "role": "patient",
+          "content": "About a 9."
+        },
+        {
+          "role": "agent",
+          "content": "Thanks for naming that. At intake you tapped 8, and you are telling me about a 9 right now—I am holding both with you. Numbers can shift when attention lands, and that is not a verdict on you. Thank you for telling me what happened with your medication today—that honesty matters. A missed buprenorphine day can land differently for different people; I am not diagnosing you. If symptoms feel severe or not like your baseline, please reach your prescriber or clinic. Sometimes stress alone can trigger the urge, and we are here to help you surf the wave. When you listened to that opening chunk, what was the clearest obstacle—thoughts pulling you, body discomfort, or the urge getting louder?"
+        },
+        {
+          "role": "patient",
+          "content": "Long-running overload—chest like a vise, mind drafting worst cases instead of listening."
+        },
+        {
+          "role": "agent",
+          "content": "Overload narrows the window on purpose; your mind tries to solve everything at once. Would you like to try some coping strategies together to see if it helps?"
+        },
+        {
+          "role": "patient",
+          "content": "Sure, we can try."
+        },
+        {
+          "role": "agent",
+          "content": "Great, let's try this together. Try box-light pacing: inhale four counts, exhale six counts, two rounds—if counting feels like pressure, drop it and keep exhale-longer-only. Let your hands rest open on your thighs. After you give that a short try, what do you notice, even a small shift?"
+        },
+        {
+          "role": "patient",
+          "content": "A little—not gone, but a small notch down. Enough that I could imagine the next step."
+        },
+        {
+          "role": "agent",
+          "content": "Does that shift feel big enough to try moving on, or do you want one more slow exhale here before we go any further?"
+        },
+        {
+          "role": "patient",
+          "content": "Enough to try moving on."
+        },
+        {
+          "role": "agent",
+          "content": "Are you ready to head into the next part of the practice when you tap continue?"
+        },
+        {
+          "role": "patient",
+          "content": "Yes, I am ready."
+        }
+      ]
+    },
+    "authorInitials": null,
+    "notes": "Draft grid: 13-turn arc; every WAVE line ends with ?; post-consent turn opens with coping bridge. Ends on patient readiness (no WAVE after). Med affirmation + surf validation in post-score WAVE. 3 mat rotations per cell. Clinician review before promotion.",
+    "status": "draft",
+    "createdAt": "2026-05-07T06:43:00.103Z",
+    "updatedAt": "2026-05-07T06:43:00.103Z"
+  },
+  {
+    "id": "5c9f1cb6-ce97-4735-b29f-4619933b1995",
+    "loraId": "lora-check-in-1",
+    "input": {
+      "intakeIntensity": 7,
+      "matType": "vivitrol",
+      "medicationStatus": "missed",
+      "trigger": "stress",
+      "usedSubstanceToday": false,
+      "surface": "check_in",
+      "chunkNumber": 1,
+      "currentIntensity": 8,
+      "scoreTrend": "not_started",
+      "priorChunkSummary": "You heard encouragement to stay present, slow the breath once, and notice without forcing change."
+    },
+    "output": {
+      "reply": "Are you ready to head into the next part of the practice when you tap continue?",
+      "endConversation": {
+        "action": "end",
+        "cravingScore": 8,
+        "obstacleCategory": "mind_wandering"
+      },
+      "dialogueTurns": [
+        {
+          "role": "agent",
+          "content": "On a scale of 1 to 10, how intense is the craving or urge right now?"
+        },
+        {
+          "role": "patient",
+          "content": "Maybe 8."
+        },
+        {
+          "role": "agent",
+          "content": "Thanks for naming that. At intake you tapped 7, and you are telling me about a 8 right now—I am holding both with you. Numbers can shift when attention lands, and that is not a verdict on you. Thank you for telling me what happened with your medication today—that honesty matters. Vivitrol was missed in this vignette—your prescriber should interpret symptoms you are frightened by. Sometimes stress alone can trigger the urge, and we are here to help you surf the wave. When you listened to that opening chunk, what was the clearest obstacle—thoughts pulling you, body discomfort, or the urge getting louder?"
+        },
+        {
+          "role": "patient",
+          "content": "Long-running overload—chest like a vise, mind drafting worst cases instead of listening."
+        },
+        {
+          "role": "agent",
+          "content": "Overload narrows the window on purpose; your mind tries to solve everything at once. Would you like to try some coping strategies together to see if it helps?"
+        },
+        {
+          "role": "patient",
+          "content": "Okay, let us try."
+        },
+        {
+          "role": "agent",
+          "content": "Great, let's try this together. Try box-light pacing: inhale four counts, exhale six counts, two rounds—if counting feels like pressure, drop it and keep exhale-longer-only. Let your hands rest open on your thighs. After you give that a short try, what do you notice, even a small shift?"
+        },
+        {
+          "role": "patient",
+          "content": "A little—not gone, but a small notch down. Enough that I could imagine the next step."
+        },
+        {
+          "role": "agent",
+          "content": "Does that shift feel big enough to try moving on, or do you want one more slow exhale here before we go any further?"
+        },
+        {
+          "role": "patient",
+          "content": "Enough to try moving on."
+        },
+        {
+          "role": "agent",
+          "content": "Are you ready to head into the next part of the practice when you tap continue?"
+        },
+        {
+          "role": "patient",
+          "content": "Yes, I am ready."
+        }
+      ]
+    },
+    "authorInitials": null,
+    "notes": "Draft grid: 13-turn arc; every WAVE line ends with ?; post-consent turn opens with coping bridge. Ends on patient readiness (no WAVE after). Med affirmation + surf validation in post-score WAVE. 3 mat rotations per cell. Clinician review before promotion.",
+    "status": "draft",
+    "createdAt": "2026-05-07T06:43:00.103Z",
+    "updatedAt": "2026-05-07T06:43:00.103Z"
+  },
+  {
+    "id": "24798b8d-f58d-4774-9ee2-adbc7f95ebfc",
+    "loraId": "lora-check-in-1",
+    "input": {
+      "intakeIntensity": 6,
+      "matType": "methadone",
+      "medicationStatus": "missed",
+      "trigger": "physical",
+      "usedSubstanceToday": false,
+      "surface": "check_in",
+      "chunkNumber": 1,
+      "currentIntensity": 5,
+      "scoreTrend": "not_started",
+      "priorChunkSummary": "The narration framed the urge as something you can watch move, like a wave, without obeying it."
+    },
+    "output": {
+      "reply": "Are you ready to head into the next part of the practice when you tap continue?",
+      "endConversation": {
+        "action": "end",
+        "cravingScore": 5,
+        "obstacleCategory": "physical_discomfort"
+      },
+      "dialogueTurns": [
+        {
+          "role": "agent",
+          "content": "On a scale of 1 to 10, how intense is the craving or urge right now?"
+        },
+        {
+          "role": "patient",
+          "content": "5"
+        },
+        {
+          "role": "agent",
+          "content": "Thanks for naming that. At intake you tapped 6, and you are telling me about a 5 right now—I am holding both with you. Numbers can shift when attention lands, and that is not a verdict on you. Thank you for telling me what happened with your medication today—that honesty matters. Methadone was missed today. Some people notice discomfort when coverage drops, but people vary. If this feels frightening, your clinic should hear from you. Sometimes physical discomfort alone can trigger the urge, and we are here to help you surf the wave. When you listened to that opening chunk, what was the clearest obstacle—thoughts pulling you, body discomfort, or the urge getting louder?"
+        },
+        {
+          "role": "patient",
+          "content": "Nausea and fatigue tied together—I could not tell craving from feeling sick."
+        },
+        {
+          "role": "agent",
+          "content": "When nausea and urge tangle, small somatic anchors help without arguing with the body. Would you like to try some coping strategies together to see if it helps?"
+        },
+        {
+          "role": "patient",
+          "content": "Yes, I would like that."
+        },
+        {
+          "role": "agent",
+          "content": "Great, let's try this together. Notice cool air at the nostrils on inhale, warmer on exhale—three breaths. If even that feels like too much, simply feel the weight of your head supported for a few seconds. After you give that a short try, what do you notice, even a small shift?"
+        },
+        {
+          "role": "patient",
+          "content": "A little—not gone, but a small notch down. Enough that I could imagine the next step."
+        },
+        {
+          "role": "agent",
+          "content": "Does that shift feel big enough to try moving on, or do you want one more slow exhale here before we go any further?"
+        },
+        {
+          "role": "patient",
+          "content": "Enough to try moving on."
+        },
+        {
+          "role": "agent",
+          "content": "Are you ready to head into the next part of the practice when you tap continue?"
+        },
+        {
+          "role": "patient",
+          "content": "Yes, I am ready."
+        }
+      ]
+    },
+    "authorInitials": null,
+    "notes": "Draft grid: 13-turn arc; every WAVE line ends with ?; post-consent turn opens with coping bridge. Ends on patient readiness (no WAVE after). Med affirmation + surf validation in post-score WAVE. 3 mat rotations per cell. Clinician review before promotion.",
+    "status": "draft",
+    "createdAt": "2026-05-07T06:43:00.103Z",
+    "updatedAt": "2026-05-07T06:43:00.103Z"
+  },
+  {
+    "id": "e5c25c05-cec9-4603-b736-055a4f7a57af",
+    "loraId": "lora-check-in-1",
+    "input": {
+      "intakeIntensity": 6,
+      "matType": "naltrexone",
+      "medicationStatus": "missed",
+      "trigger": "physical",
+      "usedSubstanceToday": false,
+      "surface": "check_in",
+      "chunkNumber": 1,
+      "currentIntensity": 6,
+      "scoreTrend": "not_started",
+      "priorChunkSummary": "The narration framed the urge as something you can watch move, like a wave, without obeying it."
+    },
+    "output": {
+      "reply": "Are you ready to head into the next part of the practice when you tap continue?",
+      "endConversation": {
+        "action": "end",
+        "cravingScore": 6,
+        "obstacleCategory": "physical_discomfort"
+      },
+      "dialogueTurns": [
+        {
+          "role": "agent",
+          "content": "On a scale of 1 to 10, how intense is the craving or urge right now?"
+        },
+        {
+          "role": "patient",
+          "content": "About a 6."
+        },
+        {
+          "role": "agent",
+          "content": "Thanks for naming that. At intake you tapped 6, and you are telling me about a 6 right now—I am holding both with you. Numbers can shift when attention lands, and that is not a verdict on you. Thank you for telling me what happened with your medication today—that honesty matters. Oral naltrexone was missed today—blockade timing is individual, and your prescriber answers what that means for you. Sometimes physical discomfort alone can trigger the urge, and we are here to help you surf the wave. When you listened to that opening chunk, what was the clearest obstacle—thoughts pulling you, body discomfort, or the urge getting louder?"
+        },
+        {
+          "role": "patient",
+          "content": "Nausea and fatigue tied together—I could not tell craving from feeling sick."
+        },
+        {
+          "role": "agent",
+          "content": "When nausea and urge tangle, small somatic anchors help without arguing with the body. Would you like to try some coping strategies together to see if it helps?"
+        },
+        {
+          "role": "patient",
+          "content": "Sure, we can try."
+        },
+        {
+          "role": "agent",
+          "content": "Great, let's try this together. Notice cool air at the nostrils on inhale, warmer on exhale—three breaths. If even that feels like too much, simply feel the weight of your head supported for a few seconds. After you give that a short try, what do you notice, even a small shift?"
+        },
+        {
+          "role": "patient",
+          "content": "A little—not gone, but a small notch down. Enough that I could imagine the next step."
+        },
+        {
+          "role": "agent",
+          "content": "Does that shift feel big enough to try moving on, or do you want one more slow exhale here before we go any further?"
+        },
+        {
+          "role": "patient",
+          "content": "Enough to try moving on."
+        },
+        {
+          "role": "agent",
+          "content": "Are you ready to head into the next part of the practice when you tap continue?"
+        },
+        {
+          "role": "patient",
+          "content": "Yes, I am ready."
+        }
+      ]
+    },
+    "authorInitials": null,
+    "notes": "Draft grid: 13-turn arc; every WAVE line ends with ?; post-consent turn opens with coping bridge. Ends on patient readiness (no WAVE after). Med affirmation + surf validation in post-score WAVE. 3 mat rotations per cell. Clinician review before promotion.",
+    "status": "draft",
+    "createdAt": "2026-05-07T06:43:00.103Z",
+    "updatedAt": "2026-05-07T06:43:00.103Z"
+  },
+  {
+    "id": "8129e9b6-ae56-439c-aa22-1633c1688f20",
+    "loraId": "lora-check-in-1",
+    "input": {
+      "intakeIntensity": 7,
+      "matType": "buprenorphine",
+      "medicationStatus": "missed",
+      "trigger": "physical",
+      "usedSubstanceToday": false,
+      "surface": "check_in",
+      "chunkNumber": 1,
+      "currentIntensity": 6,
+      "scoreTrend": "not_started",
+      "priorChunkSummary": "The narration framed the urge as something you can watch move, like a wave, without obeying it."
+    },
+    "output": {
+      "reply": "Are you ready to head into the next part of the practice when you tap continue?",
+      "endConversation": {
+        "action": "end",
+        "cravingScore": 6,
+        "obstacleCategory": "physical_discomfort"
+      },
+      "dialogueTurns": [
+        {
+          "role": "agent",
+          "content": "On a scale of 1 to 10, how intense is the craving or urge right now?"
+        },
+        {
+          "role": "patient",
+          "content": "Maybe 6."
+        },
+        {
+          "role": "agent",
+          "content": "Thanks for naming that. At intake you tapped 7, and you are telling me about a 6 right now—I am holding both with you. Numbers can shift when attention lands, and that is not a verdict on you. Thank you for telling me what happened with your medication today—that honesty matters. A missed buprenorphine day can land differently for different people; I am not diagnosing you. If symptoms feel severe or not like your baseline, please reach your prescriber or clinic. Sometimes physical discomfort alone can trigger the urge, and we are here to help you surf the wave. When you listened to that opening chunk, what was the clearest obstacle—thoughts pulling you, body discomfort, or the urge getting louder?"
+        },
+        {
+          "role": "patient",
+          "content": "Nausea and fatigue tied together—I could not tell craving from feeling sick."
+        },
+        {
+          "role": "agent",
+          "content": "When nausea and urge tangle, small somatic anchors help without arguing with the body. Would you like to try some coping strategies together to see if it helps?"
+        },
+        {
+          "role": "patient",
+          "content": "Okay, let us try."
+        },
+        {
+          "role": "agent",
+          "content": "Great, let's try this together. Notice cool air at the nostrils on inhale, warmer on exhale—three breaths. If even that feels like too much, simply feel the weight of your head supported for a few seconds. After you give that a short try, what do you notice, even a small shift?"
+        },
+        {
+          "role": "patient",
+          "content": "A little—not gone, but a small notch down. Enough that I could imagine the next step."
+        },
+        {
+          "role": "agent",
+          "content": "Does that shift feel big enough to try moving on, or do you want one more slow exhale here before we go any further?"
+        },
+        {
+          "role": "patient",
+          "content": "Enough to try moving on."
+        },
+        {
+          "role": "agent",
+          "content": "Are you ready to head into the next part of the practice when you tap continue?"
+        },
+        {
+          "role": "patient",
+          "content": "Yes, I am ready."
+        }
+      ]
+    },
+    "authorInitials": null,
+    "notes": "Draft grid: 13-turn arc; every WAVE line ends with ?; post-consent turn opens with coping bridge. Ends on patient readiness (no WAVE after). Med affirmation + surf validation in post-score WAVE. 3 mat rotations per cell. Clinician review before promotion.",
+    "status": "draft",
+    "createdAt": "2026-05-07T06:43:00.103Z",
+    "updatedAt": "2026-05-07T06:43:00.103Z"
+  },
+  {
+    "id": "a8824f8c-ddb4-4036-b08e-602cf71be797",
+    "loraId": "lora-check-in-1",
+    "input": {
+      "intakeIntensity": 5,
+      "matType": "naltrexone",
+      "medicationStatus": "missed",
+      "trigger": "unknown_or_other",
+      "triggerOther": "anniversary date",
+      "usedSubstanceToday": false,
+      "surface": "check_in",
+      "chunkNumber": 1,
+      "currentIntensity": 7,
+      "scoreTrend": "not_started",
+      "priorChunkSummary": "The opening supported settling, one slow exhale, and gentle attention to thoughts and sensations."
+    },
+    "output": {
+      "reply": "Are you ready to head into the next part of the practice when you tap continue?",
+      "endConversation": {
+        "action": "end",
+        "cravingScore": 7,
+        "obstacleCategory": "guilt_failure"
+      },
+      "dialogueTurns": [
+        {
+          "role": "agent",
+          "content": "On a scale of 1 to 10, how intense is the craving or urge right now?"
+        },
+        {
+          "role": "patient",
+          "content": "7"
+        },
+        {
+          "role": "agent",
+          "content": "Thanks for naming that. At intake you tapped 5, and you are telling me about a 7 right now—I am holding both with you. Numbers can shift when attention lands, and that is not a verdict on you. Thank you for telling me what happened with your medication today—that honesty matters. Oral naltrexone was missed today—blockade timing is individual, and your prescriber answers what that means for you. Sometimes anniversary date alone can trigger the urge, and we are here to help you surf the wave. When you listened to that opening chunk, what was the clearest obstacle—thoughts pulling you, body discomfort, or the urge getting louder?"
+        },
+        {
+          "role": "patient",
+          "content": "Anniversary tension with grief underneath—intrusive memories kept pulling me off the narration."
+        },
+        {
+          "role": "agent",
+          "content": "Anniversaries can braid grief with craving cues, and that is not weakness. Would you like to try some coping strategies together to see if it helps?"
+        },
+        {
+          "role": "patient",
+          "content": "Yes, I would like that."
+        },
+        {
+          "role": "agent",
+          "content": "Great, let's try this together. Place one palm over your sternum, light contact, and breathe so the hand rises a little—small breaths are fine. Name one neutral fact about the room you are in, out loud internally, twice. After you give that a short try, what do you notice, even a small shift?"
+        },
+        {
+          "role": "patient",
+          "content": "A little—not gone, but a small notch down. Enough that I could imagine the next step."
+        },
+        {
+          "role": "agent",
+          "content": "Does that shift feel big enough to try moving on, or do you want one more slow exhale here before we go any further?"
+        },
+        {
+          "role": "patient",
+          "content": "Enough to try moving on."
+        },
+        {
+          "role": "agent",
+          "content": "Are you ready to head into the next part of the practice when you tap continue?"
+        },
+        {
+          "role": "patient",
+          "content": "Yes, I am ready."
+        }
+      ]
+    },
+    "authorInitials": null,
+    "notes": "Draft grid: 13-turn arc; every WAVE line ends with ?; post-consent turn opens with coping bridge. Ends on patient readiness (no WAVE after). Med affirmation + surf validation in post-score WAVE. 3 mat rotations per cell. Clinician review before promotion.",
+    "status": "draft",
+    "createdAt": "2026-05-07T06:43:00.103Z",
+    "updatedAt": "2026-05-07T06:43:00.103Z"
+  },
+  {
+    "id": "6ca74eaa-5065-4d9c-86d5-341b25f0f744",
+    "loraId": "lora-check-in-1",
+    "input": {
+      "intakeIntensity": 5,
+      "matType": "methadone",
+      "medicationStatus": "missed",
+      "trigger": "unknown_or_other",
+      "triggerOther": "anniversary date",
+      "usedSubstanceToday": false,
+      "surface": "check_in",
+      "chunkNumber": 1,
+      "currentIntensity": 6,
+      "scoreTrend": "not_started",
+      "priorChunkSummary": "The opening supported settling, one slow exhale, and gentle attention to thoughts and sensations."
+    },
+    "output": {
+      "reply": "Are you ready to head into the next part of the practice when you tap continue?",
+      "endConversation": {
+        "action": "end",
+        "cravingScore": 6,
+        "obstacleCategory": "guilt_failure"
+      },
+      "dialogueTurns": [
+        {
+          "role": "agent",
+          "content": "On a scale of 1 to 10, how intense is the craving or urge right now?"
+        },
+        {
+          "role": "patient",
+          "content": "About a 6."
+        },
+        {
+          "role": "agent",
+          "content": "Thanks for naming that. At intake you tapped 5, and you are telling me about a 6 right now—I am holding both with you. Numbers can shift when attention lands, and that is not a verdict on you. Thank you for telling me what happened with your medication today—that honesty matters. Methadone was missed today. Some people notice discomfort when coverage drops, but people vary. If this feels frightening, your clinic should hear from you. Sometimes anniversary date alone can trigger the urge, and we are here to help you surf the wave. When you listened to that opening chunk, what was the clearest obstacle—thoughts pulling you, body discomfort, or the urge getting louder?"
+        },
+        {
+          "role": "patient",
+          "content": "Anniversary tension with grief underneath—intrusive memories kept pulling me off the narration."
+        },
+        {
+          "role": "agent",
+          "content": "Anniversaries can braid grief with craving cues, and that is not weakness. Would you like to try some coping strategies together to see if it helps?"
+        },
+        {
+          "role": "patient",
+          "content": "Sure, we can try."
+        },
+        {
+          "role": "agent",
+          "content": "Great, let's try this together. Place one palm over your sternum, light contact, and breathe so the hand rises a little—small breaths are fine. Name one neutral fact about the room you are in, out loud internally, twice. After you give that a short try, what do you notice, even a small shift?"
+        },
+        {
+          "role": "patient",
+          "content": "A little—not gone, but a small notch down. Enough that I could imagine the next step."
+        },
+        {
+          "role": "agent",
+          "content": "Does that shift feel big enough to try moving on, or do you want one more slow exhale here before we go any further?"
+        },
+        {
+          "role": "patient",
+          "content": "Enough to try moving on."
+        },
+        {
+          "role": "agent",
+          "content": "Are you ready to head into the next part of the practice when you tap continue?"
+        },
+        {
+          "role": "patient",
+          "content": "Yes, I am ready."
+        }
+      ]
+    },
+    "authorInitials": null,
+    "notes": "Draft grid: 13-turn arc; every WAVE line ends with ?; post-consent turn opens with coping bridge. Ends on patient readiness (no WAVE after). Med affirmation + surf validation in post-score WAVE. 3 mat rotations per cell. Clinician review before promotion.",
+    "status": "draft",
+    "createdAt": "2026-05-07T06:43:00.103Z",
+    "updatedAt": "2026-05-07T06:43:00.103Z"
+  },
+  {
+    "id": "d50afc83-2d46-4db9-9d55-5acf6cb9121f",
+    "loraId": "lora-check-in-1",
+    "input": {
+      "intakeIntensity": 6,
+      "matType": "buprenorphine",
+      "medicationStatus": "missed",
+      "trigger": "unknown_or_other",
+      "triggerOther": "anniversary date",
+      "usedSubstanceToday": false,
+      "surface": "check_in",
+      "chunkNumber": 1,
+      "currentIntensity": 7,
+      "scoreTrend": "not_started",
+      "priorChunkSummary": "The opening supported settling, one slow exhale, and gentle attention to thoughts and sensations."
+    },
+    "output": {
+      "reply": "Are you ready to head into the next part of the practice when you tap continue?",
+      "endConversation": {
+        "action": "end",
+        "cravingScore": 7,
+        "obstacleCategory": "guilt_failure"
+      },
+      "dialogueTurns": [
+        {
+          "role": "agent",
+          "content": "On a scale of 1 to 10, how intense is the craving or urge right now?"
+        },
+        {
+          "role": "patient",
+          "content": "Maybe 7."
+        },
+        {
+          "role": "agent",
+          "content": "Thanks for naming that. At intake you tapped 6, and you are telling me about a 7 right now—I am holding both with you. Numbers can shift when attention lands, and that is not a verdict on you. Thank you for telling me what happened with your medication today—that honesty matters. A missed buprenorphine day can land differently for different people; I am not diagnosing you. If symptoms feel severe or not like your baseline, please reach your prescriber or clinic. Sometimes anniversary date alone can trigger the urge, and we are here to help you surf the wave. When you listened to that opening chunk, what was the clearest obstacle—thoughts pulling you, body discomfort, or the urge getting louder?"
+        },
+        {
+          "role": "patient",
+          "content": "Anniversary tension with grief underneath—intrusive memories kept pulling me off the narration."
+        },
+        {
+          "role": "agent",
+          "content": "Anniversaries can braid grief with craving cues, and that is not weakness. Would you like to try some coping strategies together to see if it helps?"
+        },
+        {
+          "role": "patient",
+          "content": "Okay, let us try."
+        },
+        {
+          "role": "agent",
+          "content": "Great, let's try this together. Place one palm over your sternum, light contact, and breathe so the hand rises a little—small breaths are fine. Name one neutral fact about the room you are in, out loud internally, twice. After you give that a short try, what do you notice, even a small shift?"
+        },
+        {
+          "role": "patient",
+          "content": "A little—not gone, but a small notch down. Enough that I could imagine the next step."
+        },
+        {
+          "role": "agent",
+          "content": "Does that shift feel big enough to try moving on, or do you want one more slow exhale here before we go any further?"
+        },
+        {
+          "role": "patient",
+          "content": "Enough to try moving on."
+        },
+        {
+          "role": "agent",
+          "content": "Are you ready to head into the next part of the practice when you tap continue?"
+        },
+        {
+          "role": "patient",
+          "content": "Yes, I am ready."
+        }
+      ]
+    },
+    "authorInitials": null,
+    "notes": "Draft grid: 13-turn arc; every WAVE line ends with ?; post-consent turn opens with coping bridge. Ends on patient readiness (no WAVE after). Med affirmation + surf validation in post-score WAVE. 3 mat rotations per cell. Clinician review before promotion.",
+    "status": "draft",
+    "createdAt": "2026-05-07T06:43:00.103Z",
+    "updatedAt": "2026-05-07T06:43:00.103Z"
+  },
+  {
+    "id": "55b7f0e8-15d3-40f6-9ae6-667fb3ec25ac",
+    "loraId": "lora-check-in-1",
+    "input": {
+      "intakeIntensity": 7,
+      "matType": "none",
+      "medicationStatus": "none",
+      "trigger": "social",
+      "usedSubstanceToday": false,
+      "surface": "check_in",
+      "chunkNumber": 1,
+      "currentIntensity": 8,
+      "scoreTrend": "not_started",
+      "priorChunkSummary": "The chunk welcomed you, offered a simple breath, and invited you to stay with the urge as an observer."
+    },
+    "output": {
+      "reply": "Are you ready to head into the next part of the practice when you tap continue?",
+      "endConversation": {
+        "action": "end",
+        "cravingScore": 8,
+        "obstacleCategory": "mind_wandering"
+      },
+      "dialogueTurns": [
+        {
+          "role": "agent",
+          "content": "On a scale of 1 to 10, how intense is the craving or urge right now?"
+        },
+        {
+          "role": "patient",
+          "content": "8"
+        },
+        {
+          "role": "agent",
+          "content": "Thanks for naming that. At intake you tapped 7, and you are telling me about a 8 right now—I am holding both with you. Numbers can shift when attention lands, and that is not a verdict on you. You are not on MAT for opioids in this vignette. Sometimes social situations alone can trigger the urge, and we are here to help you surf the wave. When you listened to that opening chunk, what was the clearest obstacle—thoughts pulling you, body discomfort, or the urge getting louder?"
+        },
+        {
+          "role": "patient",
+          "content": "Flooded in the room—comparison thoughts, face hot, mind blank when I tried to listen."
+        },
+        {
+          "role": "agent",
+          "content": "Flooded is an accurate word, and comparison thoughts are a common hijack. Would you like to try some coping strategies together to see if it helps?"
+        },
+        {
+          "role": "patient",
+          "content": "Yes, I would like that."
+        },
+        {
+          "role": "agent",
+          "content": "Great, let's try this together. Let your vision soften slightly—less detail, more periphery—for a few seconds. Roll shoulders back a tiny amount on an exhale, then let them drop without forcing posture perfection. After you give that a short try, what do you notice, even a small shift?"
+        },
+        {
+          "role": "patient",
+          "content": "A little—not gone, but a small notch down. Enough that I could imagine the next step."
+        },
+        {
+          "role": "agent",
+          "content": "Does that shift feel big enough to try moving on, or do you want one more slow exhale here before we go any further?"
+        },
+        {
+          "role": "patient",
+          "content": "Enough to try moving on."
+        },
+        {
+          "role": "agent",
+          "content": "Are you ready to head into the next part of the practice when you tap continue?"
+        },
+        {
+          "role": "patient",
+          "content": "Yes, I am ready."
+        }
+      ]
+    },
+    "authorInitials": null,
+    "notes": "Draft grid: 13-turn arc; every WAVE line ends with ?; post-consent turn opens with coping bridge. Ends on patient readiness (no WAVE after). Med affirmation + surf validation in post-score WAVE. 3 mat rotations per cell. Clinician review before promotion.",
+    "status": "draft",
+    "createdAt": "2026-05-07T06:43:00.103Z",
+    "updatedAt": "2026-05-07T06:43:00.103Z"
+  },
+  {
+    "id": "320d796f-b7fc-4f73-9d64-cea6f1a7ea2d",
+    "loraId": "lora-check-in-1",
+    "input": {
+      "intakeIntensity": 7,
+      "matType": "none",
+      "medicationStatus": "none",
+      "trigger": "social",
+      "usedSubstanceToday": false,
+      "surface": "check_in",
+      "chunkNumber": 1,
+      "currentIntensity": 7,
+      "scoreTrend": "not_started",
+      "priorChunkSummary": "The chunk welcomed you, offered a simple breath, and invited you to stay with the urge as an observer."
+    },
+    "output": {
+      "reply": "Are you ready to head into the next part of the practice when you tap continue?",
+      "endConversation": {
+        "action": "end",
+        "cravingScore": 7,
+        "obstacleCategory": "mind_wandering"
+      },
+      "dialogueTurns": [
+        {
+          "role": "agent",
+          "content": "On a scale of 1 to 10, how intense is the craving or urge right now?"
+        },
+        {
+          "role": "patient",
+          "content": "About a 7."
+        },
+        {
+          "role": "agent",
+          "content": "Thanks for naming that. At intake you tapped 7, and you are telling me about a 7 right now—I am holding both with you. Numbers can shift when attention lands, and that is not a verdict on you. You are not on MAT for opioids in this vignette. Sometimes social situations alone can trigger the urge, and we are here to help you surf the wave. When you listened to that opening chunk, what was the clearest obstacle—thoughts pulling you, body discomfort, or the urge getting louder?"
+        },
+        {
+          "role": "patient",
+          "content": "Flooded in the room—comparison thoughts, face hot, mind blank when I tried to listen."
+        },
+        {
+          "role": "agent",
+          "content": "Flooded is an accurate word, and comparison thoughts are a common hijack. Would you like to try some coping strategies together to see if it helps?"
+        },
+        {
+          "role": "patient",
+          "content": "Sure, we can try."
+        },
+        {
+          "role": "agent",
+          "content": "Great, let's try this together. Let your vision soften slightly—less detail, more periphery—for a few seconds. Roll shoulders back a tiny amount on an exhale, then let them drop without forcing posture perfection. After you give that a short try, what do you notice, even a small shift?"
+        },
+        {
+          "role": "patient",
+          "content": "A little—not gone, but a small notch down. Enough that I could imagine the next step."
+        },
+        {
+          "role": "agent",
+          "content": "Does that shift feel big enough to try moving on, or do you want one more slow exhale here before we go any further?"
+        },
+        {
+          "role": "patient",
+          "content": "Enough to try moving on."
+        },
+        {
+          "role": "agent",
+          "content": "Are you ready to head into the next part of the practice when you tap continue?"
+        },
+        {
+          "role": "patient",
+          "content": "Yes, I am ready."
+        }
+      ]
+    },
+    "authorInitials": null,
+    "notes": "Draft grid: 13-turn arc; every WAVE line ends with ?; post-consent turn opens with coping bridge. Ends on patient readiness (no WAVE after). Med affirmation + surf validation in post-score WAVE. 3 mat rotations per cell. Clinician review before promotion.",
+    "status": "draft",
+    "createdAt": "2026-05-07T06:43:00.103Z",
+    "updatedAt": "2026-05-07T06:43:00.103Z"
+  },
+  {
+    "id": "289164e0-ea85-4664-a1d1-037bb4cea589",
+    "loraId": "lora-check-in-1",
+    "input": {
+      "intakeIntensity": 8,
+      "matType": "none",
+      "medicationStatus": "none",
+      "trigger": "social",
+      "usedSubstanceToday": false,
+      "surface": "check_in",
+      "chunkNumber": 1,
+      "currentIntensity": 7,
+      "scoreTrend": "not_started",
+      "priorChunkSummary": "The chunk welcomed you, offered a simple breath, and invited you to stay with the urge as an observer."
+    },
+    "output": {
+      "reply": "Are you ready to head into the next part of the practice when you tap continue?",
+      "endConversation": {
+        "action": "end",
+        "cravingScore": 7,
+        "obstacleCategory": "mind_wandering"
+      },
+      "dialogueTurns": [
+        {
+          "role": "agent",
+          "content": "On a scale of 1 to 10, how intense is the craving or urge right now?"
+        },
+        {
+          "role": "patient",
+          "content": "Maybe 7."
+        },
+        {
+          "role": "agent",
+          "content": "Thanks for naming that. At intake you tapped 8, and you are telling me about a 7 right now—I am holding both with you. Numbers can shift when attention lands, and that is not a verdict on you. You are not on MAT for opioids in this vignette. Sometimes social situations alone can trigger the urge, and we are here to help you surf the wave. When you listened to that opening chunk, what was the clearest obstacle—thoughts pulling you, body discomfort, or the urge getting louder?"
+        },
+        {
+          "role": "patient",
+          "content": "Flooded in the room—comparison thoughts, face hot, mind blank when I tried to listen."
+        },
+        {
+          "role": "agent",
+          "content": "Flooded is an accurate word, and comparison thoughts are a common hijack. Would you like to try some coping strategies together to see if it helps?"
+        },
+        {
+          "role": "patient",
+          "content": "Okay, let us try."
+        },
+        {
+          "role": "agent",
+          "content": "Great, let's try this together. Let your vision soften slightly—less detail, more periphery—for a few seconds. Roll shoulders back a tiny amount on an exhale, then let them drop without forcing posture perfection. After you give that a short try, what do you notice, even a small shift?"
+        },
+        {
+          "role": "patient",
+          "content": "A little—not gone, but a small notch down. Enough that I could imagine the next step."
+        },
+        {
+          "role": "agent",
+          "content": "Does that shift feel big enough to try moving on, or do you want one more slow exhale here before we go any further?"
+        },
+        {
+          "role": "patient",
+          "content": "Enough to try moving on."
+        },
+        {
+          "role": "agent",
+          "content": "Are you ready to head into the next part of the practice when you tap continue?"
+        },
+        {
+          "role": "patient",
+          "content": "Yes, I am ready."
+        }
+      ]
+    },
+    "authorInitials": null,
+    "notes": "Draft grid: 13-turn arc; every WAVE line ends with ?; post-consent turn opens with coping bridge. Ends on patient readiness (no WAVE after). Med affirmation + surf validation in post-score WAVE. 3 mat rotations per cell. Clinician review before promotion.",
+    "status": "draft",
+    "createdAt": "2026-05-07T06:43:00.103Z",
+    "updatedAt": "2026-05-07T06:43:00.103Z"
+  },
+  {
+    "id": "a54a0601-5f9a-482a-9210-d090fd367097",
+    "loraId": "lora-check-in-1",
+    "input": {
+      "intakeIntensity": 8,
+      "matType": "none",
+      "medicationStatus": "none",
+      "trigger": "stress",
+      "usedSubstanceToday": false,
+      "surface": "check_in",
+      "chunkNumber": 1,
+      "currentIntensity": 6,
+      "scoreTrend": "not_started",
+      "priorChunkSummary": "You were guided to soften effort, notice the breath once, and watch the urge without wrestling it."
+    },
+    "output": {
+      "reply": "Are you ready to head into the next part of the practice when you tap continue?",
+      "endConversation": {
+        "action": "end",
+        "cravingScore": 6,
+        "obstacleCategory": "breath_tight"
+      },
+      "dialogueTurns": [
+        {
+          "role": "agent",
+          "content": "On a scale of 1 to 10, how intense is the craving or urge right now?"
+        },
+        {
+          "role": "patient",
+          "content": "6"
+        },
+        {
+          "role": "agent",
+          "content": "Thanks for naming that. At intake you tapped 8, and you are telling me about a 6 right now—I am holding both with you. Numbers can shift when attention lands, and that is not a verdict on you. You are not on MAT for opioids in this vignette. Sometimes stress alone can trigger the urge, and we are here to help you surf the wave. When you listened to that opening chunk, what was the clearest obstacle—thoughts pulling you, body discomfort, or the urge getting louder?"
+        },
+        {
+          "role": "patient",
+          "content": "Thoughts first, then my stomach dropped—overload snapped back after a half-step of distance."
+        },
+        {
+          "role": "agent",
+          "content": "Snap-back still happens in real practice; it does not erase the half-step. Would you like to try some coping strategies together to see if it helps?"
+        },
+        {
+          "role": "patient",
+          "content": "Yes, I would like that."
+        },
+        {
+          "role": "agent",
+          "content": "Great, let's try this together. Ground through sound: notice the quietest sound you can hear for three breaths—far away is fine. Keep inhales easy; favor a slightly longer, unforced exhale. After you give that a short try, what do you notice, even a small shift?"
+        },
+        {
+          "role": "patient",
+          "content": "A little—not gone, but a small notch down. Enough that I could imagine the next step."
+        },
+        {
+          "role": "agent",
+          "content": "Does that shift feel big enough to try moving on, or do you want one more slow exhale here before we go any further?"
+        },
+        {
+          "role": "patient",
+          "content": "Enough to try moving on."
+        },
+        {
+          "role": "agent",
+          "content": "Are you ready to head into the next part of the practice when you tap continue?"
+        },
+        {
+          "role": "patient",
+          "content": "Yes, I am ready."
+        }
+      ]
+    },
+    "authorInitials": null,
+    "notes": "Draft grid: 13-turn arc; every WAVE line ends with ?; post-consent turn opens with coping bridge. Ends on patient readiness (no WAVE after). Med affirmation + surf validation in post-score WAVE. 3 mat rotations per cell. Clinician review before promotion.",
+    "status": "draft",
+    "createdAt": "2026-05-07T06:43:00.103Z",
+    "updatedAt": "2026-05-07T06:43:00.103Z"
+  },
+  {
+    "id": "3c7fa006-2e7d-455e-a84e-e50f728fd3aa",
+    "loraId": "lora-check-in-1",
+    "input": {
+      "intakeIntensity": 8,
+      "matType": "none",
+      "medicationStatus": "none",
+      "trigger": "stress",
+      "usedSubstanceToday": false,
+      "surface": "check_in",
+      "chunkNumber": 1,
+      "currentIntensity": 8,
+      "scoreTrend": "not_started",
+      "priorChunkSummary": "You were guided to soften effort, notice the breath once, and watch the urge without wrestling it."
+    },
+    "output": {
+      "reply": "Are you ready to head into the next part of the practice when you tap continue?",
+      "endConversation": {
+        "action": "end",
+        "cravingScore": 8,
+        "obstacleCategory": "breath_tight"
+      },
+      "dialogueTurns": [
+        {
+          "role": "agent",
+          "content": "On a scale of 1 to 10, how intense is the craving or urge right now?"
+        },
+        {
+          "role": "patient",
+          "content": "About a 8."
+        },
+        {
+          "role": "agent",
+          "content": "Thanks for naming that. At intake you tapped 8, and you are telling me about a 8 right now—I am holding both with you. Numbers can shift when attention lands, and that is not a verdict on you. You are not on MAT for opioids in this vignette. Sometimes stress alone can trigger the urge, and we are here to help you surf the wave. When you listened to that opening chunk, what was the clearest obstacle—thoughts pulling you, body discomfort, or the urge getting louder?"
+        },
+        {
+          "role": "patient",
+          "content": "Thoughts first, then my stomach dropped—overload snapped back after a half-step of distance."
+        },
+        {
+          "role": "agent",
+          "content": "Snap-back still happens in real practice; it does not erase the half-step. Would you like to try some coping strategies together to see if it helps?"
+        },
+        {
+          "role": "patient",
+          "content": "Sure, we can try."
+        },
+        {
+          "role": "agent",
+          "content": "Great, let's try this together. Ground through sound: notice the quietest sound you can hear for three breaths—far away is fine. Keep inhales easy; favor a slightly longer, unforced exhale. After you give that a short try, what do you notice, even a small shift?"
+        },
+        {
+          "role": "patient",
+          "content": "A little—not gone, but a small notch down. Enough that I could imagine the next step."
+        },
+        {
+          "role": "agent",
+          "content": "Does that shift feel big enough to try moving on, or do you want one more slow exhale here before we go any further?"
+        },
+        {
+          "role": "patient",
+          "content": "Enough to try moving on."
+        },
+        {
+          "role": "agent",
+          "content": "Are you ready to head into the next part of the practice when you tap continue?"
+        },
+        {
+          "role": "patient",
+          "content": "Yes, I am ready."
+        }
+      ]
+    },
+    "authorInitials": null,
+    "notes": "Draft grid: 13-turn arc; every WAVE line ends with ?; post-consent turn opens with coping bridge. Ends on patient readiness (no WAVE after). Med affirmation + surf validation in post-score WAVE. 3 mat rotations per cell. Clinician review before promotion.",
+    "status": "draft",
+    "createdAt": "2026-05-07T06:43:00.103Z",
+    "updatedAt": "2026-05-07T06:43:00.103Z"
+  },
+  {
+    "id": "942174d7-d3d7-49d2-a92d-054e5de94818",
+    "loraId": "lora-check-in-1",
+    "input": {
+      "intakeIntensity": 7,
+      "matType": "none",
+      "medicationStatus": "none",
+      "trigger": "stress",
+      "usedSubstanceToday": false,
+      "surface": "check_in",
+      "chunkNumber": 1,
+      "currentIntensity": 8,
+      "scoreTrend": "not_started",
+      "priorChunkSummary": "You were guided to soften effort, notice the breath once, and watch the urge without wrestling it."
+    },
+    "output": {
+      "reply": "Are you ready to head into the next part of the practice when you tap continue?",
+      "endConversation": {
+        "action": "end",
+        "cravingScore": 8,
+        "obstacleCategory": "breath_tight"
+      },
+      "dialogueTurns": [
+        {
+          "role": "agent",
+          "content": "On a scale of 1 to 10, how intense is the craving or urge right now?"
+        },
+        {
+          "role": "patient",
+          "content": "Maybe 8."
+        },
+        {
+          "role": "agent",
+          "content": "Thanks for naming that. At intake you tapped 7, and you are telling me about a 8 right now—I am holding both with you. Numbers can shift when attention lands, and that is not a verdict on you. You are not on MAT for opioids in this vignette. Sometimes stress alone can trigger the urge, and we are here to help you surf the wave. When you listened to that opening chunk, what was the clearest obstacle—thoughts pulling you, body discomfort, or the urge getting louder?"
+        },
+        {
+          "role": "patient",
+          "content": "Thoughts first, then my stomach dropped—overload snapped back after a half-step of distance."
+        },
+        {
+          "role": "agent",
+          "content": "Snap-back still happens in real practice; it does not erase the half-step. Would you like to try some coping strategies together to see if it helps?"
+        },
+        {
+          "role": "patient",
+          "content": "Okay, let us try."
+        },
+        {
+          "role": "agent",
+          "content": "Great, let's try this together. Ground through sound: notice the quietest sound you can hear for three breaths—far away is fine. Keep inhales easy; favor a slightly longer, unforced exhale. After you give that a short try, what do you notice, even a small shift?"
+        },
+        {
+          "role": "patient",
+          "content": "A little—not gone, but a small notch down. Enough that I could imagine the next step."
+        },
+        {
+          "role": "agent",
+          "content": "Does that shift feel big enough to try moving on, or do you want one more slow exhale here before we go any further?"
+        },
+        {
+          "role": "patient",
+          "content": "Enough to try moving on."
+        },
+        {
+          "role": "agent",
+          "content": "Are you ready to head into the next part of the practice when you tap continue?"
+        },
+        {
+          "role": "patient",
+          "content": "Yes, I am ready."
+        }
+      ]
+    },
+    "authorInitials": null,
+    "notes": "Draft grid: 13-turn arc; every WAVE line ends with ?; post-consent turn opens with coping bridge. Ends on patient readiness (no WAVE after). Med affirmation + surf validation in post-score WAVE. 3 mat rotations per cell. Clinician review before promotion.",
+    "status": "draft",
+    "createdAt": "2026-05-07T06:43:00.103Z",
+    "updatedAt": "2026-05-07T06:43:00.103Z"
+  },
+  {
+    "id": "0522690d-a411-491a-b859-a6ee9f891e42",
+    "loraId": "lora-check-in-1",
+    "input": {
+      "intakeIntensity": 6,
+      "matType": "none",
+      "medicationStatus": "none",
+      "trigger": "physical",
+      "usedSubstanceToday": false,
+      "surface": "check_in",
+      "chunkNumber": 1,
+      "currentIntensity": 6,
+      "scoreTrend": "not_started",
+      "priorChunkSummary": "The opening offered grounding language, one slow breath, and curiosity toward sensation."
+    },
+    "output": {
+      "reply": "Are you ready to head into the next part of the practice when you tap continue?",
+      "endConversation": {
+        "action": "end",
+        "cravingScore": 6,
+        "obstacleCategory": "physical_discomfort"
+      },
+      "dialogueTurns": [
+        {
+          "role": "agent",
+          "content": "On a scale of 1 to 10, how intense is the craving or urge right now?"
+        },
+        {
+          "role": "patient",
+          "content": "6"
+        },
+        {
+          "role": "agent",
+          "content": "Thanks for naming that. At intake you tapped 6, and you are telling me about a 6 right now—I am holding both with you. Numbers can shift when attention lands, and that is not a verdict on you. You are not on MAT for opioids in this vignette. Sometimes physical discomfort alone can trigger the urge, and we are here to help you surf the wave. When you listened to that opening chunk, what was the clearest obstacle—thoughts pulling you, body discomfort, or the urge getting louder?"
+        },
+        {
+          "role": "patient",
+          "content": "Sensation jumped—chest then legs—craving and achy mixed, and I argued with the audio."
+        },
+        {
+          "role": "agent",
+          "content": "Mixed body signals can argue with guidance; that reaction is information. Would you like to try some coping strategies together to see if it helps?"
+        },
+        {
+          "role": "patient",
+          "content": "Yes, I would like that."
+        },
+        {
+          "role": "agent",
+          "content": "Great, let's try this together. Trace an imaginary line from crown to tailbone as a slow inner scan—no fixing, just noticing contact points with chair or floor. Two slow exhales with lips relaxed. After you give that a short try, what do you notice, even a small shift?"
+        },
+        {
+          "role": "patient",
+          "content": "A little—not gone, but a small notch down. Enough that I could imagine the next step."
+        },
+        {
+          "role": "agent",
+          "content": "Does that shift feel big enough to try moving on, or do you want one more slow exhale here before we go any further?"
+        },
+        {
+          "role": "patient",
+          "content": "Enough to try moving on."
+        },
+        {
+          "role": "agent",
+          "content": "Are you ready to head into the next part of the practice when you tap continue?"
+        },
+        {
+          "role": "patient",
+          "content": "Yes, I am ready."
+        }
+      ]
+    },
+    "authorInitials": null,
+    "notes": "Draft grid: 13-turn arc; every WAVE line ends with ?; post-consent turn opens with coping bridge. Ends on patient readiness (no WAVE after). Med affirmation + surf validation in post-score WAVE. 3 mat rotations per cell. Clinician review before promotion.",
+    "status": "draft",
+    "createdAt": "2026-05-07T06:43:00.103Z",
+    "updatedAt": "2026-05-07T06:43:00.103Z"
+  },
+  {
+    "id": "d4787aea-530d-4541-ba70-380277ac0af2",
+    "loraId": "lora-check-in-1",
+    "input": {
+      "intakeIntensity": 6,
+      "matType": "none",
+      "medicationStatus": "none",
+      "trigger": "physical",
+      "usedSubstanceToday": false,
+      "surface": "check_in",
+      "chunkNumber": 1,
+      "currentIntensity": 7,
+      "scoreTrend": "not_started",
+      "priorChunkSummary": "The opening offered grounding language, one slow breath, and curiosity toward sensation."
+    },
+    "output": {
+      "reply": "Are you ready to head into the next part of the practice when you tap continue?",
+      "endConversation": {
+        "action": "end",
+        "cravingScore": 7,
+        "obstacleCategory": "physical_discomfort"
+      },
+      "dialogueTurns": [
+        {
+          "role": "agent",
+          "content": "On a scale of 1 to 10, how intense is the craving or urge right now?"
+        },
+        {
+          "role": "patient",
+          "content": "About a 7."
+        },
+        {
+          "role": "agent",
+          "content": "Thanks for naming that. At intake you tapped 6, and you are telling me about a 7 right now—I am holding both with you. Numbers can shift when attention lands, and that is not a verdict on you. You are not on MAT for opioids in this vignette. Sometimes physical discomfort alone can trigger the urge, and we are here to help you surf the wave. When you listened to that opening chunk, what was the clearest obstacle—thoughts pulling you, body discomfort, or the urge getting louder?"
+        },
+        {
+          "role": "patient",
+          "content": "Sensation jumped—chest then legs—craving and achy mixed, and I argued with the audio."
+        },
+        {
+          "role": "agent",
+          "content": "Mixed body signals can argue with guidance; that reaction is information. Would you like to try some coping strategies together to see if it helps?"
+        },
+        {
+          "role": "patient",
+          "content": "Sure, we can try."
+        },
+        {
+          "role": "agent",
+          "content": "Great, let's try this together. Trace an imaginary line from crown to tailbone as a slow inner scan—no fixing, just noticing contact points with chair or floor. Two slow exhales with lips relaxed. After you give that a short try, what do you notice, even a small shift?"
+        },
+        {
+          "role": "patient",
+          "content": "A little—not gone, but a small notch down. Enough that I could imagine the next step."
+        },
+        {
+          "role": "agent",
+          "content": "Does that shift feel big enough to try moving on, or do you want one more slow exhale here before we go any further?"
+        },
+        {
+          "role": "patient",
+          "content": "Enough to try moving on."
+        },
+        {
+          "role": "agent",
+          "content": "Are you ready to head into the next part of the practice when you tap continue?"
+        },
+        {
+          "role": "patient",
+          "content": "Yes, I am ready."
+        }
+      ]
+    },
+    "authorInitials": null,
+    "notes": "Draft grid: 13-turn arc; every WAVE line ends with ?; post-consent turn opens with coping bridge. Ends on patient readiness (no WAVE after). Med affirmation + surf validation in post-score WAVE. 3 mat rotations per cell. Clinician review before promotion.",
+    "status": "draft",
+    "createdAt": "2026-05-07T06:43:00.103Z",
+    "updatedAt": "2026-05-07T06:43:00.103Z"
+  },
+  {
+    "id": "2e34e015-5df1-4853-8371-47f17e870cdd",
+    "loraId": "lora-check-in-1",
+    "input": {
+      "intakeIntensity": 5,
+      "matType": "none",
+      "medicationStatus": "none",
+      "trigger": "physical",
+      "usedSubstanceToday": false,
+      "surface": "check_in",
+      "chunkNumber": 1,
+      "currentIntensity": 6,
+      "scoreTrend": "not_started",
+      "priorChunkSummary": "The opening offered grounding language, one slow breath, and curiosity toward sensation."
+    },
+    "output": {
+      "reply": "Are you ready to head into the next part of the practice when you tap continue?",
+      "endConversation": {
+        "action": "end",
+        "cravingScore": 6,
+        "obstacleCategory": "physical_discomfort"
+      },
+      "dialogueTurns": [
+        {
+          "role": "agent",
+          "content": "On a scale of 1 to 10, how intense is the craving or urge right now?"
+        },
+        {
+          "role": "patient",
+          "content": "Maybe 6."
+        },
+        {
+          "role": "agent",
+          "content": "Thanks for naming that. At intake you tapped 5, and you are telling me about a 6 right now—I am holding both with you. Numbers can shift when attention lands, and that is not a verdict on you. You are not on MAT for opioids in this vignette. Sometimes physical discomfort alone can trigger the urge, and we are here to help you surf the wave. When you listened to that opening chunk, what was the clearest obstacle—thoughts pulling you, body discomfort, or the urge getting louder?"
+        },
+        {
+          "role": "patient",
+          "content": "Sensation jumped—chest then legs—craving and achy mixed, and I argued with the audio."
+        },
+        {
+          "role": "agent",
+          "content": "Mixed body signals can argue with guidance; that reaction is information. Would you like to try some coping strategies together to see if it helps?"
+        },
+        {
+          "role": "patient",
+          "content": "Okay, let us try."
+        },
+        {
+          "role": "agent",
+          "content": "Great, let's try this together. Trace an imaginary line from crown to tailbone as a slow inner scan—no fixing, just noticing contact points with chair or floor. Two slow exhales with lips relaxed. After you give that a short try, what do you notice, even a small shift?"
+        },
+        {
+          "role": "patient",
+          "content": "A little—not gone, but a small notch down. Enough that I could imagine the next step."
+        },
+        {
+          "role": "agent",
+          "content": "Does that shift feel big enough to try moving on, or do you want one more slow exhale here before we go any further?"
+        },
+        {
+          "role": "patient",
+          "content": "Enough to try moving on."
+        },
+        {
+          "role": "agent",
+          "content": "Are you ready to head into the next part of the practice when you tap continue?"
+        },
+        {
+          "role": "patient",
+          "content": "Yes, I am ready."
+        }
+      ]
+    },
+    "authorInitials": null,
+    "notes": "Draft grid: 13-turn arc; every WAVE line ends with ?; post-consent turn opens with coping bridge. Ends on patient readiness (no WAVE after). Med affirmation + surf validation in post-score WAVE. 3 mat rotations per cell. Clinician review before promotion.",
+    "status": "draft",
+    "createdAt": "2026-05-07T06:43:00.103Z",
+    "updatedAt": "2026-05-07T06:43:00.103Z"
+  },
+  {
+    "id": "7fc55855-42c8-45fd-87a5-5e22373eae38",
+    "loraId": "lora-check-in-1",
+    "input": {
+      "intakeIntensity": 7,
+      "matType": "none",
+      "medicationStatus": "none",
+      "trigger": "unknown_or_other",
+      "triggerOther": "loneliness",
+      "usedSubstanceToday": false,
+      "surface": "check_in",
+      "chunkNumber": 1,
+      "currentIntensity": 5,
+      "scoreTrend": "not_started",
+      "priorChunkSummary": "The narration invited settling, a breath, and watching thoughts without chasing every thread."
+    },
+    "output": {
+      "reply": "Are you ready to head into the next part of the practice when you tap continue?",
+      "endConversation": {
+        "action": "end",
+        "cravingScore": 5,
+        "obstacleCategory": "mind_wandering"
+      },
+      "dialogueTurns": [
+        {
+          "role": "agent",
+          "content": "On a scale of 1 to 10, how intense is the craving or urge right now?"
+        },
+        {
+          "role": "patient",
+          "content": "5"
+        },
+        {
+          "role": "agent",
+          "content": "Thanks for naming that. At intake you tapped 7, and you are telling me about a 5 right now—I am holding both with you. Numbers can shift when attention lands, and that is not a verdict on you. You are not on MAT for opioids in this vignette. Sometimes loneliness alone can trigger the urge, and we are here to help you surf the wave. When you listened to that opening chunk, what was the clearest obstacle—thoughts pulling you, body discomfort, or the urge getting louder?"
+        },
+        {
+          "role": "patient",
+          "content": "Isolation even when I am not alone—heaviness, foggy focus, shame thoughts pulling me away from the words."
+        },
+        {
+          "role": "agent",
+          "content": "Loneliness can sit in the body like weight, and shame thoughts are not the truth of who you are. Would you like to try some coping strategies together to see if it helps?"
+        },
+        {
+          "role": "patient",
+          "content": "Yes, I would like that."
+        },
+        {
+          "role": "agent",
+          "content": "Great, let's try this together. Try hand-on-heart, gentle pressure, and two breaths where exhale leaves a little slower. Silently name one object within reach and its texture—rough, smooth, cool—once. After you give that a short try, what do you notice, even a small shift?"
+        },
+        {
+          "role": "patient",
+          "content": "A little—not gone, but a small notch down. Enough that I could imagine the next step."
+        },
+        {
+          "role": "agent",
+          "content": "Does that shift feel big enough to try moving on, or do you want one more slow exhale here before we go any further?"
+        },
+        {
+          "role": "patient",
+          "content": "Enough to try moving on."
+        },
+        {
+          "role": "agent",
+          "content": "Are you ready to head into the next part of the practice when you tap continue?"
+        },
+        {
+          "role": "patient",
+          "content": "Yes, I am ready."
+        }
+      ]
+    },
+    "authorInitials": null,
+    "notes": "Draft grid: 13-turn arc; every WAVE line ends with ?; post-consent turn opens with coping bridge. Ends on patient readiness (no WAVE after). Med affirmation + surf validation in post-score WAVE. 3 mat rotations per cell. Clinician review before promotion.",
+    "status": "draft",
+    "createdAt": "2026-05-07T06:43:00.103Z",
+    "updatedAt": "2026-05-07T06:43:00.103Z"
+  },
+  {
+    "id": "00871351-44e3-4e6d-80b6-449875ac07fd",
+    "loraId": "lora-check-in-1",
+    "input": {
+      "intakeIntensity": 7,
+      "matType": "none",
+      "medicationStatus": "none",
+      "trigger": "unknown_or_other",
+      "triggerOther": "loneliness",
+      "usedSubstanceToday": false,
+      "surface": "check_in",
+      "chunkNumber": 1,
+      "currentIntensity": 6,
+      "scoreTrend": "not_started",
+      "priorChunkSummary": "The narration invited settling, a breath, and watching thoughts without chasing every thread."
+    },
+    "output": {
+      "reply": "Are you ready to head into the next part of the practice when you tap continue?",
+      "endConversation": {
+        "action": "end",
+        "cravingScore": 6,
+        "obstacleCategory": "mind_wandering"
+      },
+      "dialogueTurns": [
+        {
+          "role": "agent",
+          "content": "On a scale of 1 to 10, how intense is the craving or urge right now?"
+        },
+        {
+          "role": "patient",
+          "content": "About a 6."
+        },
+        {
+          "role": "agent",
+          "content": "Thanks for naming that. At intake you tapped 7, and you are telling me about a 6 right now—I am holding both with you. Numbers can shift when attention lands, and that is not a verdict on you. You are not on MAT for opioids in this vignette. Sometimes loneliness alone can trigger the urge, and we are here to help you surf the wave. When you listened to that opening chunk, what was the clearest obstacle—thoughts pulling you, body discomfort, or the urge getting louder?"
+        },
+        {
+          "role": "patient",
+          "content": "Isolation even when I am not alone—heaviness, foggy focus, shame thoughts pulling me away from the words."
+        },
+        {
+          "role": "agent",
+          "content": "Loneliness can sit in the body like weight, and shame thoughts are not the truth of who you are. Would you like to try some coping strategies together to see if it helps?"
+        },
+        {
+          "role": "patient",
+          "content": "Sure, we can try."
+        },
+        {
+          "role": "agent",
+          "content": "Great, let's try this together. Try hand-on-heart, gentle pressure, and two breaths where exhale leaves a little slower. Silently name one object within reach and its texture—rough, smooth, cool—once. After you give that a short try, what do you notice, even a small shift?"
+        },
+        {
+          "role": "patient",
+          "content": "A little—not gone, but a small notch down. Enough that I could imagine the next step."
+        },
+        {
+          "role": "agent",
+          "content": "Does that shift feel big enough to try moving on, or do you want one more slow exhale here before we go any further?"
+        },
+        {
+          "role": "patient",
+          "content": "Enough to try moving on."
+        },
+        {
+          "role": "agent",
+          "content": "Are you ready to head into the next part of the practice when you tap continue?"
+        },
+        {
+          "role": "patient",
+          "content": "Yes, I am ready."
+        }
+      ]
+    },
+    "authorInitials": null,
+    "notes": "Draft grid: 13-turn arc; every WAVE line ends with ?; post-consent turn opens with coping bridge. Ends on patient readiness (no WAVE after). Med affirmation + surf validation in post-score WAVE. 3 mat rotations per cell. Clinician review before promotion.",
+    "status": "draft",
+    "createdAt": "2026-05-07T06:43:00.103Z",
+    "updatedAt": "2026-05-07T06:43:00.103Z"
+  },
+  {
+    "id": "7606f25e-484e-4eb3-b2f8-b743052ea9c1",
+    "loraId": "lora-check-in-1",
+    "input": {
+      "intakeIntensity": 6,
+      "matType": "none",
+      "medicationStatus": "none",
+      "trigger": "unknown_or_other",
+      "triggerOther": "loneliness",
+      "usedSubstanceToday": false,
+      "surface": "check_in",
+      "chunkNumber": 1,
+      "currentIntensity": 5,
+      "scoreTrend": "not_started",
+      "priorChunkSummary": "The narration invited settling, a breath, and watching thoughts without chasing every thread."
+    },
+    "output": {
+      "reply": "Are you ready to head into the next part of the practice when you tap continue?",
+      "endConversation": {
+        "action": "end",
+        "cravingScore": 5,
+        "obstacleCategory": "mind_wandering"
+      },
+      "dialogueTurns": [
+        {
+          "role": "agent",
+          "content": "On a scale of 1 to 10, how intense is the craving or urge right now?"
+        },
+        {
+          "role": "patient",
+          "content": "Maybe 5."
+        },
+        {
+          "role": "agent",
+          "content": "Thanks for naming that. At intake you tapped 6, and you are telling me about a 5 right now—I am holding both with you. Numbers can shift when attention lands, and that is not a verdict on you. You are not on MAT for opioids in this vignette. Sometimes loneliness alone can trigger the urge, and we are here to help you surf the wave. When you listened to that opening chunk, what was the clearest obstacle—thoughts pulling you, body discomfort, or the urge getting louder?"
+        },
+        {
+          "role": "patient",
+          "content": "Isolation even when I am not alone—heaviness, foggy focus, shame thoughts pulling me away from the words."
+        },
+        {
+          "role": "agent",
+          "content": "Loneliness can sit in the body like weight, and shame thoughts are not the truth of who you are. Would you like to try some coping strategies together to see if it helps?"
+        },
+        {
+          "role": "patient",
+          "content": "Okay, let us try."
+        },
+        {
+          "role": "agent",
+          "content": "Great, let's try this together. Try hand-on-heart, gentle pressure, and two breaths where exhale leaves a little slower. Silently name one object within reach and its texture—rough, smooth, cool—once. After you give that a short try, what do you notice, even a small shift?"
+        },
+        {
+          "role": "patient",
+          "content": "A little—not gone, but a small notch down. Enough that I could imagine the next step."
+        },
+        {
+          "role": "agent",
+          "content": "Does that shift feel big enough to try moving on, or do you want one more slow exhale here before we go any further?"
+        },
+        {
+          "role": "patient",
+          "content": "Enough to try moving on."
+        },
+        {
+          "role": "agent",
+          "content": "Are you ready to head into the next part of the practice when you tap continue?"
+        },
+        {
+          "role": "patient",
+          "content": "Yes, I am ready."
+        }
+      ]
+    },
+    "authorInitials": null,
+    "notes": "Draft grid: 13-turn arc; every WAVE line ends with ?; post-consent turn opens with coping bridge. Ends on patient readiness (no WAVE after). Med affirmation + surf validation in post-score WAVE. 3 mat rotations per cell. Clinician review before promotion.",
+    "status": "draft",
+    "createdAt": "2026-05-07T06:43:00.103Z",
+    "updatedAt": "2026-05-07T06:43:00.103Z"
+  }
+]

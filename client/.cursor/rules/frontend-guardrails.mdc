@@ -36,6 +36,12 @@ These rules mirror `AGENTS.md` and `PRD.md` at the repo root and apply to every 
 - WAVE is not a prescriber. "Take your medication if available" is acceptable. "Increase your dose" is not.
 - Every page that could encounter a patient in crisis must surface 988 and 1-800-662-HELP before continuing the flow.
 
+## Check-in LoRA training transcripts
+
+When editing `lora-check-in-1` seeds, the `/training` multi-turn UI, or `scripts/generate-lora-check-in-1-grid.ts`, follow **AGENTS.md > Check-in training dialogue rules (`lora-check-in-1`)** and stay consistent with `data/training-seeds/lora-check-in-1.json`. **Always** end every scripted WAVE line with `?`; after coping consent, the next WAVE line starts with `CHECK_IN_COPING_BRIDGE_OPENER` from `client/lib/training/check-in-dialogue.ts`.
+
+For **`lora-check-in-2`**, follow **AGENTS.md > Check-in training dialogue rules (`lora-check-in-2`)**, `scripts/generate-lora-check-in-2-grid.ts`, and `data/training-seeds/lora-check-in-2.json` (Turn 1 = `CHECK_IN_CHUNK2_SCORE_PROMPT`; post-score turn includes score reflection + med + surf + `CHECK_IN_BODY_URGE_LOCATION_PROMPT`; readiness = `CHECK_IN_CHUNK2_READINESS_PROMPT`). Save long-form clinician instructions under `lora-check-in-2` in `data/training-seeds/clinician-llm-instructions.json` (editable from `/training`).
+
 ## Privacy
 
 - No third-party analytics, error tracking, or ad scripts anywhere in `client/`.

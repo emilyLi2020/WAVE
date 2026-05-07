@@ -1,0 +1,110 @@
+[
+  {
+    "id": "3b175c98-bf70-46e8-8d83-c13052b2a0c3",
+    "loraId": "lora-med-ack",
+    "input": {
+      "intensity": 10,
+      "matType": "buprenorphine",
+      "medicationStatus": "none",
+      "trigger": "physical",
+      "hoursSinceDose": 24,
+      "localeTimeOfDay": "morning"
+    },
+    "output": {
+      "acknowledgment": "Your body is sending you signals right now. That can feel overwhelming or confusing. The tension, restlessness, or a racing heart is real. That's your nervous system responding to memory and it's not your fault. Thank you for taking this first step. You're in the right place.",
+      "pharmacologyClaim": {
+        "medication": "buprenorphine",
+        "claim": "Conditioned neural pathways built during past opioid use can trigger craving independently, regardless of current prescription context or diagnosis.",
+        "citation": "FDA_LABEL"
+      },
+      "crisisSignalDetected": false,
+      "nextPhase": "body_scan"
+    },
+    "authorInitials": null,
+    "notes": null,
+    "status": "ready",
+    "createdAt": "2026-05-01T01:59:30.193Z",
+    "updatedAt": "2026-05-01T01:59:30.193Z"
+  },
+  {
+    "id": "3efc5e27-7efe-4b4a-b2ec-30dd87408f44",
+    "loraId": "lora-med-ack",
+    "input": {
+      "intensity": 7,
+      "matType": "buprenorphine",
+      "medicationStatus": "late",
+      "trigger": "stress",
+      "hoursSinceDose": 26,
+      "localeTimeOfDay": "morning"
+    },
+    "output": {
+      "acknowledgment": "You may feel that pull or tension even though you've taken your medication. That's not the buprenorphine failing. Stress can activate craving on its own. It's hard. And we can get through it together. Thank you for being here. Let's ride this wave now.",
+      "pharmacologyClaim": {
+        "medication": "buprenorphine",
+        "claim": "At 26 hours, buprenorphine receptor occupancy is beginning to decline but remains therapeutically active. Stress-induced cortisol and CRF release can independently trigger craving through separate neural pathways.",
+        "citation": "FDA_LABEL"
+      },
+      "crisisSignalDetected": false,
+      "nextPhase": "body_scan"
+    },
+    "authorInitials": null,
+    "notes": null,
+    "status": "ready",
+    "createdAt": "2026-05-01T01:46:24.375Z",
+    "updatedAt": "2026-05-01T01:46:24.375Z"
+  },
+  {
+    "id": "80693573-ffc9-41d6-9e93-7b18ec162173",
+    "loraId": "lora-med-ack",
+    "input": {
+      "intensity": 6,
+      "matType": "buprenorphine",
+      "medicationStatus": "on_time",
+      "trigger": "social",
+      "hoursSinceDose": 18,
+      "localeTimeOfDay": "evening"
+    },
+    "output": {
+      "acknowledgment": "You're doing everything right by staying on your medication. What you're feeling is real, and it's coming from your memory and environment. That's not failure; that's your history showing up. And you get to choose what happens next.",
+      "pharmacologyClaim": {
+        "medication": "buprenorphine",
+        "claim": "Buprenorphine maintains stable mu-opioid receptor occupancy at therapeutic doses, but social and emotional cues activate dopamine-driven craving circuits independently of opioid receptor saturation.",
+        "citation": "FDA_LABEL"
+      },
+      "crisisSignalDetected": false,
+      "nextPhase": "body_scan"
+    },
+    "authorInitials": null,
+    "notes": null,
+    "status": "ready",
+    "createdAt": "2026-05-01T01:27:37.235Z",
+    "updatedAt": "2026-05-01T01:46:40.950Z"
+  },
+  {
+    "id": "dab90d91-f582-4d6b-8d54-a64407d42c4b",
+    "loraId": "lora-med-ack",
+    "input": {
+      "intensity": 9,
+      "matType": "buprenorphine",
+      "medicationStatus": "missed",
+      "trigger": "stress",
+      "hoursSinceDose": 36,
+      "localeTimeOfDay": "morning"
+    },
+    "output": {
+      "acknowledgment": "You may feel restless and have cravings right now. It doesn't mean you're weak or the medication isn't working for you. Your brain is simply feeling the drop in buprenorphine coverage. This is physical, expected, and temporary. ",
+      "pharmacologyClaim": {
+        "medication": "buprenorphine",
+        "claim": "Buprenorphine has long half-life (24--42 hours). The protective effect remains substantial through the first 24 hours, but begins to decline  between 36--72 hours, which is when withdrawal symptoms and cravings typically emerge.",
+        "citation": "FDA_LABEL"
+      },
+      "crisisSignalDetected": false,
+      "nextPhase": "body_scan"
+    },
+    "authorInitials": "WL",
+    "notes": null,
+    "status": "ready",
+    "createdAt": "2026-05-01T01:22:34.774Z",
+    "updatedAt": "2026-05-01T01:46:53.632Z"
+  }
+]

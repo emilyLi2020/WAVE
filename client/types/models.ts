@@ -11,8 +11,7 @@ export type TriggerCategory =
   | "social"
   | "stress"
   | "physical"
-  | "unknown"
-  | "other";
+  | "unknown_or_other";
 
 export type BodyScanLocation =
   | "chest"

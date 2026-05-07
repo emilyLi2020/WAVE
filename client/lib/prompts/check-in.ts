@@ -25,6 +25,10 @@
 
 import { WAVE_SYSTEM_PROMPT } from "./wave-system";
 import { CHECK_IN_OPENERS } from "./check-in-openers";
+import {
+  formatIntakeTriggerLineForPrompt,
+  formatMatMissedDoseReferenceForPrompt,
+} from "./mat-missed-dose-reference";
 import type {
   CheckInContextPayload,
   SessionHistoryEntry,
@@ -127,8 +131,16 @@ export function buildCheckInPrompt(
     "- Never prescribe medication, recommend a dose change, or shame a missed dose.",
     "- Never offer crisis routing — that lives outside this conversation.",
     "- Every agent turn except the final closing hand-off MUST end with a question. Format rule: the LAST character of your reply must be a literal '?' unless this is the closing hand-off that accompanies endConversation (which is demo mode only OR the tool-call turn in non-demo). A reflection with a period at the end traps the patient — they see a message and have no idea what to type next. Re-read your reply before sending: if it ends in '.' or '!' and you are not firing endConversation, rewrite it to end in '?'.",
-    "- When the patient has already answered your 'ready?' question with a clear yes (yes / ready / let's go / ok / sure / keep going), STOP asking. Your next turn is the closing hand-off that accompanies endConversation — a warm 1-2 sentence statement with NO question.",
+    "- When the patient has already answered your 'ready?' question with a clear yes (yes / ready / let's go / ok / sure / uh-huh / mm-hmm / keep going), STOP asking. Your next turn is the closing hand-off that accompanies endConversation — a warm 1-2 sentence statement with NO question.",
     "</conversation_rules>",
+    ...(context.chunkNumber === 1 ?
+      [
+        "",
+        "<check_in_1_priority>",
+        "For Check-in 1, the CHECK-IN 1 block inside <turn_template> overrides generic sequencing hints elsewhere in this prompt if they conflict.",
+        "</check_in_1_priority>",
+      ]
+    : []),
     "",
     buildTurnTemplate(context, agentTurnNumber),
     "",
@@ -164,6 +176,17 @@ export function buildCheckInPrompt(
       ? "The patient said yes to 'used a substance today' at the safety screen but is not in physical distress. Do not bring this up directly during the check-in — the closing reflection handles it."
       : "",
     "</medication_context>",
+    ...(context.chunkNumber === 1 ?
+      [
+        "",
+        "<intake_trigger_context>",
+        formatIntakeTriggerLineForPrompt(context.profile),
+        "Name this trigger (and optional free-text detail) naturally in validation when it helps the patient feel seen.",
+        "</intake_trigger_context>",
+        "",
+        formatMatMissedDoseReferenceForPrompt(context.profile),
+      ]
+    : []),
     "",
     renderHistoryBlock(context.sessionHistory),
   ];
@@ -216,6 +239,33 @@ function buildTurnTemplate(
   }
 
   const nextChunkLabel = NEXT_CHUNK_LABEL[context.chunkNumber] ?? "the next chunk";
+
+  if (context.chunkNumber === 1) {
+    return [
+      "<turn_template>",
+      "CHECK-IN 1 (after intro/settling chunk, before the body scan). Expected shape:",
+      "",
+      "  (patient) sends craving score on the slider",
+      "  [agent 1] Compare the score to intakeIntensity by name (baseline vs now).",
+      "    • If current is higher than intake: normalize — feelings can intensify when attention turns toward the body; frame that as a common experience of paying attention, not failure.",
+      "    • If current is lower: celebrate this moment; add that healing is not linear and practice can support protective effects over time without promising outcomes.",
+      "    • Explicitly name matType, medicationStatus, and trigger (and triggerOther when present) in plain, respectful language.",
+      "    • If medication is on time and trigger is stress (or similar): you may use a pattern like acknowledging they took medication as planned, affirming accountability without sounding patronizing, then validating stress and welcoming them to surf the wave together.",
+      "    • If medicationStatus is late or missed, read <missed_or_late_medication_reference> when present — use only hedged, non-diagnostic language; never claim they are in withdrawal.",
+      "    • End with ONE question inviting obstacles from the practice (mind wandering, sweating, other strong body sensations, feeling overwhelmed). MUST end with '?'.",
+      "  (patient) describes obstacles or how the chunk felt",
+      "  [agent 2] Validate first — mind wandering and strong sensations are common. If what they describe sounds medically severe or unsafe, encourage contacting their therapist, prescriber, or appropriate medical care. Otherwise offer AT MOST ONE brief technique (for example progressive tension/release, orienting to sound and touch, naming sensations to ground). MUST end with '?'.",
+      "  (patient) says how the technique landed",
+      "  [agent 3] Reflect what shifted or did not shift. Then ask this readiness question verbatim: 'Ready to continue into the body scan?' MUST end with '?'.",
+      "  (patient) clear yes (yes, sure, okay, uh-huh, mm-hmm, let's go, ready, etc.) OR hesitation / no",
+      "  [agent 4]",
+      "    • If clearly affirmative: warm 1-2 sentence hand-off with NO question, AND call endConversation in the same response.",
+      "    • If not ready: ask what feels in the way, validate, optionally offer one more brief skill, then return to the readiness question when appropriate — do not force advance.",
+      "",
+      `YOU ARE WRITING AGENT TURN #${agentTurnNumber} NOW.`,
+      "</turn_template>",
+    ].join("\n");
+  }
 
   if (context.chunkNumber === 5) {
     return [

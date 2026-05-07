@@ -77,7 +77,7 @@ session.
 | Runtime artifact | Merged ONNX model: base + LoRA |
 | Where used | Browser demo session path |
 | Training data | Combined ready rows from `lora-phase-narration`, `lora-check-in-1` through `lora-check-in-5`, and `lora-reflection` |
-| Target sample count | 140 human-written seed rows total: 20 per specialized set |
+| Target sample count | 130 human-written seed rows total: 10 for phase narration (5 chunks × 2 intake bands) plus 20 each for the five check-ins and reflection |
 | Browser behavior | One model is loaded once; no LoRA hot-swap at runtime |
 
 **What it is fine-tuned for.** `lora-wave-session` is a multitask session LoRA.
@@ -120,8 +120,8 @@ developer training UI. The same examples are included in the combined
 | Field | Value |
 |---|---|
 | Where used in future runtime | Meditation phase narration for chunks 1-5 |
-| Seed target | 20 examples total, distributed across `chunkNumber` 1-5 |
-| Focus | Six-line narration scripts that preserve the MBRP phase order: settle, body scan, sound anchor, breathing, close |
+| Seed target | 10 examples: one per cell of `chunkNumber` (1-5) × `startingIntensityBand` (`7-10` vs `1-6` intake craving) |
+| Focus | Six-line meditation narration only. Scripts are **not** stratified by medication or trigger; those axes live in check-in seeds. Two variants per chunk match higher vs milder opening urge so pacing stays clinically honest without duplicating MAT logic here. |
 
 ### `lora-check-in-1`
 
@@ -181,15 +181,8 @@ developer training UI. The same examples are included in the combined
 type PhaseNarrationInput = {
   surface: "phase_narration";
   chunkNumber: 1 | 2 | 3 | 4 | 5;
-  intakeIntensity: number;
-  medicationStatus: "on_time" | "late" | "missed" | "none";
-  matType: "buprenorphine" | "naltrexone" | "methadone" | "vivitrol" | "none";
-  trigger: "social" | "stress" | "physical" | "unknown" | "other";
-  triggerOther?: string;
-  usedSubstanceToday: boolean;
-  latestCravingScore?: number;
-  obstacleHint?: string;
-  scoreHistorySummary?: string;
+  /** Intake craving band only — meditation script pacing, not MAT/trigger. */
+  startingIntensityBand: "7-10" | "1-6";
   priorSessionSummary?: string;
 };
 ```
@@ -213,7 +206,7 @@ type CheckInInput = {
   scoreTrend: "not_started" | "rising" | "flat" | "falling" | "mixed";
   medicationStatus: "on_time" | "late" | "missed" | "none";
   matType: "buprenorphine" | "naltrexone" | "methadone" | "vivitrol" | "none";
-  trigger: "social" | "stress" | "physical" | "unknown" | "other";
+  trigger: "social" | "stress" | "physical" | "unknown_or_other";
   triggerOther?: string;
   usedSubstanceToday: boolean;
   priorChunkSummary: string;
@@ -257,7 +250,7 @@ type ReflectionInput = {
   durationSeconds: number;
   medicationStatus: "on_time" | "late" | "missed" | "none";
   matType: "buprenorphine" | "naltrexone" | "methadone" | "vivitrol" | "none";
-  trigger: "social" | "stress" | "physical" | "unknown" | "other";
+  trigger: "social" | "stress" | "physical" | "unknown_or_other";
   sessionsCount: number;
   usedSubstanceToday: boolean;
   scoreHistorySummary?: string;
@@ -338,7 +331,7 @@ Specialized LoRAs must still satisfy the ship gates in
 
 ## Alignment With The Repo
 
-- `client/app/training/` collects 20 examples per specialized sample set.
+- `client/app/training/` collects targets per specialized set (10 phase narration rows, 20 each for check-ins and reflection).
 - `client/app/api/training/export/route.ts` exports each specialized JSONL file
   and the combined `lora-wave-session.jsonl` file.
 - `client/lib/gemma/local-runtime.ts` remains the browser runtime boundary.

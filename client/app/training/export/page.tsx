@@ -1,17 +1,21 @@
+import Link from "next/link";
+
 import { assertTrainingEnabled } from "@/lib/training/guard";
 import { LORA_SPEC_LIST } from "@/lib/training/lora-specs";
 import {
   countSeedsByLora,
   describeDataLocation,
+  getAllClinicianLlmInstructions,
 } from "@/lib/training/storage";
 
 export const dynamic = "force-dynamic";
 
 export default async function ExportPage() {
   assertTrainingEnabled();
-  const [counts, dataLocation] = await Promise.all([
+  const [counts, dataLocation, instructionsByLora] = await Promise.all([
     countSeedsByLora(),
     describeDataLocation(),
+    getAllClinicianLlmInstructions(),
   ]);
 
   const totalReady = LORA_SPEC_LIST.reduce(
@@ -37,13 +41,93 @@ export default async function ExportPage() {
         </p>
       </header>
 
+      <div className="rounded-2xl border border-border bg-surface-muted/50 p-5 text-sm text-foreground/75">
+        <p className="font-medium text-foreground/90">Per-sample-set LLM instructions</p>
+        <p className="mt-1 text-xs text-foreground/65 leading-relaxed">
+          Detailed instructions are edited on each sample set&apos;s page (or when
+          adding an example). Combined and per-LoRA downloads embed the matching
+          instructions on each row — not one global block.
+        </p>
+        <p className="mt-3 text-xs">
+          <Link href="/training" className="text-accent hover:underline">
+            View status on the training home →
+          </Link>
+        </p>
+      </div>
+
+      <div className="rounded-2xl border border-border bg-surface p-5 ring-1 ring-accent/20">
+        <p className="text-xs uppercase tracking-wide text-foreground/50">
+          For LLM review &amp; handoff
+        </p>
+        <h2 className="mt-2 font-semibold">Clinician content export</h2>
+        <p className="mt-1 text-xs text-foreground/65">
+          One JSON object per line: <code>input</code>, <code>output</code>,{" "}
+          <code>notes</code>, initials, status, LoRA title, and this LoRA&apos;s{" "}
+          <code>clinicianLlmInstructions</code> when saved. No ShareGPT{" "}
+          <code>messages</code> wrapper — paste into an LLM for spot-checks,
+          Synthetix-style expansion, or documentation.
+        </p>
+        <div className="mt-4 flex flex-wrap items-center gap-3">
+          <a
+            href="/api/training/export?format=clinician-jsonl"
+            className="rounded-full border border-accent/40 bg-accent-soft/50 px-4 py-1.5 text-xs font-medium hover:border-accent hover:text-accent transition"
+          >
+            Download wave-clinician-seeds.jsonl
+          </a>
+          <a
+            href="/api/training/export?format=clinician-jsonl&includeDrafts=1"
+            className="text-[11px] text-foreground/50 hover:text-accent"
+          >
+            Include drafts
+          </a>
+        </div>
+        <ul className="mt-5 divide-y divide-border border-t border-border">
+          {LORA_SPEC_LIST.map((spec) => {
+            const instrLen =
+              instructionsByLora[spec.loraId].instructionsText.trim().length;
+            return (
+              <li
+                key={spec.loraId}
+                className="flex items-center justify-between gap-4 py-3"
+              >
+                <div className="min-w-0">
+                  <p className="text-sm font-medium">{spec.shortTitle}</p>
+                  <p className="text-xs text-foreground/55">
+                    {spec.loraId}
+                    {instrLen > 0 ?
+                      ` · ${instrLen.toLocaleString()} chars of instructions`
+                    : " · no instructions saved"}
+                  </p>
+                </div>
+                <div className="flex flex-wrap items-center justify-end gap-2">
+                  <a
+                    href={`/api/training/export?format=clinician-jsonl&loraId=${spec.loraId}`}
+                    className="rounded-full border border-border bg-background px-4 py-1.5 text-xs font-medium transition hover:border-accent hover:text-accent"
+                  >
+                    Export for LLM (.jsonl)
+                  </a>
+                  <a
+                    href={`/api/training/export?format=clinician-jsonl&loraId=${spec.loraId}&includeDrafts=1`}
+                    className="rounded-full border border-border bg-background px-4 py-1.5 text-xs font-medium transition hover:border-accent hover:text-accent"
+                  >
+                    + drafts
+                  </a>
+                </div>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+
       <div className="rounded-2xl border border-accent/30 bg-accent-soft/30 p-5">
         <h2 className="font-semibold">Demo multitask JSONL</h2>
         <p className="mt-1 text-xs text-foreground/65">
           Combines every ready specialized row into{" "}
           <code>lora-wave-session.jsonl</code>. The user message wraps each row
           with its source surface so one adapter can learn check-ins and
-          reflection together.
+          reflection together. When this row&apos;s LoRA has saved instructions,
+          the line begins with a <code>system</code> message carrying that
+          surface&apos;s text only.
         </p>
         <div className="mt-4 flex flex-wrap items-center gap-3">
           <a
@@ -71,7 +155,6 @@ export default async function ExportPage() {
           {LORA_SPEC_LIST.map((spec) => {
             const c = counts[spec.loraId];
             const ready = c.ready + c.approved;
-            const disabled = ready === 0;
             return (
               <li
                 key={spec.loraId}
@@ -91,24 +174,20 @@ export default async function ExportPage() {
                     {c.draft > 0 ? ` · ${c.draft} draft (excluded)` : ""}
                   </p>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center justify-end gap-2">
                   <a
                     href={`/api/training/export?format=jsonl&loraId=${spec.loraId}`}
-                    aria-disabled={disabled}
-                    className={`rounded-full border border-border bg-background px-4 py-1.5 text-xs font-medium transition ${
-                      disabled
-                        ? "opacity-40 pointer-events-none"
-                        : "hover:border-accent hover:text-accent"
-                    }`}
+                    className="rounded-full border border-border bg-background px-4 py-1.5 text-xs font-medium transition hover:border-accent hover:text-accent"
+                    title="Ready + approved only. Empty file if you only have drafts."
                   >
                     Download .jsonl
                   </a>
                   <a
                     href={`/api/training/export?format=jsonl&loraId=${spec.loraId}&includeDrafts=1`}
-                    className="text-[11px] text-foreground/50 hover:text-accent"
-                    title="Include drafts. Only useful for inspecting work-in-progress; do not feed to training."
+                    className="rounded-full border border-border bg-background px-4 py-1.5 text-xs font-medium transition hover:border-accent hover:text-accent"
+                    title="Includes draft rows for backup or handoff."
                   >
-                    + drafts
+                    .jsonl + drafts
                   </a>
                 </div>
               </li>
@@ -150,7 +229,7 @@ export default async function ExportPage() {
         </pre>
         <p>
           {dataLocation.exists
-            ? `${dataLocation.fileCount} file${dataLocation.fileCount === 1 ? "" : "s"} present.`
+            ? `${dataLocation.fileCount} file${dataLocation.fileCount === 1 ? "" : "s"} present (LoRA seed arrays + optional clinician-llm-instructions.json).`
             : "Directory will be created on the first save."}{" "}
           Commit these files to git so the training engineer can pull
           them. Override the location with{" "}
@@ -160,9 +239,11 @@ export default async function ExportPage() {
         <p>
           <strong>Pipeline integration.</strong> The JSONL downloads
           above match Unsloth&apos;s ShareGPT messages format (one conversation
-          per line). Use the combined file for the browser demo LoRA; use the
-          per-specialist files only for offline demonstration adapters. From{" "}
-          <code>models/</code>, load with{" "}
+          per line). Each conversation may start with a <code>system</code> turn
+          containing the instructions for <em>that row&apos;s</em> LoRA. Use the
+          combined file for the browser demo LoRA; use the per-specialist files
+          only for offline demonstration adapters. From <code>models/</code>,
+          load with{" "}
           <code>datasets.load_dataset(&quot;json&quot;, ...)</code> and
           pass the <code>messages</code> field to TRL&apos;s SFTTrainer
           with the <code>gemma-4</code> chat template

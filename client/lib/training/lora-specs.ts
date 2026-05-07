@@ -11,9 +11,17 @@
 import { z } from "zod";
 
 import {
+  CHECK_IN_BODY_URGE_LOCATION_PROMPT,
+  CHECK_IN_CHUNK2_SCORE_PROMPT,
+  CHECK_IN_COPING_BRIDGE_OPENER,
+  CHECK_IN_COPING_CONSENT_PROMPT,
+  CHECK_IN_CURRENT_URGE_SCALE_PROMPT,
+} from "./check-in-dialogue";
+import {
   LORA_IDS,
   MAT_TYPES,
   MEDICATION_STATUSES,
+  STARTING_INTENSITY_BANDS,
   TRIGGER_CATEGORIES,
   type FieldSpec,
   type LoRAId,
@@ -50,6 +58,18 @@ const STACK_AXES_BY_STATUS_AND_TRIGGER = {
   colLabel: "Trigger",
   colOptions: TRIGGER_CATEGORIES,
 } as const;
+
+/** Phase narration: two meditation tones by intake scale × five chunks. */
+const STACK_AXES_PHASE_NARRATION = {
+  rowKey: "chunkNumber",
+  rowLabel: "Phase (chunk)",
+  rowOptions: ["1", "2", "3", "4", "5"] as const,
+  colKey: "startingIntensityBand",
+  colLabel: "Starting craving (intake)",
+  colOptions: STARTING_INTENSITY_BANDS,
+} as const;
+
+const PHASE_NARRATION_TARGET_COUNT = 10;
 
 const CHUNK_LINE_COUNT = 6;
 const CHUNK_LINE_MIN_LENGTH = 12;
@@ -96,14 +116,21 @@ const COMMON_SESSION_CONTEXT_FIELDS = [
     kind: "enum",
     label: "Trigger category",
     options: TRIGGER_CATEGORIES,
+    optionLabels: {
+      social: "Social situation",
+      stress: "Stress / emotions",
+      physical: "Physical sensation",
+      unknown_or_other: "Don't know / other",
+    },
   },
   {
     key: "triggerOther",
     kind: "text",
-    label: "Trigger detail, if other",
+    label: "Trigger detail (optional, for Don't know / other)",
     maxLength: 120,
     optional: true,
     placeholder: "Example: argument with roommate",
+    help: "Only when the patient chose the merged Don't know / other category and named more.",
   },
   {
     key: "usedSubstanceToday",
@@ -148,58 +175,37 @@ function phaseInputFields(): readonly FieldSpec[] {
       max: 5,
       integer: true,
       placeholder: "Example: 2",
-      help: "Which of the five meditation phases this narration is for.",
-    },
-    ...COMMON_SESSION_CONTEXT_FIELDS,
-    {
-      key: "latestCravingScore",
-      kind: "number",
-      label: "Latest craving score (1-10)",
-      min: 1,
-      max: 10,
-      integer: true,
-      optional: true,
-      placeholder: "Example: 6",
-      help: "Most recent check-in score if this phase follows a check-in.",
+      help: "Which of the five meditation phases this narration is for (settle, body scan, sound anchor, breathing, close).",
     },
     {
-      key: "obstacleHint",
+      key: "startingIntensityBand",
       kind: "enum",
-      label: "Obstacle from prior check-in",
-      options: OBSTACLE_CATEGORIES,
-      optional: true,
-      help: "Optional summary of what got in the way before this phase.",
-    },
-    {
-      key: "scoreHistorySummary",
-      kind: "text",
-      label: "Score history summary",
-      multiline: true,
-      maxLength: 500,
-      optional: true,
-      placeholder: "Example: intake 8, check-in 1 held at 8, check-in 2 dropped to 6.",
-      help: "Example: intake 8, check-in 1 held at 8, check-in 2 dropped to 6.",
+      label: "Starting craving band (intake)",
+      options: STARTING_INTENSITY_BANDS,
+      optionLabels: {
+        "7-10": "7-10 (higher urge at session start)",
+        "1-6": "1-6 (milder urge at session start)",
+      },
+      help: "Stratifies the meditation script only. Medication, triggers, and obstacles belong in check-in seeds, not here.",
     },
     {
       key: "priorSessionSummary",
       kind: "text",
-      label: "Prior session summary",
+      label: "Prior session summary (optional)",
       multiline: true,
       maxLength: 1200,
       optional: true,
       placeholder:
-        "Example: Phase 1 introduced the wave metaphor. Patient said the urge felt tight in their chest and rated it 7/10.",
-      help: "Briefly summarize prior narration and patient check-in replies. Do not paste real patient data.",
+        "Example: Patient completed chunk 1 narration; check-in 1 score unchanged.",
+      help: "Optional continuity note. Do not paste real patient identifiers.",
     },
   ];
 }
 
-const phaseInputSchema = commonSessionContextSchema.extend({
+const phaseInputSchema = z.object({
   surface: z.literal("phase_narration"),
   chunkNumber: chunkNumberSchema(),
-  latestCravingScore: z.number().int().min(1).max(10).optional(),
-  obstacleHint: z.enum(OBSTACLE_CATEGORIES).optional(),
-  scoreHistorySummary: z.string().max(500).optional(),
+  startingIntensityBand: z.enum(STARTING_INTENSITY_BANDS),
   priorSessionSummary: z.string().max(1200).optional(),
 });
 
@@ -258,9 +264,9 @@ const phaseNarration: LoraFormSpec = {
   title: "lora-phase-narration - five-phase meditation narration",
   shortTitle: "Phase narration",
   whereUsed:
-    "Future adapter for all five meditation phase narration surfaces. The chunkNumber input tells the model which phase to write.",
+    "Future adapter for all five meditation phase narration surfaces. chunkNumber picks the phase; startingIntensityBand picks how urgent the opening tone should feel from intake alone.",
   clinicalRationale:
-    "The five narration phases share one simple output shape: six plain-text beats that preserve the MBRP flow. Keeping them in one adapter gives the model enough variety without fragmenting a small seed set.",
+    "Phase lines are a meditation script, not medication- or trigger-specific therapy. Check-in LoRAs carry the targeted clinical work. Collect two variants per chunk (intake 7-10 vs 1-6) so the model learns pacing without duplicating MAT/stratification here.",
   invariants: [
     `Output exactly ${CHUNK_LINE_COUNT} lines in the lines array.`,
     "Each line is one plain-text narration beat, with no bullets, numbering, markdown, or pause markers.",
@@ -268,13 +274,13 @@ const phaseNarration: LoraFormSpec = {
     "Do not announce chunk or phase numbers in patient-facing text.",
     "Never prescribe, never shame, never use toxic positivity, and never offer crisis routing.",
   ],
-  targetCount: SPECIALIZED_TARGET_COUNT,
+  targetCount: PHASE_NARRATION_TARGET_COUNT,
   isStretch: false,
   inputFields: phaseInputFields(),
   outputFields: phaseOutputFields,
   inputSchema: phaseInputSchema,
   outputSchema: phaseOutputSchema,
-  stackAxes: STACK_AXES_BY_STATUS_AND_TRIGGER,
+  stackAxes: STACK_AXES_PHASE_NARRATION,
 };
 
 function checkInInputFields(
@@ -390,7 +396,14 @@ const checkInOutputFields = [
   },
 ] as const;
 
-const checkInOutputSchema = z
+const checkInDialogueTurnSchema = z.object({
+  role: z.enum(["patient", "agent"]),
+  content: z.string().min(1).max(2000),
+});
+
+type CheckInDialoguePack = "one" | "two" | "generic";
+
+const checkInOutputBaseSchema = z
   .object({
     reply: z.string().min(12).max(600),
     endConversation: z
@@ -408,17 +421,202 @@ const checkInOutputSchema = z
           });
         }
       }),
-  })
-  .superRefine((output, ctx) => {
-    const toxic = /you got this|stay strong|don't give up/i.test(output.reply);
-    if (toxic) {
+    /** Full scripted check-in for training exports and clinician review. */
+    dialogueTurns: z.array(checkInDialogueTurnSchema).max(24).optional(),
+  });
+
+function refineCheckInDialogueOutput(
+  output: z.infer<typeof checkInOutputBaseSchema>,
+  ctx: z.RefinementCtx,
+  pack: CheckInDialoguePack,
+): void {
+  const toxic = /you got this|stay strong|don't give up/i;
+  if (toxic.test(output.reply)) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ["reply"],
+      message: "Avoid toxic-positivity phrases.",
+    });
+  }
+  const turns = output.dialogueTurns;
+  if (!turns || turns.length === 0) return;
+
+  for (let index = 0; index < turns.length; index += 1) {
+    const line = turns[index];
+    if (line.role === "agent" && toxic.test(line.content)) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        path: ["reply"],
+        path: ["dialogueTurns", index, "content"],
         message: "Avoid toxic-positivity phrases.",
       });
     }
-  });
+  }
+
+  const minTurns = pack === "generic" ? 2 : 3;
+  if (turns.length < minTurns) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ["dialogueTurns"],
+      message:
+        pack === "generic"
+          ? "Include at least two lines (one WAVE prompt and one patient reply), or a fuller transcript."
+          : "Include at least the score question, the patient’s number, and one follow-up WAVE turn.",
+    });
+  }
+
+  if (turns[0]?.role !== "agent") {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ["dialogueTurns", 0, "role"],
+      message: "First dialogue line should be WAVE (agent).",
+    });
+  } else if (pack === "one") {
+    const normalized = turns[0].content.replace(/\s+/g, " ").trim();
+    const expected = CHECK_IN_CURRENT_URGE_SCALE_PROMPT.replace(/\s+/g, " ").trim();
+    if (normalized !== expected) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["dialogueTurns", 0, "content"],
+        message: `First WAVE line should be exactly: ${CHECK_IN_CURRENT_URGE_SCALE_PROMPT}`,
+      });
+    }
+  } else if (pack === "two") {
+    const normalized = turns[0].content.replace(/\s+/g, " ").trim();
+    const expected = CHECK_IN_CHUNK2_SCORE_PROMPT.replace(/\s+/g, " ").trim();
+    if (normalized !== expected) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["dialogueTurns", 0, "content"],
+        message: `First WAVE line should be exactly: ${CHECK_IN_CHUNK2_SCORE_PROMPT}`,
+      });
+    }
+  }
+
+  if (pack !== "generic" && turns[1]?.role !== "patient") {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ["dialogueTurns", 1, "role"],
+      message: "Second line should be the patient’s current score (or short answer).",
+    });
+  }
+
+  if (pack === "two") {
+    const bodyNeedle = CHECK_IN_BODY_URGE_LOCATION_PROMPT.replace(/\s+/g, " ").trim();
+    const afterScore = turns[2];
+    const normalizedAgent = afterScore?.content.replace(/\s+/g, " ") ?? "";
+    if (
+      afterScore?.role !== "agent" ||
+      !normalizedAgent.includes(bodyNeedle)
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["dialogueTurns", 2, "content"],
+        message: `The first WAVE turn after the patient gives their score must include this question verbatim: ${CHECK_IN_BODY_URGE_LOCATION_PROMPT}`,
+      });
+    }
+  }
+
+  const consentNeedle = CHECK_IN_COPING_CONSENT_PROMPT.replace(/\s+/g, " ").trim();
+  const hasCopingConsentAsk = turns.some(
+    (line, index) =>
+      line.role === "agent" &&
+      index > 0 &&
+      line.content.replace(/\s+/g, " ").includes(consentNeedle),
+  );
+
+  if (
+    (pack === "one" || pack === "two") &&
+    turns.length >= 5 &&
+    !hasCopingConsentAsk
+  ) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ["dialogueTurns"],
+      message: `After validating the patient’s response, include this consent question verbatim before any coping instructions: ${CHECK_IN_COPING_CONSENT_PROMPT}`,
+    });
+  }
+
+  const bridgeNormalized = CHECK_IN_COPING_BRIDGE_OPENER.replace(/\s+/g, " ").trim();
+  for (let index = 0; index < turns.length; index += 1) {
+    const line = turns[index];
+    if (line.role === "agent" && !line.content.trim().endsWith("?")) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["dialogueTurns", index, "content"],
+        message:
+          "Every WAVE line must end with a question mark so the patient knows what to answer next.",
+      });
+    }
+  }
+
+  if ((pack === "one" || pack === "two") && hasCopingConsentAsk) {
+    const consentAgentIndex = turns.findIndex(
+      (line, index) =>
+        line.role === "agent" &&
+        index > 0 &&
+        line.content.replace(/\s+/g, " ").includes(consentNeedle),
+    );
+    if (consentAgentIndex !== -1) {
+      let nextIndex = consentAgentIndex + 1;
+      while (nextIndex < turns.length && turns[nextIndex].role === "patient") {
+        nextIndex += 1;
+      }
+      const copingAgent = turns[nextIndex];
+      if (copingAgent?.role === "agent") {
+        const copingLead = copingAgent.content.replace(/\s+/g, " ").trim().toLowerCase();
+        if (!copingLead.startsWith(bridgeNormalized.toLowerCase())) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["dialogueTurns", nextIndex, "content"],
+            message: `The first WAVE turn after the patient agrees to coping must start with: ${CHECK_IN_COPING_BRIDGE_OPENER}`,
+          });
+        }
+      }
+    }
+  }
+
+  const lastAgent = [...turns].reverse().find((line) => line.role === "agent");
+  if (!lastAgent) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ["dialogueTurns"],
+      message: "Include at least one agent (WAVE) turn.",
+    });
+  } else if (lastAgent.content.trim() !== output.reply.trim()) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ["reply"],
+      message:
+        "When dialogue turns are present, reply must match the last WAVE turn (trimmed).",
+    });
+  }
+
+  if (output.endConversation?.action === "end" && turns.length >= 1) {
+    const lastLine = turns[turns.length - 1];
+    if (lastLine?.role !== "patient") {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["dialogueTurns"],
+        message:
+          "When action is end, end the transcript on the patient’s readiness line—no WAVE message after they say they are ready; the session advances to the next chunk.",
+      });
+    }
+  }
+}
+
+function buildCheckInOutputSchema(pack: CheckInDialoguePack) {
+  return checkInOutputBaseSchema.superRefine((output, ctx) =>
+    refineCheckInDialogueOutput(output, ctx, pack),
+  );
+}
+
+function checkInDialoguePackFor(
+  chunkNumber: 1 | 2 | 3 | 4 | 5,
+): CheckInDialoguePack {
+  if (chunkNumber === 1) return "one";
+  if (chunkNumber === 2) return "two";
+  return "generic";
+}
 
 function checkInSpec(
   loraId: LoRAId,
@@ -438,9 +636,10 @@ function checkInSpec(
     clinicalRationale: `${focus} This specialized adapter is collected for evaluation and future native/mobile hot-swapping. For the browser demo, its 20 reviewed examples are folded into the combined lora-wave-session fine-tune.`,
     invariants: [
       "Score first when the patient has not given a current score.",
-      "One open-ended question or one technique per turn, never both.",
+      "When dialogueTurns are present, every WAVE line must always end with a question mark.",
       "Validate before offering a technique when the patient reports an obstacle.",
       "Never shame, never use toxic positivity, and never give medication directives.",
+      "Optional dialogueTurns captures a full training transcript; when present, reply must match the last WAVE line.",
       extraInvariant,
     ],
     targetCount: SPECIALIZED_TARGET_COUNT,
@@ -454,7 +653,7 @@ function checkInSpec(
         message: `chunkNumber must be ${chunkNumber}`,
       },
     ),
-    outputSchema: checkInOutputSchema,
+    outputSchema: buildCheckInOutputSchema(checkInDialoguePackFor(chunkNumber)),
     stackAxes: STACK_AXES_BY_STATUS_AND_TRIGGER,
   };
 }
@@ -534,6 +733,12 @@ const reflection: LoraFormSpec = {
       kind: "enum",
       label: "Trigger category",
       options: TRIGGER_CATEGORIES,
+      optionLabels: {
+        social: "Social situation",
+        stress: "Stress / emotions",
+        physical: "Physical sensation",
+        unknown_or_other: "Don't know / other",
+      },
     },
     {
       key: "sessionsCount",
@@ -655,14 +860,14 @@ export const LORA_SPECS: Record<LoRAId, LoraFormSpec> = {
     1,
     "Check-in 1",
     "Focus: baseline score, current body/emotional state, and medication-aware validation.",
-    "Check-in 1 should orient the patient gently and must not assume the urge has shifted yet.",
+    "Training transcripts (match `data/training-seeds/lora-check-in-1.json` and the grid generator): (1) Turn 1 is WAVE with the exact 1–10 craving prompt from `check-in-dialogue.ts`. (2) Turn 2 is the patient’s current score only—never the baseline; intake lives in input and WAVE compares baseline vs current on the first substantive WAVE turn after the number. (3) When recalling medication, affirm on-time and late with gratitude (e.g. thank you for keeping on track with your medication; that is very important, and you are doing the right thing) before status details; missed doses use honest, non-shaming acknowledgment plus prescriber/clinic routing as in examples. (4) Validate triggers with the surf pattern: sometimes {trigger context} alone can trigger the urge, and we are here to help you surf the wave. (5) Every WAVE line must always end with a question mark. (6) After validating an obstacle, ask consent verbatim: Would you like to try some coping strategies together to see if it helps? before any technique. (7) On the first WAVE turn after the patient agrees to coping, open with CHECK_IN_COPING_BRIDGE_OPENER from `check-in-dialogue.ts`, then give the technique, and end that same turn with a brief check-in question. (8) When the patient confirms readiness for the next chunk, end the dialogue on that patient line—no closing WAVE reply; `reply` still matches the last WAVE line (the readiness question). Use endConversation when appropriate.",
   ),
   "lora-check-in-2": checkInSpec(
     "lora-check-in-2",
     2,
     "Check-in 2",
-    "Focus: body-scan obstacles and somatic noticing after the first guided chunk.",
-    "If the patient reports body discomfort, validate sensation before naming any grounding technique.",
+    "Focus: craving score, score reflection vs prior check-in, body-location question after the body-scan chunk, and somatic validation (PRD § Check-in 2).",
+    "Training transcripts (match `data/training-seeds/lora-check-in-2.json` and `client/scripts/generate-lora-check-in-2-grid.ts`). Mirror check-in 1 unless PRD differs: (1) Turn 1 is WAVE with exactly CHECK_IN_CHUNK2_SCORE_PROMPT from `check-in-dialogue.ts`. (2) Turn 2 is the patient’s current score only (session intake/baseline stays in structured input; prior check-in score is implied for reflection, not spoken by the patient). (3) The first WAVE turn after the score opens with the score-reflection clause filled from the prior check-in score vs this score (use `fillScoreReflection` / `score-tracking.ts` patterns), then medication affirmation (same on-time/late/missed rules as check-in 1), then surf-framed trigger validation, then CHECK_IN_BODY_URGE_LOCATION_PROMPT verbatim. PRD Turn 3 then deepens on sensation or branches if they could not locate—training examples use validate → CHECK_IN_COPING_CONSENT_PROMPT → CHECK_IN_COPING_BRIDGE_OPENER → technique → check → CHECK_IN_CHUNK2_READINESS_PROMPT → patient affirms ready. (4) Every WAVE line ends with ?. (5) End on the patient’s readiness line; `reply` matches the last WAVE line. (6) Readiness names the next chunk (sound anchor), not the body scan.",
   ),
   "lora-check-in-3": checkInSpec(
     "lora-check-in-3",

@@ -1,0 +1,247 @@
+[
+  {
+    "id": "06cd89bc-ee59-4a7a-9f1d-9e1256eac4aa",
+    "loraId": "lora-phase-narration",
+    "input": {
+      "surface": "phase_narration",
+      "chunkNumber": 5,
+      "startingIntensityBand": "1-6"
+    },
+    "output": {
+      "lines": [
+        "You’ve made it to the end of this practice. Take a moment to really let that land. You showed up, you stayed, and you rode the wave.",
+        "Check in with your urge now. Has anything shifted? Just notice what’s true for you in this moment. Being here is already a huge success.",
+        "What you practiced today is a real skill. Every time you ride an urge without acting on it, you’re building something. You’re getting stronger at this, one wave at a time.",
+        "And if it felt hard, that’s okay. If your mind wandered a hundred times, that’s okay too. None of that means you failed. It just means you’re human.",
+        "When you’re ready, start to bring your attention back to the space around you. Take one easy breath. Notice where your body meets the surface beneath you. ",
+        "Thank you for giving yourself this time. Recovery isn’t a straight line, and every practice matters. You did something really meaningful for yourself today. I'm so proud of you."
+      ]
+    },
+    "authorInitials": null,
+    "notes": null,
+    "status": "ready",
+    "createdAt": "2026-05-01T07:54:45.451Z",
+    "updatedAt": "2026-05-01T07:55:09.106Z"
+  },
+  {
+    "id": "212a6f13-1332-475a-926c-c47fe5cc1534",
+    "loraId": "lora-phase-narration",
+    "input": {
+      "surface": "phase_narration",
+      "chunkNumber": 4,
+      "startingIntensityBand": "1-6"
+    },
+    "output": {
+      "lines": [
+        "You’ve been so present through all of this. Give yourself a round of applause. Now we’re going to bring in your breath to help your body settle even more. ",
+        "What we will do is called 4-4-6 breathing. You’ll breathe in for 4 seconds, hold for 4, and then breathe out slowly for 6 seconds. It's okay if your breaths are shorter at first. Just try.",
+        "When you breathe, count in your head. I will do it with you. Breathe in, 2, 3, 4. Hold it, 2, 3, 4. And breathe out using your mouth, as slowly as you can. You're doing great.",
+        "Try it again. Breathe in, noticing how you feel in your chest, stomach. And hold it, notice how you feel in your body. And breathe out through your mouth, steady and slow.",
+        "Keep practicing your breath on your own. Follow your breath as it rises and falls. Just like the waves. Have you noticed? You're doing better and better.",
+        "Your breath is always with you. It’s always available, no matter where you are. You did a wonderful job. Please keep it as a tool, and use it whenever it's needed."
+      ]
+    },
+    "authorInitials": null,
+    "notes": null,
+    "status": "ready",
+    "createdAt": "2026-05-01T07:51:49.586Z",
+    "updatedAt": "2026-05-01T07:51:49.586Z"
+  },
+  {
+    "id": "d004338e-fdc5-4803-b867-f116c2e9cb41",
+    "loraId": "lora-phase-narration",
+    "input": {
+      "surface": "phase_narration",
+      "chunkNumber": 3,
+      "startingIntensityBand": "1-6"
+    },
+    "output": {
+      "lines": [
+        "Thank you for staying with me. Now we’re going to add something to help settle you down. Listen to the sound of water in the background. Try to really focus on it.",
+        "It can be the ocean, or a lake. Let the sound wash over you, slow and steady. It’s always there — you can return to it anytime.",
+        "Imagine you’re standing on a quiet beach. The sand is cool, and steady beneath your feet. You're safe, and there's no one else here. Bring your attention back to the sound. What have you noticed?",
+        "Listen to the waves move in and out. Each one rises — just like your urge. And each one falls — just like your urge will, too.\n",
+        "If your mind drifted away just now, that’s okay. That’s what minds do. Just come back to the sound of the water, and you’re right back on the wave. You're surfing with it, up and down.",
+        "You stayed with something uncomfortable and you didn’t turn away. That is urge surfing. That is exactly what you need to do."
+      ]
+    },
+    "authorInitials": null,
+    "notes": null,
+    "status": "ready",
+    "createdAt": "2026-05-01T07:43:35.801Z",
+    "updatedAt": "2026-05-01T07:43:35.801Z"
+  },
+  {
+    "id": "fd7ed2d8-5803-4e1a-863c-8a76c996d798",
+    "loraId": "lora-phase-narration",
+    "input": {
+      "surface": "phase_narration",
+      "chunkNumber": 2,
+      "startingIntensityBand": "1-6"
+    },
+    "output": {
+      "lines": [
+        "You’re still here, and that matters more than you know. Now we’re going to slow down and check in with your body. This part is about noticing — not changing anything, just noticing.",
+        "Let's bring your attention to your feet. Feel the ground beneath you. Notice any sensation there — warmth, pressure, or maybe nothing at all. Just observe.",
+        "Now slowly bring your awareness up — through your legs, your belly, your chest. Notice where there’s tension, or tightness, or heat. Your body is holding information right now.",
+        "See if you can find where the urge lives in your body. Maybe it’s a tightness in your chest, or a restlessness in your hands, or a buzz of energy in your legs.",
+        "Whatever you find — just let it be there. You don’t have to do anything about it right now. Stay curious, like you’re watching something from a safe distance.",
+        "You just did something really important. You turned toward the feeling instead of away from it. That takes real strength. Great job."
+      ]
+    },
+    "authorInitials": null,
+    "notes": null,
+    "status": "ready",
+    "createdAt": "2026-05-01T07:35:37.988Z",
+    "updatedAt": "2026-05-01T07:35:37.988Z"
+  },
+  {
+    "id": "2552e029-126e-44c5-ac07-93c896c336cb",
+    "loraId": "lora-phase-narration",
+    "input": {
+      "surface": "phase_narration",
+      "chunkNumber": 1,
+      "startingIntensityBand": "1-6"
+    },
+    "output": {
+      "lines": [
+        "Thank you for being here. It takes real courage to pause and turn inward. You don’t have to do this perfectly. Just follow along as we go. You’re exactly where you need to be.",
+        "Let’s start by finding a comfortable position. You can sit, or lie down — whatever feels okay for your body. And when you’re ready, gently close your eyes, or just soften your gaze.",
+        "Take one slow breath in, and breathe out slowly through your mouth. Do it again.",
+        "When you breathe in, try to tighten your body like you’re freezing. And when you breathe out, try to relax like you’ve melted. Notice how your body responds.",
+        "We’re going to get curious about whatever craving or urge is showing up for you. You don’t need to fight it. You don’t need to push it away. We’re just going to explore it together.",
+        "Notice how you feel in your body, what thoughts come up, and stay with them. If feelings get intense, always go back to your breath."
+      ]
+    },
+    "authorInitials": null,
+    "notes": null,
+    "status": "ready",
+    "createdAt": "2026-05-01T07:29:55.669Z",
+    "updatedAt": "2026-05-01T07:29:55.669Z"
+  },
+  {
+    "id": "27165dcd-c85a-40fb-b152-af244048285d",
+    "loraId": "lora-phase-narration",
+    "input": {
+      "surface": "phase_narration",
+      "chunkNumber": 5,
+      "startingIntensityBand": "7-10",
+      "priorSessionSummary": "intensity stage change: 7-9-7-8-4"
+    },
+    "output": {
+      "lines": [
+        "You made it through. Take a second to really feel that. You surfed this wave. That means a lot.",
+        "Check in with the craving right now. Is it the same? A little quieter? Just notice. There’s no right or wrong answer. It is already a huge success that you stay.\n",
+        "Riding a strong urge without acting on it is one of the hardest things in recovery. You just did that. You built something real today.",
+        "If it’s still hard, it's totally okay. Strong cravings are supposed to last longer. That’s the wave peaking, and it will fall. Try to bring your attention back to your breath, and the sound.",
+        "When you're ready, gently bring your attention back to the room. Feel your feet. Look around. Tell yourself what you have noticed. ",
+        "Thank you for staying here and working on this feeling together. If things still feel intense, reaching out to someone you trust, a support person, or your care team. You don’t have to hold it alone. "
+      ]
+    },
+    "authorInitials": null,
+    "notes": null,
+    "status": "ready",
+    "createdAt": "2026-05-01T07:28:04.657Z",
+    "updatedAt": "2026-05-01T07:28:04.657Z"
+  },
+  {
+    "id": "4894a089-2a62-46c1-9b33-f97d89014135",
+    "loraId": "lora-phase-narration",
+    "input": {
+      "surface": "phase_narration",
+      "chunkNumber": 4,
+      "startingIntensityBand": "7-10",
+      "priorSessionSummary": "intensity change : 7-9-7-8"
+    },
+    "output": {
+      "lines": [
+        "Your feelings may rise and fall, like waves. It's normal if it feels more intense at some point. Your breath is going to help carry you through the rest of this. ",
+        "Let's breathe together. Inhale for 4 seconds, hold for 4, and breathe out slowly for 6 seconds. Count it in your head. I will do it together with you.",
+        "Breathe in, two, three, four. Hold it, two, three, four. And breathe out, two, three, four, five, six. It's okay if you cannot hold that long. Just keep practicing it.",
+        "Do it again. When you breathe in and hold your breath, you may gently tighten your body like you are bracing against something. And when you breathe out, let it go completely. Feel the release.",
+        "Try practicing again. You're doing better. Notice your breath. Is there any difference? Stay curious, and observe.",
+        "Your breath is always there, no matter how loud the craving gets. It's your anchor, and you can always get back to it. That’s yours to keep. Great job!"
+      ]
+    },
+    "authorInitials": null,
+    "notes": null,
+    "status": "ready",
+    "createdAt": "2026-05-01T07:20:11.310Z",
+    "updatedAt": "2026-05-01T07:20:26.966Z"
+  },
+  {
+    "id": "f58edd9b-75cf-4dd5-95a5-219301fbbf33",
+    "loraId": "lora-phase-narration",
+    "input": {
+      "surface": "phase_narration",
+      "chunkNumber": 3,
+      "startingIntensityBand": "7-10",
+      "priorSessionSummary": "chunk 1 intensity 7, chunk 2 intensity 9, now is 7"
+    },
+    "output": {
+      "lines": [
+        "You’re doing something really hard and you’re still here. That matters. You may notice many sensations moving through your body. Let's find an anchor for you to hold on. Listen. What you hear?",
+        "Bring your attention to the sound of water around you. It might be ocean waves, or the soft movement of a stream. Notice how each wave arrives on its own, then gently pulls back. Just observe.\n",
+        "Now try to imagine your feet on the sand. Cool, firm ground beneath you. You may feel the water as well. Cool, comfortable. You’re safe here.",
+        "That wave out there — it rises, it reaches its peak, and it falls. Your craving does the same thing. You are watching it peak. It will fall. You don’t have to do anything.",
+        "If your mind went somewhere else, just come straight back to the sound of the water. Try it now. It can feel hard. Keep trying, even just bring your attention back for one second. That is a win.",
+        "You stayed with the sound when things felt intense, even just a moment. That means a lot. You held on it, trained your muscle, and rode a wave. That’s exactly how this works. Great job."
+      ]
+    },
+    "authorInitials": null,
+    "notes": null,
+    "status": "ready",
+    "createdAt": "2026-05-01T07:03:53.338Z",
+    "updatedAt": "2026-05-01T07:03:53.338Z"
+  },
+  {
+    "id": "d8fdb380-e793-4acf-a4c0-c2a7623bf0f0",
+    "loraId": "lora-phase-narration",
+    "input": {
+      "surface": "phase_narration",
+      "chunkNumber": 2,
+      "startingIntensityBand": "7-10",
+      "priorSessionSummary": "check in 7, moved to 9"
+    },
+    "output": {
+      "lines": [
+        "You're still here, and that matters more than you know. Sometimes when you turn toward a craving, it gets louder before it gets quieter. That is normal.",
+        "Now we're going to slow down and check in with your body. Our goal is not changing anything, just noticing.",
+        "Bring your attention gently to your feet. Notice any sensation there — maybe warmth, maybe pressure, maybe nothing at all. Just observe, without judgment.",
+        "Now slowly bring your attention up — through your legs, your belly, your chest. Notice where there's tension, or tightness, or heat. What information are they trying to tell you?",
+        "See if you can find where the urge lives in your body. Maybe it's a tightness in your chest. Maybe it's a restlessness in your hands, or a buzz of energy in your legs.",
+        "Stay curious, like you're watching something from a safe distance. You're doing great. You turned toward the feeling instead of away from it, and that takes real strength."
+      ]
+    },
+    "authorInitials": null,
+    "notes": null,
+    "status": "ready",
+    "createdAt": "2026-05-01T06:40:03.383Z",
+    "updatedAt": "2026-05-01T07:04:17.915Z"
+  },
+  {
+    "id": "23255fee-44b1-4109-9114-6ceab03fdabd",
+    "loraId": "lora-phase-narration",
+    "input": {
+      "surface": "phase_narration",
+      "chunkNumber": 1,
+      "startingIntensityBand": "7-10",
+      "priorSessionSummary": "Patient is starting the session with a higher urge; first chunk should feel steadying without rushing."
+    },
+    "output": {
+      "lines": [
+        "Thank you for being here. It takes real courage to pause and turn inward. You don't have to do this perfectly. Just follow the narrative as it goes. You're exactly where you need to be.",
+        "Let's start by finding a comfortable position. You can sit, or lie down, whatever feels okay for your body. And when you're ready, gently close your eyes, or just soften your gaze.",
+        "Take one slow breath in, and breathe out slowly through your mouth. Do it again. ",
+        "When you breathe in, try to tight your body like you are freezing; and when you breathe out, try to relax like you're melted.",
+        "We're going to work with whatever craving or urge is showing up for you. You don't need to fight it. You don't need to push it away. We're just going to get curious about it together.",
+        "Notice how you feel in your body, what thoughts come up, and stay with them. If feelings get intense, always go back to your breath. Thank you for staying with me. You're doing great."
+      ]
+    },
+    "authorInitials": null,
+    "notes": null,
+    "status": "ready",
+    "createdAt": "2026-05-01T05:21:13.850Z",
+    "updatedAt": "2026-05-01T05:21:13.850Z"
+  }
+]

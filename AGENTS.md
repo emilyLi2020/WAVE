@@ -116,6 +116,33 @@ The intake safety screen, fallback bank, and crisis-routing rules remain rule-ba
 - **Offline-first (everywhere)**: The final session path must make **zero LLM network requests** on both mobile and the web demo. Mobile runs Gemma 4 E2B via LiteRT; the web demo runs Gemma 4 E2B via transformers.js + WebGPU. The one scripted narration bank in `client/lib/prompts/` is the single fallback when WebGPU is unavailable or Gemma output fails Zod validation twice.
 - **Privacy floor**: No account required to use the app. No third-party analytics in the session flow. Opt-in only for any data export to a clinician, and exports must be local files (PDF/JSON) the patient chooses to share.
 
+## Check-in training dialogue rules (`lora-check-in-1`)
+
+Strict guidance for training seeds (`data/training-seeds/lora-check-in-1.json`), `client/scripts/generate-lora-check-in-1-grid.ts`, and `/training` multi-turn examples—keep new examples aligned with the checked-in set.
+
+1. **Opening**: Line 1 is always WAVE with the exact 1–10 craving prompt from `client/lib/training/check-in-dialogue.ts` (`CHECK_IN_CURRENT_URGE_SCALE_PROMPT`).
+2. **Scores**: The patient states **current** intensity only, not baseline. Intake (baseline) is in structured input; the **first substantive WAVE reply after the number** compares baseline to current.
+3. **Medication**: For **on-time** and **late**, affirm engagement first (e.g. *Thank you for keeping on track with your medication. That is very important, and you are doing the right thing.*), then give timing context without shame. For **missed**, thank them for honesty, normalize, and use prescriber/clinic language as in the seed file—do not use the same “keeping on track” line as if the dose were taken.
+4. **Trigger**: Validate with surf framing, e.g. *Sometimes {trigger or triggerOther} alone can trigger the urge, and we are here to help you surf the wave.*
+5. **Always end with a question**: Every WAVE line **must** end with a **`?`** so the patient always knows what to answer next (validated in `checkInOutputSchema` when `dialogueTurns` are present).
+6. **Coping**: After obstacle validation, ask consent verbatim (`CHECK_IN_COPING_CONSENT_PROMPT` in `check-in-dialogue.ts`) **before** any coping instructions. On the **first** WAVE turn after the patient agrees, open with **`CHECK_IN_COPING_BRIDGE_OPENER`** (*Great, let's try this together.*), give the technique, and close that same turn with a short check-in question (see grid generator).
+7. **Next chunk**: When the patient says they are ready, **stop**—no further WAVE line; the session advances. The transcript’s **last line is the patient**; `reply` in JSON still matches the **last WAVE** line (the readiness question).
+
+**Clinician / LLM expansion** (Synthetix, dataset review): long-form instructions live in `data/training-seeds/clinician-llm-instructions.json` under **`lora-check-in-1`**, editable from `/training` → Check-in 1.
+
+## Check-in training dialogue rules (`lora-check-in-2`)
+
+Same clinical stack as check-in 1 (medication affirmation, surf-framed trigger validation, always end WAVE lines with `?`, consent + `CHECK_IN_COPING_BRIDGE_OPENER` before techniques, transcript ends on patient readiness with no extra WAVE line). **Differences (PRD § Chunk 2 / Check-in 2):**
+
+1. **Turn 1 prompt**: Exactly **`CHECK_IN_CHUNK2_SCORE_PROMPT`** in `client/lib/training/check-in-dialogue.ts` (shorter craving ask after the body-scan chunk—not the same string as check-in 1).
+2. **Turn 2 (first WAVE after the number)**: Begin with a **score reflection** comparing this score to the **prior check-in score** (patterns in `client/lib/session/score-tracking.ts` / `fillScoreReflection`), then medication + surf lines as in check-in 1, then the body-awareness question **`CHECK_IN_BODY_URGE_LOCATION_PROMPT`** verbatim. Do **not** use the check-in 1 “obstacle enum” question here.
+3. **Turn 3+**: Patient describes locating the urge, difficulty locating, or mixed mind–body experience; WAVE **validates** somatically, then may deepen (tight/warm/shift—PRD) or, in these training seeds, move to **consent → bridge → one technique** like check-in 1 when extra grounding helps.
+4. **Readiness**: Last WAVE line uses **`CHECK_IN_CHUNK2_READINESS_PROMPT`** (next phase is the **sound anchor**).
+
+Canonical grid: `data/training-seeds/lora-check-in-2.json` via `client/scripts/generate-lora-check-in-2-grid.ts`.
+
+**Clinician / LLM expansion**: long-form instructions live in `data/training-seeds/clinician-llm-instructions.json` under **`lora-check-in-2`**, editable from `/training` → Check-in 2.
+
 ## Learned User Preferences
 
 - When editing prompt templates under `client/lib/prompts/`, preserve clinical content verbatim and only tighten structural/voice work; never alter pharmacology, citations, or safety copy without a fresh citation.

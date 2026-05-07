@@ -28,8 +28,7 @@ const triggerOptions: { value: TriggerCategory; label: string }[] = [
   { value: "social", label: "Social situation" },
   { value: "stress", label: "Stress / emotions" },
   { value: "physical", label: "Physical sensation" },
-  { value: "unknown", label: "I don't know" },
-  { value: "other", label: "Other" },
+  { value: "unknown_or_other", label: "Don't know / other" },
 ];
 
 export interface IntakeAnswers {
@@ -37,6 +36,8 @@ export interface IntakeAnswers {
   matType: MatType;
   medicationStatus: MedicationStatus;
   trigger: TriggerCategory;
+  /** Optional when trigger is `unknown_or_other` (patient-named context). */
+  triggerOther: string | null;
   /**
    * Demo mode collapses every scripted `pause` and `breath` segment in
    * the chunk player to a flat 2-second beat so a reviewer can watch
@@ -57,6 +58,7 @@ export function IntakeForm({ onSubmit }: Props) {
   const [medicationStatus, setMedicationStatus] =
     useState<MedicationStatus | null>(null);
   const [trigger, setTrigger] = useState<TriggerCategory | null>(null);
+  const [triggerOther, setTriggerOther] = useState("");
   const [demoMode, setDemoMode] = useState(false);
 
   const needsMedicationStatus = matType !== null && matType !== "none";
@@ -77,6 +79,10 @@ export function IntakeForm({ onSubmit }: Props) {
         ? (medicationStatus as MedicationStatus)
         : "none",
       trigger,
+      triggerOther:
+        trigger === "unknown_or_other" && triggerOther.trim().length > 0
+          ? triggerOther.trim().slice(0, 80)
+          : null,
       demoMode,
     });
   }
@@ -166,7 +172,12 @@ export function IntakeForm({ onSubmit }: Props) {
             <button
               key={option.value}
               type="button"
-              onClick={() => setTrigger(option.value)}
+              onClick={() => {
+                setTrigger(option.value);
+                if (option.value !== "unknown_or_other") {
+                  setTriggerOther("");
+                }
+              }}
               aria-pressed={trigger === option.value}
               className={`text-left rounded-xl border px-4 py-3 text-sm transition ${
                 trigger === option.value
@@ -178,6 +189,25 @@ export function IntakeForm({ onSubmit }: Props) {
             </button>
           ))}
         </div>
+        {trigger === "unknown_or_other" ? (
+          <div className="mt-4">
+            <label
+              htmlFor="trigger-other"
+              className="text-sm font-medium text-foreground/80"
+            >
+              Say more (optional, max 80 characters)
+            </label>
+            <input
+              id="trigger-other"
+              type="text"
+              maxLength={80}
+              value={triggerOther}
+              onChange={(event) => setTriggerOther(event.target.value)}
+              className="mt-2 w-full rounded-xl border border-border bg-surface-muted px-4 py-2.5 text-sm"
+              placeholder="e.g. restless legs, not sure why"
+            />
+          </div>
+        ) : null}
       </article>
 
       <div className="flex justify-end">
