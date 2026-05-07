@@ -6,6 +6,7 @@
 >
 > For *which* Gemma model and LoRAs WAVE ships, see [`models.md`](./models.md).
 > For the training pipeline, see [`model-training.md`](./model-training.md).
+> For the isolated voice stack test page, see [`voice-test.md`](./voice-test.md).
 
 Sources used throughout this file:
 
@@ -62,10 +63,10 @@ What you can put in, what comes out, and the hard limits.
 | Interleaved text + image + audio in one prompt | ✅ | ✅ | text+image only | text+image only | Best practice: **place image/audio before text** in the message content array. |
 
 **For WAVE specifically:** the production session path is **text-in, text-out**.
-The MVP does not consume image, video, or audio inputs. The capability is
-there in the base — we just do not use it. If a future surface (e.g. a "log
-your day" voice journal) wants ASR, E2B already supports it without swapping
-models.
+The MVP does not consume image, video, or audio inputs. The developer-only
+`/training/voice-test` page validates a separate browser voice stack using
+Whisper for STT and Kokoro for TTS; Gemma remains the local text-reply model.
+See [`voice-test.md`](./voice-test.md) for that stack.
 
 ---
 

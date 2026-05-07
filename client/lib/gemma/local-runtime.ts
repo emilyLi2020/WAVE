@@ -29,9 +29,9 @@ const GEMMA_CACHE_KEY = "wave-gemma4-cache";
 const GEMMA_DTYPE = "q4f16";
 const CHECK_IN_TOOL_NONE_OBSTACLE = "none";
 
-type ChatRole = "system" | "user" | "assistant";
+export type ChatRole = "system" | "user" | "assistant";
 
-interface ChatMessage {
+export interface ChatMessage {
   role: ChatRole;
   content: string;
 }
@@ -52,6 +52,10 @@ export interface LocalChunkResult {
 }
 
 export interface LocalInsightsResult {
+  text: string;
+}
+
+export interface LocalVoiceTestResult {
   text: string;
 }
 
@@ -282,6 +286,31 @@ export async function generateGemmaInsights(
   return { text: extractFirstJSONObject(text) };
 }
 
+export async function generateGemmaVoiceTestTurn(
+  history: readonly ChatMessage[],
+  options: GenerateOptions,
+  systemPrompt = [
+    "You are running a developer-only voice loop test for WAVE.",
+    "This is not a clinical session and not medical advice.",
+    "Hold a normal, friendly conversation in short spoken sentences.",
+    "Keep every reply under 45 words unless the user asks for detail.",
+    "Do not mention implementation details unless asked.",
+  ].join("\n"),
+): Promise<LocalVoiceTestResult> {
+  const text = await generateChatText(
+    [
+      {
+        role: "system",
+        content: systemPrompt,
+      },
+      ...history,
+    ],
+    options,
+  );
+
+  return { text: sanitizeVoiceTestText(text) };
+}
+
 async function generateChatText(
   messages: readonly ChatMessage[],
   options: GenerateOptions,
@@ -290,27 +319,40 @@ async function generateChatText(
   const generator = await getGenerator();
   throwIfAborted(options.signal);
 
-  const { TextStreamer } = await import("@huggingface/transformers");
+  const { InterruptableStoppingCriteria, TextStreamer } = await import(
+    "@huggingface/transformers"
+  );
+  const stoppingCriteria = new InterruptableStoppingCriteria();
+  const handleAbort = () => stoppingCriteria.interrupt();
+  if (options.signal?.aborted) handleAbort();
+  options.signal?.addEventListener("abort", handleAbort, { once: true });
   let accumulated = "";
   const streamer = new TextStreamer(generator.tokenizer, {
     skip_prompt: true,
     skip_special_tokens: true,
     callback_function: (chunk: string) => {
+      if (options.signal?.aborted) return;
       accumulated += chunk;
       options.onDelta?.(accumulated);
     },
   });
 
-  const output = await generator([...messages], {
-    max_new_tokens: options.maxNewTokens,
-    do_sample: false,
-    return_full_text: false,
-    streamer,
-  });
+  try {
+    const output = await generator([...messages], {
+      max_new_tokens: options.maxNewTokens,
+      do_sample: false,
+      return_full_text: false,
+      streamer,
+      stopping_criteria: stoppingCriteria,
+    });
 
-  throwIfAborted(options.signal);
-  const finalText = extractGeneratedText(output).trim();
-  return finalText.length > 0 ? finalText : accumulated.trim();
+    throwIfAborted(options.signal);
+    const finalText = extractGeneratedText(output).trim();
+    return finalText.length > 0 ? finalText : accumulated.trim();
+  } finally {
+    options.signal?.removeEventListener("abort", handleAbort);
+    stoppingCriteria.reset();
+  }
 }
 
 async function getCheckInLanguageModel(): Promise<ReturnType<typeof transformersJS>> {
@@ -389,6 +431,16 @@ function sanitizeCheckInModelText(text: string): string {
   return text
     .replace(/\]\s*\[/g, " ")
     .replace(/[\[\]]/g, "")
+    .replace(/[–—]/g, ",")
+    .replace(/\s+([,.;:?])/g, "$1")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function sanitizeVoiceTestText(text: string): string {
+  return text
+    .replace(/\]\s*\[/g, " ")
+    .replace(/[\[\]{}]/g, "")
     .replace(/[–—]/g, ",")
     .replace(/\s+([,.;:?])/g, "$1")
     .replace(/\s+/g, " ")
