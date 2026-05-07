@@ -661,10 +661,14 @@ export function VoiceTestClient() {
     controller?.abort();
     stopTtsPlayback();
 
-    const interruptedDraft = assistantDraftRef.current?.content.trim() ?? "";
-    if (assistantDraftRef.current) {
+    const activeDraft = assistantDraftRef.current;
+    const interruptedDraft =
+      reason === "interruption" && activeDraft?.status === "streaming"
+        ? activeDraft.content.trim()
+        : "";
+    if (activeDraft) {
       setAssistantDraft({
-        ...assistantDraftRef.current,
+        ...activeDraft,
         status: reason === "interruption" ? "interrupted" : "discarded",
       });
     }
@@ -1015,13 +1019,6 @@ export function VoiceTestClient() {
         content: gemmaResult.text,
       };
       historyRef.current = [...nextHistory, assistantTurn];
-      setAssistantDraft({
-        status: "complete",
-        content: gemmaResult.text,
-        turnId: `assistant-${generationRunId}`,
-        generationRunId,
-        startedAt: gemmaStartedAt,
-      });
       appendTranscript({
         role: "assistant",
         content: gemmaResult.text,
