@@ -70,6 +70,29 @@ export const CHECK_IN_CHUNK4_READINESS_PROMPT =
   "Ready to continue with the next part, the closing reflection, and see if it helps?";
 
 /**
+ * Check-in 5 — Turn 1 only (after closing chunk). Matches
+ * `CHECK_IN_OPENERS[5].turn1` in `client/lib/prompts/check-in-openers.ts`.
+ */
+export const CHECK_IN_CHUNK5_SCORE_PROMPT =
+  "Last check-in — craving score 1 to 10?";
+
+/**
+ * Check-in 5 — first substantive WAVE turn after the patient gives the final score. The
+ * `[full-arc reflection]` slot is replaced by {@link fillScoreReflection} from
+ * `client/lib/session/score-tracking.ts` (same mechanism as scripted Turn 2 openers).
+ * Matches the shaped content of `CHECK_IN_OPENERS[5].turn2`.
+ */
+export const CHECK_IN_CHUNK5_NOTICE_OPENER_TEMPLATE =
+  "[full-arc reflection] What did you notice about yourself during this practice?";
+
+/**
+ * Check-in 5 — closing question (not “ready to continue”; there is no next chunk).
+ * Matches `CHECK_IN_OPENERS[5].turn5`.
+ */
+export const CHECK_IN_CHUNK5_CARRY_FORWARD_PROMPT =
+  "Is there anything from this session you want to carry with you as you move through your day?";
+
+/**
  * Verbatim block for the second WAVE turn after the score (after the patient answers the
  * landing prompt): body observe on check-in 2; sound-anchor hold on check-in 3; PRD breathing
  * follow-up on check-in 4.

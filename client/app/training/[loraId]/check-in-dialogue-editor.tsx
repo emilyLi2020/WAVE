@@ -5,6 +5,9 @@ import {
   CHECK_IN_BODY_URGE_LOCATION_OBSERVE_PROMPT,
   CHECK_IN_CHUNK2_LANDING_SECTION_PROMPT,
   CHECK_IN_CHUNK2_READINESS_PROMPT,
+  CHECK_IN_CHUNK5_CARRY_FORWARD_PROMPT,
+  CHECK_IN_CHUNK5_NOTICE_OPENER_TEMPLATE,
+  CHECK_IN_CHUNK5_SCORE_PROMPT,
   CHECK_IN_COPING_BRIDGE_OPENER,
   CHECK_IN_COPING_CONSENT_PROMPT,
   CHECK_IN_CURRENT_URGE_SCALE_PROMPT,
@@ -15,7 +18,7 @@ export type DialogueTurn = {
   content: string;
 };
 
-export type CheckInDialoguePack = "check-in-1" | "check-in-2";
+export type CheckInDialoguePack = "check-in-1" | "check-in-2" | "check-in-5";
 
 interface Props {
   turns: DialogueTurn[];
@@ -69,6 +72,31 @@ export function CheckInDialogueEditor({
               <code className="text-[11px]">endConversation.action = end</code> with{" "}
               <code className="text-[11px]">cravingScore</code>.
             </>
+          ) : dialoguePack === "check-in-5" ? (
+            <>
+              <strong>Closing check-in</strong> (after Chunk 5). Turn 1 must be <strong>WAVE</strong>{" "}
+              with <code className="text-[11px]">CHECK_IN_CHUNK5_SCORE_PROMPT</code> (see below) —
+              not the check-in 2–4 score line. Turn 2 is the <strong>patient&apos;s final number
+              only</strong>. The next WAVE turn weaves a <strong>full-arc score reflection</strong>{" "}
+              (PRD § Score-tracking / <code className="text-[11px]">fillScoreReflection</code> with{" "}
+              <code className="text-[11px]">[full-arc reflection]</code>), making the story explicit
+              vs <strong>intake baseline</strong> and <strong>check-in 4&apos;s score</strong> when
+              helpful, and ends with the notice question from{" "}
+              <code className="text-[11px]">CHECK_IN_CHUNK5_NOTICE_OPENER_TEMPLATE</code> (second
+              block — slot filled, not left literal). If the score is flat or up vs baseline,
+              validate frustration, thank them for staying, and keep healing non-linear; if the
+              final score is 9–10, recommend reaching out to their therapist or doctor (no med
+              changes). Then respond to what they noticed, normalize forward in plain language,
+              and close with{" "}
+              <code className="text-[11px]">CHECK_IN_CHUNK5_CARRY_FORWARD_PROMPT</code> verbatim
+              (third block). <strong>Do not</strong> ask{" "}
+              <code className="text-[11px]">ready to continue</code> or name a next chunk — there is
+              none. <strong>Every</strong> WAVE line ends with <strong>?</strong>. End on a{" "}
+              <strong>patient</strong> line after the carry-forward question;{" "}
+              <code className="text-[11px]">reply</code> still matches the <strong>last WAVE</strong>{" "}
+              line. Use <code className="text-[11px]">endConversation.action = end</code> with{" "}
+              <code className="text-[11px]">cravingScore</code>.
+            </>
           ) : (
             <>
               Turn 1 must be <strong>WAVE</strong> with the shared check-in 2–4 craving prompt (see
@@ -92,6 +120,8 @@ export function CheckInDialogueEditor({
         <p className="text-[11px] font-mono text-foreground/70 bg-surface border border-border rounded-lg px-3 py-2">
           {dialoguePack === "check-in-1" ?
             CHECK_IN_CURRENT_URGE_SCALE_PROMPT
+          : dialoguePack === "check-in-5" ?
+            CHECK_IN_CHUNK5_SCORE_PROMPT
           : CHECK_IN_CHUNK234_SCORE_PROMPT}
         </p>
         {dialoguePack === "check-in-2" ? (
@@ -117,18 +147,39 @@ export function CheckInDialogueEditor({
             </p>
           </>
         ) : null}
-        <p className="text-[11px] text-foreground/55 mt-2 mb-1">
-          After validation, before any coping instructions:
-        </p>
-        <p className="text-[11px] font-mono text-foreground/70 bg-surface border border-border rounded-lg px-3 py-2">
-          {CHECK_IN_COPING_CONSENT_PROMPT}
-        </p>
-        <p className="text-[11px] text-foreground/55 mt-2 mb-1">
-          Immediately after the patient agrees to coping, the next WAVE line opens with:
-        </p>
-        <p className="text-[11px] font-mono text-foreground/70 bg-surface border border-border rounded-lg px-3 py-2">
-          {CHECK_IN_COPING_BRIDGE_OPENER}
-        </p>
+        {dialoguePack === "check-in-5" ? (
+          <>
+            <p className="text-[11px] text-foreground/55 mt-2 mb-1">
+              After the score — full-arc reflection slot + notice question (template; replace{" "}
+              <code className="text-[11px]">[full-arc reflection]</code> via{" "}
+              <code className="text-[11px]">fillScoreReflection</code>):
+            </p>
+            <p className="text-[11px] font-mono text-foreground/70 bg-surface border border-border rounded-lg px-3 py-2 whitespace-pre-wrap">
+              {CHECK_IN_CHUNK5_NOTICE_OPENER_TEMPLATE}
+            </p>
+            <p className="text-[11px] text-foreground/55 mt-2 mb-1">
+              Closing carry-forward (verbatim final WAVE question before session handoff):
+            </p>
+            <p className="text-[11px] font-mono text-foreground/70 bg-surface border border-border rounded-lg px-3 py-2">
+              {CHECK_IN_CHUNK5_CARRY_FORWARD_PROMPT}
+            </p>
+          </>
+        ) : (
+          <>
+            <p className="text-[11px] text-foreground/55 mt-2 mb-1">
+              After validation, before any coping instructions:
+            </p>
+            <p className="text-[11px] font-mono text-foreground/70 bg-surface border border-border rounded-lg px-3 py-2">
+              {CHECK_IN_COPING_CONSENT_PROMPT}
+            </p>
+            <p className="text-[11px] text-foreground/55 mt-2 mb-1">
+              Immediately after the patient agrees to coping, the next WAVE line opens with:
+            </p>
+            <p className="text-[11px] font-mono text-foreground/70 bg-surface border border-border rounded-lg px-3 py-2">
+              {CHECK_IN_COPING_BRIDGE_OPENER}
+            </p>
+          </>
+        )}
       </div>
 
       <ul className="space-y-3">

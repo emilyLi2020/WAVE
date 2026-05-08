@@ -918,7 +918,7 @@ export const LORA_SPECS: Record<LoRAId, LoraFormSpec> = {
     5,
     "Check-in 5",
     "Focus: closing score, full-arc reflection, and carry-forward question.",
-    "Check-in 5 must close the conversation and must not ask whether the patient is ready for another chunk.",
+    "Align with PRD Check-in 5 exception and `check-in-dialogue.ts`: Turn 1 = CHECK_IN_CHUNK5_SCORE_PROMPT; first post-score WAVE = thanks/acknowledgment as needed + explicit comparison of final score to **intake baseline** and to **check-in 4 final score** + fillScoreReflection on CHECK_IN_CHUNK5_NOTICE_OPENER_TEMPLATE (full-arc slot) + notice question verbatim; if final ≥ baseline (up or flat vs intake), validate frustration, thank for staying, non-linear healing / between-sessions change / practice-with-urge-over-time without guaranteed outcomes; if final 9–10, recommend therapist or doctor (no med changes); then respond to what they noticed; one forward-normalizing WAVE turn; last WAVE = CHECK_IN_CHUNK5_CARRY_FORWARD_PROMPT verbatim; no CI2–4 landing prompts; never ready-to-continue; every WAVE line ends with ?; end on patient line after carry-forward; `reply` matches last WAVE line.",
   ),
   "lora-reflection": reflection,
 };

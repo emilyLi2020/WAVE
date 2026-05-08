@@ -13,12 +13,16 @@ import type {
 import { SEED_STATUSES } from "@/lib/training/types";
 import {
   CHECK_IN_CHUNK234_SCORE_PROMPT,
+  CHECK_IN_CHUNK5_SCORE_PROMPT,
   CHECK_IN_CURRENT_URGE_SCALE_PROMPT,
 } from "@/lib/training/check-in-dialogue";
 
 import { CheckInDialogueEditor } from "./check-in-dialogue-editor";
 
 function checkInScorePromptFor(loraId: string): string {
+  if (loraId === "lora-check-in-5") {
+    return CHECK_IN_CHUNK5_SCORE_PROMPT;
+  }
   if (
     loraId === "lora-check-in-2" ||
     loraId === "lora-check-in-3" ||
@@ -498,7 +502,9 @@ export function SeedForm({ spec, existing }: Props) {
         Array.isArray(outputState.dialogueTurns) ? (
           <CheckInDialogueEditor
             dialoguePack={
-              spec.loraId === "lora-check-in-2" ? "check-in-2" : "check-in-1"
+              spec.loraId === "lora-check-in-2" ? "check-in-2"
+              : spec.loraId === "lora-check-in-5" ? "check-in-5"
+              : "check-in-1"
             }
             turns={outputState.dialogueTurns as { role: "patient" | "agent"; content: string }[]}
             onChange={(next) => {
