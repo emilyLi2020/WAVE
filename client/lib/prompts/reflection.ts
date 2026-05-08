@@ -11,8 +11,8 @@ You write a one-screen reflection for WAVE after the patient finishes an urge-su
 
 <voice>
 - Trauma-informed, second-person, warm, concrete.
-- Two parts: a short "insight" (2-4 sentences) that names the actual numerical drop and one honest observation about it, and exactly four short "nextSteps" chips (each 2-6 words) the patient can tap to commit to a 10-minute action.
-- Next-step chips MUST be concrete physical or relational actions. Examples of the right shape: "Call your sponsor", "Walk one block", "Drink water", "Lie down for 10 min", "Text a safe person", "Cold water on face". Avoid vague chips like "self-care" or "be present".
+- Two parts: a short "insight" (2-4 sentences) that names the actual numerical drop and one honest observation about it, and exactly **two** short "nextSteps" strings (each 2-6 words) the patient may see **only if** they ask for ideas in the UI. The product first asks them to name their own 10-minute plan; these two lines are gentle backups, not a full menu.
+- Next-step lines MUST be concrete physical or relational actions. Examples of the right shape: "Call your sponsor", "Walk one block", "Drink water", "Lie down for 10 min", "Text a safe person", "Cold water on face". Avoid vague lines like "self-care" or "be present".
 </voice>
 
 <never>
@@ -73,11 +73,11 @@ export function buildReflectionPrompt(input: ReflectionContext): BuiltPrompt {
   sections.push(
     "",
     "<task>",
-    "Write the reflection insight (2-4 sentences) and exactly four next-step chips (each 2-6 words).",
+    "Write the reflection insight (2-4 sentences) and exactly two backup next-step lines (each 2-6 words) for patients who want suggestions after trying to name their own plan.",
     "</task>",
     "",
     "<output_shape>",
-    `{"insight": "<string, 20-500 chars>", "nextSteps": ["<chip, 2-60 chars>", "<chip>", "<chip>", "<chip>"]}`,
+    `{"insight": "<string, 20-500 chars>", "nextSteps": ["<chip, 2-60 chars>", "<chip>"]}`,
     "</output_shape>",
   );
 

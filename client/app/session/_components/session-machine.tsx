@@ -523,24 +523,93 @@ function ReflectionPhaseBlock({
   }
 
   return (
+    <ReflectionPlanAndSuggestions
+      payload={state.payload}
+      source={state.source}
+      onPickNextStep={onPickNextStep}
+    />
+  );
+}
+
+function ReflectionPlanAndSuggestions({
+  payload,
+  source,
+  onPickNextStep,
+}: {
+  payload: ReflectionPayload;
+  source: "model" | "fallback";
+  onPickNextStep: (choice: string) => void;
+}) {
+  const [stage, setStage] = useState<"askPlan" | "suggestions">("askPlan");
+  const [ownPlanDraft, setOwnPlanDraft] = useState("");
+
+  const trimmedPlan = ownPlanDraft.trim();
+  const canUseOwnPlan = trimmedPlan.length >= 2;
+
+  return (
     <NarrationCard
       title="Reflection"
       badge="Closing"
       loading={false}
-      source={state.source}
+      source={source}
       footer={
-        <div className="space-y-3">
-          <p className="text-sm text-foreground/70">
-            Pick one 10-minute action.
-          </p>
-          <NextStepChips
-            options={state.payload.nextSteps}
-            onPick={onPickNextStep}
-          />
-        </div>
+        stage === "askPlan" ? (
+          <div className="space-y-3">
+            <p className="text-sm text-foreground/70">
+              What feels doable in the next 10 minutes? Name anything that fits,
+              even a tiny step. If nothing comes to mind, you can ask for a
+              couple of ideas.
+            </p>
+            <label className="block text-xs font-medium text-foreground/55">
+              Your plan (optional)
+              <textarea
+                value={ownPlanDraft}
+                onChange={(event) => setOwnPlanDraft(event.target.value)}
+                rows={2}
+                maxLength={160}
+                placeholder="e.g. drink water, step outside, text someone safe"
+                className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground/90 focus:outline-none focus:border-accent"
+              />
+            </label>
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                disabled={!canUseOwnPlan}
+                onClick={() => onPickNextStep(trimmedPlan)}
+                className="rounded-full bg-accent px-4 py-2 text-sm font-medium text-accent-foreground hover:opacity-90 transition disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                Use my plan
+              </button>
+              <button
+                type="button"
+                onClick={() => setStage("suggestions")}
+                className="rounded-full border border-border bg-surface-muted px-4 py-2 text-sm font-medium text-foreground/85 hover:border-accent hover:text-accent transition"
+              >
+                No ideas, show suggestions
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            <p className="text-sm text-foreground/70">
+              Two gentle options. Pick one, or go back to write your own.
+            </p>
+            <NextStepChips
+              options={payload.nextSteps}
+              onPick={onPickNextStep}
+            />
+            <button
+              type="button"
+              onClick={() => setStage("askPlan")}
+              className="text-xs text-foreground/55 hover:text-accent underline-offset-2 hover:underline"
+            >
+              Back to my own plan
+            </button>
+          </div>
+        )
       }
     >
-      <p>{state.payload.insight}</p>
+      <p>{payload.insight}</p>
     </NarrationCard>
   );
 }
