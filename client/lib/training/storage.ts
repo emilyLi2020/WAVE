@@ -179,13 +179,23 @@ export async function listAllSeeds(): Promise<TrainingSeed[]> {
   return all.flat();
 }
 
-export async function getSeed(id: string): Promise<TrainingSeed | null> {
+export async function getSeed(
+  id: string,
+  options?: { expectedLoraId?: LoRAId },
+): Promise<TrainingSeed | null> {
   // Search every LoRA's file. Cheap for demo volumes (≤ a few hundred
   // rows total). If this ever gets slow, add an id → loraId index file.
-  for (const loraId of LORA_IDS) {
-    const seeds = await readFileSeeds(loraId);
+  for (const fileLoraId of LORA_IDS) {
+    const seeds = await readFileSeeds(fileLoraId);
     const found = seeds.find((seed) => seed.id === id);
-    if (found) return found;
+    if (!found) continue;
+    if (
+      options?.expectedLoraId !== undefined &&
+      found.loraId !== options.expectedLoraId
+    ) {
+      continue;
+    }
+    return found;
   }
   return null;
 }

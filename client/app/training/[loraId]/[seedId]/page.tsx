@@ -25,7 +25,7 @@ export default async function EditSeedPage({ params }: PageProps) {
 
   const spec = getSpec(loraId);
   const [seed, instructionsState] = await Promise.all([
-    getSeed(seedId),
+    getSeed(seedId, { expectedLoraId: loraId }),
     getClinicianLlmInstructions(loraId),
   ]);
   if (!seed || seed.loraId !== loraId) notFound();
