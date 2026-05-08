@@ -233,8 +233,9 @@ export default async function ExportPage() {
             : "Directory will be created on the first save."}{" "}
           Commit these files to git so the training engineer can pull
           them. Override the location with{" "}
-          <code>WAVE_TRAINING_DATA_DIR</code> if you run <code>pnpm dev</code>
-          {" "}from somewhere other than <code>client/</code>.
+          <code>WAVE_TRAINING_DATA_DIR</code> if you need a custom path;
+          otherwise seeds resolve under <code>client/data/training-seeds</code>{" "}
+          (with upward search from <code>process.cwd()</code> for monorepos).
         </p>
         <p>
           <strong>Pipeline integration.</strong> The JSONL downloads

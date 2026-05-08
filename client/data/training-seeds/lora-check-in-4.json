@@ -74,9 +74,9 @@
     },
     "authorInitials": null,
     "notes": "Hand-authored example: CI4 two-turn landing split; verbatim landing + PRD breathing follow-up from check-in-dialogue.ts; breath_tight path without pushing deeper 4-4-6; consent + bridge before technique; ends on patient readiness. Prior check-in score 7 implied in score-reflection clause. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-06T20:00:00.000Z",
-    "updatedAt": "2026-05-07T10:06:06.376Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "de61e407-aa5c-451b-a448-13578a2b7c5b",
@@ -161,9 +161,9 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 4 after 4-4-6 breathing; score reflection vs prior check-in (variants cover flat, rise, drop); landing split; verbatim breathing follow-up; consent + coping bridge; readiness for closing reflection. 3 mat rotations per cell. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:36:25.774Z",
-    "updatedAt": "2026-05-07T11:36:25.774Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "7dc9376c-895e-402b-99a0-30a883b729cb",
@@ -248,9 +248,9 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 4 after 4-4-6 breathing; score reflection vs prior check-in (variants cover flat, rise, drop); landing split; verbatim breathing follow-up; consent + coping bridge; readiness for closing reflection. 3 mat rotations per cell. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:36:25.774Z",
-    "updatedAt": "2026-05-07T11:36:25.774Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "5d788d64-1983-48e1-9a0d-7f2d9ece499a",
@@ -335,9 +335,9 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 4 after 4-4-6 breathing; score reflection vs prior check-in (variants cover flat, rise, drop); landing split; verbatim breathing follow-up; consent + coping bridge; readiness for closing reflection. 3 mat rotations per cell. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:36:25.774Z",
-    "updatedAt": "2026-05-07T11:36:25.774Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "5abdb4f8-e155-4ec6-af15-19cf9aa97dee",
@@ -422,9 +422,9 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 4 after 4-4-6 breathing; score reflection vs prior check-in (variants cover flat, rise, drop); landing split; verbatim breathing follow-up; consent + coping bridge; readiness for closing reflection. 3 mat rotations per cell. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:36:25.774Z",
-    "updatedAt": "2026-05-07T11:36:25.774Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "e0187ac1-fdee-4fb1-94b0-73d941f4ec57",
@@ -509,9 +509,9 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 4 after 4-4-6 breathing; score reflection vs prior check-in (variants cover flat, rise, drop); landing split; verbatim breathing follow-up; consent + coping bridge; readiness for closing reflection. 3 mat rotations per cell. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:36:25.774Z",
-    "updatedAt": "2026-05-07T11:36:25.774Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "b39566fb-cb0a-485a-8331-9274812a0b5f",
@@ -596,9 +596,9 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 4 after 4-4-6 breathing; score reflection vs prior check-in (variants cover flat, rise, drop); landing split; verbatim breathing follow-up; consent + coping bridge; readiness for closing reflection. 3 mat rotations per cell. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:36:25.774Z",
-    "updatedAt": "2026-05-07T11:36:25.774Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "98b9404d-7f65-4e4d-a926-e1e16d567f4a",
@@ -683,9 +683,9 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 4 after 4-4-6 breathing; score reflection vs prior check-in (variants cover flat, rise, drop); landing split; verbatim breathing follow-up; consent + coping bridge; readiness for closing reflection. 3 mat rotations per cell. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:36:25.774Z",
-    "updatedAt": "2026-05-07T11:36:25.774Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "a81ee3ca-3044-4f64-bbbd-2b365d004262",
@@ -770,9 +770,9 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 4 after 4-4-6 breathing; score reflection vs prior check-in (variants cover flat, rise, drop); landing split; verbatim breathing follow-up; consent + coping bridge; readiness for closing reflection. 3 mat rotations per cell. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:36:25.774Z",
-    "updatedAt": "2026-05-07T11:36:25.774Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "df286d4b-391e-4ae5-8469-e27b50e246e2",
@@ -858,9 +858,9 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 4 after 4-4-6 breathing; score reflection vs prior check-in (variants cover flat, rise, drop); landing split; verbatim breathing follow-up; consent + coping bridge; readiness for closing reflection. 3 mat rotations per cell. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:36:25.774Z",
-    "updatedAt": "2026-05-07T11:36:25.774Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "a00c56c0-a2c4-4648-bfc9-9709810ecf1b",
@@ -946,9 +946,9 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 4 after 4-4-6 breathing; score reflection vs prior check-in (variants cover flat, rise, drop); landing split; verbatim breathing follow-up; consent + coping bridge; readiness for closing reflection. 3 mat rotations per cell. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:36:25.774Z",
-    "updatedAt": "2026-05-07T11:36:25.774Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "ccd6f0e6-732a-44b1-b500-68962f5803dd",
@@ -1034,9 +1034,9 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 4 after 4-4-6 breathing; score reflection vs prior check-in (variants cover flat, rise, drop); landing split; verbatim breathing follow-up; consent + coping bridge; readiness for closing reflection. 3 mat rotations per cell. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:36:25.774Z",
-    "updatedAt": "2026-05-07T11:36:25.774Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "d9f6cd52-0f9f-4cae-9055-b1bdeed47114",
@@ -1121,9 +1121,9 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 4 after 4-4-6 breathing; score reflection vs prior check-in (variants cover flat, rise, drop); landing split; verbatim breathing follow-up; consent + coping bridge; readiness for closing reflection. 3 mat rotations per cell. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:36:25.774Z",
-    "updatedAt": "2026-05-07T11:36:25.774Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "895bf356-798c-4938-9da7-0a95eb95160b",
@@ -1208,9 +1208,9 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 4 after 4-4-6 breathing; score reflection vs prior check-in (variants cover flat, rise, drop); landing split; verbatim breathing follow-up; consent + coping bridge; readiness for closing reflection. 3 mat rotations per cell. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:36:25.774Z",
-    "updatedAt": "2026-05-07T11:36:25.774Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "fd6da73f-0c59-457b-9458-aa86393947cf",
@@ -1295,9 +1295,9 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 4 after 4-4-6 breathing; score reflection vs prior check-in (variants cover flat, rise, drop); landing split; verbatim breathing follow-up; consent + coping bridge; readiness for closing reflection. 3 mat rotations per cell. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:36:25.774Z",
-    "updatedAt": "2026-05-07T11:36:25.774Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "caec3a74-517b-452c-99c9-840768ee721c",
@@ -1382,9 +1382,9 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 4 after 4-4-6 breathing; score reflection vs prior check-in (variants cover flat, rise, drop); landing split; verbatim breathing follow-up; consent + coping bridge; readiness for closing reflection. 3 mat rotations per cell. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:36:25.774Z",
-    "updatedAt": "2026-05-07T11:36:25.774Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "b5865d34-eca7-425b-a5fa-51126828c2f5",
@@ -1469,9 +1469,9 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 4 after 4-4-6 breathing; score reflection vs prior check-in (variants cover flat, rise, drop); landing split; verbatim breathing follow-up; consent + coping bridge; readiness for closing reflection. 3 mat rotations per cell. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:36:25.774Z",
-    "updatedAt": "2026-05-07T11:36:25.774Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "fa45431b-9633-42ba-ac0f-1711cd29d950",
@@ -1556,9 +1556,9 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 4 after 4-4-6 breathing; score reflection vs prior check-in (variants cover flat, rise, drop); landing split; verbatim breathing follow-up; consent + coping bridge; readiness for closing reflection. 3 mat rotations per cell. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:36:25.774Z",
-    "updatedAt": "2026-05-07T11:36:25.774Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "4512bcec-5ac5-4578-adae-31dafe3f8d19",
@@ -1643,9 +1643,9 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 4 after 4-4-6 breathing; score reflection vs prior check-in (variants cover flat, rise, drop); landing split; verbatim breathing follow-up; consent + coping bridge; readiness for closing reflection. 3 mat rotations per cell. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:36:25.774Z",
-    "updatedAt": "2026-05-07T11:36:25.774Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "8880f512-38a7-4446-a5a3-ef9b88e62f1d",
@@ -1730,9 +1730,9 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 4 after 4-4-6 breathing; score reflection vs prior check-in (variants cover flat, rise, drop); landing split; verbatim breathing follow-up; consent + coping bridge; readiness for closing reflection. 3 mat rotations per cell. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:36:25.774Z",
-    "updatedAt": "2026-05-07T11:36:25.774Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "0083828d-8c61-4456-b7ae-e7466bf98531",
@@ -1817,9 +1817,9 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 4 after 4-4-6 breathing; score reflection vs prior check-in (variants cover flat, rise, drop); landing split; verbatim breathing follow-up; consent + coping bridge; readiness for closing reflection. 3 mat rotations per cell. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:36:25.774Z",
-    "updatedAt": "2026-05-07T11:36:25.774Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "90d0b9d9-e452-44fe-88c5-912dbaaa7f7f",
@@ -1905,9 +1905,9 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 4 after 4-4-6 breathing; score reflection vs prior check-in (variants cover flat, rise, drop); landing split; verbatim breathing follow-up; consent + coping bridge; readiness for closing reflection. 3 mat rotations per cell. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:36:25.774Z",
-    "updatedAt": "2026-05-07T11:36:25.774Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "9dfd201a-5315-4a76-ad91-bddc557e3430",
@@ -1993,9 +1993,9 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 4 after 4-4-6 breathing; score reflection vs prior check-in (variants cover flat, rise, drop); landing split; verbatim breathing follow-up; consent + coping bridge; readiness for closing reflection. 3 mat rotations per cell. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:36:25.774Z",
-    "updatedAt": "2026-05-07T11:36:25.774Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "3e677086-897e-4ea6-86b8-c9b44bd71fdc",
@@ -2081,9 +2081,9 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 4 after 4-4-6 breathing; score reflection vs prior check-in (variants cover flat, rise, drop); landing split; verbatim breathing follow-up; consent + coping bridge; readiness for closing reflection. 3 mat rotations per cell. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:36:25.774Z",
-    "updatedAt": "2026-05-07T11:36:25.774Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "82bc5e35-8dc3-4fa2-81da-e3bc3da7ccff",
@@ -2168,9 +2168,9 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 4 after 4-4-6 breathing; score reflection vs prior check-in (variants cover flat, rise, drop); landing split; verbatim breathing follow-up; consent + coping bridge; readiness for closing reflection. 3 mat rotations per cell. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:36:25.774Z",
-    "updatedAt": "2026-05-07T11:36:25.774Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "1a14fa32-a70d-40ee-8ab7-9f9a5de19657",
@@ -2255,9 +2255,9 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 4 after 4-4-6 breathing; score reflection vs prior check-in (variants cover flat, rise, drop); landing split; verbatim breathing follow-up; consent + coping bridge; readiness for closing reflection. 3 mat rotations per cell. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:36:25.774Z",
-    "updatedAt": "2026-05-07T11:36:25.774Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "5fb492f8-3d3f-4f83-b3de-e8030d1480d0",
@@ -2342,9 +2342,9 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 4 after 4-4-6 breathing; score reflection vs prior check-in (variants cover flat, rise, drop); landing split; verbatim breathing follow-up; consent + coping bridge; readiness for closing reflection. 3 mat rotations per cell. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:36:25.774Z",
-    "updatedAt": "2026-05-07T11:36:25.774Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "f745ec6c-5c21-479b-bfe8-69aac6c095dd",
@@ -2429,9 +2429,9 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 4 after 4-4-6 breathing; score reflection vs prior check-in (variants cover flat, rise, drop); landing split; verbatim breathing follow-up; consent + coping bridge; readiness for closing reflection. 3 mat rotations per cell. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:36:25.774Z",
-    "updatedAt": "2026-05-07T11:36:25.774Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "2dda8d57-f58e-4d4d-8843-68d9d6b9b795",
@@ -2516,9 +2516,9 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 4 after 4-4-6 breathing; score reflection vs prior check-in (variants cover flat, rise, drop); landing split; verbatim breathing follow-up; consent + coping bridge; readiness for closing reflection. 3 mat rotations per cell. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:36:25.774Z",
-    "updatedAt": "2026-05-07T11:36:25.774Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "aa4445f5-8e05-4db1-a6db-e99c72e4dea0",
@@ -2603,9 +2603,9 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 4 after 4-4-6 breathing; score reflection vs prior check-in (variants cover flat, rise, drop); landing split; verbatim breathing follow-up; consent + coping bridge; readiness for closing reflection. 3 mat rotations per cell. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:36:25.774Z",
-    "updatedAt": "2026-05-07T11:36:25.774Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "9f5244e7-6d45-4e6b-b46f-8a89f3726b74",
@@ -2690,9 +2690,9 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 4 after 4-4-6 breathing; score reflection vs prior check-in (variants cover flat, rise, drop); landing split; verbatim breathing follow-up; consent + coping bridge; readiness for closing reflection. 3 mat rotations per cell. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:36:25.774Z",
-    "updatedAt": "2026-05-07T11:36:25.774Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "9ea7bb9d-e609-44f1-973b-d3fc9735f57d",
@@ -2777,9 +2777,9 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 4 after 4-4-6 breathing; score reflection vs prior check-in (variants cover flat, rise, drop); landing split; verbatim breathing follow-up; consent + coping bridge; readiness for closing reflection. 3 mat rotations per cell. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:36:25.774Z",
-    "updatedAt": "2026-05-07T11:36:25.774Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "ca232909-bc5e-430a-b39c-a6354b93bfee",
@@ -2864,9 +2864,9 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 4 after 4-4-6 breathing; score reflection vs prior check-in (variants cover flat, rise, drop); landing split; verbatim breathing follow-up; consent + coping bridge; readiness for closing reflection. 3 mat rotations per cell. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:36:25.774Z",
-    "updatedAt": "2026-05-07T11:36:25.774Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "a82f6535-d173-4b50-ae8f-7d5abdc49ebf",
@@ -2952,9 +2952,9 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 4 after 4-4-6 breathing; score reflection vs prior check-in (variants cover flat, rise, drop); landing split; verbatim breathing follow-up; consent + coping bridge; readiness for closing reflection. 3 mat rotations per cell. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:36:25.774Z",
-    "updatedAt": "2026-05-07T11:36:25.774Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "ca4d188d-9c1f-47ea-bffe-0156bf719dbc",
@@ -3040,9 +3040,9 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 4 after 4-4-6 breathing; score reflection vs prior check-in (variants cover flat, rise, drop); landing split; verbatim breathing follow-up; consent + coping bridge; readiness for closing reflection. 3 mat rotations per cell. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:36:25.774Z",
-    "updatedAt": "2026-05-07T11:36:25.774Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "cb06f494-9e35-4121-9eff-0c1def04adb2",
@@ -3128,9 +3128,9 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 4 after 4-4-6 breathing; score reflection vs prior check-in (variants cover flat, rise, drop); landing split; verbatim breathing follow-up; consent + coping bridge; readiness for closing reflection. 3 mat rotations per cell. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:36:25.774Z",
-    "updatedAt": "2026-05-07T11:36:25.774Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "4434424f-f0a6-4feb-901a-02376af86b58",
@@ -3215,9 +3215,9 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 4 after 4-4-6 breathing; score reflection vs prior check-in (variants cover flat, rise, drop); landing split; verbatim breathing follow-up; consent + coping bridge; readiness for closing reflection. 3 mat rotations per cell. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:36:25.774Z",
-    "updatedAt": "2026-05-07T11:36:25.774Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "f3febf22-911f-4b94-9df2-c98ddfe1aaba",
@@ -3302,9 +3302,9 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 4 after 4-4-6 breathing; score reflection vs prior check-in (variants cover flat, rise, drop); landing split; verbatim breathing follow-up; consent + coping bridge; readiness for closing reflection. 3 mat rotations per cell. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:36:25.774Z",
-    "updatedAt": "2026-05-07T11:36:25.774Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "4c06e9af-4ff7-4f1e-abad-bbb09380f247",
@@ -3389,9 +3389,9 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 4 after 4-4-6 breathing; score reflection vs prior check-in (variants cover flat, rise, drop); landing split; verbatim breathing follow-up; consent + coping bridge; readiness for closing reflection. 3 mat rotations per cell. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:36:25.774Z",
-    "updatedAt": "2026-05-07T11:36:25.774Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "13c3f19d-9259-4766-87d5-2d62b6d2e9b3",
@@ -3476,9 +3476,9 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 4 after 4-4-6 breathing; score reflection vs prior check-in (variants cover flat, rise, drop); landing split; verbatim breathing follow-up; consent + coping bridge; readiness for closing reflection. 3 mat rotations per cell. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:36:25.774Z",
-    "updatedAt": "2026-05-07T11:36:25.774Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "a1d1d5d7-818f-4bd1-86e9-9b07e679a4b2",
@@ -3563,9 +3563,9 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 4 after 4-4-6 breathing; score reflection vs prior check-in (variants cover flat, rise, drop); landing split; verbatim breathing follow-up; consent + coping bridge; readiness for closing reflection. 3 mat rotations per cell. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:36:25.774Z",
-    "updatedAt": "2026-05-07T11:36:25.774Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "97650297-5c39-4dc8-80e1-762b385e8ca7",
@@ -3650,9 +3650,9 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 4 after 4-4-6 breathing; score reflection vs prior check-in (variants cover flat, rise, drop); landing split; verbatim breathing follow-up; consent + coping bridge; readiness for closing reflection. 3 mat rotations per cell. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:36:25.774Z",
-    "updatedAt": "2026-05-07T11:36:25.774Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "cdbb8fe5-a099-451f-bb92-fffd4ee2dfdc",
@@ -3737,9 +3737,9 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 4 after 4-4-6 breathing; score reflection vs prior check-in (variants cover flat, rise, drop); landing split; verbatim breathing follow-up; consent + coping bridge; readiness for closing reflection. 3 mat rotations per cell. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:36:25.774Z",
-    "updatedAt": "2026-05-07T11:36:25.774Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "ac13a241-7a47-438c-bd9f-d0d00aa1b24f",
@@ -3824,9 +3824,9 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 4 after 4-4-6 breathing; score reflection vs prior check-in (variants cover flat, rise, drop); landing split; verbatim breathing follow-up; consent + coping bridge; readiness for closing reflection. 3 mat rotations per cell. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:36:25.774Z",
-    "updatedAt": "2026-05-07T11:36:25.774Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "cdbeb18a-2110-440e-a01a-204da24b15f4",
@@ -3911,9 +3911,9 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 4 after 4-4-6 breathing; score reflection vs prior check-in (variants cover flat, rise, drop); landing split; verbatim breathing follow-up; consent + coping bridge; readiness for closing reflection. 3 mat rotations per cell. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:36:25.774Z",
-    "updatedAt": "2026-05-07T11:36:25.774Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "33eb0f5b-e64b-4914-8c9f-f898b9058004",
@@ -3999,9 +3999,9 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 4 after 4-4-6 breathing; score reflection vs prior check-in (variants cover flat, rise, drop); landing split; verbatim breathing follow-up; consent + coping bridge; readiness for closing reflection. 3 mat rotations per cell. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:36:25.774Z",
-    "updatedAt": "2026-05-07T11:36:25.774Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "c575e0e2-4f35-4722-9fd0-5c5c272a0f37",
@@ -4087,9 +4087,9 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 4 after 4-4-6 breathing; score reflection vs prior check-in (variants cover flat, rise, drop); landing split; verbatim breathing follow-up; consent + coping bridge; readiness for closing reflection. 3 mat rotations per cell. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:36:25.774Z",
-    "updatedAt": "2026-05-07T11:36:25.774Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "efde54e0-f532-4901-987b-6441fd08cea8",
@@ -4175,8 +4175,8 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 4 after 4-4-6 breathing; score reflection vs prior check-in (variants cover flat, rise, drop); landing split; verbatim breathing follow-up; consent + coping bridge; readiness for closing reflection. 3 mat rotations per cell. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:36:25.774Z",
-    "updatedAt": "2026-05-07T11:36:25.774Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   }
 ]

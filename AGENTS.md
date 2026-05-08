@@ -118,7 +118,7 @@ The intake safety screen, fallback bank, and crisis-routing rules remain rule-ba
 
 ## Check-in training dialogue rules (`lora-check-in-1`)
 
-Strict guidance for training seeds (`data/training-seeds/lora-check-in-1.json`), `client/scripts/generate-lora-check-in-1-grid.ts`, and `/training` multi-turn examples—keep new examples aligned with the checked-in set.
+Strict guidance for training seeds (`client/data/training-seeds/lora-check-in-1.json`), `client/scripts/generate-lora-check-in-1-grid.ts`, and `/training` multi-turn examples—keep new examples aligned with the checked-in set.
 
 1. **Opening**: Line 1 is always WAVE with the exact 1–10 craving prompt from `client/lib/training/check-in-dialogue.ts` (`CHECK_IN_CURRENT_URGE_SCALE_PROMPT`).
 2. **Scores**: The patient states **current** intensity only, not baseline. Intake (baseline) is in structured input; the **first substantive WAVE reply after the number** compares baseline to current.
@@ -128,7 +128,7 @@ Strict guidance for training seeds (`data/training-seeds/lora-check-in-1.json`),
 6. **Coping**: After obstacle validation, ask consent verbatim (`CHECK_IN_COPING_CONSENT_PROMPT` in `check-in-dialogue.ts`) **before** any coping instructions. On the **first** WAVE turn after the patient agrees, open with **`CHECK_IN_COPING_BRIDGE_OPENER`** (*Great, let's try this together.*), give the technique, and close that same turn with a short check-in question (see grid generator).
 7. **Next chunk**: When the patient says they are ready, **stop**—no further WAVE line; the session advances. The transcript’s **last line is the patient**; `reply` in JSON still matches the **last WAVE** line (the readiness question).
 
-**Clinician / LLM expansion** (Synthetix, dataset review): long-form instructions live in `data/training-seeds/clinician-llm-instructions.json` under **`lora-check-in-1`**, editable from `/training` → Check-in 1.
+**Clinician / LLM expansion** (Synthetix, dataset review): long-form instructions live in `client/data/training-seeds/clinician-llm-instructions.json` under **`lora-check-in-1`**, editable from `/training` → Check-in 1.
 
 ## Check-in training dialogue rules (`lora-check-in-2`)
 
@@ -139,9 +139,9 @@ Same sequencing discipline as check-in 1 (always end WAVE lines with `?`, consen
 3. **Next patient turn**: Locating the urge, difficulty locating, or mixed experience; WAVE **validates** somatically, then may deepen or move to **consent → bridge → one technique** as in training seeds.
 4. **Readiness**: Last WAVE line uses **`CHECK_IN_CHUNK2_READINESS_PROMPT`** (next phase is the **sound anchor**).
 
-Canonical grid: `data/training-seeds/lora-check-in-2.json` via `client/scripts/generate-lora-check-in-2-grid.ts`.
+Canonical grid: `client/data/training-seeds/lora-check-in-2.json` via `client/scripts/generate-lora-check-in-2-grid.ts`.
 
-**Clinician / LLM expansion**: long-form instructions live in `data/training-seeds/clinician-llm-instructions.json` under **`lora-check-in-2`**, editable from `/training` → Check-in 2.
+**Clinician / LLM expansion**: long-form instructions live in `client/data/training-seeds/clinician-llm-instructions.json` under **`lora-check-in-2`**, editable from `/training` → Check-in 2.
 
 ## Check-in training dialogue rules (`lora-check-in-3`)
 
@@ -153,7 +153,7 @@ Same global discipline as check-in 2 (no check-in-1 med + surf paragraph on the 
 4. **Branching (PRD § Adaptive path / Chunk 3 user flow)**: After the patient answers about the anchor, **validate before technique**. If the anchor did not land, do **not** push harder on visualization; use the obstacle-library stance (e.g. real-sound anchoring, thought labeling, normalizing urge intensification). At most **one** technique before readiness.
 5. **Readiness**: Last WAVE line uses **`CHECK_IN_CHUNK3_READINESS_PROMPT`** (next part is **breathing**).
 
-**Clinician / LLM expansion**: long-form instructions live in `data/training-seeds/clinician-llm-instructions.json` under **`lora-check-in-3`**, editable from `/training` when that surface is wired.
+**Clinician / LLM expansion**: long-form instructions live in `client/data/training-seeds/clinician-llm-instructions.json` under **`lora-check-in-3`**, editable from `/training` when that surface is wired.
 
 ## Check-in training dialogue rules (`lora-check-in-4`)
 
@@ -165,7 +165,7 @@ Same global discipline as check-ins 2–3 (no check-in-1 med + surf paragraph on
 4. **Branching (PRD § Check-in 4 / obstacle library)**: After the patient answers about breathing, **validate before technique**. Branch on tight chest, intruding thoughts, and breath-induced anxiety. **Never** push deeper, longer, or more “disciplined” breaths when the patient reports **breath anxiety** or **chest tightness**; prefer smaller breaths, orientation, or outer focus. At most **one** technique before readiness (`lora-specs` invariant).
 5. **Readiness**: Last WAVE line uses **`CHECK_IN_CHUNK4_READINESS_PROMPT`** (next part is the **closing reflection**).
 
-**Clinician / LLM expansion**: long-form instructions live in `data/training-seeds/clinician-llm-instructions.json` under **`lora-check-in-4`**, editable from `/training` when that surface is wired.
+**Clinician / LLM expansion**: long-form instructions live in `client/data/training-seeds/clinician-llm-instructions.json` under **`lora-check-in-4`**, editable from `/training` when that surface is wired.
 
 ## Learned User Preferences
 

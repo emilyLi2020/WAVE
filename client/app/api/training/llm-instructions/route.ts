@@ -1,6 +1,6 @@
 /**
  * GET/PUT per-LoRA clinician LLM instructions for the /training UI.
- * Persisted at data/training-seeds/clinician-llm-instructions.json (see storage.ts).
+ * Persisted at client/data/training-seeds/clinician-llm-instructions.json (see storage.ts).
  */
 
 import { NextResponse } from "next/server";

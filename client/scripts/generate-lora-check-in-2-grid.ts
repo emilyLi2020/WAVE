@@ -1,5 +1,5 @@
 /**
- * Writes data/training-seeds/lora-check-in-2.json with 48 draft seeds:
+ * Writes client/data/training-seeds/lora-check-in-2.json with 48 draft seeds:
  * 16 medicationStatus × trigger cells × 3 matType-rotated variants (same grid as
  * check-in 1). Check-in 2 follows PRD: Turn 1 is CHECK_IN_CHUNK2_SCORE_PROMPT;
  * after the score, WAVE uses score reflection vs the prior check-in score, then
@@ -28,7 +28,7 @@ import type { LoRAId, TrainingSeed } from "../lib/training/types";
 
 const LORA_ID = "lora-check-in-2" as LoRAId;
 const OUT = path.resolve(
-  path.join(__dirname, "..", "..", "data", "training-seeds", `${LORA_ID}.json`),
+  path.join(__dirname, "..", "data", "training-seeds", `${LORA_ID}.json`),
 );
 
 type Med = "buprenorphine" | "methadone" | "naltrexone" | "vivitrol" | "none";

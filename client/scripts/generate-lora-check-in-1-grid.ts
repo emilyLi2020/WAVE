@@ -1,5 +1,5 @@
 /**
- * Writes data/training-seeds/lora-check-in-1.json with 48 draft seeds:
+ * Writes client/data/training-seeds/lora-check-in-1.json with 48 draft seeds:
  * 16 medicationStatus × trigger cells × 3 matType-rotated variants.
  * Each seed opens with WAVE’s 1–10 craving question; the patient answers with
  * a number only (intake/baseline stays in structured input). WAVE then mirrors
@@ -23,7 +23,7 @@ import type { LoRAId, TrainingSeed } from "../lib/training/types";
 
 const LORA_ID = "lora-check-in-1" as LoRAId;
 const OUT = path.resolve(
-  path.join(__dirname, "..", "..", "data", "training-seeds", `${LORA_ID}.json`),
+  path.join(__dirname, "..", "data", "training-seeds", `${LORA_ID}.json`),
 );
 
 type Med = "buprenorphine" | "methadone" | "naltrexone" | "vivitrol" | "none";

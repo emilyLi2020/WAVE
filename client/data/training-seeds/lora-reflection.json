@@ -1,0 +1,33 @@
+[
+  {
+    "id": "a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d",
+    "loraId": "lora-reflection",
+    "input": {
+      "surface": "reflection",
+      "intakeIntensity": 7,
+      "endingIntensity": 2,
+      "durationSeconds": 780,
+      "medicationStatus": "on_time",
+      "matType": "buprenorphine",
+      "trigger": "stress",
+      "sessionsCount": 12,
+      "usedSubstanceToday": false,
+      "scoreHistorySummary": "Intake 7; check-in arc stepped down to ending 2; on-time buprenorphine; stress trigger."
+    },
+    "output": {
+      "insight": "You surfed a 7 down to a 2 in about 13 minutes. Stress was loud when you started, and you still stayed with the wave instead of arguing with it. This is your 12th session — not a straight line every time, but today's numbers show the practice can move with you when you stay close.",
+      "journalPromptQuestion": "What is one small sign from today that you could notice again the next time stress spikes?",
+      "nextSteps": {
+        "one": "Drink a full glass of water",
+        "two": "Walk one block outside",
+        "three": "Text someone you trust for 2 minutes",
+        "four": "Rest quietly for 10 minutes"
+      }
+    },
+    "authorInitials": null,
+    "notes": "Handcrafted example aligned with PRD Reflection + next step, check-in 5 handoff, and client/lib/prompts/reflection.ts voice; insight includes ending digit 2; no invented longitudinal averages. Clinician review before promotion.",
+    "status": "draft",
+    "createdAt": "2026-05-07T22:30:00.000Z",
+    "updatedAt": "2026-05-07T22:30:00.000Z"
+  }
+]

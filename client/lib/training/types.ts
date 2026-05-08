@@ -151,7 +151,7 @@ export interface ClinicianLlmInstructionsState {
 
 /**
  * One persisted training seed. Stored as a plain JSON object inside
- * the LoRA's file at <repo-root>/data/training-seeds/<lora-id>.json.
+ * the LoRA's file at client/data/training-seeds/<lora-id>.json.
  */
 export interface TrainingSeed {
   id: string;

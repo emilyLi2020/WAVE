@@ -54,7 +54,7 @@ Per specialized set:
 The UI stores rows as JSON files under:
 
 ```
-data/training-seeds/<lora-id>.json
+client/data/training-seeds/<lora-id>.json
 ```
 
 These files contain synthetic clinical dialogue only. Do not paste real patient
@@ -265,7 +265,7 @@ client/app/training/                  # developer-only seed collection UI
 client/app/api/training/export/route.ts
                                       # specialized and combined JSONL export
 client/lib/training/lora-specs.ts     # form specs + Zod validators
-data/training-seeds/
+client/data/training-seeds/
   lora-phase-narration.json
   lora-check-in-1.json
   lora-check-in-2.json

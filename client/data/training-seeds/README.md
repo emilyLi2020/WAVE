@@ -36,6 +36,6 @@ individually for demonstration adapters or combine them into
 engineer running the QLoRA pipeline (`docs/model-training.md`) can pull them.
 
 The Next.js dev server reads from and writes to this directory via
-`client/lib/training/storage.ts`. Override the location with
-`WAVE_TRAINING_DATA_DIR` if you run `pnpm dev` from somewhere other
-than `client/`.
+`client/lib/training/storage.ts` (which resolves `client/data/training-seeds`
+from the app root and walks upward from `cwd` for monorepo layouts). Override
+with `WAVE_TRAINING_DATA_DIR` if you need a custom absolute path.

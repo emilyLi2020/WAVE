@@ -2,17 +2,16 @@
  * Local-file storage for the dev-only /training UI.
  *
  * One JSON-array file per LoRA at:
- *   <repo-root>/data/training-seeds/<lora-id>.json
+ *   client/data/training-seeds/<lora-id>.json
  *
  * Per-LoRA clinician LLM instructions live at:
- *   <repo-root>/data/training-seeds/clinician-llm-instructions.json
+ *   client/data/training-seeds/clinician-llm-instructions.json
  * Legacy single-file rules (migrated into lora-phase-narration on first read):
- *   <repo-root>/data/training-seeds/clinician-llm-rules.json
+ *   client/data/training-seeds/clinician-llm-rules.json
  *
- * The directory lives OUTSIDE the Next.js project root so Next's dev
- * watcher doesn't trigger a rebuild every time the doctor saves a seed.
- * Override the location with WAVE_TRAINING_DATA_DIR if you run the dev
- * server from somewhere other than `client/`.
+ * The folder lives under `client/` so deploys whose app root is `client/`
+ * still ship seeds. `dataDir()` walks upward from `process.cwd()` so local
+ * monorepo layouts keep working. Override with WAVE_TRAINING_DATA_DIR if needed.
  *
  * Server-only — every function here writes to disk and must be called
  * from a Server Component or Route Handler that has already passed
@@ -27,6 +26,7 @@
 import "server-only";
 
 import { randomUUID } from "node:crypto";
+import { existsSync } from "node:fs";
 import {
   mkdir,
   readFile,
@@ -46,28 +46,56 @@ import type {
 
 const SUBDIR = path.join("data", "training-seeds");
 
+function trainingSeedsHasMarker(dir: string): boolean {
+  return (
+    existsSync(path.join(dir, "clinician-llm-instructions.json")) ||
+    existsSync(path.join(dir, "lora-check-in-1.json")) ||
+    existsSync(path.join(dir, "lora-reflection.json"))
+  );
+}
+
 function dataDir(): string {
   if (process.env.WAVE_TRAINING_DATA_DIR) {
     return path.resolve(process.env.WAVE_TRAINING_DATA_DIR);
   }
-  // Default: assume `pnpm dev` is running from `client/`, so the repo
-  // root is one level up.
-  return path.resolve(process.cwd(), "..", SUBDIR);
+  // Resolve at request time (not module load): cwd varies by host (local dev,
+  // Vercel with Root Directory = client, monorepo root, etc.).
+  let cur = path.resolve(process.cwd());
+  for (let depth = 0; depth < 16; depth++) {
+    const candidates = [
+      path.join(cur, "client", SUBDIR),
+      path.join(cur, SUBDIR),
+    ];
+    for (const dir of candidates) {
+      if (trainingSeedsHasMarker(dir)) return dir;
+    }
+    const parent = path.dirname(cur);
+    if (parent === cur) break;
+    cur = parent;
+  }
+  const fallbacks = [
+    path.resolve(process.cwd(), "client", SUBDIR),
+    path.resolve(process.cwd(), SUBDIR),
+    path.resolve(process.cwd(), "..", SUBDIR),
+  ];
+  for (const dir of fallbacks) {
+    if (trainingSeedsHasMarker(dir)) return dir;
+  }
+  return path.resolve(process.cwd(), SUBDIR);
 }
 
 function fileFor(loraId: LoRAId): string {
   return path.join(dataDir(), `${loraId}.json`);
 }
 
-const CLINICIAN_LLM_INSTRUCTIONS_FILE = path.join(
-  dataDir(),
-  "clinician-llm-instructions.json",
-);
+function clinicianLlmInstructionsFile(): string {
+  return path.join(dataDir(), "clinician-llm-instructions.json");
+}
+
 /** Pre–per-LoRA format; migrated once into `lora-phase-narration` instructions. */
-const CLINICIAN_LLM_RULES_LEGACY_FILE = path.join(
-  dataDir(),
-  "clinician-llm-rules.json",
-);
+function clinicianLlmRulesLegacyFile(): string {
+  return path.join(dataDir(), "clinician-llm-rules.json");
+}
 
 const writeLocks: Map<string, Promise<unknown>> = new Map();
 
@@ -394,7 +422,7 @@ async function writeInstructionsMapToDisk(
   map: Record<LoRAId, ClinicianLlmInstructionsState>,
 ): Promise<void> {
   await ensureDir();
-  const target = CLINICIAN_LLM_INSTRUCTIONS_FILE;
+  const target = clinicianLlmInstructionsFile();
   const tmp = `${target}.tmp-${process.pid}-${randomUUID()}`;
   const serializable = instructionsToDiskPayload(map);
   await writeFile(tmp, `${JSON.stringify(serializable, null, 2)}\n`, "utf8");
@@ -410,7 +438,7 @@ export async function getAllClinicianLlmInstructions(): Promise<
   Record<LoRAId, ClinicianLlmInstructionsState>
 > {
   try {
-    const raw = await readFile(CLINICIAN_LLM_INSTRUCTIONS_FILE, "utf8");
+    const raw = await readFile(clinicianLlmInstructionsFile(), "utf8");
     if (raw.trim()) {
       return normalizeInstructionsPayload(JSON.parse(raw) as unknown);
     }
@@ -419,7 +447,7 @@ export async function getAllClinicianLlmInstructions(): Promise<
   }
 
   try {
-    const legacyRaw = await readFile(CLINICIAN_LLM_RULES_LEGACY_FILE, "utf8");
+    const legacyRaw = await readFile(clinicianLlmRulesLegacyFile(), "utf8");
     const legacy = JSON.parse(legacyRaw) as {
       rulesText?: string;
       updatedAt?: string;

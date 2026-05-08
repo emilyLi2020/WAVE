@@ -66,9 +66,9 @@
     },
     "authorInitials": null,
     "notes": "Updated handcrafted: dual baseline + check-in-4 framing, full score history [7,6,5,5,3] for fillScoreReflection (step-down vs check-in 4 without stays-low misfire); no flat/up vs baseline block (final below intake); no 9–10 contact line; closing arc + verbatim carry-forward. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-06T21:00:00.000Z",
-    "updatedAt": "2026-05-07T11:45:05.472Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "f3828133-512a-402b-a300-c64c21853750",
@@ -137,9 +137,9 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 5 closing; baseline + check-in-4 dual framing; optional flat/up vs baseline + optional 9–10 therapist/doctor prompt; fillScoreReflection on full history; verbatim carry-forward; variants cover CI5 score flat/rise/drop after CI4. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:45:05.443Z",
-    "updatedAt": "2026-05-07T11:45:05.443Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "31c5dccc-42c5-4b9a-89ae-cb414f15f9b4",
@@ -208,9 +208,9 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 5 closing; baseline + check-in-4 dual framing; optional flat/up vs baseline + optional 9–10 therapist/doctor prompt; fillScoreReflection on full history; verbatim carry-forward; variants cover CI5 score flat/rise/drop after CI4. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:45:05.443Z",
-    "updatedAt": "2026-05-07T11:45:05.443Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "609f3033-d057-4089-b071-33738b897f70",
@@ -279,9 +279,9 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 5 closing; baseline + check-in-4 dual framing; optional flat/up vs baseline + optional 9–10 therapist/doctor prompt; fillScoreReflection on full history; verbatim carry-forward; variants cover CI5 score flat/rise/drop after CI4. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:45:05.443Z",
-    "updatedAt": "2026-05-07T11:45:05.443Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "1b3f6521-a5fb-4e58-84c9-17d46f79a522",
@@ -350,9 +350,9 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 5 closing; baseline + check-in-4 dual framing; optional flat/up vs baseline + optional 9–10 therapist/doctor prompt; fillScoreReflection on full history; verbatim carry-forward; variants cover CI5 score flat/rise/drop after CI4. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:45:05.443Z",
-    "updatedAt": "2026-05-07T11:45:05.443Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "7905ab6f-1b1c-4cf7-8dd7-a56cc8b683a3",
@@ -421,9 +421,9 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 5 closing; baseline + check-in-4 dual framing; optional flat/up vs baseline + optional 9–10 therapist/doctor prompt; fillScoreReflection on full history; verbatim carry-forward; variants cover CI5 score flat/rise/drop after CI4. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:45:05.443Z",
-    "updatedAt": "2026-05-07T11:45:05.443Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "b7da178e-48f1-4544-bc76-ef7628948692",
@@ -492,9 +492,9 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 5 closing; baseline + check-in-4 dual framing; optional flat/up vs baseline + optional 9–10 therapist/doctor prompt; fillScoreReflection on full history; verbatim carry-forward; variants cover CI5 score flat/rise/drop after CI4. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:45:05.443Z",
-    "updatedAt": "2026-05-07T11:45:05.443Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "682488a7-6ef4-447e-98e8-caf4e22b9200",
@@ -563,9 +563,9 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 5 closing; baseline + check-in-4 dual framing; optional flat/up vs baseline + optional 9–10 therapist/doctor prompt; fillScoreReflection on full history; verbatim carry-forward; variants cover CI5 score flat/rise/drop after CI4. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:45:05.443Z",
-    "updatedAt": "2026-05-07T11:45:05.443Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "2330e0a4-255c-47a3-b7a8-4cca0bf3a2a5",
@@ -634,9 +634,9 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 5 closing; baseline + check-in-4 dual framing; optional flat/up vs baseline + optional 9–10 therapist/doctor prompt; fillScoreReflection on full history; verbatim carry-forward; variants cover CI5 score flat/rise/drop after CI4. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:45:05.443Z",
-    "updatedAt": "2026-05-07T11:45:05.443Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "80c55c24-9923-4b8b-b17f-40005e3e0a92",
@@ -706,9 +706,9 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 5 closing; baseline + check-in-4 dual framing; optional flat/up vs baseline + optional 9–10 therapist/doctor prompt; fillScoreReflection on full history; verbatim carry-forward; variants cover CI5 score flat/rise/drop after CI4. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:45:05.443Z",
-    "updatedAt": "2026-05-07T11:45:05.443Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "bdb0618d-df92-44a3-bdab-5182fc4840f9",
@@ -778,9 +778,9 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 5 closing; baseline + check-in-4 dual framing; optional flat/up vs baseline + optional 9–10 therapist/doctor prompt; fillScoreReflection on full history; verbatim carry-forward; variants cover CI5 score flat/rise/drop after CI4. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:45:05.443Z",
-    "updatedAt": "2026-05-07T11:45:05.443Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "1c682162-d01c-4991-9466-d0dbed0da50d",
@@ -850,9 +850,9 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 5 closing; baseline + check-in-4 dual framing; optional flat/up vs baseline + optional 9–10 therapist/doctor prompt; fillScoreReflection on full history; verbatim carry-forward; variants cover CI5 score flat/rise/drop after CI4. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:45:05.443Z",
-    "updatedAt": "2026-05-07T11:45:05.443Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "9d1538b8-ff0f-4ddf-90d3-e8b686b6b715",
@@ -921,9 +921,9 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 5 closing; baseline + check-in-4 dual framing; optional flat/up vs baseline + optional 9–10 therapist/doctor prompt; fillScoreReflection on full history; verbatim carry-forward; variants cover CI5 score flat/rise/drop after CI4. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:45:05.443Z",
-    "updatedAt": "2026-05-07T11:45:05.443Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "2d2bb25e-58fe-46d0-8ffa-c3aecbe4d66e",
@@ -992,9 +992,9 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 5 closing; baseline + check-in-4 dual framing; optional flat/up vs baseline + optional 9–10 therapist/doctor prompt; fillScoreReflection on full history; verbatim carry-forward; variants cover CI5 score flat/rise/drop after CI4. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:45:05.443Z",
-    "updatedAt": "2026-05-07T11:45:05.443Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "39714605-8864-41bd-8dbe-f880ec1aebe5",
@@ -1063,9 +1063,9 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 5 closing; baseline + check-in-4 dual framing; optional flat/up vs baseline + optional 9–10 therapist/doctor prompt; fillScoreReflection on full history; verbatim carry-forward; variants cover CI5 score flat/rise/drop after CI4. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:45:05.443Z",
-    "updatedAt": "2026-05-07T11:45:05.443Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "1d03dc71-d3c4-4a0a-895a-1a74e87bd363",
@@ -1134,9 +1134,9 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 5 closing; baseline + check-in-4 dual framing; optional flat/up vs baseline + optional 9–10 therapist/doctor prompt; fillScoreReflection on full history; verbatim carry-forward; variants cover CI5 score flat/rise/drop after CI4. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:45:05.443Z",
-    "updatedAt": "2026-05-07T11:45:05.443Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "b22878e5-5448-4190-bc9d-0d8c9d439bfc",
@@ -1205,9 +1205,9 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 5 closing; baseline + check-in-4 dual framing; optional flat/up vs baseline + optional 9–10 therapist/doctor prompt; fillScoreReflection on full history; verbatim carry-forward; variants cover CI5 score flat/rise/drop after CI4. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:45:05.443Z",
-    "updatedAt": "2026-05-07T11:45:05.443Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "65748e06-bad0-4a54-a50d-5159097fc1ad",
@@ -1276,9 +1276,9 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 5 closing; baseline + check-in-4 dual framing; optional flat/up vs baseline + optional 9–10 therapist/doctor prompt; fillScoreReflection on full history; verbatim carry-forward; variants cover CI5 score flat/rise/drop after CI4. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:45:05.443Z",
-    "updatedAt": "2026-05-07T11:45:05.443Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "00782eb1-73d8-4d2f-9367-84a10e882587",
@@ -1347,9 +1347,9 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 5 closing; baseline + check-in-4 dual framing; optional flat/up vs baseline + optional 9–10 therapist/doctor prompt; fillScoreReflection on full history; verbatim carry-forward; variants cover CI5 score flat/rise/drop after CI4. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:45:05.443Z",
-    "updatedAt": "2026-05-07T11:45:05.443Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "136a4851-0a71-42c7-af8c-a77d22369221",
@@ -1418,9 +1418,9 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 5 closing; baseline + check-in-4 dual framing; optional flat/up vs baseline + optional 9–10 therapist/doctor prompt; fillScoreReflection on full history; verbatim carry-forward; variants cover CI5 score flat/rise/drop after CI4. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:45:05.443Z",
-    "updatedAt": "2026-05-07T11:45:05.443Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "2054ca6b-c373-41f5-9216-a2ea9a879911",
@@ -1489,9 +1489,9 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 5 closing; baseline + check-in-4 dual framing; optional flat/up vs baseline + optional 9–10 therapist/doctor prompt; fillScoreReflection on full history; verbatim carry-forward; variants cover CI5 score flat/rise/drop after CI4. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:45:05.443Z",
-    "updatedAt": "2026-05-07T11:45:05.443Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "eaa73534-3209-48f4-97d2-7ecd07a9ea25",
@@ -1561,9 +1561,9 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 5 closing; baseline + check-in-4 dual framing; optional flat/up vs baseline + optional 9–10 therapist/doctor prompt; fillScoreReflection on full history; verbatim carry-forward; variants cover CI5 score flat/rise/drop after CI4. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:45:05.443Z",
-    "updatedAt": "2026-05-07T11:45:05.443Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "5ffba56d-41ce-44f8-81ee-569ddbe28791",
@@ -1633,9 +1633,9 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 5 closing; baseline + check-in-4 dual framing; optional flat/up vs baseline + optional 9–10 therapist/doctor prompt; fillScoreReflection on full history; verbatim carry-forward; variants cover CI5 score flat/rise/drop after CI4. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:45:05.443Z",
-    "updatedAt": "2026-05-07T11:45:05.443Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "47f2268a-f436-4afb-8146-02b9af97106e",
@@ -1705,9 +1705,9 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 5 closing; baseline + check-in-4 dual framing; optional flat/up vs baseline + optional 9–10 therapist/doctor prompt; fillScoreReflection on full history; verbatim carry-forward; variants cover CI5 score flat/rise/drop after CI4. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:45:05.443Z",
-    "updatedAt": "2026-05-07T11:45:05.443Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "b6a0208a-ed6d-4568-a121-ad00bfab66d2",
@@ -1776,9 +1776,9 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 5 closing; baseline + check-in-4 dual framing; optional flat/up vs baseline + optional 9–10 therapist/doctor prompt; fillScoreReflection on full history; verbatim carry-forward; variants cover CI5 score flat/rise/drop after CI4. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:45:05.443Z",
-    "updatedAt": "2026-05-07T11:45:05.443Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "4c2e4d75-214e-4cf1-ace8-b7ab576e4403",
@@ -1847,9 +1847,9 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 5 closing; baseline + check-in-4 dual framing; optional flat/up vs baseline + optional 9–10 therapist/doctor prompt; fillScoreReflection on full history; verbatim carry-forward; variants cover CI5 score flat/rise/drop after CI4. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:45:05.443Z",
-    "updatedAt": "2026-05-07T11:45:05.443Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "2b95ce2b-956e-47f0-bdba-559ab339f4cb",
@@ -1918,9 +1918,9 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 5 closing; baseline + check-in-4 dual framing; optional flat/up vs baseline + optional 9–10 therapist/doctor prompt; fillScoreReflection on full history; verbatim carry-forward; variants cover CI5 score flat/rise/drop after CI4. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:45:05.443Z",
-    "updatedAt": "2026-05-07T11:45:05.443Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "e3e12506-b0d6-42d0-90d7-698ecc4e8d8a",
@@ -1989,9 +1989,9 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 5 closing; baseline + check-in-4 dual framing; optional flat/up vs baseline + optional 9–10 therapist/doctor prompt; fillScoreReflection on full history; verbatim carry-forward; variants cover CI5 score flat/rise/drop after CI4. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:45:05.443Z",
-    "updatedAt": "2026-05-07T11:45:05.443Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "8156d3fc-1f34-4da4-95bf-177afb4e73b9",
@@ -2060,9 +2060,9 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 5 closing; baseline + check-in-4 dual framing; optional flat/up vs baseline + optional 9–10 therapist/doctor prompt; fillScoreReflection on full history; verbatim carry-forward; variants cover CI5 score flat/rise/drop after CI4. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:45:05.443Z",
-    "updatedAt": "2026-05-07T11:45:05.443Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "9bb593e7-3d47-4016-b264-b0dc6b4ea8c6",
@@ -2131,9 +2131,9 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 5 closing; baseline + check-in-4 dual framing; optional flat/up vs baseline + optional 9–10 therapist/doctor prompt; fillScoreReflection on full history; verbatim carry-forward; variants cover CI5 score flat/rise/drop after CI4. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:45:05.443Z",
-    "updatedAt": "2026-05-07T11:45:05.443Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "c96eb1cb-e989-49ca-b9f1-f7073984e65f",
@@ -2202,9 +2202,9 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 5 closing; baseline + check-in-4 dual framing; optional flat/up vs baseline + optional 9–10 therapist/doctor prompt; fillScoreReflection on full history; verbatim carry-forward; variants cover CI5 score flat/rise/drop after CI4. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:45:05.443Z",
-    "updatedAt": "2026-05-07T11:45:05.443Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "605ff1be-0115-415d-a29a-a788d34e5d71",
@@ -2273,9 +2273,9 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 5 closing; baseline + check-in-4 dual framing; optional flat/up vs baseline + optional 9–10 therapist/doctor prompt; fillScoreReflection on full history; verbatim carry-forward; variants cover CI5 score flat/rise/drop after CI4. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:45:05.443Z",
-    "updatedAt": "2026-05-07T11:45:05.443Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "a0eae409-ef2f-447b-92e9-6dbb2f2ecc2b",
@@ -2344,9 +2344,9 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 5 closing; baseline + check-in-4 dual framing; optional flat/up vs baseline + optional 9–10 therapist/doctor prompt; fillScoreReflection on full history; verbatim carry-forward; variants cover CI5 score flat/rise/drop after CI4. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:45:05.443Z",
-    "updatedAt": "2026-05-07T11:45:05.443Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "62b6db5d-cc2c-4b61-a593-aea8184212e8",
@@ -2416,9 +2416,9 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 5 closing; baseline + check-in-4 dual framing; optional flat/up vs baseline + optional 9–10 therapist/doctor prompt; fillScoreReflection on full history; verbatim carry-forward; variants cover CI5 score flat/rise/drop after CI4. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:45:05.443Z",
-    "updatedAt": "2026-05-07T11:45:05.443Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "ee2208ba-3989-4e0d-861b-9d82045dd62c",
@@ -2488,9 +2488,9 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 5 closing; baseline + check-in-4 dual framing; optional flat/up vs baseline + optional 9–10 therapist/doctor prompt; fillScoreReflection on full history; verbatim carry-forward; variants cover CI5 score flat/rise/drop after CI4. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:45:05.443Z",
-    "updatedAt": "2026-05-07T11:45:05.443Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "44a4205a-8dd4-4975-b620-f6f27006e4de",
@@ -2560,9 +2560,9 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 5 closing; baseline + check-in-4 dual framing; optional flat/up vs baseline + optional 9–10 therapist/doctor prompt; fillScoreReflection on full history; verbatim carry-forward; variants cover CI5 score flat/rise/drop after CI4. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:45:05.443Z",
-    "updatedAt": "2026-05-07T11:45:05.443Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "31ee3d95-afcd-4a70-b2ec-73476aee4bc4",
@@ -2631,9 +2631,9 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 5 closing; baseline + check-in-4 dual framing; optional flat/up vs baseline + optional 9–10 therapist/doctor prompt; fillScoreReflection on full history; verbatim carry-forward; variants cover CI5 score flat/rise/drop after CI4. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:45:05.443Z",
-    "updatedAt": "2026-05-07T11:45:05.443Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "3b7517f9-e6dc-43d0-932e-1be3b697fb0b",
@@ -2702,9 +2702,9 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 5 closing; baseline + check-in-4 dual framing; optional flat/up vs baseline + optional 9–10 therapist/doctor prompt; fillScoreReflection on full history; verbatim carry-forward; variants cover CI5 score flat/rise/drop after CI4. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:45:05.443Z",
-    "updatedAt": "2026-05-07T11:45:05.443Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "4ced9094-a56a-4d05-b4ad-e5aeca4ed695",
@@ -2773,9 +2773,9 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 5 closing; baseline + check-in-4 dual framing; optional flat/up vs baseline + optional 9–10 therapist/doctor prompt; fillScoreReflection on full history; verbatim carry-forward; variants cover CI5 score flat/rise/drop after CI4. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:45:05.443Z",
-    "updatedAt": "2026-05-07T11:45:05.443Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "dcdf7fc9-59c7-4fb0-b547-c6676867b9cc",
@@ -2844,9 +2844,9 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 5 closing; baseline + check-in-4 dual framing; optional flat/up vs baseline + optional 9–10 therapist/doctor prompt; fillScoreReflection on full history; verbatim carry-forward; variants cover CI5 score flat/rise/drop after CI4. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:45:05.443Z",
-    "updatedAt": "2026-05-07T11:45:05.443Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "0b211f17-1461-40ab-b1c2-7b3331b7f244",
@@ -2915,9 +2915,9 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 5 closing; baseline + check-in-4 dual framing; optional flat/up vs baseline + optional 9–10 therapist/doctor prompt; fillScoreReflection on full history; verbatim carry-forward; variants cover CI5 score flat/rise/drop after CI4. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:45:05.443Z",
-    "updatedAt": "2026-05-07T11:45:05.443Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "e3fa4a5e-6309-4734-bb8b-e487c943f3b2",
@@ -2986,9 +2986,9 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 5 closing; baseline + check-in-4 dual framing; optional flat/up vs baseline + optional 9–10 therapist/doctor prompt; fillScoreReflection on full history; verbatim carry-forward; variants cover CI5 score flat/rise/drop after CI4. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:45:05.443Z",
-    "updatedAt": "2026-05-07T11:45:05.443Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "a9bf8dab-b51e-4aef-8bfa-779e1c461f8b",
@@ -3057,9 +3057,9 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 5 closing; baseline + check-in-4 dual framing; optional flat/up vs baseline + optional 9–10 therapist/doctor prompt; fillScoreReflection on full history; verbatim carry-forward; variants cover CI5 score flat/rise/drop after CI4. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:45:05.443Z",
-    "updatedAt": "2026-05-07T11:45:05.443Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "4e78fe6f-442c-4341-a9d5-0d13cd698324",
@@ -3128,9 +3128,9 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 5 closing; baseline + check-in-4 dual framing; optional flat/up vs baseline + optional 9–10 therapist/doctor prompt; fillScoreReflection on full history; verbatim carry-forward; variants cover CI5 score flat/rise/drop after CI4. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:45:05.443Z",
-    "updatedAt": "2026-05-07T11:45:05.443Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "7625cefe-12e1-4e66-aebc-9ea0537f3146",
@@ -3199,9 +3199,9 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 5 closing; baseline + check-in-4 dual framing; optional flat/up vs baseline + optional 9–10 therapist/doctor prompt; fillScoreReflection on full history; verbatim carry-forward; variants cover CI5 score flat/rise/drop after CI4. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:45:05.443Z",
-    "updatedAt": "2026-05-07T11:45:05.443Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "551c3052-0914-4338-9fea-471406678970",
@@ -3271,9 +3271,9 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 5 closing; baseline + check-in-4 dual framing; optional flat/up vs baseline + optional 9–10 therapist/doctor prompt; fillScoreReflection on full history; verbatim carry-forward; variants cover CI5 score flat/rise/drop after CI4. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:45:05.443Z",
-    "updatedAt": "2026-05-07T11:45:05.443Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "bb7af634-a3d0-4050-a2e6-e17ff36fc05e",
@@ -3343,9 +3343,9 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 5 closing; baseline + check-in-4 dual framing; optional flat/up vs baseline + optional 9–10 therapist/doctor prompt; fillScoreReflection on full history; verbatim carry-forward; variants cover CI5 score flat/rise/drop after CI4. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:45:05.443Z",
-    "updatedAt": "2026-05-07T11:45:05.443Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   },
   {
     "id": "fab88222-afcf-414a-a84a-22eabc3f5f3f",
@@ -3415,8 +3415,8 @@
     },
     "authorInitials": null,
     "notes": "Draft grid: check-in 5 closing; baseline + check-in-4 dual framing; optional flat/up vs baseline + optional 9–10 therapist/doctor prompt; fillScoreReflection on full history; verbatim carry-forward; variants cover CI5 score flat/rise/drop after CI4. Clinician review before promotion.",
-    "status": "draft",
+    "status": "approved",
     "createdAt": "2026-05-07T11:45:05.443Z",
-    "updatedAt": "2026-05-07T11:45:05.443Z"
+    "updatedAt": "2026-05-08T03:49:18.007Z"
   }
 ]

@@ -1,5 +1,5 @@
 /**
- * Writes data/training-seeds/lora-check-in-5.json with 48 draft seeds (or merges
+ * Writes client/data/training-seeds/lora-check-in-5.json with 48 draft seeds (or merges
  * when the file already has exactly one seed: replaces it with the scripted
  * handcrafted row and appends 47 grid rows).
  *
@@ -26,7 +26,7 @@ import type { LoRAId, TrainingSeed } from "../lib/training/types";
 
 const LORA_ID = "lora-check-in-5" as LoRAId;
 const OUT = path.resolve(
-  path.join(__dirname, "..", "..", "data", "training-seeds", `${LORA_ID}.json`),
+  path.join(__dirname, "..", "data", "training-seeds", `${LORA_ID}.json`),
 );
 
 type Med = "buprenorphine" | "methadone" | "naltrexone" | "vivitrol" | "none";
