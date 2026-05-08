@@ -19,13 +19,15 @@
       "journalPromptQuestion": "What is one small sign from today that you could notice again the next time stress spikes?",
       "nextSteps": {
         "one": "Drink a full glass of water",
-        "two": "Walk one block outside"
+        "two": "Walk one block outside",
+        "three": "Text someone you trust for 2 minutes",
+        "four": "Rest quietly for 10 minutes"
       }
     },
     "authorInitials": null,
-    "notes": "Handcrafted: plan-first UX in app; these two lines are backup suggestions only. Insight includes ending digit 2. Seed id is hex without hyphens. Clinician review before promotion.",
-    "status": "draft",
+    "notes": "Handcrafted: plan-first UX; four backup chips only after 'No ideas'. Insight includes ending digit 2. Seed id is hex without hyphens. Clinician review before promotion.",
+    "status": "ready",
     "createdAt": "2026-05-07T22:30:00.000Z",
-    "updatedAt": "2026-05-08T12:00:00.000Z"
+    "updatedAt": "2026-05-08T04:50:53.640Z"
   }
 ]

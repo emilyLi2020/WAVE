@@ -17,8 +17,8 @@ export type JsonSchema = Record<string, unknown>;
 
 export const reflectionPayloadSchema = z.object({
   insight: z.string().min(20).max(500),
-  /** Shown only if the patient asks for ideas; keep small to avoid overwhelm. */
-  nextSteps: z.array(z.string().min(2).max(60)).length(2),
+  /** Shown only after "No ideas" — four tap options; patient still picks one. */
+  nextSteps: z.array(z.string().min(2).max(60)).length(4),
 });
 
 export type ReflectionPayload = z.infer<typeof reflectionPayloadSchema>;
@@ -31,8 +31,8 @@ export const reflectionJsonSchema: JsonSchema = {
     insight: { type: "string", minLength: 20, maxLength: 500 },
     nextSteps: {
       type: "array",
-      minItems: 2,
-      maxItems: 2,
+      minItems: 4,
+      maxItems: 4,
       items: { type: "string", minLength: 2, maxLength: 60 },
     },
   },

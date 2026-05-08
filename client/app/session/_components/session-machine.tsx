@@ -557,8 +557,8 @@ function ReflectionPlanAndSuggestions({
           <div className="space-y-3">
             <p className="text-sm text-foreground/70">
               What feels doable in the next 10 minutes? Name anything that fits,
-              even a tiny step. If nothing comes to mind, you can ask for a
-              couple of ideas.
+              even a tiny step. If nothing comes to mind, you can see four
+              gentle ideas to pick from.
             </p>
             <label className="block text-xs font-medium text-foreground/55">
               Your plan (optional)
@@ -592,7 +592,7 @@ function ReflectionPlanAndSuggestions({
         ) : (
           <div className="space-y-3">
             <p className="text-sm text-foreground/70">
-              Two gentle options. Pick one, or go back to write your own.
+              Four gentle options. Pick one, or go back to write your own.
             </p>
             <NextStepChips
               options={payload.nextSteps}

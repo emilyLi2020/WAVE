@@ -712,7 +712,7 @@ const reflection: LoraFormSpec = {
   invariants: [
     "insight MUST contain the numeric endingIntensity.",
     "When usedSubstanceToday is true: never shame, never imply failure, never frame the decision to use as a relapse event.",
-    "nextSteps are two backup suggestions only; the app asks for the patient's own plan first.",
+    "nextSteps are four backup tap options; the app asks for the patient's own plan first; they still choose one chip.",
     "Never tell the patient to start, stop, or change medication.",
   ],
   targetCount: SPECIALIZED_TARGET_COUNT,
@@ -821,7 +821,7 @@ const reflection: LoraFormSpec = {
     {
       key: "nextSteps",
       kind: "object",
-      label: "Two backup next-step lines",
+      label: "Four backup next-step chips",
       fields: [
         {
           key: "one",
@@ -839,6 +839,22 @@ const reflection: LoraFormSpec = {
           maxLength: 80,
           placeholder: "Example: Walk one block",
         },
+        {
+          key: "three",
+          kind: "text",
+          label: "Backup suggestion 3",
+          minLength: 3,
+          maxLength: 80,
+          placeholder: "Example: Text a safe person",
+        },
+        {
+          key: "four",
+          kind: "text",
+          label: "Backup suggestion 4",
+          minLength: 3,
+          maxLength: 80,
+          placeholder: "Example: Rest for 10 min",
+        },
       ],
     },
   ],
@@ -850,6 +866,8 @@ const reflection: LoraFormSpec = {
       nextSteps: z.object({
         one: z.string().min(3).max(80),
         two: z.string().min(3).max(80),
+        three: z.string().min(3).max(80),
+        four: z.string().min(3).max(80),
       }),
     })
     .superRefine((output, ctx) => {

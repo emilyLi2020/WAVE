@@ -261,7 +261,12 @@ await test("reflection boundary validates, sanitizes, and emits progress titles"
       return {
         text: JSON.stringify({
           insight: "You stayed [with it] — and the wave moved.",
-          nextSteps: ["Drink water", "Text safe person"],
+          nextSteps: [
+            "Drink water",
+            "Text safe person",
+            "Walk one block",
+            "Rest 10 min",
+          ],
         }),
       };
     },
@@ -274,6 +279,8 @@ await test("reflection boundary validates, sanitizes, and emits progress titles"
   assert.deepEqual(result.payload.nextSteps, [
     "Drink water",
     "Text safe person",
+    "Walk one block",
+    "Rest 10 min",
   ]);
 });
 
@@ -299,7 +306,7 @@ await test("reflection boundary retries invalid output then falls back", async (
   assert.equal(result.source, "fallback");
   assert.equal(result.attempts, 2);
   assert.equal(titles.includes("Pulling a saved reflection"), true);
-  assert.equal(result.payload.nextSteps.length, 2);
+  assert.equal(result.payload.nextSteps.length, 4);
 });
 
 await test("insights boundary parses validated local Gemma cards", async () => {

@@ -28,6 +28,8 @@ import { isAffirmative } from "@/lib/session/is-affirmative";
 const NEXT_STEPS_DEFAULT = [
   "Drink a glass of water",
   "Walk one block outside",
+  "Text a safe person",
+  "Lie down for 10 min",
 ];
 
 function bankReflection(input: ReflectionContext): ReflectionPayload {
