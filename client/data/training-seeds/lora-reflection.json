@@ -25,9 +25,1466 @@
       }
     },
     "authorInitials": null,
-    "notes": "Handcrafted: plan-first UX; four backup chips only after 'No ideas'. Insight includes ending digit 2. Seed id is hex without hyphens. Clinician review before promotion.",
+    "notes": "Handcrafted anchor row. Plan-first UX in product; four backup chips after 'No ideas'. Clinician review before promotion.",
     "status": "ready",
     "createdAt": "2026-05-07T22:30:00.000Z",
-    "updatedAt": "2026-05-08T04:50:53.640Z"
+    "updatedAt": "2026-05-08T04:57:41.781Z"
+  },
+  {
+    "id": "aa72dfb96cbf1f62b6b945ea944a8dca",
+    "loraId": "lora-reflection",
+    "input": {
+      "surface": "reflection",
+      "intakeIntensity": 6,
+      "endingIntensity": 6,
+      "durationSeconds": 407,
+      "medicationStatus": "on_time",
+      "matType": "methadone",
+      "trigger": "social",
+      "sessionsCount": 6,
+      "usedSubstanceToday": false,
+      "scoreHistorySummary": "Intake 6; ending 6; on_time methadone; social."
+    },
+    "output": {
+      "insight": "You stayed near 6 from start to finish this time, about 7 minutes on the clock. social pull was in the room, and your on-time medication context with methadone still matters for how this lands. This is session 6 for you, and practice adds up in uneven steps.",
+      "journalPromptQuestion": "Where did you feel the urge soften first, even a little?",
+      "nextSteps": {
+        "one": "Splash cool water on wrists",
+        "two": "Step outside for fresh air",
+        "three": "Call your sponsor",
+        "four": "Sit and breathe slowly"
+      }
+    },
+    "authorInitials": null,
+    "notes": "Synthetic grid: 16 medStatus × trigger × 3 mat variants; plan-first product, four backup chips in training JSON. Clinician review before promotion.",
+    "status": "ready",
+    "createdAt": "2026-05-08T04:57:41.775Z",
+    "updatedAt": "2026-05-08T04:57:41.775Z"
+  },
+  {
+    "id": "a4f743535f3f9a13a14ace1f4ab5554d",
+    "loraId": "lora-reflection",
+    "input": {
+      "surface": "reflection",
+      "intakeIntensity": 6,
+      "endingIntensity": 7,
+      "durationSeconds": 454,
+      "medicationStatus": "on_time",
+      "matType": "naltrexone",
+      "trigger": "social",
+      "sessionsCount": 11,
+      "usedSubstanceToday": false,
+      "scoreHistorySummary": "Intake 6; ending 7; on_time naltrexone; social."
+    },
+    "output": {
+      "insight": "You started at 6 and ended at 7, about 8 minutes in the practice. social pull was in the room, and your on-time medication context with naltrexone still matters for how this lands. This is session 11 for you, and practice adds up in uneven steps.",
+      "journalPromptQuestion": "What helped you stay with the practice when your mind wanted to bail?",
+      "nextSteps": {
+        "one": "Drink warm tea slowly",
+        "two": "Stretch neck and shoulders",
+        "three": "Message a trusted person",
+        "four": "Lie down with eyes closed"
+      }
+    },
+    "authorInitials": null,
+    "notes": "Synthetic grid: 16 medStatus × trigger × 3 mat variants; plan-first product, four backup chips in training JSON. Clinician review before promotion.",
+    "status": "ready",
+    "createdAt": "2026-05-08T04:57:41.775Z",
+    "updatedAt": "2026-05-08T04:57:41.775Z"
+  },
+  {
+    "id": "c9bcbfe37041ae3dfecb8bc8c5e8881a",
+    "loraId": "lora-reflection",
+    "input": {
+      "surface": "reflection",
+      "intakeIntensity": 7,
+      "endingIntensity": 5,
+      "durationSeconds": 501,
+      "medicationStatus": "on_time",
+      "matType": "methadone",
+      "trigger": "stress",
+      "sessionsCount": 16,
+      "usedSubstanceToday": false,
+      "scoreHistorySummary": "Intake 7; ending 5; on_time methadone; stress."
+    },
+    "output": {
+      "insight": "You surfed a 7 down to a 5 in about 8 minutes. stress was in the room, and your on-time medication context with methadone still matters for how this lands. This is session 16 for you, and practice adds up in uneven steps.",
+      "journalPromptQuestion": "What would you tell a friend who just finished the same session?",
+      "nextSteps": {
+        "one": "Eat a small snack",
+        "two": "Walk to the mailbox",
+        "three": "Hum a slow tune",
+        "four": "Journal one sentence"
+      }
+    },
+    "authorInitials": null,
+    "notes": "Synthetic grid: 16 medStatus × trigger × 3 mat variants; plan-first product, four backup chips in training JSON. Clinician review before promotion.",
+    "status": "ready",
+    "createdAt": "2026-05-08T04:57:41.775Z",
+    "updatedAt": "2026-05-08T04:57:41.775Z"
+  },
+  {
+    "id": "1633a1e468f47b41e354d91a24e5d047",
+    "loraId": "lora-reflection",
+    "input": {
+      "surface": "reflection",
+      "intakeIntensity": 9,
+      "endingIntensity": 9,
+      "durationSeconds": 548,
+      "medicationStatus": "on_time",
+      "matType": "naltrexone",
+      "trigger": "stress",
+      "sessionsCount": 21,
+      "usedSubstanceToday": false,
+      "scoreHistorySummary": "Intake 9; ending 9; on_time naltrexone; stress."
+    },
+    "output": {
+      "insight": "You stayed near 9 from start to finish this time, about 9 minutes on the clock. stress was in the room, and your on-time medication context with naltrexone still matters for how this lands. This is session 21 for you, and practice adds up in uneven steps.",
+      "journalPromptQuestion": "What is one word for how your body feels now compared to the start?",
+      "nextSteps": {
+        "one": "Drink a glass of water",
+        "two": "Walk one block outside",
+        "three": "Text someone safe",
+        "four": "Rest quietly 10 minutes"
+      }
+    },
+    "authorInitials": null,
+    "notes": "Synthetic grid: 16 medStatus × trigger × 3 mat variants; plan-first product, four backup chips in training JSON. Clinician review before promotion.",
+    "status": "ready",
+    "createdAt": "2026-05-08T04:57:41.775Z",
+    "updatedAt": "2026-05-08T04:57:41.775Z"
+  },
+  {
+    "id": "33e17d2d5b1249efae4306ba5ba420e2",
+    "loraId": "lora-reflection",
+    "input": {
+      "surface": "reflection",
+      "intakeIntensity": 4,
+      "endingIntensity": 5,
+      "durationSeconds": 595,
+      "medicationStatus": "on_time",
+      "matType": "vivitrol",
+      "trigger": "stress",
+      "sessionsCount": 26,
+      "usedSubstanceToday": false,
+      "scoreHistorySummary": "Intake 4; ending 5; on_time Vivitrol; stress."
+    },
+    "output": {
+      "insight": "You started at 4 and ended at 5, about 10 minutes in the practice. stress was in the room, and your on-time medication context with Vivitrol still matters for how this lands. This is session 26 for you, and practice adds up in uneven steps.",
+      "journalPromptQuestion": "What is one thing you did today that counts as care, even if it was quiet?",
+      "nextSteps": {
+        "one": "Splash cool water on wrists",
+        "two": "Step outside for fresh air",
+        "three": "Call your sponsor",
+        "four": "Sit and breathe slowly"
+      }
+    },
+    "authorInitials": null,
+    "notes": "Synthetic grid: 16 medStatus × trigger × 3 mat variants; plan-first product, four backup chips in training JSON. Clinician review before promotion.",
+    "status": "ready",
+    "createdAt": "2026-05-08T04:57:41.775Z",
+    "updatedAt": "2026-05-08T04:57:41.775Z"
+  },
+  {
+    "id": "bfa01bd0390c6a27d598e1ec6bb62463",
+    "loraId": "lora-reflection",
+    "input": {
+      "surface": "reflection",
+      "intakeIntensity": 5,
+      "endingIntensity": 3,
+      "durationSeconds": 642,
+      "medicationStatus": "on_time",
+      "matType": "naltrexone",
+      "trigger": "physical",
+      "sessionsCount": 31,
+      "usedSubstanceToday": false,
+      "scoreHistorySummary": "Intake 5; ending 3; on_time naltrexone; physical."
+    },
+    "output": {
+      "insight": "You surfed a 5 down to a 3 in about 11 minutes. body cues was in the room, and your on-time medication context with naltrexone still matters for how this lands. This is session 31 for you, and practice adds up in uneven steps.",
+      "journalPromptQuestion": "What is one small sign from today you could notice again when the urge returns?",
+      "nextSteps": {
+        "one": "Drink warm tea slowly",
+        "two": "Stretch neck and shoulders",
+        "three": "Message a trusted person",
+        "four": "Lie down with eyes closed"
+      }
+    },
+    "authorInitials": null,
+    "notes": "Synthetic grid: 16 medStatus × trigger × 3 mat variants; plan-first product, four backup chips in training JSON. Clinician review before promotion.",
+    "status": "ready",
+    "createdAt": "2026-05-08T04:57:41.775Z",
+    "updatedAt": "2026-05-08T04:57:41.775Z"
+  },
+  {
+    "id": "c42667ae4dbfa767138e2226e6434ae3",
+    "loraId": "lora-reflection",
+    "input": {
+      "surface": "reflection",
+      "intakeIntensity": 7,
+      "endingIntensity": 7,
+      "durationSeconds": 689,
+      "medicationStatus": "on_time",
+      "matType": "buprenorphine",
+      "trigger": "physical",
+      "sessionsCount": 36,
+      "usedSubstanceToday": false,
+      "scoreHistorySummary": "Intake 7; ending 7; on_time buprenorphine; physical."
+    },
+    "output": {
+      "insight": "You stayed near 7 from start to finish this time, about 11 minutes on the clock. body cues was in the room, and your on-time medication context with buprenorphine still matters for how this lands. This is session 36 for you, and practice adds up in uneven steps.",
+      "journalPromptQuestion": "Where did you feel the urge soften first, even a little?",
+      "nextSteps": {
+        "one": "Eat a small snack",
+        "two": "Walk to the mailbox",
+        "three": "Hum a slow tune",
+        "four": "Journal one sentence"
+      }
+    },
+    "authorInitials": null,
+    "notes": "Synthetic grid: 16 medStatus × trigger × 3 mat variants; plan-first product, four backup chips in training JSON. Clinician review before promotion.",
+    "status": "ready",
+    "createdAt": "2026-05-08T04:57:41.775Z",
+    "updatedAt": "2026-05-08T04:57:41.775Z"
+  },
+  {
+    "id": "34dc441b1aa95f72e4425ef04a20354f",
+    "loraId": "lora-reflection",
+    "input": {
+      "surface": "reflection",
+      "intakeIntensity": 7,
+      "endingIntensity": 8,
+      "durationSeconds": 736,
+      "medicationStatus": "on_time",
+      "matType": "methadone",
+      "trigger": "physical",
+      "sessionsCount": 41,
+      "usedSubstanceToday": false,
+      "scoreHistorySummary": "Intake 7; ending 8; on_time methadone; physical."
+    },
+    "output": {
+      "insight": "You started at 7 and ended at 8, about 12 minutes in the practice. body cues was in the room, and your on-time medication context with methadone still matters for how this lands. This is session 41 for you, and practice adds up in uneven steps.",
+      "journalPromptQuestion": "What helped you stay with the practice when your mind wanted to bail?",
+      "nextSteps": {
+        "one": "Drink a glass of water",
+        "two": "Walk one block outside",
+        "three": "Text someone safe",
+        "four": "Rest quietly 10 minutes"
+      }
+    },
+    "authorInitials": null,
+    "notes": "Synthetic grid: 16 medStatus × trigger × 3 mat variants; plan-first product, four backup chips in training JSON. Clinician review before promotion.",
+    "status": "ready",
+    "createdAt": "2026-05-08T04:57:41.775Z",
+    "updatedAt": "2026-05-08T04:57:41.775Z"
+  },
+  {
+    "id": "b599e5e36033ec98122ef911e841f7e6",
+    "loraId": "lora-reflection",
+    "input": {
+      "surface": "reflection",
+      "intakeIntensity": 8,
+      "endingIntensity": 6,
+      "durationSeconds": 783,
+      "medicationStatus": "on_time",
+      "matType": "vivitrol",
+      "trigger": "unknown_or_other",
+      "sessionsCount": 46,
+      "usedSubstanceToday": false,
+      "scoreHistorySummary": "Intake 8; ending 6; on_time Vivitrol; unknown_or_other."
+    },
+    "output": {
+      "insight": "You surfed a 8 down to a 6 in about 13 minutes. mixed triggers was in the room, and your on-time medication context with Vivitrol still matters for how this lands. This is session 46 for you, and practice adds up in uneven steps.",
+      "journalPromptQuestion": "What would you tell a friend who just finished the same session?",
+      "nextSteps": {
+        "one": "Splash cool water on wrists",
+        "two": "Step outside for fresh air",
+        "three": "Call your sponsor",
+        "four": "Sit and breathe slowly"
+      }
+    },
+    "authorInitials": null,
+    "notes": "Synthetic grid: 16 medStatus × trigger × 3 mat variants; plan-first product, four backup chips in training JSON. Clinician review before promotion.",
+    "status": "ready",
+    "createdAt": "2026-05-08T04:57:41.775Z",
+    "updatedAt": "2026-05-08T04:57:41.775Z"
+  },
+  {
+    "id": "0986d457e7516b98e9166729f2c9e41c",
+    "loraId": "lora-reflection",
+    "input": {
+      "surface": "reflection",
+      "intakeIntensity": 5,
+      "endingIntensity": 5,
+      "durationSeconds": 830,
+      "medicationStatus": "on_time",
+      "matType": "buprenorphine",
+      "trigger": "unknown_or_other",
+      "sessionsCount": 3,
+      "usedSubstanceToday": false,
+      "scoreHistorySummary": "Intake 5; ending 5; on_time buprenorphine; unknown_or_other."
+    },
+    "output": {
+      "insight": "You stayed near 5 from start to finish this time, about 14 minutes on the clock. mixed triggers was in the room, and your on-time medication context with buprenorphine still matters for how this lands. This is session 3 for you, and practice adds up in uneven steps.",
+      "journalPromptQuestion": "What is one word for how your body feels now compared to the start?",
+      "nextSteps": {
+        "one": "Drink warm tea slowly",
+        "two": "Stretch neck and shoulders",
+        "three": "Message a trusted person",
+        "four": "Lie down with eyes closed"
+      }
+    },
+    "authorInitials": null,
+    "notes": "Synthetic grid: 16 medStatus × trigger × 3 mat variants; plan-first product, four backup chips in training JSON. Clinician review before promotion.",
+    "status": "ready",
+    "createdAt": "2026-05-08T04:57:41.775Z",
+    "updatedAt": "2026-05-08T04:57:41.775Z"
+  },
+  {
+    "id": "359b6984f23047d3edf2fab668d9e022",
+    "loraId": "lora-reflection",
+    "input": {
+      "surface": "reflection",
+      "intakeIntensity": 5,
+      "endingIntensity": 6,
+      "durationSeconds": 877,
+      "medicationStatus": "on_time",
+      "matType": "methadone",
+      "trigger": "unknown_or_other",
+      "sessionsCount": 8,
+      "usedSubstanceToday": false,
+      "scoreHistorySummary": "Intake 5; ending 6; on_time methadone; unknown_or_other."
+    },
+    "output": {
+      "insight": "You started at 5 and ended at 6, about 15 minutes in the practice. mixed triggers was in the room, and your on-time medication context with methadone still matters for how this lands. This is session 8 for you, and practice adds up in uneven steps.",
+      "journalPromptQuestion": "What is one thing you did today that counts as care, even if it was quiet?",
+      "nextSteps": {
+        "one": "Eat a small snack",
+        "two": "Walk to the mailbox",
+        "three": "Hum a slow tune",
+        "four": "Journal one sentence"
+      }
+    },
+    "authorInitials": null,
+    "notes": "Synthetic grid: 16 medStatus × trigger × 3 mat variants; plan-first product, four backup chips in training JSON. Clinician review before promotion.",
+    "status": "ready",
+    "createdAt": "2026-05-08T04:57:41.775Z",
+    "updatedAt": "2026-05-08T04:57:41.775Z"
+  },
+  {
+    "id": "750fb80aa93a76a425c6eb1ee38c912d",
+    "loraId": "lora-reflection",
+    "input": {
+      "surface": "reflection",
+      "intakeIntensity": 6,
+      "endingIntensity": 4,
+      "durationSeconds": 384,
+      "medicationStatus": "late",
+      "matType": "buprenorphine",
+      "trigger": "social",
+      "sessionsCount": 13,
+      "usedSubstanceToday": false,
+      "scoreHistorySummary": "Intake 6; ending 4; late buprenorphine; social."
+    },
+    "output": {
+      "insight": "You surfed a 6 down to a 4 in about 6 minutes. social pull was in the room, and your late dose today context with buprenorphine still matters for how this lands. This is session 13 for you, and practice adds up in uneven steps.",
+      "journalPromptQuestion": "What is one small sign from today you could notice again when the urge returns?",
+      "nextSteps": {
+        "one": "Drink a glass of water",
+        "two": "Walk one block outside",
+        "three": "Text someone safe",
+        "four": "Rest quietly 10 minutes"
+      }
+    },
+    "authorInitials": null,
+    "notes": "Synthetic grid: 16 medStatus × trigger × 3 mat variants; plan-first product, four backup chips in training JSON. Clinician review before promotion.",
+    "status": "ready",
+    "createdAt": "2026-05-08T04:57:41.775Z",
+    "updatedAt": "2026-05-08T04:57:41.775Z"
+  },
+  {
+    "id": "219faee252281365b2e29eb178624795",
+    "loraId": "lora-reflection",
+    "input": {
+      "surface": "reflection",
+      "intakeIntensity": 8,
+      "endingIntensity": 8,
+      "durationSeconds": 431,
+      "medicationStatus": "late",
+      "matType": "methadone",
+      "trigger": "social",
+      "sessionsCount": 18,
+      "usedSubstanceToday": false,
+      "scoreHistorySummary": "Intake 8; ending 8; late methadone; social."
+    },
+    "output": {
+      "insight": "You stayed near 8 from start to finish this time, about 7 minutes on the clock. social pull was in the room, and your late dose today context with methadone still matters for how this lands. This is session 18 for you, and practice adds up in uneven steps.",
+      "journalPromptQuestion": "Where did you feel the urge soften first, even a little?",
+      "nextSteps": {
+        "one": "Splash cool water on wrists",
+        "two": "Step outside for fresh air",
+        "three": "Call your sponsor",
+        "four": "Sit and breathe slowly"
+      }
+    },
+    "authorInitials": null,
+    "notes": "Synthetic grid: 16 medStatus × trigger × 3 mat variants; plan-first product, four backup chips in training JSON. Clinician review before promotion.",
+    "status": "ready",
+    "createdAt": "2026-05-08T04:57:41.775Z",
+    "updatedAt": "2026-05-08T04:57:41.775Z"
+  },
+  {
+    "id": "2a81dad97ff735d0ccea502966fb40f6",
+    "loraId": "lora-reflection",
+    "input": {
+      "surface": "reflection",
+      "intakeIntensity": 8,
+      "endingIntensity": 9,
+      "durationSeconds": 478,
+      "medicationStatus": "late",
+      "matType": "vivitrol",
+      "trigger": "social",
+      "sessionsCount": 23,
+      "usedSubstanceToday": false,
+      "scoreHistorySummary": "Intake 8; ending 9; late Vivitrol; social."
+    },
+    "output": {
+      "insight": "You started at 8 and ended at 9, about 8 minutes in the practice. social pull was in the room, and your late dose today context with Vivitrol still matters for how this lands. This is session 23 for you, and practice adds up in uneven steps.",
+      "journalPromptQuestion": "What helped you stay with the practice when your mind wanted to bail?",
+      "nextSteps": {
+        "one": "Drink warm tea slowly",
+        "two": "Stretch neck and shoulders",
+        "three": "Message a trusted person",
+        "four": "Lie down with eyes closed"
+      }
+    },
+    "authorInitials": null,
+    "notes": "Synthetic grid: 16 medStatus × trigger × 3 mat variants; plan-first product, four backup chips in training JSON. Clinician review before promotion.",
+    "status": "ready",
+    "createdAt": "2026-05-08T04:57:41.775Z",
+    "updatedAt": "2026-05-08T04:57:41.775Z"
+  },
+  {
+    "id": "45c63245533fe1dcddcc74ab62127c51",
+    "loraId": "lora-reflection",
+    "input": {
+      "surface": "reflection",
+      "intakeIntensity": 4,
+      "endingIntensity": 2,
+      "durationSeconds": 525,
+      "medicationStatus": "late",
+      "matType": "methadone",
+      "trigger": "stress",
+      "sessionsCount": 28,
+      "usedSubstanceToday": false,
+      "scoreHistorySummary": "Intake 4; ending 2; late methadone; stress."
+    },
+    "output": {
+      "insight": "You surfed a 4 down to a 2 in about 9 minutes. stress was in the room, and your late dose today context with methadone still matters for how this lands. This is session 28 for you, and practice adds up in uneven steps.",
+      "journalPromptQuestion": "What would you tell a friend who just finished the same session?",
+      "nextSteps": {
+        "one": "Eat a small snack",
+        "two": "Walk to the mailbox",
+        "three": "Hum a slow tune",
+        "four": "Journal one sentence"
+      }
+    },
+    "authorInitials": null,
+    "notes": "Synthetic grid: 16 medStatus × trigger × 3 mat variants; plan-first product, four backup chips in training JSON. Clinician review before promotion.",
+    "status": "ready",
+    "createdAt": "2026-05-08T04:57:41.775Z",
+    "updatedAt": "2026-05-08T04:57:41.775Z"
+  },
+  {
+    "id": "8fd9e0b07237b254ef86a3dbfcd5167f",
+    "loraId": "lora-reflection",
+    "input": {
+      "surface": "reflection",
+      "intakeIntensity": 6,
+      "endingIntensity": 6,
+      "durationSeconds": 572,
+      "medicationStatus": "late",
+      "matType": "buprenorphine",
+      "trigger": "stress",
+      "sessionsCount": 33,
+      "usedSubstanceToday": true,
+      "scoreHistorySummary": "Intake 6; ending 6; late buprenorphine; stress."
+    },
+    "output": {
+      "insight": "You stayed near 6 from start to finish this time, about 10 minutes on the clock. stress was in the room, and your late dose today context with buprenorphine still matters for how this lands. This is session 33 for you, and practice adds up in uneven steps. You still chose to surf a craving today; that choice is allowed to sit next to everything else you are holding.",
+      "journalPromptQuestion": "What is one word for how your body feels now compared to the start?",
+      "nextSteps": {
+        "one": "Drink a glass of water",
+        "two": "Walk one block outside",
+        "three": "Text someone safe",
+        "four": "Rest quietly 10 minutes"
+      }
+    },
+    "authorInitials": null,
+    "notes": "Synthetic grid: 16 medStatus × trigger × 3 mat variants; plan-first product, four backup chips in training JSON. Clinician review before promotion.",
+    "status": "ready",
+    "createdAt": "2026-05-08T04:57:41.775Z",
+    "updatedAt": "2026-05-08T04:57:41.775Z"
+  },
+  {
+    "id": "293b6163a2aa5c3d84bb9bc57278ddf4",
+    "loraId": "lora-reflection",
+    "input": {
+      "surface": "reflection",
+      "intakeIntensity": 6,
+      "endingIntensity": 7,
+      "durationSeconds": 619,
+      "medicationStatus": "late",
+      "matType": "naltrexone",
+      "trigger": "stress",
+      "sessionsCount": 38,
+      "usedSubstanceToday": false,
+      "scoreHistorySummary": "Intake 6; ending 7; late naltrexone; stress."
+    },
+    "output": {
+      "insight": "You started at 6 and ended at 7, about 10 minutes in the practice. stress was in the room, and your late dose today context with naltrexone still matters for how this lands. This is session 38 for you, and practice adds up in uneven steps.",
+      "journalPromptQuestion": "What is one thing you did today that counts as care, even if it was quiet?",
+      "nextSteps": {
+        "one": "Splash cool water on wrists",
+        "two": "Step outside for fresh air",
+        "three": "Call your sponsor",
+        "four": "Sit and breathe slowly"
+      }
+    },
+    "authorInitials": null,
+    "notes": "Synthetic grid: 16 medStatus × trigger × 3 mat variants; plan-first product, four backup chips in training JSON. Clinician review before promotion.",
+    "status": "ready",
+    "createdAt": "2026-05-08T04:57:41.775Z",
+    "updatedAt": "2026-05-08T04:57:41.775Z"
+  },
+  {
+    "id": "84abe7daf8db8f80808810e9a39d483f",
+    "loraId": "lora-reflection",
+    "input": {
+      "surface": "reflection",
+      "intakeIntensity": 7,
+      "endingIntensity": 5,
+      "durationSeconds": 666,
+      "medicationStatus": "late",
+      "matType": "buprenorphine",
+      "trigger": "physical",
+      "sessionsCount": 43,
+      "usedSubstanceToday": false,
+      "scoreHistorySummary": "Intake 7; ending 5; late buprenorphine; physical."
+    },
+    "output": {
+      "insight": "You surfed a 7 down to a 5 in about 11 minutes. body cues was in the room, and your late dose today context with buprenorphine still matters for how this lands. This is session 43 for you, and practice adds up in uneven steps.",
+      "journalPromptQuestion": "What is one small sign from today you could notice again when the urge returns?",
+      "nextSteps": {
+        "one": "Drink warm tea slowly",
+        "two": "Stretch neck and shoulders",
+        "three": "Message a trusted person",
+        "four": "Lie down with eyes closed"
+      }
+    },
+    "authorInitials": null,
+    "notes": "Synthetic grid: 16 medStatus × trigger × 3 mat variants; plan-first product, four backup chips in training JSON. Clinician review before promotion.",
+    "status": "ready",
+    "createdAt": "2026-05-08T04:57:41.775Z",
+    "updatedAt": "2026-05-08T04:57:41.775Z"
+  },
+  {
+    "id": "34f1b41e8629f62b6b3af7114016e2d0",
+    "loraId": "lora-reflection",
+    "input": {
+      "surface": "reflection",
+      "intakeIntensity": 9,
+      "endingIntensity": 9,
+      "durationSeconds": 713,
+      "medicationStatus": "late",
+      "matType": "naltrexone",
+      "trigger": "physical",
+      "sessionsCount": 48,
+      "usedSubstanceToday": false,
+      "scoreHistorySummary": "Intake 9; ending 9; late naltrexone; physical."
+    },
+    "output": {
+      "insight": "You stayed near 9 from start to finish this time, about 12 minutes on the clock. body cues was in the room, and your late dose today context with naltrexone still matters for how this lands. This is session 48 for you, and practice adds up in uneven steps.",
+      "journalPromptQuestion": "Where did you feel the urge soften first, even a little?",
+      "nextSteps": {
+        "one": "Eat a small snack",
+        "two": "Walk to the mailbox",
+        "three": "Hum a slow tune",
+        "four": "Journal one sentence"
+      }
+    },
+    "authorInitials": null,
+    "notes": "Synthetic grid: 16 medStatus × trigger × 3 mat variants; plan-first product, four backup chips in training JSON. Clinician review before promotion.",
+    "status": "ready",
+    "createdAt": "2026-05-08T04:57:41.775Z",
+    "updatedAt": "2026-05-08T04:57:41.775Z"
+  },
+  {
+    "id": "ffb60546c7a0411f2f0bd40b6a9d9571",
+    "loraId": "lora-reflection",
+    "input": {
+      "surface": "reflection",
+      "intakeIntensity": 4,
+      "endingIntensity": 5,
+      "durationSeconds": 760,
+      "medicationStatus": "late",
+      "matType": "methadone",
+      "trigger": "physical",
+      "sessionsCount": 5,
+      "usedSubstanceToday": false,
+      "scoreHistorySummary": "Intake 4; ending 5; late methadone; physical."
+    },
+    "output": {
+      "insight": "You started at 4 and ended at 5, about 13 minutes in the practice. body cues was in the room, and your late dose today context with methadone still matters for how this lands. This is session 5 for you, and practice adds up in uneven steps.",
+      "journalPromptQuestion": "What helped you stay with the practice when your mind wanted to bail?",
+      "nextSteps": {
+        "one": "Drink a glass of water",
+        "two": "Walk one block outside",
+        "three": "Text someone safe",
+        "four": "Rest quietly 10 minutes"
+      }
+    },
+    "authorInitials": null,
+    "notes": "Synthetic grid: 16 medStatus × trigger × 3 mat variants; plan-first product, four backup chips in training JSON. Clinician review before promotion.",
+    "status": "ready",
+    "createdAt": "2026-05-08T04:57:41.775Z",
+    "updatedAt": "2026-05-08T04:57:41.775Z"
+  },
+  {
+    "id": "5c9c9ad315b798cd07e645f233bce985",
+    "loraId": "lora-reflection",
+    "input": {
+      "surface": "reflection",
+      "intakeIntensity": 5,
+      "endingIntensity": 3,
+      "durationSeconds": 807,
+      "medicationStatus": "late",
+      "matType": "naltrexone",
+      "trigger": "unknown_or_other",
+      "sessionsCount": 10,
+      "usedSubstanceToday": false,
+      "scoreHistorySummary": "Intake 5; ending 3; late naltrexone; unknown_or_other."
+    },
+    "output": {
+      "insight": "You surfed a 5 down to a 3 in about 13 minutes. mixed triggers was in the room, and your late dose today context with naltrexone still matters for how this lands. This is session 10 for you, and practice adds up in uneven steps.",
+      "journalPromptQuestion": "What would you tell a friend who just finished the same session?",
+      "nextSteps": {
+        "one": "Splash cool water on wrists",
+        "two": "Step outside for fresh air",
+        "three": "Call your sponsor",
+        "four": "Sit and breathe slowly"
+      }
+    },
+    "authorInitials": null,
+    "notes": "Synthetic grid: 16 medStatus × trigger × 3 mat variants; plan-first product, four backup chips in training JSON. Clinician review before promotion.",
+    "status": "ready",
+    "createdAt": "2026-05-08T04:57:41.775Z",
+    "updatedAt": "2026-05-08T04:57:41.775Z"
+  },
+  {
+    "id": "d7d183e55b21d28649491f735d2823cf",
+    "loraId": "lora-reflection",
+    "input": {
+      "surface": "reflection",
+      "intakeIntensity": 7,
+      "endingIntensity": 7,
+      "durationSeconds": 854,
+      "medicationStatus": "late",
+      "matType": "vivitrol",
+      "trigger": "unknown_or_other",
+      "sessionsCount": 15,
+      "usedSubstanceToday": false,
+      "scoreHistorySummary": "Intake 7; ending 7; late Vivitrol; unknown_or_other."
+    },
+    "output": {
+      "insight": "You stayed near 7 from start to finish this time, about 14 minutes on the clock. mixed triggers was in the room, and your late dose today context with Vivitrol still matters for how this lands. This is session 15 for you, and practice adds up in uneven steps.",
+      "journalPromptQuestion": "What is one word for how your body feels now compared to the start?",
+      "nextSteps": {
+        "one": "Drink warm tea slowly",
+        "two": "Stretch neck and shoulders",
+        "three": "Message a trusted person",
+        "four": "Lie down with eyes closed"
+      }
+    },
+    "authorInitials": null,
+    "notes": "Synthetic grid: 16 medStatus × trigger × 3 mat variants; plan-first product, four backup chips in training JSON. Clinician review before promotion.",
+    "status": "ready",
+    "createdAt": "2026-05-08T04:57:41.775Z",
+    "updatedAt": "2026-05-08T04:57:41.775Z"
+  },
+  {
+    "id": "eca2c81c543fc75095121fdabeb19cba",
+    "loraId": "lora-reflection",
+    "input": {
+      "surface": "reflection",
+      "intakeIntensity": 7,
+      "endingIntensity": 8,
+      "durationSeconds": 361,
+      "medicationStatus": "late",
+      "matType": "buprenorphine",
+      "trigger": "unknown_or_other",
+      "sessionsCount": 20,
+      "usedSubstanceToday": false,
+      "scoreHistorySummary": "Intake 7; ending 8; late buprenorphine; unknown_or_other."
+    },
+    "output": {
+      "insight": "You started at 7 and ended at 8, about 6 minutes in the practice. mixed triggers was in the room, and your late dose today context with buprenorphine still matters for how this lands. This is session 20 for you, and practice adds up in uneven steps.",
+      "journalPromptQuestion": "What is one thing you did today that counts as care, even if it was quiet?",
+      "nextSteps": {
+        "one": "Eat a small snack",
+        "two": "Walk to the mailbox",
+        "three": "Hum a slow tune",
+        "four": "Journal one sentence"
+      }
+    },
+    "authorInitials": null,
+    "notes": "Synthetic grid: 16 medStatus × trigger × 3 mat variants; plan-first product, four backup chips in training JSON. Clinician review before promotion.",
+    "status": "ready",
+    "createdAt": "2026-05-08T04:57:41.775Z",
+    "updatedAt": "2026-05-08T04:57:41.775Z"
+  },
+  {
+    "id": "71abfd853ea890247aad2b3d6740108c",
+    "loraId": "lora-reflection",
+    "input": {
+      "surface": "reflection",
+      "intakeIntensity": 8,
+      "endingIntensity": 6,
+      "durationSeconds": 408,
+      "medicationStatus": "missed",
+      "matType": "buprenorphine",
+      "trigger": "social",
+      "sessionsCount": 25,
+      "usedSubstanceToday": false,
+      "scoreHistorySummary": "Intake 8; ending 6; missed buprenorphine; social."
+    },
+    "output": {
+      "insight": "You surfed a 8 down to a 6 in about 7 minutes. social pull was in the room, and your a missed dose in the picture context with buprenorphine still matters for how this lands. This is session 25 for you, and practice adds up in uneven steps.",
+      "journalPromptQuestion": "What is one small sign from today you could notice again when the urge returns?",
+      "nextSteps": {
+        "one": "Drink a glass of water",
+        "two": "Walk one block outside",
+        "three": "Text someone safe",
+        "four": "Rest quietly 10 minutes"
+      }
+    },
+    "authorInitials": null,
+    "notes": "Synthetic grid: 16 medStatus × trigger × 3 mat variants; plan-first product, four backup chips in training JSON. Clinician review before promotion.",
+    "status": "ready",
+    "createdAt": "2026-05-08T04:57:41.775Z",
+    "updatedAt": "2026-05-08T04:57:41.775Z"
+  },
+  {
+    "id": "e881627592be582a8f1bfdbb413481e5",
+    "loraId": "lora-reflection",
+    "input": {
+      "surface": "reflection",
+      "intakeIntensity": 5,
+      "endingIntensity": 5,
+      "durationSeconds": 455,
+      "medicationStatus": "missed",
+      "matType": "methadone",
+      "trigger": "social",
+      "sessionsCount": 30,
+      "usedSubstanceToday": false,
+      "scoreHistorySummary": "Intake 5; ending 5; missed methadone; social."
+    },
+    "output": {
+      "insight": "You stayed near 5 from start to finish this time, about 8 minutes on the clock. social pull was in the room, and your a missed dose in the picture context with methadone still matters for how this lands. This is session 30 for you, and practice adds up in uneven steps.",
+      "journalPromptQuestion": "Where did you feel the urge soften first, even a little?",
+      "nextSteps": {
+        "one": "Splash cool water on wrists",
+        "two": "Step outside for fresh air",
+        "three": "Call your sponsor",
+        "four": "Sit and breathe slowly"
+      }
+    },
+    "authorInitials": null,
+    "notes": "Synthetic grid: 16 medStatus × trigger × 3 mat variants; plan-first product, four backup chips in training JSON. Clinician review before promotion.",
+    "status": "ready",
+    "createdAt": "2026-05-08T04:57:41.775Z",
+    "updatedAt": "2026-05-08T04:57:41.775Z"
+  },
+  {
+    "id": "33a687a872dccfa496de81e65deec435",
+    "loraId": "lora-reflection",
+    "input": {
+      "surface": "reflection",
+      "intakeIntensity": 5,
+      "endingIntensity": 6,
+      "durationSeconds": 502,
+      "medicationStatus": "missed",
+      "matType": "naltrexone",
+      "trigger": "social",
+      "sessionsCount": 35,
+      "usedSubstanceToday": false,
+      "scoreHistorySummary": "Intake 5; ending 6; missed naltrexone; social."
+    },
+    "output": {
+      "insight": "You started at 5 and ended at 6, about 8 minutes in the practice. social pull was in the room, and your a missed dose in the picture context with naltrexone still matters for how this lands. This is session 35 for you, and practice adds up in uneven steps.",
+      "journalPromptQuestion": "What helped you stay with the practice when your mind wanted to bail?",
+      "nextSteps": {
+        "one": "Drink warm tea slowly",
+        "two": "Stretch neck and shoulders",
+        "three": "Message a trusted person",
+        "four": "Lie down with eyes closed"
+      }
+    },
+    "authorInitials": null,
+    "notes": "Synthetic grid: 16 medStatus × trigger × 3 mat variants; plan-first product, four backup chips in training JSON. Clinician review before promotion.",
+    "status": "ready",
+    "createdAt": "2026-05-08T04:57:41.775Z",
+    "updatedAt": "2026-05-08T04:57:41.775Z"
+  },
+  {
+    "id": "9d0103bcbd8283e4271b73366283e2c1",
+    "loraId": "lora-reflection",
+    "input": {
+      "surface": "reflection",
+      "intakeIntensity": 6,
+      "endingIntensity": 4,
+      "durationSeconds": 549,
+      "medicationStatus": "missed",
+      "matType": "methadone",
+      "trigger": "stress",
+      "sessionsCount": 40,
+      "usedSubstanceToday": false,
+      "scoreHistorySummary": "Intake 6; ending 4; missed methadone; stress."
+    },
+    "output": {
+      "insight": "You surfed a 6 down to a 4 in about 9 minutes. stress was in the room, and your a missed dose in the picture context with methadone still matters for how this lands. This is session 40 for you, and practice adds up in uneven steps.",
+      "journalPromptQuestion": "What would you tell a friend who just finished the same session?",
+      "nextSteps": {
+        "one": "Eat a small snack",
+        "two": "Walk to the mailbox",
+        "three": "Hum a slow tune",
+        "four": "Journal one sentence"
+      }
+    },
+    "authorInitials": null,
+    "notes": "Synthetic grid: 16 medStatus × trigger × 3 mat variants; plan-first product, four backup chips in training JSON. Clinician review before promotion.",
+    "status": "ready",
+    "createdAt": "2026-05-08T04:57:41.775Z",
+    "updatedAt": "2026-05-08T04:57:41.775Z"
+  },
+  {
+    "id": "973575b6005af6d708e378bccf6705f3",
+    "loraId": "lora-reflection",
+    "input": {
+      "surface": "reflection",
+      "intakeIntensity": 8,
+      "endingIntensity": 8,
+      "durationSeconds": 596,
+      "medicationStatus": "missed",
+      "matType": "buprenorphine",
+      "trigger": "stress",
+      "sessionsCount": 45,
+      "usedSubstanceToday": false,
+      "scoreHistorySummary": "Intake 8; ending 8; missed buprenorphine; stress."
+    },
+    "output": {
+      "insight": "You stayed near 8 from start to finish this time, about 10 minutes on the clock. stress was in the room, and your a missed dose in the picture context with buprenorphine still matters for how this lands. This is session 45 for you, and practice adds up in uneven steps.",
+      "journalPromptQuestion": "What is one word for how your body feels now compared to the start?",
+      "nextSteps": {
+        "one": "Drink a glass of water",
+        "two": "Walk one block outside",
+        "three": "Text someone safe",
+        "four": "Rest quietly 10 minutes"
+      }
+    },
+    "authorInitials": null,
+    "notes": "Synthetic grid: 16 medStatus × trigger × 3 mat variants; plan-first product, four backup chips in training JSON. Clinician review before promotion.",
+    "status": "ready",
+    "createdAt": "2026-05-08T04:57:41.775Z",
+    "updatedAt": "2026-05-08T04:57:41.775Z"
+  },
+  {
+    "id": "77491cd914ee8bf677ee7a44f6ff497a",
+    "loraId": "lora-reflection",
+    "input": {
+      "surface": "reflection",
+      "intakeIntensity": 8,
+      "endingIntensity": 9,
+      "durationSeconds": 643,
+      "medicationStatus": "missed",
+      "matType": "vivitrol",
+      "trigger": "stress",
+      "sessionsCount": 2,
+      "usedSubstanceToday": false,
+      "scoreHistorySummary": "Intake 8; ending 9; missed Vivitrol; stress."
+    },
+    "output": {
+      "insight": "You started at 8 and ended at 9, about 11 minutes in the practice. stress was in the room, and your a missed dose in the picture context with Vivitrol still matters for how this lands. This is session 2 for you, and practice adds up in uneven steps.",
+      "journalPromptQuestion": "What is one thing you did today that counts as care, even if it was quiet?",
+      "nextSteps": {
+        "one": "Splash cool water on wrists",
+        "two": "Step outside for fresh air",
+        "three": "Call your sponsor",
+        "four": "Sit and breathe slowly"
+      }
+    },
+    "authorInitials": null,
+    "notes": "Synthetic grid: 16 medStatus × trigger × 3 mat variants; plan-first product, four backup chips in training JSON. Clinician review before promotion.",
+    "status": "ready",
+    "createdAt": "2026-05-08T04:57:41.775Z",
+    "updatedAt": "2026-05-08T04:57:41.775Z"
+  },
+  {
+    "id": "564dee5cc769ac8bf884236107192432",
+    "loraId": "lora-reflection",
+    "input": {
+      "surface": "reflection",
+      "intakeIntensity": 4,
+      "endingIntensity": 2,
+      "durationSeconds": 690,
+      "medicationStatus": "missed",
+      "matType": "methadone",
+      "trigger": "physical",
+      "sessionsCount": 7,
+      "usedSubstanceToday": false,
+      "scoreHistorySummary": "Intake 4; ending 2; missed methadone; physical."
+    },
+    "output": {
+      "insight": "You surfed a 4 down to a 2 in about 12 minutes. body cues was in the room, and your a missed dose in the picture context with methadone still matters for how this lands. This is session 7 for you, and practice adds up in uneven steps.",
+      "journalPromptQuestion": "What is one small sign from today you could notice again when the urge returns?",
+      "nextSteps": {
+        "one": "Drink warm tea slowly",
+        "two": "Stretch neck and shoulders",
+        "three": "Message a trusted person",
+        "four": "Lie down with eyes closed"
+      }
+    },
+    "authorInitials": null,
+    "notes": "Synthetic grid: 16 medStatus × trigger × 3 mat variants; plan-first product, four backup chips in training JSON. Clinician review before promotion.",
+    "status": "ready",
+    "createdAt": "2026-05-08T04:57:41.775Z",
+    "updatedAt": "2026-05-08T04:57:41.775Z"
+  },
+  {
+    "id": "ad5f86fe085e62e85b281c32f64a6217",
+    "loraId": "lora-reflection",
+    "input": {
+      "surface": "reflection",
+      "intakeIntensity": 6,
+      "endingIntensity": 6,
+      "durationSeconds": 737,
+      "medicationStatus": "missed",
+      "matType": "naltrexone",
+      "trigger": "physical",
+      "sessionsCount": 12,
+      "usedSubstanceToday": false,
+      "scoreHistorySummary": "Intake 6; ending 6; missed naltrexone; physical."
+    },
+    "output": {
+      "insight": "You stayed near 6 from start to finish this time, about 12 minutes on the clock. body cues was in the room, and your a missed dose in the picture context with naltrexone still matters for how this lands. This is session 12 for you, and practice adds up in uneven steps.",
+      "journalPromptQuestion": "Where did you feel the urge soften first, even a little?",
+      "nextSteps": {
+        "one": "Eat a small snack",
+        "two": "Walk to the mailbox",
+        "three": "Hum a slow tune",
+        "four": "Journal one sentence"
+      }
+    },
+    "authorInitials": null,
+    "notes": "Synthetic grid: 16 medStatus × trigger × 3 mat variants; plan-first product, four backup chips in training JSON. Clinician review before promotion.",
+    "status": "ready",
+    "createdAt": "2026-05-08T04:57:41.775Z",
+    "updatedAt": "2026-05-08T04:57:41.775Z"
+  },
+  {
+    "id": "bc8319f05fd82f08b67ca34b1e1eb553",
+    "loraId": "lora-reflection",
+    "input": {
+      "surface": "reflection",
+      "intakeIntensity": 6,
+      "endingIntensity": 7,
+      "durationSeconds": 784,
+      "medicationStatus": "missed",
+      "matType": "buprenorphine",
+      "trigger": "physical",
+      "sessionsCount": 17,
+      "usedSubstanceToday": false,
+      "scoreHistorySummary": "Intake 6; ending 7; missed buprenorphine; physical."
+    },
+    "output": {
+      "insight": "You started at 6 and ended at 7, about 13 minutes in the practice. body cues was in the room, and your a missed dose in the picture context with buprenorphine still matters for how this lands. This is session 17 for you, and practice adds up in uneven steps.",
+      "journalPromptQuestion": "What helped you stay with the practice when your mind wanted to bail?",
+      "nextSteps": {
+        "one": "Drink a glass of water",
+        "two": "Walk one block outside",
+        "three": "Text someone safe",
+        "four": "Rest quietly 10 minutes"
+      }
+    },
+    "authorInitials": null,
+    "notes": "Synthetic grid: 16 medStatus × trigger × 3 mat variants; plan-first product, four backup chips in training JSON. Clinician review before promotion.",
+    "status": "ready",
+    "createdAt": "2026-05-08T04:57:41.775Z",
+    "updatedAt": "2026-05-08T04:57:41.775Z"
+  },
+  {
+    "id": "3b67d785087455c6a832e250c184d0cf",
+    "loraId": "lora-reflection",
+    "input": {
+      "surface": "reflection",
+      "intakeIntensity": 7,
+      "endingIntensity": 5,
+      "durationSeconds": 831,
+      "medicationStatus": "missed",
+      "matType": "naltrexone",
+      "trigger": "unknown_or_other",
+      "sessionsCount": 22,
+      "usedSubstanceToday": false,
+      "scoreHistorySummary": "Intake 7; ending 5; missed naltrexone; unknown_or_other."
+    },
+    "output": {
+      "insight": "You surfed a 7 down to a 5 in about 14 minutes. mixed triggers was in the room, and your a missed dose in the picture context with naltrexone still matters for how this lands. This is session 22 for you, and practice adds up in uneven steps.",
+      "journalPromptQuestion": "What would you tell a friend who just finished the same session?",
+      "nextSteps": {
+        "one": "Splash cool water on wrists",
+        "two": "Step outside for fresh air",
+        "three": "Call your sponsor",
+        "four": "Sit and breathe slowly"
+      }
+    },
+    "authorInitials": null,
+    "notes": "Synthetic grid: 16 medStatus × trigger × 3 mat variants; plan-first product, four backup chips in training JSON. Clinician review before promotion.",
+    "status": "ready",
+    "createdAt": "2026-05-08T04:57:41.775Z",
+    "updatedAt": "2026-05-08T04:57:41.775Z"
+  },
+  {
+    "id": "20e4273ecb6df872dc13c19be7f60772",
+    "loraId": "lora-reflection",
+    "input": {
+      "surface": "reflection",
+      "intakeIntensity": 9,
+      "endingIntensity": 9,
+      "durationSeconds": 878,
+      "medicationStatus": "missed",
+      "matType": "methadone",
+      "trigger": "unknown_or_other",
+      "sessionsCount": 27,
+      "usedSubstanceToday": false,
+      "scoreHistorySummary": "Intake 9; ending 9; missed methadone; unknown_or_other."
+    },
+    "output": {
+      "insight": "You stayed near 9 from start to finish this time, about 15 minutes on the clock. mixed triggers was in the room, and your a missed dose in the picture context with methadone still matters for how this lands. This is session 27 for you, and practice adds up in uneven steps.",
+      "journalPromptQuestion": "What is one word for how your body feels now compared to the start?",
+      "nextSteps": {
+        "one": "Drink warm tea slowly",
+        "two": "Stretch neck and shoulders",
+        "three": "Message a trusted person",
+        "four": "Lie down with eyes closed"
+      }
+    },
+    "authorInitials": null,
+    "notes": "Synthetic grid: 16 medStatus × trigger × 3 mat variants; plan-first product, four backup chips in training JSON. Clinician review before promotion.",
+    "status": "ready",
+    "createdAt": "2026-05-08T04:57:41.775Z",
+    "updatedAt": "2026-05-08T04:57:41.775Z"
+  },
+  {
+    "id": "239caa10656e7cb9b63bb7c570413015",
+    "loraId": "lora-reflection",
+    "input": {
+      "surface": "reflection",
+      "intakeIntensity": 4,
+      "endingIntensity": 5,
+      "durationSeconds": 385,
+      "medicationStatus": "missed",
+      "matType": "buprenorphine",
+      "trigger": "unknown_or_other",
+      "sessionsCount": 32,
+      "usedSubstanceToday": false,
+      "scoreHistorySummary": "Intake 4; ending 5; missed buprenorphine; unknown_or_other."
+    },
+    "output": {
+      "insight": "You started at 4 and ended at 5, about 6 minutes in the practice. mixed triggers was in the room, and your a missed dose in the picture context with buprenorphine still matters for how this lands. This is session 32 for you, and practice adds up in uneven steps.",
+      "journalPromptQuestion": "What is one thing you did today that counts as care, even if it was quiet?",
+      "nextSteps": {
+        "one": "Eat a small snack",
+        "two": "Walk to the mailbox",
+        "three": "Hum a slow tune",
+        "four": "Journal one sentence"
+      }
+    },
+    "authorInitials": null,
+    "notes": "Synthetic grid: 16 medStatus × trigger × 3 mat variants; plan-first product, four backup chips in training JSON. Clinician review before promotion.",
+    "status": "ready",
+    "createdAt": "2026-05-08T04:57:41.775Z",
+    "updatedAt": "2026-05-08T04:57:41.775Z"
+  },
+  {
+    "id": "3f84fd92e42f67ded5af41b083f935b9",
+    "loraId": "lora-reflection",
+    "input": {
+      "surface": "reflection",
+      "intakeIntensity": 5,
+      "endingIntensity": 3,
+      "durationSeconds": 432,
+      "medicationStatus": "none",
+      "matType": "none",
+      "trigger": "social",
+      "sessionsCount": 37,
+      "usedSubstanceToday": false,
+      "scoreHistorySummary": "Intake 5; ending 3; none MAT; social."
+    },
+    "output": {
+      "insight": "You surfed a 5 down to a 3 in about 7 minutes. social pull was in the room, and your no MAT in the picture context with MAT still matters for how this lands. This is session 37 for you, and practice adds up in uneven steps.",
+      "journalPromptQuestion": "What is one small sign from today you could notice again when the urge returns?",
+      "nextSteps": {
+        "one": "Drink a glass of water",
+        "two": "Walk one block outside",
+        "three": "Text someone safe",
+        "four": "Rest quietly 10 minutes"
+      }
+    },
+    "authorInitials": null,
+    "notes": "Synthetic grid: 16 medStatus × trigger × 3 mat variants; plan-first product, four backup chips in training JSON. Clinician review before promotion.",
+    "status": "ready",
+    "createdAt": "2026-05-08T04:57:41.775Z",
+    "updatedAt": "2026-05-08T04:57:41.775Z"
+  },
+  {
+    "id": "83dc5109897141b80b8dba78d4993533",
+    "loraId": "lora-reflection",
+    "input": {
+      "surface": "reflection",
+      "intakeIntensity": 7,
+      "endingIntensity": 7,
+      "durationSeconds": 479,
+      "medicationStatus": "none",
+      "matType": "none",
+      "trigger": "social",
+      "sessionsCount": 42,
+      "usedSubstanceToday": false,
+      "scoreHistorySummary": "Intake 7; ending 7; none MAT; social."
+    },
+    "output": {
+      "insight": "You stayed near 7 from start to finish this time, about 8 minutes on the clock. social pull was in the room, and your no MAT in the picture context with MAT still matters for how this lands. This is session 42 for you, and practice adds up in uneven steps.",
+      "journalPromptQuestion": "Where did you feel the urge soften first, even a little?",
+      "nextSteps": {
+        "one": "Splash cool water on wrists",
+        "two": "Step outside for fresh air",
+        "three": "Call your sponsor",
+        "four": "Sit and breathe slowly"
+      }
+    },
+    "authorInitials": null,
+    "notes": "Synthetic grid: 16 medStatus × trigger × 3 mat variants; plan-first product, four backup chips in training JSON. Clinician review before promotion.",
+    "status": "ready",
+    "createdAt": "2026-05-08T04:57:41.775Z",
+    "updatedAt": "2026-05-08T04:57:41.775Z"
+  },
+  {
+    "id": "dd23c3939ef28157ac7cea4b58186b03",
+    "loraId": "lora-reflection",
+    "input": {
+      "surface": "reflection",
+      "intakeIntensity": 7,
+      "endingIntensity": 8,
+      "durationSeconds": 526,
+      "medicationStatus": "none",
+      "matType": "none",
+      "trigger": "social",
+      "sessionsCount": 47,
+      "usedSubstanceToday": false,
+      "scoreHistorySummary": "Intake 7; ending 8; none MAT; social."
+    },
+    "output": {
+      "insight": "You started at 7 and ended at 8, about 9 minutes in the practice. social pull was in the room, and your no MAT in the picture context with MAT still matters for how this lands. This is session 47 for you, and practice adds up in uneven steps.",
+      "journalPromptQuestion": "What helped you stay with the practice when your mind wanted to bail?",
+      "nextSteps": {
+        "one": "Drink warm tea slowly",
+        "two": "Stretch neck and shoulders",
+        "three": "Message a trusted person",
+        "four": "Lie down with eyes closed"
+      }
+    },
+    "authorInitials": null,
+    "notes": "Synthetic grid: 16 medStatus × trigger × 3 mat variants; plan-first product, four backup chips in training JSON. Clinician review before promotion.",
+    "status": "ready",
+    "createdAt": "2026-05-08T04:57:41.775Z",
+    "updatedAt": "2026-05-08T04:57:41.775Z"
+  },
+  {
+    "id": "0a02fe52d9fd54456ad74ed15bc089f5",
+    "loraId": "lora-reflection",
+    "input": {
+      "surface": "reflection",
+      "intakeIntensity": 8,
+      "endingIntensity": 6,
+      "durationSeconds": 573,
+      "medicationStatus": "none",
+      "matType": "none",
+      "trigger": "stress",
+      "sessionsCount": 4,
+      "usedSubstanceToday": false,
+      "scoreHistorySummary": "Intake 8; ending 6; none MAT; stress."
+    },
+    "output": {
+      "insight": "You surfed a 8 down to a 6 in about 10 minutes. stress was in the room, and your no MAT in the picture context with MAT still matters for how this lands. This is session 4 for you, and practice adds up in uneven steps.",
+      "journalPromptQuestion": "What would you tell a friend who just finished the same session?",
+      "nextSteps": {
+        "one": "Eat a small snack",
+        "two": "Walk to the mailbox",
+        "three": "Hum a slow tune",
+        "four": "Journal one sentence"
+      }
+    },
+    "authorInitials": null,
+    "notes": "Synthetic grid: 16 medStatus × trigger × 3 mat variants; plan-first product, four backup chips in training JSON. Clinician review before promotion.",
+    "status": "ready",
+    "createdAt": "2026-05-08T04:57:41.775Z",
+    "updatedAt": "2026-05-08T04:57:41.775Z"
+  },
+  {
+    "id": "4838a71560c969d4093167e8a2673a24",
+    "loraId": "lora-reflection",
+    "input": {
+      "surface": "reflection",
+      "intakeIntensity": 5,
+      "endingIntensity": 5,
+      "durationSeconds": 620,
+      "medicationStatus": "none",
+      "matType": "none",
+      "trigger": "stress",
+      "sessionsCount": 9,
+      "usedSubstanceToday": true,
+      "scoreHistorySummary": "Intake 5; ending 5; none MAT; stress."
+    },
+    "output": {
+      "insight": "You stayed near 5 from start to finish this time, about 10 minutes on the clock. stress was in the room, and your no MAT in the picture context with MAT still matters for how this lands. This is session 9 for you, and practice adds up in uneven steps. You still chose to surf a craving today; that choice is allowed to sit next to everything else you are holding.",
+      "journalPromptQuestion": "What is one word for how your body feels now compared to the start?",
+      "nextSteps": {
+        "one": "Drink a glass of water",
+        "two": "Walk one block outside",
+        "three": "Text someone safe",
+        "four": "Rest quietly 10 minutes"
+      }
+    },
+    "authorInitials": null,
+    "notes": "Synthetic grid: 16 medStatus × trigger × 3 mat variants; plan-first product, four backup chips in training JSON. Clinician review before promotion.",
+    "status": "ready",
+    "createdAt": "2026-05-08T04:57:41.775Z",
+    "updatedAt": "2026-05-08T04:57:41.775Z"
+  },
+  {
+    "id": "a6d2cf71476def16944276d158ae539d",
+    "loraId": "lora-reflection",
+    "input": {
+      "surface": "reflection",
+      "intakeIntensity": 5,
+      "endingIntensity": 6,
+      "durationSeconds": 667,
+      "medicationStatus": "none",
+      "matType": "none",
+      "trigger": "stress",
+      "sessionsCount": 14,
+      "usedSubstanceToday": false,
+      "scoreHistorySummary": "Intake 5; ending 6; none MAT; stress."
+    },
+    "output": {
+      "insight": "You started at 5 and ended at 6, about 11 minutes in the practice. stress was in the room, and your no MAT in the picture context with MAT still matters for how this lands. This is session 14 for you, and practice adds up in uneven steps.",
+      "journalPromptQuestion": "What is one thing you did today that counts as care, even if it was quiet?",
+      "nextSteps": {
+        "one": "Splash cool water on wrists",
+        "two": "Step outside for fresh air",
+        "three": "Call your sponsor",
+        "four": "Sit and breathe slowly"
+      }
+    },
+    "authorInitials": null,
+    "notes": "Synthetic grid: 16 medStatus × trigger × 3 mat variants; plan-first product, four backup chips in training JSON. Clinician review before promotion.",
+    "status": "ready",
+    "createdAt": "2026-05-08T04:57:41.775Z",
+    "updatedAt": "2026-05-08T04:57:41.775Z"
+  },
+  {
+    "id": "f847106d28ea4453fff4cace02771fd2",
+    "loraId": "lora-reflection",
+    "input": {
+      "surface": "reflection",
+      "intakeIntensity": 6,
+      "endingIntensity": 4,
+      "durationSeconds": 714,
+      "medicationStatus": "none",
+      "matType": "none",
+      "trigger": "physical",
+      "sessionsCount": 19,
+      "usedSubstanceToday": false,
+      "scoreHistorySummary": "Intake 6; ending 4; none MAT; physical."
+    },
+    "output": {
+      "insight": "You surfed a 6 down to a 4 in about 12 minutes. body cues was in the room, and your no MAT in the picture context with MAT still matters for how this lands. This is session 19 for you, and practice adds up in uneven steps.",
+      "journalPromptQuestion": "What is one small sign from today you could notice again when the urge returns?",
+      "nextSteps": {
+        "one": "Drink warm tea slowly",
+        "two": "Stretch neck and shoulders",
+        "three": "Message a trusted person",
+        "four": "Lie down with eyes closed"
+      }
+    },
+    "authorInitials": null,
+    "notes": "Synthetic grid: 16 medStatus × trigger × 3 mat variants; plan-first product, four backup chips in training JSON. Clinician review before promotion.",
+    "status": "ready",
+    "createdAt": "2026-05-08T04:57:41.775Z",
+    "updatedAt": "2026-05-08T04:57:41.775Z"
+  },
+  {
+    "id": "2405a2fa61752ea8190a3e2c01fdebca",
+    "loraId": "lora-reflection",
+    "input": {
+      "surface": "reflection",
+      "intakeIntensity": 8,
+      "endingIntensity": 8,
+      "durationSeconds": 761,
+      "medicationStatus": "none",
+      "matType": "none",
+      "trigger": "physical",
+      "sessionsCount": 24,
+      "usedSubstanceToday": false,
+      "scoreHistorySummary": "Intake 8; ending 8; none MAT; physical."
+    },
+    "output": {
+      "insight": "You stayed near 8 from start to finish this time, about 13 minutes on the clock. body cues was in the room, and your no MAT in the picture context with MAT still matters for how this lands. This is session 24 for you, and practice adds up in uneven steps.",
+      "journalPromptQuestion": "Where did you feel the urge soften first, even a little?",
+      "nextSteps": {
+        "one": "Eat a small snack",
+        "two": "Walk to the mailbox",
+        "three": "Hum a slow tune",
+        "four": "Journal one sentence"
+      }
+    },
+    "authorInitials": null,
+    "notes": "Synthetic grid: 16 medStatus × trigger × 3 mat variants; plan-first product, four backup chips in training JSON. Clinician review before promotion.",
+    "status": "ready",
+    "createdAt": "2026-05-08T04:57:41.775Z",
+    "updatedAt": "2026-05-08T04:57:41.775Z"
+  },
+  {
+    "id": "507312dea1858668cb2e0ca0a6423dbf",
+    "loraId": "lora-reflection",
+    "input": {
+      "surface": "reflection",
+      "intakeIntensity": 8,
+      "endingIntensity": 9,
+      "durationSeconds": 808,
+      "medicationStatus": "none",
+      "matType": "none",
+      "trigger": "physical",
+      "sessionsCount": 29,
+      "usedSubstanceToday": false,
+      "scoreHistorySummary": "Intake 8; ending 9; none MAT; physical."
+    },
+    "output": {
+      "insight": "You started at 8 and ended at 9, about 13 minutes in the practice. body cues was in the room, and your no MAT in the picture context with MAT still matters for how this lands. This is session 29 for you, and practice adds up in uneven steps.",
+      "journalPromptQuestion": "What helped you stay with the practice when your mind wanted to bail?",
+      "nextSteps": {
+        "one": "Drink a glass of water",
+        "two": "Walk one block outside",
+        "three": "Text someone safe",
+        "four": "Rest quietly 10 minutes"
+      }
+    },
+    "authorInitials": null,
+    "notes": "Synthetic grid: 16 medStatus × trigger × 3 mat variants; plan-first product, four backup chips in training JSON. Clinician review before promotion.",
+    "status": "ready",
+    "createdAt": "2026-05-08T04:57:41.775Z",
+    "updatedAt": "2026-05-08T04:57:41.775Z"
+  },
+  {
+    "id": "34e54621e15206596b73eb21a49d79b3",
+    "loraId": "lora-reflection",
+    "input": {
+      "surface": "reflection",
+      "intakeIntensity": 4,
+      "endingIntensity": 2,
+      "durationSeconds": 855,
+      "medicationStatus": "none",
+      "matType": "none",
+      "trigger": "unknown_or_other",
+      "sessionsCount": 34,
+      "usedSubstanceToday": false,
+      "scoreHistorySummary": "Intake 4; ending 2; none MAT; unknown_or_other."
+    },
+    "output": {
+      "insight": "You surfed a 4 down to a 2 in about 14 minutes. mixed triggers was in the room, and your no MAT in the picture context with MAT still matters for how this lands. This is session 34 for you, and practice adds up in uneven steps.",
+      "journalPromptQuestion": "What would you tell a friend who just finished the same session?",
+      "nextSteps": {
+        "one": "Splash cool water on wrists",
+        "two": "Step outside for fresh air",
+        "three": "Call your sponsor",
+        "four": "Sit and breathe slowly"
+      }
+    },
+    "authorInitials": null,
+    "notes": "Synthetic grid: 16 medStatus × trigger × 3 mat variants; plan-first product, four backup chips in training JSON. Clinician review before promotion.",
+    "status": "ready",
+    "createdAt": "2026-05-08T04:57:41.775Z",
+    "updatedAt": "2026-05-08T04:57:41.775Z"
+  },
+  {
+    "id": "8146ea83c99b0c4891be261e6049bf05",
+    "loraId": "lora-reflection",
+    "input": {
+      "surface": "reflection",
+      "intakeIntensity": 6,
+      "endingIntensity": 6,
+      "durationSeconds": 362,
+      "medicationStatus": "none",
+      "matType": "none",
+      "trigger": "unknown_or_other",
+      "sessionsCount": 39,
+      "usedSubstanceToday": false,
+      "scoreHistorySummary": "Intake 6; ending 6; none MAT; unknown_or_other."
+    },
+    "output": {
+      "insight": "You stayed near 6 from start to finish this time, about 6 minutes on the clock. mixed triggers was in the room, and your no MAT in the picture context with MAT still matters for how this lands. This is session 39 for you, and practice adds up in uneven steps.",
+      "journalPromptQuestion": "What is one word for how your body feels now compared to the start?",
+      "nextSteps": {
+        "one": "Drink warm tea slowly",
+        "two": "Stretch neck and shoulders",
+        "three": "Message a trusted person",
+        "four": "Lie down with eyes closed"
+      }
+    },
+    "authorInitials": null,
+    "notes": "Synthetic grid: 16 medStatus × trigger × 3 mat variants; plan-first product, four backup chips in training JSON. Clinician review before promotion.",
+    "status": "ready",
+    "createdAt": "2026-05-08T04:57:41.775Z",
+    "updatedAt": "2026-05-08T04:57:41.775Z"
+  },
+  {
+    "id": "d32605ebce1027436a5a84f65b6792f1",
+    "loraId": "lora-reflection",
+    "input": {
+      "surface": "reflection",
+      "intakeIntensity": 6,
+      "endingIntensity": 7,
+      "durationSeconds": 409,
+      "medicationStatus": "none",
+      "matType": "none",
+      "trigger": "unknown_or_other",
+      "sessionsCount": 44,
+      "usedSubstanceToday": false,
+      "scoreHistorySummary": "Intake 6; ending 7; none MAT; unknown_or_other."
+    },
+    "output": {
+      "insight": "You started at 6 and ended at 7, about 7 minutes in the practice. mixed triggers was in the room, and your no MAT in the picture context with MAT still matters for how this lands. This is session 44 for you, and practice adds up in uneven steps.",
+      "journalPromptQuestion": "What is one thing you did today that counts as care, even if it was quiet?",
+      "nextSteps": {
+        "one": "Eat a small snack",
+        "two": "Walk to the mailbox",
+        "three": "Hum a slow tune",
+        "four": "Journal one sentence"
+      }
+    },
+    "authorInitials": null,
+    "notes": "Synthetic grid: 16 medStatus × trigger × 3 mat variants; plan-first product, four backup chips in training JSON. Clinician review before promotion.",
+    "status": "ready",
+    "createdAt": "2026-05-08T04:57:41.775Z",
+    "updatedAt": "2026-05-08T04:57:41.775Z"
   }
 ]

@@ -27,7 +27,7 @@ We still collect data under specialized future adapter IDs:
 - `lora-check-in-5`
 - `lora-reflection`
 
-Each specialized set has a **target** row count in `client/lib/training/lora-specs.ts` (phase narration: 10; each check-in and reflection: 20). Those same rows
+Each specialized set has a **target** row count in `client/lib/training/lora-specs.ts` (phase narration: 10; each check-in: 20; `lora-reflection`: 48). Those same rows
 
 1. **Demo path:** combine all ready/approved rows into
    `lora-wave-session.jsonl` and fine-tune one multitask LoRA.
@@ -45,11 +45,11 @@ human-written seed examples.
 
 Per specialized set:
 
-- Target: see per-LoRA `targetCount` in `lora-specs.ts` (10 for `lora-phase-narration`, 20 for each check-in and reflection).
+- Target: see per-LoRA `targetCount` in `lora-specs.ts` (10 for `lora-phase-narration`, 20 for each check-in, 48 for `lora-reflection`).
 - Draft rows are allowed but are never exported by default.
 - Inputs and outputs are validated by the Zod schemas in
   `client/lib/training/lora-specs.ts`.
-- Coverage is tracked on a per-LoRA grid: **phase narration** uses `chunkNumber × startingIntensityBand` (5 phases × two intake bands: 7-10 vs 1-6). **Check-ins and reflection** use `medicationStatus × trigger` so the seed set does not collapse into only one medication or trigger scenario.
+- Coverage is tracked on a per-LoRA grid: **phase narration** uses `chunkNumber × startingIntensityBand` (5 phases × two intake bands: 7-10 vs 1-6). **Check-ins** use `medicationStatus × trigger` (plus scripted dialogue axes). **Reflection** uses the same `medicationStatus × trigger` axes with **three** `matType` variants per cell (see `client/scripts/generate-lora-reflection-grid.ts`) for 48 total rows.
 
 The UI stores rows as JSON files under:
 
@@ -117,14 +117,14 @@ They are not mounted in the browser demo.
 
 ## 3. Optional Synthetic Expansion
 
-For the hackathon demo, the minimum training source is the **130** human-written
+For the hackathon demo, the minimum training source is the **158** human-written
 rows:
 
 ```
 lora-phase-narration: 10 (5 chunks × 2 intake bands)
 + 5 check-in sets × 20 = 100
-+ lora-reflection: 20
-= 130 examples
++ lora-reflection: 48 (16 medStatus × trigger cells × 3 mat variants)
+= 158 examples
 ```
 
 If time allows, a larger Gemma model running on a developer workstation can

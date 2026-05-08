@@ -715,7 +715,7 @@ const reflection: LoraFormSpec = {
     "nextSteps are four backup tap options; the app asks for the patient's own plan first; they still choose one chip.",
     "Never tell the patient to start, stop, or change medication.",
   ],
-  targetCount: SPECIALIZED_TARGET_COUNT,
+  targetCount: 48,
   isStretch: false,
   inputFields: [
     { key: "surface", kind: "const", label: "Surface", value: "reflection" },

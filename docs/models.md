@@ -77,7 +77,7 @@ session.
 | Runtime artifact | Merged ONNX model: base + LoRA |
 | Where used | Browser demo session path |
 | Training data | Combined ready rows from `lora-phase-narration`, `lora-check-in-1` through `lora-check-in-5`, and `lora-reflection` |
-| Target sample count | 130 human-written seed rows total: 10 for phase narration (5 chunks × 2 intake bands) plus 20 each for the five check-ins and reflection |
+| Target sample count | 158 human-written seed rows total: 10 for phase narration (5 chunks × 2 intake bands), 20 each for the five check-ins, and 48 for reflection (16 medicationStatus × trigger cells × 3 matType variants; see `client/scripts/generate-lora-reflection-grid.ts`) |
 | Browser behavior | One model is loaded once; no LoRA hot-swap at runtime |
 
 **What it is fine-tuned for.** `lora-wave-session` is a multitask session LoRA.
