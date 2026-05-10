@@ -1,0 +1,1906 @@
+{
+  "run_id": "trun_718b98a742794de897b7219061f8ba22",
+  "interaction_id": "trun_718b98a742794de897b7219061f8ba22",
+  "result_url": "https://platform.parallel.ai/play/deep-research/trun_718b98a742794de897b7219061f8ba22",
+  "status": "completed",
+  "output": {
+    "basis": [
+      {
+        "field": "model_evaluation_guidance",
+        "reasoning": "The finegrained field value describes a structured approach to evaluating a fine-tuned model using Unsloth Studio: real-time observability during training (monitoring loss and GPU usage), early stopping to address overfitting, an explicit post-training qualitative evaluation via a Model Arena/Compare Mode, evaluation on a curated set for safety and behavior checks, and official benchmarks demonstrating performance and efficiency gains. Excerpts that discuss Unsloth Studio providing no-code fine-tuning with observability align directly with the real-time monitoring and early stopping components. Benchmarking and evaluation-focused excerpts describe formal evaluation systems, including context-length or performance benchmarks, which corroborate the existence of both during-training monitoring and post-training evaluation infrastructure. Additional excerpts describe fine-tuning workflows (LoRA/QLoRA) and the ability to train and evaluate models within Unsloth, supporting the notion of integrated evaluation capabilities within the workflow. Taken together, these excerpts support the claim that Unsloth offers both real-time observability for training and a post-training evaluation workflow (Compare Mode / Model Arena) with official benchmarks to demonstrate model performance.",
+        "citations": [
+          {
+            "url": "https://unsloth.ai/docs/get-started/fine-tuning-llms-guide",
+            "excerpts": [
+              "> [**Introducing Unsloth Studio:** ](/docs/new/studio.md) Our new open-source web UI for training and running models. This means you can now fine-tune models with no-code and have observability and automatic dataset creation features.",
+              "Enables LLMs to predict if a headline impacts a company positively or negatively. Can use historical customer interactions for more accurate and custom responses. Fine-tune LLM on legal texts for contract analysis, case law research, and compliance.",
+              "With [Unsloth](https://github.com/unslothai/unsloth), you can fine-tune or do RL for free on Colab, Kaggle, or locally with just 3GB VRAM by using our [notebooks](https://docs.unsloth.ai/get-started/unsloth-notebooks)."
+            ],
+            "title": "Fine-tuning LLMs Guide | Unsloth Documentation"
+          },
+          {
+            "url": "https://deepwiki.com/unslothai/unsloth-studio/4.2-benchmarking-and-evaluation",
+            "excerpts": [
+              "This document covers the benchmarking and evaluation systems in unsloth-studio, focusing on model performance assessment through standardized benchmarks. The primary evaluation system implements MMLU"
+            ],
+            "title": "Benchmarking and Evaluation | unslothai/unsloth-studio | DeepWiki"
+          },
+          {
+            "url": "https://unsloth.ai/docs/basics/unsloth-benchmarks",
+            "excerpts": [
+              "We tested using the Alpaca Dataset, a batch size of 2, gradient accumulation steps of 4, rank = 32, and applied QLoRA on all linear layers (q, k, v, o, gate, up, down): The more data you have, the less VRAM Unsloth uses due to our gradient checkpointing algorithm + Apple's CCE algorithm!",
+              "## Context length benchmarks\n### **Llama 3.3 (70B) max. context length**\nWe tested Llama 3.3 (70B) Instruct on a 80GB A100 and did 4bit QLoRA on all linear layers (Q, K, V, O, gate, up and down) with rank = 32 with a batch size of 1. We padded all sequences to a certain maximum sequence length to mimic long context finetuning workloads."
+            ],
+            "title": "Unsloth Benchmarks | Unsloth Documentation"
+          }
+        ],
+        "confidence": "high"
+      },
+      {
+        "field": "qlora_and_lora_workflows",
+        "reasoning": "The fine-grained field value describes optimized workflows for both LoRA (16-bit) and QLoRA (4-bit) fine-tuning, including a detailed comparison and recommended hyperparameters. The most directly supportive excerpts state that LoRA is a parameter-efficient method using added adapter weights and 16-bit precision, while QLoRA uses 4-bit precision to cut VRAM usage, with a note that 4-bit approaches save memory with only a small accuracy trade-off. This aligns with the claim of optimized LoRA/QLoRA workflows and their relative memory and speed characteristics. Additional excerpts enumerate exact target modules to tune for best accuracy, listing modules such as q_proj, k_proj, v_proj, o_proj, gate_proj, up_proj, and down_proj, which directly map to the field value\u2019s guidance on which parts of the model to fine-tune. Further excerpts provide concrete hyperparameter recommendations (rank r, alpha, dropout, weight_decay, learning rate) and talk about matching or approaching full fine-tuning performance with LoRA while saving VRAM, which substantiates the recommended configurations. There are also notes on practical workflow details like gradient accumulation and gradient checkpointing, which are described as memory-saving strategies to enable larger effective batch sizes on low-VRAM GPUs, consistent with the intent of optimized LoRA/QLoRA workflows. The remaining excerpts reinforce practical usage contexts\u2014data creation, training/export, and running locally\u2014that support applying these LoRA/QLoRA workflows in real projects, but the strongest support comes from the explicit claims and configurations around LoRA/QLoRA, target_modules, and memory-accuracy trade-offs.",
+        "citations": [
+          {
+            "url": "https://unsloth.ai/docs/get-started/fine-tuning-llms-guide/lora-hyperparameters-guide",
+            "excerpts": [
+              "Learn step-by-step the best LLM fine-tuning settings - LoRA rank & alpha, epochs, batch size + gradient accumulation, QLoRA vs. LoRA, target modules, and more.",
+              "LoRA uses 16-bit precision, while QLoRA is a 4-bit fine-tuning method.",
+              "`target_modules = [\"q_proj\", \"k_proj\", \"v_proj\", \"o_proj\", \"gate_proj\", \"up_proj\", \"down_proj\",]` to target both **MLP** and **attention** layers to increase accuracy."
+            ],
+            "title": "LoRA fine-tuning Hyperparameters Guide | Unsloth Documentation"
+          },
+          {
+            "url": "https://unsloth.ai/docs/get-started/fine-tuning-llms-guide",
+            "excerpts": [
+              "* **QLoRA** combines LoRA with 4-bit precision to handle very large models with minimal resources.",
+              "* **LoRA** is a parameter efficient training method that typically keeps the base model\u2019s weights frozen and trains a small set of added low-rank adapter weights (in 16-bit precision).",
+              "Enables LLMs to predict if a headline impacts a company positively or negatively. Can use historical customer interactions for more accurate and custom responses. Fine-tune LLM on legal texts for contract analysis, case law research, and compliance.",
+              "> [**Introducing Unsloth Studio:** ](/docs/new/studio.md) Our new open-source web UI for training and running models. This means you can now fine-tune models with no-code and have observability and automatic dataset creation features."
+            ],
+            "title": "Fine-tuning LLMs Guide | Unsloth Documentation"
+          },
+          {
+            "url": "http://vast.ai/article/unsloth-studio-now-available-on-vast-ai",
+            "excerpts": [
+              "* **Fine-tune** \u2014 Train with QLoRA, LoRA, or full fine-tuning. Upload datasets or build them from raw documents using Data Recipes. Monitor training with real-time loss curves and GPU stats.",
+              "xport** \u2014 Save fine-tuned models as merged safetensors, LoRA adapters, or GGUF files. Upload directly to Hugging Face Hub"
+            ],
+            "title": "Unsloth Studio Is Now Available on Vast.ai"
+          }
+        ],
+        "confidence": "high"
+      },
+      {
+        "field": "model_export_formats",
+        "reasoning": "The finest-grained field value centers on three concrete export formats and their roles: a merged model export that embeds the LoRA adapter into the base model, a LoRA-only export that distributes only the adapter weights, and an export to GGUF for local/offline inference. Direct references describe exporting to merged safetensors or GGUF files, which aligns with the merged model and GGUF export concepts. Explicit statements show that you can export a merged model as a 16-bit safetensors file, or export only the LoRA adapters, or export to GGUF for deployment with common inference engines. Several excerpts discuss saving or exporting models to GGUF, safetensors, or LoRA adapters, and some mention that merged models or LoRA adapters can be exported together or separately. Additionally, the documentation notes that these export options are usable in the Unsloth Studio workflow for local inference, which reinforces the practical applicability of these formats in offline or edge deployments. The most relevant passages directly mention: (a) exporting merged models with LoRA merged into base weights, (b) exporting only LoRA adapter weights, and (c) exporting to GGUF format for local inference and deployment. Collectively, these excerpts corroborate the defined field value and illustrate concrete export commands and workflows, indicating strong alignment between the field value and the provided documentation.",
+        "citations": [
+          {
+            "url": "http://vast.ai/article/unsloth-studio-now-available-on-vast-ai",
+            "excerpts": [
+              "xport** \u2014 Save fine-tuned models as merged safetensors, LoRA adapters, or GGUF files. Upload directly to Hugging Face Hub"
+            ],
+            "title": "Unsloth Studio Is Now Available on Vast.ai"
+          },
+          {
+            "url": "https://unsloth.ai/docs/new/studio/export",
+            "excerpts": [
+              "export a merged model, LoRA adapter weights, or a GGUF model for local inference.",
+              "Merged Model | **16-bit model** with the LoRA adapter merged into the base weights.",
+              "LoRA Only | Exports **only the adapter weights**. Requires the original base model.",
+              "GGUF / llama.cpp | Converts the model to **GGUF format** for Unsloth / llama.cpp **/** Ollama / LM Studio inference.",
+              "Use Unsloth Studio to export, save, or convert models to GGUF, Safetensors, or LoRA for deployment, sharing, or local inference in Unsloth, llama.cpp, Ollama, vLLM, and more."
+            ],
+            "title": "Export models with Unsloth Studio | Unsloth Documentation"
+          },
+          {
+            "url": "http://unsloth.ai/docs/models/gemma-4/train",
+            "excerpts": [
+              "#### Export your fine-tuned model\nOnce done, Unsloth Studio allows you to export the model to GGUF, safetensor etc formats."
+            ],
+            "title": "Gemma 4 Fine-tuning Guide | Unsloth Documentation"
+          },
+          {
+            "url": "http://unsloth.ai/",
+            "excerpts": [
+              "Export any model, including your fine-tuned models, to safetensors, or GGUF for use with llama.cpp, vLLM, Ollama, and more."
+            ],
+            "title": "Unsloth - Train and Run Models Locally"
+          }
+        ],
+        "confidence": "high"
+      },
+      {
+        "field": "pricing_and_licensing",
+        "reasoning": "The most directly relevant information comes from excerpts that explicitly label or describe the Free tier as freeware or open-source, and indicate that it targets single-GPU setups while supporting common open-source models and fine-tuning formats. This directly supports the free_tier_summary portion of the field value. The licensing-related excerpts provide explicit statements about the Community License, which align with license_type. Excerpts describing Pro and Enterprise tiers (and their benefits such as multi-GPU scaling, faster training, and higher VRAM efficiency) supply the necessary context for pro_tier_summary and enterprise_tier_summary, even if the exact phrasing of those summaries isn\u2019t identical. Finally, explicit mentions of pricing structure and tier differences help corroborate the existence and distinctions between tiers. Taken together, the strongest direct matches are those that explicitly reference Freeware/open-source status, followed by license terms, and then tiered features for Pro/Enterprise alignment.\n",
+        "citations": [
+          {
+            "url": "https://unsloth.ai/pricing",
+            "excerpts": [
+              "# Free",
+              "Freeware of our standard version of unsloth",
+              "* Open-source",
+              "unsloth Enterprise Unlock 30x faster training + multi-node support + 30% accuracy Contact us 32x number of GPUs faster than FA2",
+              "Unlock 30x faster training + multi-node support + 30% accuracy",
+              "# unsloth Pro"
+            ],
+            "title": "Pricing - Unsloth"
+          },
+          {
+            "url": "http://unsloth.ai/",
+            "excerpts": [
+              "Freeware of our standard version of unsloth",
+              "* Open-source"
+            ],
+            "title": "Unsloth - Train and Run Models Locally"
+          },
+          {
+            "url": "https://unsloth.ai/license",
+            "excerpts": [
+              "Disclosure of your information We do not sell, trade, or otherwise transfer your personal information to outside parties. We may disclose your personal information when we believe it's necessary to comply with the law, enforce our site policies, or protect our rights, property, or safety.",
+              " # Community License",
+              "Contact us If you have any questions about Licensing, please contact us via email: info@unsloth.ai"
+            ],
+            "title": "Unsloth AI Community License Agreement"
+          }
+        ],
+        "confidence": "high"
+      },
+      {
+        "field": "unsloth_studio_vs_open_source",
+        "reasoning": "The field value asserts that Unsloth Studio is an open-source, no-code web UI designed to run 100% offline, supports cross-platform operation (Mac, Windows, Linux), offers features like Data Recipes for dataset creation, tool-calling, web search, and an API, and that the open-source core provides performance benefits and a freeware tier. It also notes a use-case for running on Vast.ai cloud templates and local training/export workflows. Direct quotes from the excerpts show that Studio runs offline on Mac and Windows, is open-source, provides a no-code training interface with real-time observability, includes Data Recipes for transforming PDFs/CSV/JSON into datasets, supports exporting models, and is accessible on multiple platforms. Additionally, excerpts describe the open-source kernel optimizations and performance benefits, and mention Jointly that Studio complements open-source use cases (e.g., fine-tuning Gemma or other models) in local or cloud contexts. These pieces align with the field value by confirming: Studio is open-source and offline-capable, cross-platform, feature-rich with no-code tooling and data creation workflows, and that the open-source base provides performance advantages and different licensing tiers. The excerpts collectively corroborate the described studio_description, studio_platforms, studio_key_features, open_source_description, and open_source_use_case, with practical notes about offline use, cross-platform compatibility, and data/workflow capabilities. The discussion about running in Vast.ai and exporting models further supports practical deployment contexts and emphasizes Studio\u2019s versatility in both local and cloud-like environments, consistent with the field value\u2019s description of how a Next.js/offline demo could leverage the ecosystem for fine-tuning workflows.",
+        "citations": [
+          {
+            "url": "http://unsloth.ai/",
+            "excerpts": [
+              "No-code training\nAuto-create datasets from PDF, CSV, JSON docs and start training with real-time observability.\nStudio runs 100% offline on your **Mac** and **Windows** device. Run GGUF and Safetensors models with tool-calling, web search, and OpenAI compatible API\nUnsloth is an open-source, no-code web UI for training, running and exporting open models in one unified local interface.",
+              "Unsloth Studio runs 100% offline on your **Mac** and **Windows** device. Run GGUF and Safetensors models with tool-calling, web search, and OpenAI compatible API.",
+              "Unsloth is an open-source, no-code web UI for training, running and exporting open models in one unified local interface.",
+              " No-code training\nAuto-create datasets from PDF, CSV, JSON docs and start training with real-time observability.\n",
+              "Export any model, including your fine-tuned models, to safetensors, or GGUF for use with llama.cpp, vLLM, Ollama, and more."
+            ],
+            "title": "Unsloth - Train and Run Models Locally"
+          },
+          {
+            "url": "http://unsloth.ai/docs",
+            "excerpts": [
+              "Unsloth lets you run and train AI models on your own local hardware. Our docs will guide you through running & training your own model locally."
+            ],
+            "title": "Unsloth Docs | Unsloth Documentation"
+          },
+          {
+            "url": "http://vast.ai/article/unsloth-studio-now-available-on-vast-ai",
+            "excerpts": [
+              "* **Fine-tune** \u2014 Train with QLoRA, LoRA, or full fine-tuning. Upload datasets or build them from raw documents using Data Recipes. Monitor training with real-time loss curves and GPU stats.",
+              "new/studio) is an open-source, no-code web UI for running and fine-tuning more than 500 open-source AI models across text, vision, audio, and embeddings. It delivers 2x faster training with 70% less VRAM than standard approaches, which makes it possible to fine-tune larger models on more affordable hardware.\nVa",
+              "xport** \u2014 Save fine-tuned models as merged safetensors, LoRA adapters, or GGUF files. Upload directly to Hugging Face Hub"
+            ],
+            "title": "Unsloth Studio Is Now Available on Vast.ai"
+          }
+        ],
+        "confidence": "high"
+      },
+      {
+        "field": "practical_recommendations_summary",
+        "reasoning": "The requested practical recommendations center on choosing Gemma-4-E2B-it for an offline, on-device workflow, leveraging Unsloth Data Recipes for privacy-conscious datasets, and applying memory-efficient fine-tuning (QLoRA/LoRA) with targeted layers to maximize accuracy. The most directly supporting content describes Gemma 4\u2019s fine-tuning workflow, including E2B variants, VRAM considerations, and how to export fine-tuned adapters (GGUF, safetensors, LoRA) for deployment. It also confirms that Unsloth Studio can train and export Gemma 4 models, and that E2B LoRA support exists with specific VRAM budgets. Details about exporting entire merged models, adapter weights, or GGUF formats are highly relevant to the deployment path (llama.cpp) for an offline Next.js demo. Additional excerpts describe LoRA/QLoRA fundamentals, including precision and targeting modules (attention and MLP) to improve accuracy, which directly informs the recommended fine-tuning approach. Guidance on Data Recipes and safety guardrails helps operationalize the dataset handling and safety evaluation aspects of the field value. References to running locally on Mac/Windows/Linux, and to offline/offline deployment via llama.cpp, further corroborate the deployment strategy. The inclusion of export formats and how to push or host artifacts (e.g., HF Hub) provides practical flexibility for future reuse and integration in a web demo. Overall, the strongest support comes from explicit Gemma-4 E2B-related fine-tuning guidance, explicit VRAM, and export formats; supportive details on LoRA/QLoRA and local/offline deployment complete the practical recipe. ",
+        "citations": [
+          {
+            "url": "http://unsloth.ai/docs/models/gemma-4/train",
+            "excerpts": [
+              "trains Gemma 4 **~1.5x faster** with **~60% less VRAM** than FA2 setups (no accuracy loss)",
+              "* Gemma 4 E2B trains on **8GB VRAM**. E4B requires 10GB VRAM.",
+              "* **31B QLoRA works with 22GB** and 26B-A4B LoRA needs >40GB",
+              "#### Export your fine-tuned model\nOnce done, Unsloth Studio allows you to export the model to GGUF, safetensor etc formats.",
+              "* We fixed many universal [bugs for Gemma 4 training](#bug-fixes--tips) (not derived from Unsloth).",
+              "* Unsloth trains Gemma 4 **~1.5x faster** with **~60% less VRAM** than FA2 setups (no accuracy loss)",
+              "* Gemma 4 E2B LoRA works on 8-10GB VRAM. E4B LoRA requires 17GB VRAM.",
+              "Gemma 4 uses the standard:\n* `system`\n* `user`\n* `assistant`",
+              "#### Compare fine-tuned model vs original model\nClick on `Compare Mode` to compare the LoRA adapter and the original model."
+            ],
+            "title": "Gemma 4 Fine-tuning Guide | Unsloth Documentation"
+          },
+          {
+            "url": "https://unsloth.ai/docs/models/gemma-4",
+            "excerpts": [
+              "You can now run GGUFs and fine-tune Gemma 4 in Unsloth Studio \u2728",
+              "\n* Search, download, run GGUFs and safetensor models",
+              "* **Self-healing** tool calling + **web search**",
+              "* **Code execution** (Python, Bash)",
+              "* Automatic inference parameter tuning (temp, top-p, etc.)",
+              "* Fast CPU + GPU inference via llama.cpp",
+              "Gemma 4 is Google DeepMind\u2019s new family of open models, including E2B, E4B, 26B-A4B, and 31B. The multimodal, hybrid-thinking models support 140+ languages, up to 256K context, and have dense and MoE variants. Gemma 4 is Apache-2.0 licensed and can run on your local device.",
+              "Gemma 4 is Google DeepMind\u2019s new family of open models, including **E2B** , **E4B** , **26B-A4B** , and **31B.**",
+              "Gemma-4-E2B** and **E4B** support image and audi",
+              "Run on **5GB RAM** (4-bit) or 15GB (full 16-bit).",
+              "B-A4B** runs on **18GB** (4-bit) or 28GB (8-bit).",
+              "B** needs **20GB RAM** (4-bit) or 34GB (8-bit)."
+            ],
+            "title": "Gemma 4 - How to Run Locally | Unsloth Documentation"
+          },
+          {
+            "url": "https://unsloth.ai/docs/get-started/fine-tuning-llms-guide/lora-hyperparameters-guide",
+            "excerpts": [
+              "LoRA uses 16-bit precision, while QLoRA is a 4-bit fine-tuning method.",
+              "`target_modules = [\"q_proj\", \"k_proj\", \"v_proj\", \"o_proj\", \"gate_proj\", \"up_proj\", \"down_proj\",]` to target both **MLP** and **attention** layers to increase accuracy.",
+              "Done well, **LoRA can match full fine-tuning performance** while using 4\u00d7 less VRAM."
+            ],
+            "title": "LoRA fine-tuning Hyperparameters Guide | Unsloth Documentation"
+          },
+          {
+            "url": "https://unsloth.ai/docs/get-started/fine-tuning-llms-guide",
+            "excerpts": [
+              "> [**Introducing Unsloth Studio:** ](/docs/new/studio.md) Our new open-source web UI for training and running models. This means you can now fine-tune models with no-code and have observability and automatic dataset creation features.",
+              "* **LoRA** is a parameter efficient training method that typically keeps the base model\u2019s weights frozen and trains a small set of added low-rank adapter weights (in 16-bit precision).",
+              "* **QLoRA** combines LoRA with 4-bit precision to handle very large models with minimal resources."
+            ],
+            "title": "Fine-tuning LLMs Guide | Unsloth Documentation"
+          },
+          {
+            "url": "http://vast.ai/article/unsloth-studio-now-available-on-vast-ai",
+            "excerpts": [
+              "xport** \u2014 Save fine-tuned models as merged safetensors, LoRA adapters, or GGUF files. Upload directly to Hugging Face Hub"
+            ],
+            "title": "Unsloth Studio Is Now Available on Vast.ai"
+          },
+          {
+            "url": "https://unsloth.ai/docs/new/studio/export",
+            "excerpts": [
+              "Use Unsloth Studio to export, save, or convert models to GGUF, Safetensors, or LoRA for deployment, sharing, or local inference in Unsloth, llama.cpp, Ollama, vLLM, and more.",
+              "export a merged model, LoRA adapter weights, or a GGUF model for local inference.",
+              "Merged Model | **16-bit model** with the LoRA adapter merged into the base weights.",
+              "LoRA Only | Exports **only the adapter weights**. Requires the original base model.",
+              "GGUF / llama.cpp | Converts the model to **GGUF format** for Unsloth / llama.cpp **/** Ollama / LM Studio inference.",
+              "Save the exported model files directly to your machine.",
+              "or pushed to the Hugging Face Hub for hosting and sharing."
+            ],
+            "title": "Export models with Unsloth Studio | Unsloth Documentation"
+          }
+        ],
+        "confidence": "high"
+      },
+      {
+        "field": "hardware_requirements",
+        "reasoning": "Direct hardware requirements are described in excerpts pinpointing exact VRAM for Gemma 4 E2B and E2B LoRA ranges, as well as memory budgets for the 31B QLoRA setup. The statement that Gemma 4 E2B trains on 8GB VRAM directly confirms the lower bound of the 8\u201310 GB range. The note that E2B LoRA works on 8\u201310 GB VRAM supports the upper bound of that same range. For larger models, the 31B QLoRA requirement of around 22 GB VRAM is explicitly stated. Additional excerpts break down per-model memory configurations, including 4-bit versus 16-bit requirements and specific RAM/VRAM figures for various Gemma 4 variants, which align with the inference RAM estimates and overall hardware considerations. Together, these excerpts substantiate the proposed hardware bandwidths and VRAM/RAM targets for E2B (8\u201310 GB) and 31B QLoRA (\u224822 GB), as well as the inference RAM guidance (~4\u20135 GB for E2B 4-bit GGUF and ~17\u201320 GB for 31B 4-bit GGUF) when combined with the model\u2019s 4-bit/16-bit configurations. The contextual references also confirm that Unsloth supports running and fine-tuning Gemma 4 locally on consumer hardware and provide concrete VRAM figures across variants, reinforcing the practical feasibility of the stated values.",
+        "citations": [
+          {
+            "url": "http://unsloth.ai/docs/models/gemma-4/train",
+            "excerpts": [
+              "* Gemma 4 E2B trains on **8GB VRAM**. E4B requires 10GB VRAM.",
+              "* Gemma 4 E2B LoRA works on 8-10GB VRAM. E4B LoRA requires 17GB VRAM.",
+              "* **31B QLoRA works with 22GB** and 26B-A4B LoRA needs >40GB"
+            ],
+            "title": "Gemma 4 Fine-tuning Guide | Unsloth Documentation"
+          },
+          {
+            "url": "https://unsloth.ai/docs/models/gemma-4",
+            "excerpts": [
+              "Gemma 4 variant\n4-bit\n8-bit\nBF16 / FP16\n**E2B**\n4 GB\n5\u20138 GB\n10 GB\n**E4B**\n5.5\u20136 GB\n9\u201312 GB\n16 GB\n**26B A4B**\n16\u201318 GB\n28\u201330 GB\n52 GB\n**31B**\n17\u201320 GB\n34\u201338 GB\n62 GB",
+              "Run on **5GB RAM** (4-bit) or 15GB (full 16-bit).",
+              "B-A4B** runs on **18GB** (4-bit) or 28GB (8-bit).",
+              "B** needs **20GB RAM** (4-bit) or 34GB (8-bit).",
+              "Gemma 4 is Google DeepMind\u2019s new family of open models, including **E2B** , **E4B** , **26B-A4B** , and **31B.**",
+              "Gemma-4-E2B** and **E4B** support image and audi",
+              "Gemma 4 is Google DeepMind\u2019s new family of open models, including E2B, E4B, 26B-A4B, and 31B. The multimodal, hybrid-thinking models support 140+ languages, up to 256K context, and have dense and MoE variants. Gemma 4 is Apache-2.0 licensed and can run on your local device."
+            ],
+            "title": "Gemma 4 - How to Run Locally | Unsloth Documentation"
+          }
+        ],
+        "confidence": "high"
+      },
+      {
+        "field": "supported_dataset_formats",
+        "reasoning": "Direct references to dataset formats and data structures strongly support the field value. Excerpt describing a concrete JSON structure for multimodal Gemma-4 training shows the exact arrangement of a messages array with image preceding text in the content, which aligns with a structured dataset format for Gemma-4 fine-tuning. Excerpts about Data Recipes explain how PDFs, CSVs, and other documents are transformed into usable datasets, and that the output can be used for fine-tuning, which confirms practical dataset formats generated by Unsloth Studio. Additional excerpts discuss that Unsloth provides utilities to standardize and convert datasets into compatible formats (e.g., conversational JSONL, Alpaca-style formats, and ChatML in guidance material). The LoRA/QLoRA-focused excerpts, while not describing dataset formats themselves, reinforce the context of fine-tuning workflows that rely on specific data representations and adapter-based training, supporting the relevance of format compatibility within the workflow. The general fine-tuning guides mention typical formats (instruction-based, conversational templates) and utilities like get_chat_template and standardize_data_formats, which further corroborate the kinds of dataset formats the platform expects. Collectively, these excerpts establish that Unsloth supports and documents concrete dataset formats for both text-only and multimodal Gemma-4 training, including off-the-shelf formats (JSONL for conversational data, Alpaca/ChatML-style structures) and the Data Recipes pipeline for generating structured datasets from raw documents. ",
+        "citations": [
+          {
+            "url": "http://unsloth.ai/docs/models/gemma-4/train",
+            "excerpts": [
+              "```json\n{\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": [\n        {\"type\": \"image\", \"image\": \"/path/to/image OR object\"},\n        {\"type\": \"text\", \"text\": \"Extract all text from this receipt. Return line items, total, merchant, and date as JSON.\"}\n      ]\n    },\n    {\n      \"role\": \"assistant\",\n      \"content\": [\n        {\"type\": \"text\", \"text\": \"{\\\"merchant\\\": \\\"Example Store\\\", \\\"total\\\": \\\"19.99\\\"}\"}\n      ]\n    }\n  ]\n}\n```"
+            ],
+            "title": "Gemma 4 Fine-tuning Guide | Unsloth Documentation"
+          },
+          {
+            "url": "https://unsloth.ai/docs/new/studio/data-recipe",
+            "excerpts": [
+              "Unsloth Studio's Data Recipes lets you upload documents like PDFs or CSVs files and transforms them into useable / synthetic datasets. Create and edit datasets visually via a graph-node workflow. This guide will get you started with the basics before you dive into Unsloth Data Recipes.",
+              "Unsloth Studio's Data Recipes lets you upload documents like PDFs or CSVs files and transforms them into useable / synthetic datasets."
+            ],
+            "title": "Unsloth Data Recipes | Unsloth Documentation"
+          },
+          {
+            "url": "https://unsloth.ai/docs/get-started/fine-tuning-llms-guide",
+            "excerpts": [
+              "> [**Introducing Unsloth Studio:** ](/docs/new/studio.md) Our new open-source web UI for training and running models. This means you can now fine-tune models with no-code and have observability and automatic dataset creation features.",
+              "* **LoRA** is a parameter efficient training method that typically keeps the base model\u2019s weights frozen and trains a small set of added low-rank adapter weights (in 16-bit precision).",
+              "* **QLoRA** combines LoRA with 4-bit precision to handle very large models with minimal resources.",
+              "Enables LLMs to predict if a headline impacts a company positively or negatively. Can use historical customer interactions for more accurate and custom responses. Fine-tune LLM on legal texts for contract analysis, case law research, and compliance."
+            ],
+            "title": "Fine-tuning LLMs Guide | Unsloth Documentation"
+          }
+        ],
+        "confidence": "high"
+      },
+      {
+        "field": "project_fine_tuning_strategy",
+        "reasoning": "The proposed fine-tuning strategy centers on Gemma 4 variants (notably E2B/E4B), efficient training with LoRA/QLoRA in 4-bit or mixed precision, targeting both MLP and attention layers, and using Unsloth Studio with its Data Recipes for dataset curation into a structured JSONL/QA-like format suitable for fine-tuning. Excerpts describing Gemma 4 variants and their on-device/offline operation provide the necessary hardware and deployment context (e.g., Gemma 4 E2B trains with smaller VRAM footprints and 8 GB VRAM, while more VRAM can enable E4B). Excerpts detailing LoRA and QLoRA roles explain how low-rank adapters operate, with QLoRA combining LoRA with 4-bit precision to minimize VRAM, and guidance on which modules to target to maximize accuracy (covering both attention and MLP layers). Several excerpts discuss Unsloth Studio\u2019s data preparation capabilities, including Data Recipes for transforming PDFs/CSVs into usable datasets and the recommended final-answer training format (excluding chain-of-thought), which aligns with the requirement to structure data as system/user/assistant with a final answer format. Export capabilities (GGUF, safetensors, LoRA adapters) and the ability to train and export fine-tuned adapters are covered, supporting the plan to export or deploy the Gemma 4 E2B-it LoRA adapters. Additional excerpts mention running and fine-tuning Gemma 4 locally via Unsloth Studio and hardware considerations (RAM/VRAM) that inform the feasibility of on-device training. Several entries reinforce related tooling (Data Recipes, LoRA/QLoRA hyperparameters, target_modules configurations) that map directly to the hyperparameter guidance and module targeting described in the field value. Taken together, these excerpts strongly support the core components of the proposed strategy (variant selection, dataset preparation, 4-bit/LoRA/QLoRA training, module targeting, on-device feasibility, and export/participating deployment).",
+        "citations": [
+          {
+            "url": "https://unsloth.ai/docs/models/gemma-4",
+            "excerpts": [
+              "Gemma 4 is Google DeepMind\u2019s new family of open models, including E2B, E4B, 26B-A4B, and 31B. The multimodal, hybrid-thinking models support 140+ languages, up to 256K context, and have dense and MoE variants. Gemma 4 is Apache-2.0 licensed and can run on your local device.",
+              "Gemma 4 is Google DeepMind\u2019s new family of open models, including **E2B** , **E4B** , **26B-A4B** , and **31B.**",
+              "Gemma-4-E2B** and **E4B** support image and audi",
+              "Run on **5GB RAM** (4-bit) or 15GB (full 16-bit).",
+              "B-A4B** runs on **18GB** (4-bit) or 28GB (8-bit).",
+              "B** needs **20GB RAM** (4-bit) or 34GB (8-bit).",
+              "You can now run GGUFs and fine-tune Gemma 4 in Unsloth Studio \u2728"
+            ],
+            "title": "Gemma 4 - How to Run Locally | Unsloth Documentation"
+          },
+          {
+            "url": "https://unsloth.ai/docs/get-started/fine-tuning-llms-guide",
+            "excerpts": [
+              "* **LoRA** is a parameter efficient training method that typically keeps the base model\u2019s weights frozen and trains a small set of added low-rank adapter weights (in 16-bit precision).",
+              "* **QLoRA** combines LoRA with 4-bit precision to handle very large models with minimal resources.",
+              "Enables LLMs to predict if a headline impacts a company positively or negatively. Can use historical customer interactions for more accurate and custom responses. Fine-tune LLM on legal texts for contract analysis, case law research, and compliance.",
+              "> [**Introducing Unsloth Studio:** ](/docs/new/studio.md) Our new open-source web UI for training and running models. This means you can now fine-tune models with no-code and have observability and automatic dataset creation features."
+            ],
+            "title": "Fine-tuning LLMs Guide | Unsloth Documentation"
+          },
+          {
+            "url": "https://deepwiki.com/unslothai/unsloth-studio/4.2-benchmarking-and-evaluation",
+            "excerpts": [
+              "This document covers the benchmarking and evaluation systems in unsloth-studio, focusing on model performance assessment through standardized benchmarks. The primary evaluation system implements MMLU"
+            ],
+            "title": "Benchmarking and Evaluation | unslothai/unsloth-studio | DeepWiki"
+          },
+          {
+            "url": "https://unsloth.ai/docs/new/studio/data-recipe",
+            "excerpts": [
+              "Unsloth Studio's Data Recipes lets you upload documents like PDFs or CSVs files and transforms them into useable / synthetic datasets. Create and edit datasets visually via a graph-node workflow. This guide will get you started with the basics before you dive into Unsloth Data Recipes.",
+              "Unsloth Studio's Data Recipes lets you upload documents like PDFs or CSVs files and transforms them into useable / synthetic datasets."
+            ],
+            "title": "Unsloth Data Recipes | Unsloth Documentation"
+          },
+          {
+            "url": "https://github.com/unslothai/unsloth",
+            "excerpts": [
+              "* **Introducing Unsloth Studio** : our new web UI for running and training LLMs.",
+              "* **Export models** : [Save or export](https://unsloth.ai/docs/new/studio/export) models to GGUF, 16-bit safetensors and other formats."
+            ],
+            "title": "GitHub - unslothai/unsloth: Unsloth Studio is a web UI for ..."
+          },
+          {
+            "url": "https://unsloth.ai/docs/new/studio/export",
+            "excerpts": [
+              "export a merged model, LoRA adapter weights, or a GGUF model for local inference.",
+              "Use Unsloth Studio to export, save, or convert models to GGUF, Safetensors, or LoRA for deployment, sharing, or local inference in Unsloth, llama.cpp, Ollama, vLLM, and more."
+            ],
+            "title": "Export models with Unsloth Studio | Unsloth Documentation"
+          },
+          {
+            "url": "http://unsloth.ai/docs/models/gemma-4/train",
+            "excerpts": [
+              "trains Gemma 4 **~1.5x faster** with **~60% less VRAM** than FA2 setups (no accuracy loss)",
+              "* Unsloth trains Gemma 4 **~1.5x faster** with **~60% less VRAM** than FA2 setups (no accuracy loss)",
+              "* We fixed many universal [bugs for Gemma 4 training](#bug-fixes--tips) (not derived from Unsloth).",
+              "* Gemma 4 E2B trains on **8GB VRAM**. E4B requires 10GB VRAM.",
+              "* Gemma 4 E2B LoRA works on 8-10GB VRAM. E4B LoRA requires 17GB VRAM.",
+              "* **31B QLoRA works with 22GB** and 26B-A4B LoRA needs >40GB",
+              "#### Export your fine-tuned model\nOnce done, Unsloth Studio allows you to export the model to GGUF, safetensor etc formats.",
+              "Gemma 4 uses the standard:\n* `system`\n* `user`\n* `assistant`",
+              "```json\n{\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": [\n        {\"type\": \"image\", \"image\": \"/path/to/image OR object\"},\n        {\"type\": \"text\", \"text\": \"Extract all text from this receipt. Return line items, total, merchant, and date as JSON.\"}\n      ]\n    },\n    {\n      \"role\": \"assistant\",\n      \"content\": [\n        {\"type\": \"text\", \"text\": \"{\\\"merchant\\\": \\\"Example Store\\\", \\\"total\\\": \\\"19.99\\\"}\"}\n      ]\n    }\n  ]\n}\n```",
+              "#### Compare fine-tuned model vs original model\nClick on `Compare Mode` to compare the LoRA adapter and the original model."
+            ],
+            "title": "Gemma 4 Fine-tuning Guide | Unsloth Documentation"
+          }
+        ],
+        "confidence": "medium"
+      },
+      {
+        "field": "unsloth_capabilities_overview",
+        "reasoning": "The most relevant passages directly describe core capability areas in Unsloth: LoRA and QLoRA fine-tuning, 16-bit and 4-bit precision, and performance benefits, which align with the field value\u2019s emphasis on fine-tuning and training efficiency. Several excerpts confirm offline/local operation via Unsloth Studio, 100% offline capability on Mac/Windows/Linux, and no-code dataset creation via Data Recipes, which supports the stated capability of local training and data processing workflows. Export formats are explicitly covered (GGUF, safetensors, LoRA adapters), which matches the mention of deployment/export formats. Gemma 4 specifics (training/inference, VRAM/memory assumptions, running locally) provide concrete corroboration for Gemma 4-related aspects. A number of excerpts also describe the ability to run and fine-tune a variety of models, including 500+ models, and integration features like tool-calling, web search, and OpenAI-compatible API, reinforcing the broader capability landscape. Contextual excerpts about data workflows, offline usage, and export pathways complement the core capabilities by describing how the tools are used end-to-end (training, fine-tuning, exporting, and deploying). Taken together, these excerpts map directly to the requested capability overview: inference and training support, data processing, multiple precision LoRA/QLoRA approaches, enterprise options, offline Studio usage, and export/deployment formats.\n",
+        "citations": [
+          {
+            "url": "https://unsloth.ai/docs/get-started/fine-tuning-llms-guide/lora-hyperparameters-guide",
+            "excerpts": [
+              "LoRA uses 16-bit precision, while QLoRA is a 4-bit fine-tuning method.",
+              "`target_modules = [\"q_proj\", \"k_proj\", \"v_proj\", \"o_proj\", \"gate_proj\", \"up_proj\", \"down_proj\",]` to target both **MLP** and **attention** layers to increase accuracy.",
+              "Done well, **LoRA can match full fine-tuning performance** while using 4\u00d7 less VRAM."
+            ],
+            "title": "LoRA fine-tuning Hyperparameters Guide | Unsloth Documentation"
+          },
+          {
+            "url": "https://unsloth.ai/docs/new/studio/export",
+            "excerpts": [
+              "Use Unsloth Studio to export, save, or convert models to GGUF, Safetensors, or LoRA for deployment, sharing, or local inference in Unsloth, llama.cpp, Ollama, vLLM, and more.",
+              "export a merged model, LoRA adapter weights, or a GGUF model for local inference.",
+              "Merged Model | **16-bit model** with the LoRA adapter merged into the base weights.",
+              "LoRA Only | Exports **only the adapter weights**. Requires the original base model.",
+              "GGUF / llama.cpp | Converts the model to **GGUF format** for Unsloth / llama.cpp **/** Ollama / LM Studio inference."
+            ],
+            "title": "Export models with Unsloth Studio | Unsloth Documentation"
+          },
+          {
+            "url": "http://unsloth.ai/docs/models/gemma-4/train",
+            "excerpts": [
+              "trains Gemma 4 **~1.5x faster** with **~60% less VRAM** than FA2 setups (no accuracy loss)",
+              "* Unsloth trains Gemma 4 **~1.5x faster** with **~60% less VRAM** than FA2 setups (no accuracy loss)",
+              "* We fixed many universal [bugs for Gemma 4 training](#bug-fixes--tips) (not derived from Unsloth).",
+              "* Gemma 4 E2B trains on **8GB VRAM**. E4B requires 10GB VRAM.",
+              "* Gemma 4 E2B LoRA works on 8-10GB VRAM. E4B LoRA requires 17GB VRAM.",
+              "* **31B QLoRA works with 22GB** and 26B-A4B LoRA needs >40GB",
+              "#### Export your fine-tuned model\nOnce done, Unsloth Studio allows you to export the model to GGUF, safetensor etc formats."
+            ],
+            "title": "Gemma 4 Fine-tuning Guide | Unsloth Documentation"
+          },
+          {
+            "url": "https://unsloth.ai/docs/models/gemma-4",
+            "excerpts": [
+              "Gemma 4 is Google DeepMind\u2019s new family of open models, including E2B, E4B, 26B-A4B, and 31B. The multimodal, hybrid-thinking models support 140+ languages, up to 256K context, and have dense and MoE variants. Gemma 4 is Apache-2.0 licensed and can run on your local device.",
+              "Gemma 4 is Google DeepMind\u2019s new family of open models, including **E2B** , **E4B** , **26B-A4B** , and **31B.**",
+              "Gemma-4-E2B** and **E4B** support image and audi",
+              "Run on **5GB RAM** (4-bit) or 15GB (full 16-bit).",
+              "B-A4B** runs on **18GB** (4-bit) or 28GB (8-bit).",
+              "B** needs **20GB RAM** (4-bit) or 34GB (8-bit).",
+              "You can now run GGUFs and fine-tune Gemma 4 in Unsloth Studio \u2728",
+              " NOT** use CUDA 13.2 runtime for any GGUF as it will cause poor outputs.",
+              "Gemma 4 variant\n4-bit\n8-bit\nBF16 / FP16\n**E2B**\n4 GB\n5\u20138 GB\n10 GB\n**E4B**\n5.5\u20136 GB\n9\u201312 GB\n16 GB\n**26B A4B**\n16\u201318 GB\n28\u201330 GB\n52 GB\n**31B**\n17\u201320 GB\n34\u201338 GB\n62 GB",
+              "Unsloth Studio lets you run models locally on **MacOS, Windows** , Linux and:",
+              "\n* Search, download, run GGUFs and safetensor models",
+              "* **Self-healing** tool calling + **web search**",
+              "* **Code execution** (Python, Bash)",
+              "* Automatic inference parameter tuning (temp, top-p, etc.)",
+              "* Fast CPU + GPU inference via llama.cpp",
+              "* Train LLMs 2x faster with 70% less VRAM"
+            ],
+            "title": "Gemma 4 - How to Run Locally | Unsloth Documentation"
+          },
+          {
+            "url": "https://unsloth.ai/docs/new/studio/data-recipe",
+            "excerpts": [
+              "Unsloth Studio's Data Recipes lets you upload documents like PDFs or CSVs files and transforms them into useable / synthetic datasets."
+            ],
+            "title": "Unsloth Data Recipes | Unsloth Documentation"
+          },
+          {
+            "url": "https://github.com/unslothai/unsloth",
+            "excerpts": [
+              "Unsloth Studio (Beta) lets you run and train text, audio, embedding, vision models on Windows, Linux and macOS. Export models: Save or export models to GGUF, 16-bit safetensors and other formats. Auto set inference settings and customize chat templates.",
+              "Finetune Mistral, Llama 2-5x faster with 70% less memory!",
+              "* Train and RL **500+ models** up to **2x faster** with up to **70% less VRAM** , with no accuracy loss.",
+              "* **Data Recipes** : [Auto-create datasets](https://unsloth.ai/docs/new/studio/data-recipe) from **PDF, CSV, DOCX** etc. Edit data in a visual-node workflow.",
+              "* **Gemma 4** : Run and train Google\u2019s new models directly in Unsloth. [Blog](https://unsloth.ai/docs/models/gemma-4)",
+              "* **Introducing Unsloth Studio** : our new web UI for running and training LLMs."
+            ],
+            "title": "GitHub - unslothai/unsloth: Unsloth Studio is a web UI for ..."
+          },
+          {
+            "url": "https://unsloth.ai/docs/get-started/fine-tuning-llms-guide",
+            "excerpts": [
+              "> [**Introducing Unsloth Studio:** ](/docs/new/studio.md) Our new open-source web UI for training and running models. This means you can now fine-tune models with no-code and have observability and automatic dataset creation features.",
+              "* **LoRA** is a parameter efficient training method that typically keeps the base model\u2019s weights frozen and trains a small set of added low-rank adapter weights (in 16-bit precision).",
+              "* **QLoRA** combines LoRA with 4-bit precision to handle very large models with minimal resources."
+            ],
+            "title": "Fine-tuning LLMs Guide | Unsloth Documentation"
+          },
+          {
+            "url": "https://deepwiki.com/unslothai/unsloth-studio/4.2-benchmarking-and-evaluation",
+            "excerpts": [
+              "This document covers the benchmarking and evaluation systems in unsloth-studio, focusing on model performance assessment through standardized benchmarks. The primary evaluation system implements MMLU"
+            ],
+            "title": "Benchmarking and Evaluation | unslothai/unsloth-studio | DeepWiki"
+          }
+        ],
+        "confidence": "high"
+      },
+      {
+        "field": "training_scripts_and_process",
+        "reasoning": "The most relevant information directly supports the core workflow: Unsloth\u2019s optimization using a patched model driver (FastModel.from_pretrained) and subsequent PEFT configuration for LoRA/QLoRA. Specifically, the description that the optimization happens when the loaded model is passed to FastModel.from_pretrained() directly connects to the field value\u2019s emphasis on initializing and managing a training process with Unsloth. The accompanying code example using a FastLanguageModel.from_pretrained(...) reinforces the practical pattern of loading a base model and preparing it for PEFT within Unsloth. The discussion of PEFT configuration parameters such as target_modules, r, lora_alpha, and lora_dropout provides concrete details that align with configuring LoRA/QLoRA as part of the training workflow described in the field value. Additional excerpts from the Gemma 4 fine-tuning guide supply model-specific context (e.g., E2B LoRA, VRAM considerations) that corroborate the practical steps and resource considerations mentioned in the field value, showing how the training process is applied to Gemma 4. The LoRA/QLoRA hyperparameter guidance clarifies the expected configuration surface (4-bit QLoRA vs 16-bit LoRA, target modules including q_proj/k_proj/v_proj/o_proj, etc.) and supports the notion that Unsloth enables efficient fine-tuning with shared, minimal-code workflows, which is consistent with the field value\u2019s claim of matching standard Hugging Face workflows with Unsloth\u2019s optimizations. Additional guidance on fine-tuning workflow (SFTTrainer usage, dataset preparation, and training initiation) from general fine-tuning guides aligns with the field value\u2019s high-level process of using TRL\u2019s SFTTrainer to conduct fine-tuning and using evaluation modes to compare models, thereby reinforcing the overall process described. In summary, the most pertinent excerpts provide explicit statements and examples about the initialization of a model with Unsloth\u2019s FastModel, the PEFT setup for LoRA/QLoRA, dataset preparation, and trainer usage, which directly support the field value\u2019s described training pipeline. Excerpts about export formats and generic training benchmarks provide useful context but do not directly validate the specific procedural steps outlined in the field value.\u201d,\n",
+        "citations": [
+          {
+            "url": "https://unsloth.ai/docs/get-started/fine-tuning-llms-guide/lora-hyperparameters-guide",
+            "excerpts": [
+              "`target_modules = [\"q_proj\", \"k_proj\", \"v_proj\", \"o_proj\", \"gate_proj\", \"up_proj\", \"down_proj\",]` to target both **MLP** and **attention** layers to increase accuracy.",
+              "LoRA uses 16-bit precision, while QLoRA is a 4-bit fine-tuning method."
+            ],
+            "title": "LoRA fine-tuning Hyperparameters Guide | Unsloth Documentation"
+          },
+          {
+            "url": "https://unsloth.ai/docs/get-started/fine-tuning-llms-guide",
+            "excerpts": [
+              "* **LoRA** is a parameter efficient training method that typically keeps the base model\u2019s weights frozen and trains a small set of added low-rank adapter weights (in 16-bit precision).",
+              "* **QLoRA** combines LoRA with 4-bit precision to handle very large models with minimal resources.",
+              "With [Unsloth](https://github.com/unslothai/unsloth), you can fine-tune or do RL for free on Colab, Kaggle, or locally with just 3GB VRAM by using our [notebooks](https://docs.unsloth.ai/get-started/unsloth-notebooks).",
+              "> [**Introducing Unsloth Studio:** ](/docs/new/studio.md) Our new open-source web UI for training and running models. This means you can now fine-tune models with no-code and have observability and automatic dataset creation features."
+            ],
+            "title": "Fine-tuning LLMs Guide | Unsloth Documentation"
+          },
+          {
+            "url": "http://unsloth.ai/docs/models/gemma-4/train",
+            "excerpts": [
+              "* Unsloth trains Gemma 4 **~1.5x faster** with **~60% less VRAM** than FA2 setups (no accuracy loss)",
+              "* We fixed many universal [bugs for Gemma 4 training](#bug-fixes--tips) (not derived from Unsloth).",
+              "* Gemma 4 E2B trains on **8GB VRAM**. E4B requires 10GB VRAM.",
+              "* Gemma 4 E2B LoRA works on 8-10GB VRAM. E4B LoRA requires 17GB VRAM.",
+              "* **31B QLoRA works with 22GB** and 26B-A4B LoRA needs >40GB"
+            ],
+            "title": "Gemma 4 Fine-tuning Guide | Unsloth Documentation"
+          },
+          {
+            "url": "https://deepwiki.com/unslothai/unsloth-studio/4.2-benchmarking-and-evaluation",
+            "excerpts": [
+              "This document covers the benchmarking and evaluation systems in unsloth-studio, focusing on model performance assessment through standardized benchmarks. The primary evaluation system implements MMLU"
+            ],
+            "title": "Benchmarking and Evaluation | unslothai/unsloth-studio | DeepWiki"
+          }
+        ],
+        "confidence": "high"
+      },
+      {
+        "field": "project_plan_title",
+        "reasoning": "The core project plan title is about Fine-Tuning Gemma 4 for a clinical urge surfing web app. Excerpts that describe Gemma 4 fine-tuning workflows, speed/VRAM improvements, and general guidance for fine-tuning (especially with LoRA/QLoRA) provide direct justification for a project plan focused on this topic. For example, content stating that Gemma 4 training can be ~1.5x faster with ~60% less VRAM than FA2 setups, and that Gemma 4 E2B can train with specific VRAM requirements, supports the feasibility and resource planning aspects of the project. Additional guidance notes that LoRA/QLoRA are used to fine-tune models efficiently and that 31B QLoRA works with 22GB and 26B-A4B with >40GB VRAM, which informs hardware planning and method selection for a clinical app. Export guidance (exporting to GGUF or safetensors) supports deployment considerations for a web/demo product. Local/offline execution is reinforced by mentions of Studio running 100% offline on Mac/Windows, which aligns with a self-hosted clinical app workflow. The combination of these details enables a concrete plan: (1) adopt Gemma 4 fine-tuning with LoRA/QLoRA, (2) account for VRAM and RAM requirements per model variant, (3) plan for offline/local training with Unsloth Studio, (4) specify export formats suitable for deployment (GGUF, safetensors, LoRA adapters), and (5) reference related setup steps and comparisons to full fine-tuning to justify resource and time estimates in the plan. The additional notes about running Gemma 4 locally, supported RAM/VRAM configurations, and the existence of export/import tooling directly support a realistic project plan for a clinical web app that requires privacy and offline capabilities while leveraging modern LoRA-based fine-tuning strategies.",
+        "citations": [
+          {
+            "url": "http://unsloth.ai/docs/models/gemma-4/train",
+            "excerpts": [
+              "trains Gemma 4 **~1.5x faster** with **~60% less VRAM** than FA2 setups (no accuracy loss)",
+              "* Unsloth trains Gemma 4 **~1.5x faster** with **~60% less VRAM** than FA2 setups (no accuracy loss)",
+              "* We fixed many universal [bugs for Gemma 4 training](#bug-fixes--tips) (not derived from Unsloth).",
+              "* Gemma 4 E2B trains on **8GB VRAM**. E4B requires 10GB VRAM.",
+              "* Gemma 4 E2B LoRA works on 8-10GB VRAM. E4B LoRA requires 17GB VRAM.",
+              "* **31B QLoRA works with 22GB** and 26B-A4B LoRA needs >40GB",
+              "#### Export your fine-tuned model\nOnce done, Unsloth Studio allows you to export the model to GGUF, safetensor etc formats."
+            ],
+            "title": "Gemma 4 Fine-tuning Guide | Unsloth Documentation"
+          },
+          {
+            "url": "https://unsloth.ai/docs/models/gemma-4",
+            "excerpts": [
+              "Gemma 4 is Google DeepMind\u2019s new family of open models, including **E2B** , **E4B** , **26B-A4B** , and **31B.**",
+              "Gemma-4-E2B** and **E4B** support image and audi",
+              "Run on **5GB RAM** (4-bit) or 15GB (full 16-bit).",
+              "B-A4B** runs on **18GB** (4-bit) or 28GB (8-bit).",
+              "B** needs **20GB RAM** (4-bit) or 34GB (8-bit).",
+              "You can now run GGUFs and fine-tune Gemma 4 in Unsloth Studio \u2728"
+            ],
+            "title": "Gemma 4 - How to Run Locally | Unsloth Documentation"
+          },
+          {
+            "url": "https://unsloth.ai/docs/get-started/fine-tuning-llms-guide",
+            "excerpts": [
+              "* **LoRA** is a parameter efficient training method that typically keeps the base model\u2019s weights frozen and trains a small set of added low-rank adapter weights (in 16-bit precision).",
+              "* **QLoRA** combines LoRA with 4-bit precision to handle very large models with minimal resources.",
+              "Enables LLMs to predict if a headline impacts a company positively or negatively. Can use historical customer interactions for more accurate and custom responses. Fine-tune LLM on legal texts for contract analysis, case law research, and compliance.",
+              "With [Unsloth](https://github.com/unslothai/unsloth), you can fine-tune or do RL for free on Colab, Kaggle, or locally with just 3GB VRAM by using our [notebooks](https://docs.unsloth.ai/get-started/unsloth-notebooks).",
+              "> [**Introducing Unsloth Studio:** ](/docs/new/studio.md) Our new open-source web UI for training and running models. This means you can now fine-tune models with no-code and have observability and automatic dataset creation features."
+            ],
+            "title": "Fine-tuning LLMs Guide | Unsloth Documentation"
+          },
+          {
+            "url": "https://github.com/unslothai/unsloth",
+            "excerpts": [
+              "Unsloth Studio (Beta) lets you run and train text, audio, embedding, vision models on Windows, Linux and macOS. Export models: Save or export models to GGUF, 16-bit safetensors and other formats. Auto set inference settings and customize chat templates.",
+              "## \u2b50 Features",
+              "* **Search + download + run models** including GGUF, LoRA adapters, safetensors"
+            ],
+            "title": "GitHub - unslothai/unsloth: Unsloth Studio is a web UI for ..."
+          }
+        ],
+        "confidence": "high"
+      },
+      {
+        "field": "executive_summary",
+        "reasoning": "The strongest corroboration comes from excerpts that explicitly discuss Gemma 4 fine-tuning with Unsloth, including performance claims (e.g., ~1.5x faster training with ~60% less VRAM) and LoRA/QLoRA usage, which directly maps to the field value\u2019s emphasis on efficient Gemma 4 fine-tuning and memory benefits. Details about E2B/E4B variants, VRAM requirements for Gemma 4 (8\u201310 GB for LoRA, higher for other configurations), and export formats (GGUF, safetensors, LoRA adapters) provide concrete alignment with the described offline/local workflow and export paths for a Next.js offline demo. References that describe Unsloth Studio running 100% offline on Mac/Windows/Linux, and the ability to run/export locally, directly support the claim of an offline, private solution suitable for a clinical app, including the ability to export adapters and run them with llama.cpp. Data preparation features like Data Recipes help address the field value\u2019s mention of curated datasets and offline-ready pipelines. General LoRA/QLoRA guidance explains the technical underpinnings (4-bit QLoRA, 16-bit LoRA, target modules, and design goals) which reinforces the proposed workflows for Gemma 4. Export-related excerpts detail the formats and paths for model deployment (GGUF, safetensors, and LoRA weights), matching the field value\u2019s emphasis on local deployment. Several excerpts also touch on the range of hardware considerations and multi-GPU/VRAM efficiency, which underpin the offline clinical demo\u2019s feasibility. Collectively, these excerpts form a coherent map from Unsloth\u2019s offline/local capabilities and Gemma 4 integration to practical, exportable workflows suitable for a Next.js offline demo, and they provide concrete numbers and format options to ground recommendations.",
+        "citations": [
+          {
+            "url": "http://unsloth.ai/docs/models/gemma-4/train",
+            "excerpts": [
+              "trains Gemma 4 **~1.5x faster** with **~60% less VRAM** than FA2 setups (no accuracy loss)",
+              "* Gemma 4 E2B trains on **8GB VRAM**. E4B requires 10GB VRAM.",
+              "* Gemma 4 E2B LoRA works on 8-10GB VRAM. E4B LoRA requires 17GB VRAM.",
+              "* **31B QLoRA works with 22GB** and 26B-A4B LoRA needs >40GB",
+              "#### Export your fine-tuned model\nOnce done, Unsloth Studio allows you to export the model to GGUF, safetensor etc formats."
+            ],
+            "title": "Gemma 4 Fine-tuning Guide | Unsloth Documentation"
+          },
+          {
+            "url": "https://unsloth.ai/docs/models/gemma-4",
+            "excerpts": [
+              "Gemma 4 is Google DeepMind\u2019s new family of open models, including **E2B** , **E4B** , **26B-A4B** , and **31B.**",
+              "Gemma-4-E2B** and **E4B** support image and audi",
+              "Run on **5GB RAM** (4-bit) or 15GB (full 16-bit).",
+              "B-A4B** runs on **18GB** (4-bit) or 28GB (8-bit).",
+              "B** needs **20GB RAM** (4-bit) or 34GB (8-bit).",
+              "You can now run GGUFs and fine-tune Gemma 4 in Unsloth Studio \u2728"
+            ],
+            "title": "Gemma 4 - How to Run Locally | Unsloth Documentation"
+          },
+          {
+            "url": "https://unsloth.ai/docs/get-started/fine-tuning-llms-guide/lora-hyperparameters-guide",
+            "excerpts": [
+              "LoRA uses 16-bit precision, while QLoRA is a 4-bit fine-tuning method.",
+              "`target_modules = [\"q_proj\", \"k_proj\", \"v_proj\", \"o_proj\", \"gate_proj\", \"up_proj\", \"down_proj\",]` to target both **MLP** and **attention** layers to increase accuracy.",
+              "Done well, **LoRA can match full fine-tuning performance** while using 4\u00d7 less VRAM."
+            ],
+            "title": "LoRA fine-tuning Hyperparameters Guide | Unsloth Documentation"
+          },
+          {
+            "url": "https://unsloth.ai/docs/get-started/fine-tuning-llms-guide",
+            "excerpts": [
+              "> [**Introducing Unsloth Studio:** ](/docs/new/studio.md) Our new open-source web UI for training and running models. This means you can now fine-tune models with no-code and have observability and automatic dataset creation features.",
+              "* **LoRA** is a parameter efficient training method that typically keeps the base model\u2019s weights frozen and trains a small set of added low-rank adapter weights (in 16-bit precision).",
+              "* **QLoRA** combines LoRA with 4-bit precision to handle very large models with minimal resources."
+            ],
+            "title": "Fine-tuning LLMs Guide | Unsloth Documentation"
+          },
+          {
+            "url": "https://unsloth.ai/docs/new/studio/export",
+            "excerpts": [
+              "Use Unsloth Studio to export, save, or convert models to GGUF, Safetensors, or LoRA for deployment, sharing, or local inference in Unsloth, llama.cpp, Ollama, vLLM, and more.",
+              "GGUF / llama.cpp | Converts the model to **GGUF format** for Unsloth / llama.cpp **/** Ollama / LM Studio inference."
+            ],
+            "title": "Export models with Unsloth Studio | Unsloth Documentation"
+          },
+          {
+            "url": "http://vast.ai/article/unsloth-studio-now-available-on-vast-ai",
+            "excerpts": [
+              "xport** \u2014 Save fine-tuned models as merged safetensors, LoRA adapters, or GGUF files. Upload directly to Hugging Face Hub",
+              "new/studio) is an open-source, no-code web UI for running and fine-tuning more than 500 open-source AI models across text, vision, audio, and embeddings. It delivers 2x faster training with 70% less VRAM than standard approaches, which makes it possible to fine-tune larger models on more affordable hardware.\nVa",
+              "* **Run models** \u2014 Search and download any of 500+ models from Hugging Face. Chat with built-in tool calling, code execution, and web search.",
+              "* **Fine-tune** \u2014 Train with QLoRA, LoRA, or full fine-tuning. Upload datasets or build them from raw documents using Data Recipes. Monitor training with real-time loss curves and GPU stats."
+            ],
+            "title": "Unsloth Studio Is Now Available on Vast.ai"
+          },
+          {
+            "url": "http://unsloth.ai/",
+            "excerpts": [
+              "Export any model, including your fine-tuned models, to safetensors, or GGUF for use with llama.cpp, vLLM, Ollama, and more."
+            ],
+            "title": "Unsloth - Train and Run Models Locally"
+          }
+        ],
+        "confidence": "high"
+      },
+      {
+        "field": "gemma_4_support_details",
+        "reasoning": "The most directly relevant information confirms the Gemma 4 support details and fine-tuning workflow. Excerpts noting Gemma 4 variants such as E2B and E4B being part of the Gemma 4 family establish the core scope of Unsloth\u2019s support for these OpenModels. Specific mentions of E2B and E4B support, as well as the association of Gemma 4 with local running and training in Unsloth Studio, provide exact alignment with the defined variants and the environments in which they run. Additional excerpts describe that E2B LoRA workflows are viable and specify memory/VRAM requirements for 4-bit and full 16-bit configurations, which substantiates the claimed VRAM efficiency and hardware considerations. References stating that LoRA/QLoRA fine-tuning is supported by Unsloth, and that you can export or merge LoRA adapters and GGUF formats, directly support the modalities and formats mentioned in the fine-grained field value. Explicit performance claims\u2014such as training being ~1.5x faster and requiring ~60% less VRAM compared with FA2 setups\u2014align with the performance_gains field and confirm Unsloth\u2019s efficiency benefits during Gemma 4 fine-tuning. Bug fixes related to Gemma 4 training, including corrected gradient accumulation behavior that makes small-batch with accumulation equivalent to larger batch sizes, validate the key_bug_fixes claim. The combination of variant coverage, modality support, LoRA/QLoRA workflow compatibility, export formats, and documented performance improvements forms a coherent picture that maps cleanly to the requested fine-grained field value.",
+        "citations": [
+          {
+            "url": "https://unsloth.ai/docs/models/gemma-4",
+            "excerpts": [
+              "Gemma 4 is Google DeepMind\u2019s new family of open models, including **E2B** , **E4B** , **26B-A4B** , and **31B.**",
+              "Gemma-4-E2B** and **E4B** support image and audi",
+              "Run on **5GB RAM** (4-bit) or 15GB (full 16-bit).",
+              "B-A4B** runs on **18GB** (4-bit) or 28GB (8-bit).",
+              "B** needs **20GB RAM** (4-bit) or 34GB (8-bit).",
+              "Gemma 4 is Google DeepMind\u2019s new family of open models, including E2B, E4B, 26B-A4B, and 31B. The multimodal, hybrid-thinking models support 140+ languages, up to 256K context, and have dense and MoE variants. Gemma 4 is Apache-2.0 licensed and can run on your local device.",
+              "Gemma 4 variant\n4-bit\n8-bit\nBF16 / FP16\n**E2B**\n4 GB\n5\u20138 GB\n10 GB\n**E4B**\n5.5\u20136 GB\n9\u201312 GB\n16 GB\n**26B A4B**\n16\u201318 GB\n28\u201330 GB\n52 GB\n**31B**\n17\u201320 GB\n34\u201338 GB\n62 GB",
+              "\n* Search, download, run GGUFs and safetensor models",
+              "* **Self-healing** tool calling + **web search**",
+              "* **Code execution** (Python, Bash)",
+              "* Automatic inference parameter tuning (temp, top-p, etc.)",
+              "* Fast CPU + GPU inference via llama.cpp",
+              "* Train LLMs 2x faster with 70% less VRAM"
+            ],
+            "title": "Gemma 4 - How to Run Locally | Unsloth Documentation"
+          },
+          {
+            "url": "http://unsloth.ai/docs/models/gemma-4/train",
+            "excerpts": [
+              "trains Gemma 4 **~1.5x faster** with **~60% less VRAM** than FA2 setups (no accuracy loss)",
+              "* Gemma 4 E2B LoRA works on 8-10GB VRAM. E4B LoRA requires 17GB VRAM.",
+              "* **31B QLoRA works with 22GB** and 26B-A4B LoRA needs >40GB",
+              "* Unsloth trains Gemma 4 **~1.5x faster** with **~60% less VRAM** than FA2 setups (no accuracy loss)",
+              "* Gemma 4 E2B trains on **8GB VRAM**. E4B requires 10GB VRAM.",
+              "#### Export your fine-tuned model\nOnce done, Unsloth Studio allows you to export the model to GGUF, safetensor etc formats.",
+              "* We fixed many universal [bugs for Gemma 4 training](#bug-fixes--tips) (not derived from Unsloth).",
+              "#### Compare fine-tuned model vs original model\nClick on `Compare Mode` to compare the LoRA adapter and the original model."
+            ],
+            "title": "Gemma 4 Fine-tuning Guide | Unsloth Documentation"
+          },
+          {
+            "url": "https://unsloth.ai/docs/new/studio/data-recipe",
+            "excerpts": [
+              "Unsloth Studio's Data Recipes lets you upload documents like PDFs or CSVs files and transforms them into useable / synthetic datasets. Create and edit datasets visually via a graph-node workflow. This guide will get you started with the basics before you dive into Unsloth Data Recipes.",
+              "Unsloth Studio's Data Recipes lets you upload documents like PDFs or CSVs files and transforms them into useable / synthetic datasets."
+            ],
+            "title": "Unsloth Data Recipes | Unsloth Documentation"
+          },
+          {
+            "url": "https://github.com/unslothai/unsloth",
+            "excerpts": [
+              "Unsloth Studio (Beta) lets you run and train text, audio, embedding, vision models on Windows, Linux and macOS. Export models: Save or export models to GGUF, 16-bit safetensors and other formats. Auto set inference settings and customize chat templates.",
+              "Finetune Mistral, Llama 2-5x faster with 70% less memory!",
+              "## \u2b50 Features",
+              "* **Search + download + run models** including GGUF, LoRA adapters, safetensors",
+              "* Train and RL **500+ models** up to **2x faster** with up to **70% less VRAM** , with no accuracy loss.",
+              "* **Export models** : [Save or export](https://unsloth.ai/docs/new/studio/export) models to GGUF, 16-bit safetensors and other formats.",
+              "* **Data Recipes** : [Auto-create datasets](https://unsloth.ai/docs/new/studio/data-recipe) from **PDF, CSV, DOCX** etc. Edit data in a visual-node workflow.",
+              "* **Gemma 4** : Run and train Google\u2019s new models directly in Unsloth. [Blog](https://unsloth.ai/docs/models/gemma-4)",
+              "* **Introducing Unsloth Studio** : our new web UI for running and training LLMs."
+            ],
+            "title": "GitHub - unslothai/unsloth: Unsloth Studio is a web UI for ..."
+          },
+          {
+            "url": "https://unsloth.ai/docs/basics/unsloth-benchmarks",
+            "excerpts": [
+              "We tested using the Alpaca Dataset, a batch size of 2, gradient accumulation steps of 4, rank = 32, and applied QLoRA on all linear layers (q, k, v, o, gate, up, down): The more data you have, the less VRAM Unsloth uses due to our gradient checkpointing algorithm + Apple's CCE algorithm!",
+              "## Context length benchmarks\n### **Llama 3.3 (70B) max. context length**\nWe tested Llama 3.3 (70B) Instruct on a 80GB A100 and did 4bit QLoRA on all linear layers (Q, K, V, O, gate, up and down) with rank = 32 with a batch size of 1. We padded all sequences to a certain maximum sequence length to mimic long context finetuning workloads.",
+              "| GPU VRAM | \ud83e\udda5Unsloth context length | Hugging Face + FA2 |\n| 48 GB | 12,106 | OOM |\n| 80 GB | 89,389 | 6,916 |"
+            ],
+            "title": "Unsloth Benchmarks | Unsloth Documentation"
+          },
+          {
+            "url": "http://tech-insider.org/google-gemma-4-open-model-benchmarks-2026",
+            "excerpts": [
+              "Google released Gemma 4 on April 2, 2026, delivering what the company calls its most intelligent open AI model family to date."
+            ],
+            "title": "Gemma 4: How a 31B Model Beats 400B Rivals [2026]"
+          },
+          {
+            "url": "https://unsloth.ai/docs/get-started/fine-tuning-llms-guide",
+            "excerpts": [
+              "Enables LLMs to predict if a headline impacts a company positively or negatively. Can use historical customer interactions for more accurate and custom responses. Fine-tune LLM on legal texts for contract analysis, case law research, and compliance.",
+              "With [Unsloth](https://github.com/unslothai/unsloth), you can fine-tune or do RL for free on Colab, Kaggle, or locally with just 3GB VRAM by using our [notebooks](https://docs.unsloth.ai/get-started/unsloth-notebooks).",
+              "> [**Introducing Unsloth Studio:** ](/docs/new/studio.md) Our new open-source web UI for training and running models. This means you can now fine-tune models with no-code and have observability and automatic dataset creation features.",
+              "* **LoRA** is a parameter efficient training method that typically keeps the base model\u2019s weights frozen and trains a small set of added low-rank adapter weights (in 16-bit precision).",
+              "* **QLoRA** combines LoRA with 4-bit precision to handle very large models with minimal resources."
+            ],
+            "title": "Fine-tuning LLMs Guide | Unsloth Documentation"
+          },
+          {
+            "url": "https://deepwiki.com/unslothai/unsloth-studio/4.2-benchmarking-and-evaluation",
+            "excerpts": [
+              "This document covers the benchmarking and evaluation systems in unsloth-studio, focusing on model performance assessment through standardized benchmarks. The primary evaluation system implements MMLU"
+            ],
+            "title": "Benchmarking and Evaluation | unslothai/unsloth-studio | DeepWiki"
+          }
+        ],
+        "confidence": "high"
+      },
+      {
+        "field": "nextjs_offline_demo_implementation_guide",
+        "reasoning": "The most directly relevant content describes exporting models to GGUF or safetensors, and how to load them in offline contexts using llama.cpp or Transformers.js. Specific passages explain exporting a merged model with LoRA weights into GGUF for llama.cpp, and exporting a merged 16-bit safetensors combination for Transformers.js in a way that can be bundled with a Next.js app or cached for offline use via service workers. This aligns with the need to bundle a quantized or merged model for a browser-based or local-server-based offline demo, and with the option to run a local server (llama-server) that exposes an OpenAI-compatible API endpoint for a Next.js frontend. Additional passages describe running Gemma 4 locally, hardware requirements, and offline-capable workflows, which reinforce the feasibility of a fully offline Next.js demo using Unsloth Studio exports. Specific guidance about exporting to GGUF and safetensors, the ability to run GGUF-based deployments with llama.cpp, and the option to use a local server for API-like interactions directly support the recommended deployment approaches in the field value. In addition, content describing local run capabilities, RAM/VRAM considerations, and offline usage of Unsloth Studio provides practical constraints and validation for choosing between the browser-based Transformers.js path versus the server-based llama.cpp path, and for how to structure the Next.js app to interact with a local inference service. The UI integration guidance in the offline context (e.g., creating a local endpoint and having the Next.js frontend call a local API) is supported by material on local runtimes and server-backed inference. Overall, the strongest support centers on exporting and loading formats (GGUF, safetensors, LoRA adapters) and offline runtimes (llama.cpp server, Transformers.js offline), with concrete notes on Gemma 4 variants, VRAM constraints, and offline deployment workflows that inform the implementation and integration steps for a Next.js offline demo. The remaining excerpts provide contextual background on Unsloth Studio features, Gemma 4 hardware requirements, and offline execution capabilities that corroborate feasibility but are slightly less targeted to the exact Next.js offline integration flow.",
+        "citations": [
+          {
+            "url": "http://vast.ai/article/unsloth-studio-now-available-on-vast-ai",
+            "excerpts": [
+              "xport** \u2014 Save fine-tuned models as merged safetensors, LoRA adapters, or GGUF files. Upload directly to Hugging Face Hub",
+              "* **Fine-tune** \u2014 Train with QLoRA, LoRA, or full fine-tuning. Upload datasets or build them from raw documents using Data Recipes. Monitor training with real-time loss curves and GPU stats."
+            ],
+            "title": "Unsloth Studio Is Now Available on Vast.ai"
+          },
+          {
+            "url": "https://unsloth.ai/docs/new/studio/export",
+            "excerpts": [
+              "GGUF / llama.cpp | Converts the model to **GGUF format** for Unsloth / llama.cpp **/** Ollama / LM Studio inference.",
+              "Use Unsloth Studio to export, save, or convert models to GGUF, Safetensors, or LoRA for deployment, sharing, or local inference in Unsloth, llama.cpp, Ollama, vLLM, and more.",
+              "export a merged model, LoRA adapter weights, or a GGUF model for local inference.",
+              "Merged Model | **16-bit model** with the LoRA adapter merged into the base weights.",
+              "LoRA Only | Exports **only the adapter weights**. Requires the original base model."
+            ],
+            "title": "Export models with Unsloth Studio | Unsloth Documentation"
+          },
+          {
+            "url": "https://unsloth.ai/docs/models/gemma-4",
+            "excerpts": [
+              "Gemma 4 is Google DeepMind\u2019s new family of open models, including E2B, E4B, 26B-A4B, and 31B. The multimodal, hybrid-thinking models support 140+ languages, up to 256K context, and have dense and MoE variants. Gemma 4 is Apache-2.0 licensed and can run on your local device.",
+              "Gemma 4 is Google DeepMind\u2019s new family of open models, including **E2B** , **E4B** , **26B-A4B** , and **31B.**",
+              "Gemma-4-E2B** and **E4B** support image and audi",
+              "Run on **5GB RAM** (4-bit) or 15GB (full 16-bit).",
+              "B-A4B** runs on **18GB** (4-bit) or 28GB (8-bit).",
+              "B** needs **20GB RAM** (4-bit) or 34GB (8-bit).",
+              "You can now run GGUFs and fine-tune Gemma 4 in Unsloth Studio \u2728",
+              "Unsloth Studio lets you run models locally on **MacOS, Windows** , Linux and:",
+              "\n* Search, download, run GGUFs and safetensor models",
+              "* **Self-healing** tool calling + **web search**",
+              "* **Code execution** (Python, Bash)",
+              "* Automatic inference parameter tuning (temp, top-p, etc.)",
+              "* Fast CPU + GPU inference via llama.cpp",
+              "* Train LLMs 2x faster with 70% less VRAM"
+            ],
+            "title": "Gemma 4 - How to Run Locally | Unsloth Documentation"
+          },
+          {
+            "url": "https://unsloth.ai/docs/new/studio/data-recipe",
+            "excerpts": [
+              "Unsloth Studio's Data Recipes lets you upload documents like PDFs or CSVs files and transforms them into useable / synthetic datasets. Create and edit datasets visually via a graph-node workflow. This guide will get you started with the basics before you dive into Unsloth Data Recipes.",
+              "Unsloth Studio's Data Recipes lets you upload documents like PDFs or CSVs files and transforms them into useable / synthetic datasets."
+            ],
+            "title": "Unsloth Data Recipes | Unsloth Documentation"
+          },
+          {
+            "url": "https://github.com/unslothai/unsloth",
+            "excerpts": [
+              "Unsloth Studio (Beta) lets you run and train text, audio, embedding, vision models on Windows, Linux and macOS. Export models: Save or export models to GGUF, 16-bit safetensors and other formats. Auto set inference settings and customize chat templates.",
+              "Finetune Mistral, Llama 2-5x faster with 70% less memory!",
+              "## \u2b50 Features",
+              "* **Search + download + run models** including GGUF, LoRA adapters, safetensors",
+              "* Train and RL **500+ models** up to **2x faster** with up to **70% less VRAM** , with no accuracy loss.",
+              "* **Export models** : [Save or export](https://unsloth.ai/docs/new/studio/export) models to GGUF, 16-bit safetensors and other formats.",
+              "* **Data Recipes** : [Auto-create datasets](https://unsloth.ai/docs/new/studio/data-recipe) from **PDF, CSV, DOCX** etc. Edit data in a visual-node workflow.",
+              "* **Gemma 4** : Run and train Google\u2019s new models directly in Unsloth. [Blog](https://unsloth.ai/docs/models/gemma-4)",
+              "* **Introducing Unsloth Studio** : our new web UI for running and training LLMs."
+            ],
+            "title": "GitHub - unslothai/unsloth: Unsloth Studio is a web UI for ..."
+          },
+          {
+            "url": "https://unsloth.ai/docs/basics/unsloth-benchmarks",
+            "excerpts": [
+              "We tested using the Alpaca Dataset, a batch size of 2, gradient accumulation steps of 4, rank = 32, and applied QLoRA on all linear layers (q, k, v, o, gate, up, down): The more data you have, the less VRAM Unsloth uses due to our gradient checkpointing algorithm + Apple's CCE algorithm!",
+              "## Context length benchmarks\n### **Llama 3.3 (70B) max. context length**\nWe tested Llama 3.3 (70B) Instruct on a 80GB A100 and did 4bit QLoRA on all linear layers (Q, K, V, O, gate, up and down) with rank = 32 with a batch size of 1. We padded all sequences to a certain maximum sequence length to mimic long context finetuning workloads.",
+              "| GPU VRAM | \ud83e\udda5Unsloth context length | Hugging Face + FA2 |\n| 48 GB | 12,106 | OOM |\n| 80 GB | 89,389 | 6,916 |"
+            ],
+            "title": "Unsloth Benchmarks | Unsloth Documentation"
+          },
+          {
+            "url": "http://tech-insider.org/google-gemma-4-open-model-benchmarks-2026",
+            "excerpts": [
+              "Google released Gemma 4 on April 2, 2026, delivering what the company calls its most intelligent open AI model family to date."
+            ],
+            "title": "Gemma 4: How a 31B Model Beats 400B Rivals [2026]"
+          },
+          {
+            "url": "https://unsloth.ai/docs/get-started/fine-tuning-llms-guide",
+            "excerpts": [
+              "Enables LLMs to predict if a headline impacts a company positively or negatively. Can use historical customer interactions for more accurate and custom responses. Fine-tune LLM on legal texts for contract analysis, case law research, and compliance.",
+              "With [Unsloth](https://github.com/unslothai/unsloth), you can fine-tune or do RL for free on Colab, Kaggle, or locally with just 3GB VRAM by using our [notebooks](https://docs.unsloth.ai/get-started/unsloth-notebooks).",
+              "> [**Introducing Unsloth Studio:** ](/docs/new/studio.md) Our new open-source web UI for training and running models. This means you can now fine-tune models with no-code and have observability and automatic dataset creation features.",
+              "* **LoRA** is a parameter efficient training method that typically keeps the base model\u2019s weights frozen and trains a small set of added low-rank adapter weights (in 16-bit precision).",
+              "* **QLoRA** combines LoRA with 4-bit precision to handle very large models with minimal resources."
+            ],
+            "title": "Fine-tuning LLMs Guide | Unsloth Documentation"
+          },
+          {
+            "url": "https://deepwiki.com/unslothai/unsloth-studio/4.2-benchmarking-and-evaluation",
+            "excerpts": [
+              "This document covers the benchmarking and evaluation systems in unsloth-studio, focusing on model performance assessment through standardized benchmarks. The primary evaluation system implements MMLU"
+            ],
+            "title": "Benchmarking and Evaluation | unslothai/unsloth-studio | DeepWiki"
+          },
+          {
+            "url": "https://www.crunchbase.com/organization/unsloth-ai",
+            "excerpts": [
+              "At Unsloth, we're focusing on making AI more accessible. We have over 150 million total downloads (4th most), and partner with Google, OpenAI, Meta,"
+            ],
+            "title": "Unsloth AI - Crunchbase Company Profile & Funding"
+          },
+          {
+            "url": "https://unsloth.ai/docs",
+            "excerpts": [
+              "* Search + download + run any model like GGUFs, LoRA adapters, safetensors."
+            ],
+            "title": "Fetched web page"
+          }
+        ],
+        "confidence": "high"
+      },
+      {
+        "field": "model_export_formats.merged_model_export",
+        "reasoning": "The finegrained field value asserts that a merged model export combines the original base model with the fine-tuned LoRA adapter weights into a single model, typically output as a 16-bit safetensors file, and is intended to simplify inference pipelines by providing a self-contained artifact. The most directly supportive content states that a Merged Model is a 16-bit model with the LoRA adapter merged into the base weights, which directly aligns with the described merged export scenario. It is further reinforced by the notion that exports can be saved or converted into formats like safetensors and GGUF, enabling deployment in environments that use or do not use the PEFT loading pathway. Additional excerpts indicate that you can export a merged model or the LoRA adapter alone, and that safetensors or GGUF formats are common targets for local inference and deployment, which corroborates the practical implications of producing a self-contained merged artifact and expands on supported formats for deployment. Collectively, these excerpts support the idea that the merged export is a single, self-contained artifact (a 16-bit safetensors file) combining base and LoRA, and that this aligns with deployment workflows in typical inference environments.",
+        "citations": [
+          {
+            "url": "https://unsloth.ai/docs/new/studio/export",
+            "excerpts": [
+              "Merged Model | **16-bit model** with the LoRA adapter merged into the base weights.",
+              "Use Unsloth Studio to export, save, or convert models to GGUF, Safetensors, or LoRA for deployment, sharing, or local inference in Unsloth, llama.cpp, Ollama, vLLM, and more."
+            ],
+            "title": "Export models with Unsloth Studio | Unsloth Documentation"
+          },
+          {
+            "url": "http://vast.ai/article/unsloth-studio-now-available-on-vast-ai",
+            "excerpts": [
+              "xport** \u2014 Save fine-tuned models as merged safetensors, LoRA adapters, or GGUF files. Upload directly to Hugging Face Hub"
+            ],
+            "title": "Unsloth Studio Is Now Available on Vast.ai"
+          },
+          {
+            "url": "http://unsloth.ai/docs/models/gemma-4/train",
+            "excerpts": [
+              "#### Export your fine-tuned model\nOnce done, Unsloth Studio allows you to export the model to GGUF, safetensor etc formats."
+            ],
+            "title": "Gemma 4 Fine-tuning Guide | Unsloth Documentation"
+          }
+        ],
+        "confidence": "high"
+      },
+      {
+        "field": "pricing_and_licensing.license_type",
+        "reasoning": "The target field value is a license type, specifically Community License. Excerpts that explicitly mention the Community License or a Community License Agreement directly support this value. One excerpt is titled Unsloth AI Community License Agreement and explicitly references a Community License, making it the most directly relevant. Related excerpts that discuss licensing terms or licensing inquiries in the context of the Unsloth platform further corroborate the licensing framework and how licensing information is communicated (including how to contact for licensing questions). Other excerpts focus on pricing components (free, freeware, open-source, enterprise features) and do not themselves state the license type, but they provide contextual backdrop about how pricing structures are described alongside licensing terms. The combination of a direct statement of the Community License and accompanying licensing context forms the core support for the field value, while pricing-related snippets provide boundary context about how licensing might be framed alongside price tiers, but do not contradict or redefine the license type in question.",
+        "citations": [
+          {
+            "url": "https://unsloth.ai/license",
+            "excerpts": [
+              " # Community License",
+              "Disclosure of your information We do not sell, trade, or otherwise transfer your personal information to outside parties. We may disclose your personal information when we believe it's necessary to comply with the law, enforce our site policies, or protect our rights, property, or safety.",
+              "Contact us If you have any questions about Licensing, please contact us via email: info@unsloth.ai"
+            ],
+            "title": "Unsloth AI Community License Agreement"
+          },
+          {
+            "url": "https://unsloth.ai/pricing",
+            "excerpts": [
+              "# Free",
+              "Unlock 30x faster training + multi-node support + 30% accuracy",
+              "unsloth Enterprise Unlock 30x faster training + multi-node support + 30% accuracy Contact us 32x number of GPUs faster than FA2",
+              "# unsloth Pro",
+              "Freeware of our standard version of unsloth",
+              "* Open-source"
+            ],
+            "title": "Pricing - Unsloth"
+          },
+          {
+            "url": "http://unsloth.ai/",
+            "excerpts": [
+              "Freeware of our standard version of unsloth",
+              "* Open-source"
+            ],
+            "title": "Unsloth - Train and Run Models Locally"
+          }
+        ],
+        "confidence": "high"
+      },
+      {
+        "field": "pricing_and_licensing.pro_tier_summary",
+        "reasoning": "The finegrained field value asserts specific characteristics of a Pro tier: it is a commercial offering for professional users, enabling enhanced multi-GPU performance, up to 8 GPUs in a single node, and states that pricing is available upon contacting the provider. The excerpt stating \"# unsloth Pro\" directly confirms the existence of a Pro tier, making it the most directly relevant. Excerpts describing enterprise features and performance claims such as \u201cEnterprise Unlock 30x faster training + multi-node support + 30% accuracy\u201d and \u201cUnlock 30x faster training + multi-node support + 30% accuracy\u201d provide supporting details about performance and scale that align with the Pro tier\u2019s intended use for multi-GPU setups, thus they are highly relevant though slightly less direct than an explicit Pro label. General pricing references like Free, Freeware, and Open-source still contextualize the pricing landscape and license models, so they are relevant for understanding what exists around the Pro tier but do not substantiate the specific Pro capabilities on their own. License-related excerpts describe Community License terms and licensing contact information, which are relevant to the licensing aspect of the field value but do not confirm Pro-tier specifics by themselves. The locally hosted/open-source training/execution references provide background but do not directly support Pro-tier claims. In sum, the most compelling supports come from explicit Pro mentions and performance/scale claims associated with professional tiers, followed by broader pricing and licensing context, and finally general or tangential items.",
+        "citations": [
+          {
+            "url": "https://unsloth.ai/pricing",
+            "excerpts": [
+              "# unsloth Pro",
+              "unsloth Enterprise Unlock 30x faster training + multi-node support + 30% accuracy Contact us 32x number of GPUs faster than FA2",
+              "Unlock 30x faster training + multi-node support + 30% accuracy",
+              "# Free",
+              "Freeware of our standard version of unsloth",
+              "* Open-source"
+            ],
+            "title": "Pricing - Unsloth"
+          },
+          {
+            "url": "http://unsloth.ai/",
+            "excerpts": [
+              "Freeware of our standard version of unsloth",
+              "* Open-source"
+            ],
+            "title": "Unsloth - Train and Run Models Locally"
+          },
+          {
+            "url": "https://unsloth.ai/license",
+            "excerpts": [
+              " # Community License",
+              "Disclosure of your information We do not sell, trade, or otherwise transfer your personal information to outside parties. We may disclose your personal information when we believe it's necessary to comply with the law, enforce our site policies, or protect our rights, property, or safety."
+            ],
+            "title": "Unsloth AI Community License Agreement"
+          }
+        ],
+        "confidence": "medium"
+      },
+      {
+        "field": "unsloth_studio_vs_open_source.open_source_use_case",
+        "reasoning": "The most directly relevant information is that you can fine-tune using QLoRA, LoRA, or full fine-tuning, and that you can upload datasets for this purpose. This directly aligns with the field value\u2019s emphasis on fine-tuning with 4-bit or 16-bit precision in code-first, local/scripted environments. The excerpts that describe training with QLoRA/LoRA, and the ability to fine-tune, are therefore the strongest support for the stated use case. Additional excerpts confirm open-source, no-code/low-code, or locally runnable tooling, which contextualizes the code-first/open-source workflow in practical terms (offline capabilities, local hardware, and exporting results as adapters or formats). They also mention exporting fine-tuned models and adapters (LoRA) to formats usable by common inference runtimes, which supports the practical end-to-end workflow described in the field value. The remaining excerpts add supportive details about offline/local operation, dataset creation, and export formats, reinforcing the context but offering less direct evidence about the exact code-first/open-source use-case specifics and the precise fine-tuning configurations described in the field value.",
+        "citations": [
+          {
+            "url": "http://vast.ai/article/unsloth-studio-now-available-on-vast-ai",
+            "excerpts": [
+              "* **Fine-tune** \u2014 Train with QLoRA, LoRA, or full fine-tuning. Upload datasets or build them from raw documents using Data Recipes. Monitor training with real-time loss curves and GPU stats.",
+              "new/studio) is an open-source, no-code web UI for running and fine-tuning more than 500 open-source AI models across text, vision, audio, and embeddings. It delivers 2x faster training with 70% less VRAM than standard approaches, which makes it possible to fine-tune larger models on more affordable hardware.\nVa",
+              "xport** \u2014 Save fine-tuned models as merged safetensors, LoRA adapters, or GGUF files. Upload directly to Hugging Face Hub"
+            ],
+            "title": "Unsloth Studio Is Now Available on Vast.ai"
+          },
+          {
+            "url": "http://unsloth.ai/",
+            "excerpts": [
+              "No-code training\nAuto-create datasets from PDF, CSV, JSON docs and start training with real-time observability.\nStudio runs 100% offline on your **Mac** and **Windows** device. Run GGUF and Safetensors models with tool-calling, web search, and OpenAI compatible API\nUnsloth is an open-source, no-code web UI for training, running and exporting open models in one unified local interface.",
+              "Unsloth is an open-source, no-code web UI for training, running and exporting open models in one unified local interface.",
+              "Unsloth Studio runs 100% offline on your **Mac** and **Windows** device. Run GGUF and Safetensors models with tool-calling, web search, and OpenAI compatible API.",
+              "Export any model, including your fine-tuned models, to safetensors, or GGUF for use with llama.cpp, vLLM, Ollama, and more.",
+              " No-code training\nAuto-create datasets from PDF, CSV, JSON docs and start training with real-time observability.\n"
+            ],
+            "title": "Unsloth - Train and Run Models Locally"
+          },
+          {
+            "url": "http://unsloth.ai/docs",
+            "excerpts": [
+              "Unsloth lets you run and train AI models on your own local hardware. Our docs will guide you through running & training your own model locally."
+            ],
+            "title": "Unsloth Docs | Unsloth Documentation"
+          }
+        ],
+        "confidence": "high"
+      },
+      {
+        "field": "pricing_and_licensing.free_tier_summary",
+        "reasoning": "The core field value describes a Free tier that is open-source and supports local training for single-GPU setups, including compatibility with models such as Gemma, Mistral, and Llama families, as well as the ability to perform 4-bit (QLoRA) and 16-bit (LoRA) fine-tuning and to achieve certain performance advantages. Among the excerpts, there are explicit references to the Free/open-source nature of the offering and to local training capabilities: one excerpt highlights the Freeware status and another explicitly notes that training and running models can be done locally in an open-source context. Additional excerpts reference pricing tiers (Free, Pro, Enterprise) and the existence of an open-source license agreement, which corroborate the licensing and cost structure part of the field value. While none of the excerpts individually confirms the full, detailed technical capabilities (specific model support list, exact 4-bit/LoRA support, and quantified performance metrics), together they establish the essential pieces: a Free/open-source option and the ability to run/train locally. The most directly relevant parts emphasize: the availability of a Freeware/open-source offering and the possibility of local/open-source model training. The other excerpts provide contextual pricing and licensing details that support the overall licensing narrative but do not override the more specific claims about free/open-source and local deployment.",
+        "citations": [
+          {
+            "url": "http://unsloth.ai/",
+            "excerpts": [
+              "* Open-source",
+              "Freeware of our standard version of unsloth"
+            ],
+            "title": "Unsloth - Train and Run Models Locally"
+          },
+          {
+            "url": "https://unsloth.ai/pricing",
+            "excerpts": [
+              "* Open-source",
+              "# Free",
+              "unsloth Enterprise Unlock 30x faster training + multi-node support + 30% accuracy Contact us 32x number of GPUs faster than FA2",
+              "Unlock 30x faster training + multi-node support + 30% accuracy",
+              "# unsloth Pro",
+              "Freeware of our standard version of unsloth"
+            ],
+            "title": "Pricing - Unsloth"
+          },
+          {
+            "url": "https://unsloth.ai/license",
+            "excerpts": [
+              " # Community License",
+              "Disclosure of your information We do not sell, trade, or otherwise transfer your personal information to outside parties. We may disclose your personal information when we believe it's necessary to comply with the law, enforce our site policies, or protect our rights, property, or safety.",
+              "Contact us If you have any questions about Licensing, please contact us via email: info@unsloth.ai"
+            ],
+            "title": "Unsloth AI Community License Agreement"
+          }
+        ],
+        "confidence": "medium"
+      },
+      {
+        "field": "model_export_formats.lora_only_export",
+        "reasoning": "The finegrained field value describes exporting only the LoRA adapter weights and using them with a base model by first loading the base model and then applying the adapter weights on top. The most directly relevant information is that there is a specific export option labeled as 'LoRA Only' which exports only the adapter weights and requires the original base model to be loaded for inference. This clearly confirms the existence of a lightweight, separable adapter export that is intended for storage efficiency and sharing, aligning with the field value. Additional excerpts reinforce this concept by noting that LoRA adapters can be saved as part of a export workflow, alongside other formats, and that these adapters are intended for deployment or local inference workflows when combined with the base model. Other excerpts expand on the ecosystem around exporting models (to GGUF or safetensors) and deploying them in various runtimes, which provides practical context for how these LoRA adapters might be used in real-world scenarios and the formats involved. The combination of explicit LoRA-only export, the dependency on the base model, and the practical notes about formats and deployment support all coherently support the field value describing LoRA-only adapter export and its usage.",
+        "citations": [
+          {
+            "url": "https://unsloth.ai/docs/new/studio/export",
+            "excerpts": [
+              "LoRA Only | Exports **only the adapter weights**. Requires the original base model.",
+              "GGUF / llama.cpp | Converts the model to **GGUF format** for Unsloth / llama.cpp **/** Ollama / LM Studio inference.",
+              "Use Unsloth Studio to export, save, or convert models to GGUF, Safetensors, or LoRA for deployment, sharing, or local inference in Unsloth, llama.cpp, Ollama, vLLM, and more.",
+              "export a merged model, LoRA adapter weights, or a GGUF model for local inference."
+            ],
+            "title": "Export models with Unsloth Studio | Unsloth Documentation"
+          },
+          {
+            "url": "http://vast.ai/article/unsloth-studio-now-available-on-vast-ai",
+            "excerpts": [
+              "xport** \u2014 Save fine-tuned models as merged safetensors, LoRA adapters, or GGUF files. Upload directly to Hugging Face Hub"
+            ],
+            "title": "Unsloth Studio Is Now Available on Vast.ai"
+          },
+          {
+            "url": "http://unsloth.ai/docs/models/gemma-4/train",
+            "excerpts": [
+              "#### Export your fine-tuned model\nOnce done, Unsloth Studio allows you to export the model to GGUF, safetensor etc formats."
+            ],
+            "title": "Gemma 4 Fine-tuning Guide | Unsloth Documentation"
+          },
+          {
+            "url": "http://unsloth.ai/",
+            "excerpts": [
+              "Export any model, including your fine-tuned models, to safetensors, or GGUF for use with llama.cpp, vLLM, Ollama, and more."
+            ],
+            "title": "Unsloth - Train and Run Models Locally"
+          }
+        ],
+        "confidence": "high"
+      },
+      {
+        "field": "hardware_requirements.gemma_4_e2b_training_vram",
+        "reasoning": "The finegrained field value specifies that fine-tuning the Gemma 4 E2B model with LoRA on consumer-grade hardware requires between 8 and 10 GB of VRAM. The most directly relevant information is that LoRA for Gemma 4 E2B is stated to operate on 8\u201310 GB VRAM. This directly supports the lower and upper bounds of the target VRAM range. Additional corroboration comes from a related note that Gemma 4 E2B training can occur on 8 GB VRAM, which aligns with the lower bound of the range. A separate table-like reference indicates that E2B configurations can use VRAM needs around 5\u20138 GB and up to 10 GB depending on bitness and variant, which corroborates that the 8\u201310 GB window is a plausible and commonly supported range for E2B training scenarios. Collectively, these excerpts reinforce that consumer-grade hardware with roughly 8 to 10 GB of VRAM is compatible with LoRA-based fine-tuning of Gemma 4 E2B, matching the field value\u2019s asserted range.",
+        "citations": [
+          {
+            "url": "http://unsloth.ai/docs/models/gemma-4/train",
+            "excerpts": [
+              "* Gemma 4 E2B LoRA works on 8-10GB VRAM. E4B LoRA requires 17GB VRAM.",
+              "* Gemma 4 E2B trains on **8GB VRAM**. E4B requires 10GB VRAM."
+            ],
+            "title": "Gemma 4 Fine-tuning Guide | Unsloth Documentation"
+          },
+          {
+            "url": "https://unsloth.ai/docs/models/gemma-4",
+            "excerpts": [
+              "Gemma 4 variant\n4-bit\n8-bit\nBF16 / FP16\n**E2B**\n4 GB\n5\u20138 GB\n10 GB\n**E4B**\n5.5\u20136 GB\n9\u201312 GB\n16 GB\n**26B A4B**\n16\u201318 GB\n28\u201330 GB\n52 GB\n**31B**\n17\u201320 GB\n34\u201338 GB\n62 GB"
+            ],
+            "title": "Gemma 4 - How to Run Locally | Unsloth Documentation"
+          }
+        ],
+        "confidence": "high"
+      },
+      {
+        "field": "gemma_4_support_details.performance_gains",
+        "reasoning": "The target field value asserts a precise performance improvement: training Gemma 4 models is about 1.5 times faster and uses roughly 60% less VRAM compared to FA2 setups. The most directly supportive material states that Gemma 4 training is ~1.5x faster with ~60% less VRAM than FA2. This directly corroborates both components of the claim (speedup and memory reduction). Additional related statements acknowledge similar efficiency benefits (e.g., faster training overall and VRAM considerations) but do not quantify the exact comparison to FA2 in the same explicit way, so they provide supportive context rather than primary evidence. There is no clear contradictory statement in the excerpts provided, so the claim is well-supported by the most relevant excerpts.",
+        "citations": [
+          {
+            "url": "http://unsloth.ai/docs/models/gemma-4/train",
+            "excerpts": [
+              "trains Gemma 4 **~1.5x faster** with **~60% less VRAM** than FA2 setups (no accuracy loss)",
+              "* Unsloth trains Gemma 4 **~1.5x faster** with **~60% less VRAM** than FA2 setups (no accuracy loss)"
+            ],
+            "title": "Gemma 4 Fine-tuning Guide | Unsloth Documentation"
+          }
+        ],
+        "confidence": "high"
+      },
+      {
+        "field": "unsloth_studio_vs_open_source.studio_key_features",
+        "reasoning": "The most directly relevant excerpts describe a no-code training interface and real-time observability, which align with the core claim of a visual, no-code training experience that exposes live metrics like loss and GPU usage. They also mention Data Recipes for turning PDFs, CSVs, and JSONs into datasets, which supports the data preparation capability highlighted in the field value. Further, discussions of fine-tuning via QLoRA/LoRA, and the ability to export models in formats such as safetensors and GGUF, map to the explicit LoRA workflows and multi-format exports described. Additional excerpts reference offline/offline-capable operation and a web-UI for running and exporting models, which reinforces the offline/Studio vs open-source contrast and the practical deployment angle. Mentions of tool-calling with auto-healing, web search, and an OpenAI-compatible API echo the API compatibility aspect noted in the field value, while references to a Model Arena for model comparison provide context for evaluation workflows. Collectively, these excerpts substantiate the major components listed in the field value, including training UI, dataset creation, real-time metrics, LoRA/QLoRA support, and export formats, as well as the interoperability features that would be relevant for integrating into a Next.js/offline web demo project.",
+        "citations": [
+          {
+            "url": "http://unsloth.ai/",
+            "excerpts": [
+              "No-code training\nAuto-create datasets from PDF, CSV, JSON docs and start training with real-time observability.\nStudio runs 100% offline on your **Mac** and **Windows** device. Run GGUF and Safetensors models with tool-calling, web search, and OpenAI compatible API\nUnsloth is an open-source, no-code web UI for training, running and exporting open models in one unified local interface.",
+              "Export any model, including your fine-tuned models, to safetensors, or GGUF for use with llama.cpp, vLLM, Ollama, and more.",
+              "Unsloth Studio runs 100% offline on your **Mac** and **Windows** device. Run GGUF and Safetensors models with tool-calling, web search, and OpenAI compatible API.",
+              " No-code training\nAuto-create datasets from PDF, CSV, JSON docs and start training with real-time observability.\n",
+              "Unsloth is an open-source, no-code web UI for training, running and exporting open models in one unified local interface."
+            ],
+            "title": "Unsloth - Train and Run Models Locally"
+          },
+          {
+            "url": "http://vast.ai/article/unsloth-studio-now-available-on-vast-ai",
+            "excerpts": [
+              "new/studio) is an open-source, no-code web UI for running and fine-tuning more than 500 open-source AI models across text, vision, audio, and embeddings. It delivers 2x faster training with 70% less VRAM than standard approaches, which makes it possible to fine-tune larger models on more affordable hardware.\nVa",
+              "* **Fine-tune** \u2014 Train with QLoRA, LoRA, or full fine-tuning. Upload datasets or build them from raw documents using Data Recipes. Monitor training with real-time loss curves and GPU stats.",
+              "xport** \u2014 Save fine-tuned models as merged safetensors, LoRA adapters, or GGUF files. Upload directly to Hugging Face Hub"
+            ],
+            "title": "Unsloth Studio Is Now Available on Vast.ai"
+          },
+          {
+            "url": "http://unsloth.ai/docs",
+            "excerpts": [
+              "Unsloth lets you run and train AI models on your own local hardware. Our docs will guide you through running & training your own model locally."
+            ],
+            "title": "Unsloth Docs | Unsloth Documentation"
+          }
+        ],
+        "confidence": "high"
+      },
+      {
+        "field": "gemma_4_support_details.key_bug_fixes",
+        "reasoning": "The specific field value claims that Unsloth has implemented crucial bug fixes for universal training issues affecting Gemma 4, including resolving gradient accumulation-related problems that would make small-batch with accumulation steps equivalent to large-batch training. The excerpts explicitly state that universal bugs for Gemma 4 training were fixed (not derived from Unsloth), which directly supports the existence of bug fixes affecting Gemma 4 training workflows. While other excerpts discuss training speed, VRAM usage, and LoRA/QLoRA workflows, they do not provide explicit evidence about bug fixes or gradient accumulation behavior. Thus, the strongest, directly relevant support is the explicit note about bug fixes for Gemma 4 training. The field value\u2019s gradient-accumulation-specific claim is plausible given the bug-fix context but is not directly evidenced in the excerpts provided, so it remains as a plausible implication rather than an independently corroborated detail.",
+        "citations": [
+          {
+            "url": "http://unsloth.ai/docs/models/gemma-4/train",
+            "excerpts": [
+              "* We fixed many universal [bugs for Gemma 4 training](#bug-fixes--tips) (not derived from Unsloth)."
+            ],
+            "title": "Gemma 4 Fine-tuning Guide | Unsloth Documentation"
+          }
+        ],
+        "confidence": "low"
+      },
+      {
+        "field": "hardware_requirements.gemma_4_31b_qlora_training_vram",
+        "reasoning": "The requested fine-grained field value specifies that to fine-tune the larger Gemma 4 31B model using Unsloth's QLoRA implementation, a GPU with approximately 22 GB of VRAM is required. Directly relevant evidence shows that the 31B QLoRA configuration is stated to work with 22 GB VRAM, which directly supports the target VRAM figure for the 31B QLoRA setup. Additional related information provides context about VRAM needs for other Gemma 4 variants and setups: a table of running locally references the 31B row with substantial VRAM values depending on precision, which helps triangulate VRAM ranges for 31B configurations; and other excerpts confirm general VRAM ranges for E2B/E4B and other model sizes, offering useful comparisons to ensure the 22 GB figure is plausible within the broader model family. The least directly supportive items include general statements about model capabilities and licensing, which help situational understanding but do not specifically corroborate the 22 GB figure for 31B QLoRA. Collectively, the strongest support comes from the explicit claim that 31B QLoRA works with 22 GB, with corroborating table entries that place 31B VRAM needs in a higher range depending on mode, thereby aligning with a 22 GB target as the proposed requirement for QLoRA fine-tuning of the 31B model.",
+        "citations": [
+          {
+            "url": "http://unsloth.ai/docs/models/gemma-4/train",
+            "excerpts": [
+              "* **31B QLoRA works with 22GB** and 26B-A4B LoRA needs >40GB",
+              "* Gemma 4 E2B trains on **8GB VRAM**. E4B requires 10GB VRAM.",
+              "* Gemma 4 E2B LoRA works on 8-10GB VRAM. E4B LoRA requires 17GB VRAM."
+            ],
+            "title": "Gemma 4 Fine-tuning Guide | Unsloth Documentation"
+          },
+          {
+            "url": "https://unsloth.ai/docs/models/gemma-4",
+            "excerpts": [
+              "Gemma 4 variant\n4-bit\n8-bit\nBF16 / FP16\n**E2B**\n4 GB\n5\u20138 GB\n10 GB\n**E4B**\n5.5\u20136 GB\n9\u201312 GB\n16 GB\n**26B A4B**\n16\u201318 GB\n28\u201330 GB\n52 GB\n**31B**\n17\u201320 GB\n34\u201338 GB\n62 GB",
+              "Gemma 4 is Google DeepMind\u2019s new family of open models, including E2B, E4B, 26B-A4B, and 31B. The multimodal, hybrid-thinking models support 140+ languages, up to 256K context, and have dense and MoE variants. Gemma 4 is Apache-2.0 licensed and can run on your local device.",
+              "Run on **5GB RAM** (4-bit) or 15GB (full 16-bit).",
+              "B-A4B** runs on **18GB** (4-bit) or 28GB (8-bit).",
+              "B** needs **20GB RAM** (4-bit) or 34GB (8-bit).",
+              "Gemma 4 is Google DeepMind\u2019s new family of open models, including **E2B** , **E4B** , **26B-A4B** , and **31B.**",
+              "Gemma-4-E2B** and **E4B** support image and audi"
+            ],
+            "title": "Gemma 4 - How to Run Locally | Unsloth Documentation"
+          }
+        ],
+        "confidence": "high"
+      },
+      {
+        "field": "hardware_requirements.inference_ram_summary_31b",
+        "reasoning": "The field value specifies that running inference on the Gemma 4 31B model in 4-bit quantization (GGUF) requires a combined RAM and VRAM of 17 to 20 GB. The clearest corroboration comes from an excerpt that lists model-specific RAM/VRAM requirements for 31B, showing a 17\u201320 GB range for that model. This directly matches the requested field value. Additional excerpts provide supporting context: references to 31B as part of Gemma 4\u2019s open-model family establish that 31B is a supported size, and other excerpts compare RAM/VRAM needs across models and configurations (for example, E2B and E4B variants, as well as other bit-widths or formats). These provide a broader hardware landscape but do not contradict the exact 17\u201320 GB figure for 31B 4-bit GGUF; instead, they reinforce that RAM/VRAM requirements are model- and configuration-dependent and that 31B has substantial but specific resource needs. Directly relevant details from the excerpts include the explicit 17\u201320 GB range for 31B inference and the assertion that Gemma 4 includes multiple model sizes (including 31B) that have distinct hardware requirements. Taken together, these excerpts support the field value by anchoring 31B inference memory requirements to a 17\u201320 GB RAM/VRAM envelope and situating it within the broader Gemma 4 family. ",
+        "citations": [
+          {
+            "url": "https://unsloth.ai/docs/models/gemma-4",
+            "excerpts": [
+              "Gemma 4 variant\n4-bit\n8-bit\nBF16 / FP16\n**E2B**\n4 GB\n5\u20138 GB\n10 GB\n**E4B**\n5.5\u20136 GB\n9\u201312 GB\n16 GB\n**26B A4B**\n16\u201318 GB\n28\u201330 GB\n52 GB\n**31B**\n17\u201320 GB\n34\u201338 GB\n62 GB",
+              "Gemma 4 is Google DeepMind\u2019s new family of open models, including E2B, E4B, 26B-A4B, and 31B. The multimodal, hybrid-thinking models support 140+ languages, up to 256K context, and have dense and MoE variants. Gemma 4 is Apache-2.0 licensed and can run on your local device.",
+              "Gemma 4 is Google DeepMind\u2019s new family of open models, including **E2B** , **E4B** , **26B-A4B** , and **31B.**",
+              "Gemma-4-E2B** and **E4B** support image and audi",
+              "Run on **5GB RAM** (4-bit) or 15GB (full 16-bit).",
+              "B-A4B** runs on **18GB** (4-bit) or 28GB (8-bit).",
+              "B** needs **20GB RAM** (4-bit) or 34GB (8-bit)."
+            ],
+            "title": "Gemma 4 - How to Run Locally | Unsloth Documentation"
+          },
+          {
+            "url": "http://unsloth.ai/docs/models/gemma-4/train",
+            "excerpts": [
+              "* **31B QLoRA works with 22GB** and 26B-A4B LoRA needs >40GB",
+              "* Gemma 4 E2B trains on **8GB VRAM**. E4B requires 10GB VRAM.",
+              "* Gemma 4 E2B LoRA works on 8-10GB VRAM. E4B LoRA requires 17GB VRAM."
+            ],
+            "title": "Gemma 4 Fine-tuning Guide | Unsloth Documentation"
+          }
+        ],
+        "confidence": "high"
+      },
+      {
+        "field": "hardware_requirements.inference_ram_summary_e2b",
+        "reasoning": "The finegrained field corresponds to hardware resources for running inference with Gemma 4 E2B in a 4-bit quantized setup using GGUF. The most directly supportive evidence comes from excerpts detailing E2B 4-bit RAM requirements: one excerpt shows that E2B in 4-bit demands about 4 GB RAM, and another indicates that running in 4-bit can require around 5 GB RAM. These directly align with the target field value that the combined RAM/VRAM for 4-bit quantized inference is roughly 4 to 5 GB. Additional excerpts provide corroborating context about VRAM requirements for E2B (e.g., 8 GB VRAM in some configurations) and other quantization/bit-width variants, which helps situate the E2B 4-bit requirement within the broader hardware landscape without contradicting the 4\u20135 GB RAM guidance. Collectively, these sources support a close match to the stated field value and help confirm that a 4-bit E2B inference can operate with around 4\u20135 GB RAM, depending on the exact setup.",
+        "citations": [
+          {
+            "url": "https://unsloth.ai/docs/models/gemma-4",
+            "excerpts": [
+              "Gemma 4 variant\n4-bit\n8-bit\nBF16 / FP16\n**E2B**\n4 GB\n5\u20138 GB\n10 GB\n**E4B**\n5.5\u20136 GB\n9\u201312 GB\n16 GB\n**26B A4B**\n16\u201318 GB\n28\u201330 GB\n52 GB\n**31B**\n17\u201320 GB\n34\u201338 GB\n62 GB",
+              "Run on **5GB RAM** (4-bit) or 15GB (full 16-bit).",
+              "Gemma 4 is Google DeepMind\u2019s new family of open models, including **E2B** , **E4B** , **26B-A4B** , and **31B.**",
+              "Gemma-4-E2B** and **E4B** support image and audi",
+              "Gemma 4 is Google DeepMind\u2019s new family of open models, including E2B, E4B, 26B-A4B, and 31B. The multimodal, hybrid-thinking models support 140+ languages, up to 256K context, and have dense and MoE variants. Gemma 4 is Apache-2.0 licensed and can run on your local device.",
+              "B-A4B** runs on **18GB** (4-bit) or 28GB (8-bit).",
+              "B** needs **20GB RAM** (4-bit) or 34GB (8-bit)."
+            ],
+            "title": "Gemma 4 - How to Run Locally | Unsloth Documentation"
+          },
+          {
+            "url": "http://unsloth.ai/docs/models/gemma-4/train",
+            "excerpts": [
+              "* Gemma 4 E2B trains on **8GB VRAM**. E4B requires 10GB VRAM.",
+              "* **31B QLoRA works with 22GB** and 26B-A4B LoRA needs >40GB",
+              "* Gemma 4 E2B LoRA works on 8-10GB VRAM. E4B LoRA requires 17GB VRAM."
+            ],
+            "title": "Gemma 4 Fine-tuning Guide | Unsloth Documentation"
+          }
+        ],
+        "confidence": "high"
+      },
+      {
+        "field": "pricing_and_licensing.enterprise_tier_summary",
+        "reasoning": "The most directly supportive content points to an enterprise tier that emphasizes faster training and multi-node capabilities, which aligns with the field value\u2019s claim of enterprise-grade performance and scalability. Specifically, the excerpt describing Enterprise Unlock includes explicit statements about 30x faster training, multi-node support, and improved accuracy, which corroborate the enterprise performance and multi-node aspects of the field value, though the exact figure differs slightly (the field value cites 32x faster training). This partial alignment still reinforces the notion that the enterprise tier centers on substantial speedups and scale, which is the core of the finegrained field. The same excerpt also mentions training speed advantages and scaling, which underpins the field value\u2019s emphasis on large-scale deployment and demanding training workloads. Another excerpt reinforces the enterprise angle by mentioning fast training capabilities in a pricing context, contributing to the same narrative about premium enterprise features. A further snippet references general pricing and licensing terms, which provides contextual background for how licensing is structured (e.g., requiring contact for enterprise pricing), supporting the field value\u2019s note that pricing is available upon inquiry. Additional excerpts that discuss open-source, freeware, or non-enterprise pricing tiers are less directly supportive but help sketch the overall pricing landscape and reinforce that enterprise is a distinct tier with different terms. Together, these excerpts substantiate the existence and general expectations of an enterprise tier with accelerated training, multi-node support, and licensing/pricing practices, while acknowledging a minor discrepancy in the exact speedup figure between the field value and the cited enterprise claim.",
+        "citations": [
+          {
+            "url": "https://unsloth.ai/pricing",
+            "excerpts": [
+              "unsloth Enterprise Unlock 30x faster training + multi-node support + 30% accuracy Contact us 32x number of GPUs faster than FA2",
+              "Unlock 30x faster training + multi-node support + 30% accuracy",
+              "# Free",
+              "Freeware of our standard version of unsloth",
+              "# unsloth Pro",
+              "* Open-source"
+            ],
+            "title": "Pricing - Unsloth"
+          },
+          {
+            "url": "http://unsloth.ai/",
+            "excerpts": [
+              "Freeware of our standard version of unsloth",
+              "* Open-source"
+            ],
+            "title": "Unsloth - Train and Run Models Locally"
+          },
+          {
+            "url": "https://unsloth.ai/license",
+            "excerpts": [
+              "Disclosure of your information We do not sell, trade, or otherwise transfer your personal information to outside parties. We may disclose your personal information when we believe it's necessary to comply with the law, enforce our site policies, or protect our rights, property, or safety.",
+              " # Community License",
+              "Contact us If you have any questions about Licensing, please contact us via email: info@unsloth.ai"
+            ],
+            "title": "Unsloth AI Community License Agreement"
+          }
+        ],
+        "confidence": "medium"
+      },
+      {
+        "field": "gemma_4_support_details.supported_modalities",
+        "reasoning": "The most directly supporting excerpt states that Gemma-4-E2B and E4B support image and audio inputs, which aligns with the claim that these variants are multimodal (text, image, and audio). A closely supporting excerpt describes Gemma 4 as a multimodal, hybrid-thinking model family, indicating the broader multimodal capability across variants. Another excerpt lists Gemma 4 as including E2B, E4B, 26B-A4B, and 31B, which supports the idea that multiple variants exist, including those with multimodal capabilities. Taken together, these sources corroborate that Gemma 4 has multimodal support and that the E2B/E4B variants specifically handle image and audio (in addition to text, by implication). The combination of explicit modality support for E2B/E4B and the general multimodal description provides coherent evidence for the stated field value.",
+        "citations": [
+          {
+            "url": "https://unsloth.ai/docs/models/gemma-4",
+            "excerpts": [
+              "Gemma-4-E2B** and **E4B** support image and audi",
+              "Gemma 4 is Google DeepMind\u2019s new family of open models, including E2B, E4B, 26B-A4B, and 31B. The multimodal, hybrid-thinking models support 140+ languages, up to 256K context, and have dense and MoE variants. Gemma 4 is Apache-2.0 licensed and can run on your local device.",
+              "Gemma 4 is Google DeepMind\u2019s new family of open models, including **E2B** , **E4B** , **26B-A4B** , and **31B.**"
+            ],
+            "title": "Gemma 4 - How to Run Locally | Unsloth Documentation"
+          }
+        ],
+        "confidence": "high"
+      },
+      {
+        "field": "unsloth_studio_vs_open_source.open_source_description",
+        "reasoning": "The most relevant information directly corroborates the requested field value: a claim that the open-source Unsloth Studio enables faster training (2x) and significantly reduced VRAM (about 60-70% less) compared to baseline approaches, described as part of a freeware tier. This aligns with the field value asserting a core engine with performance optimizations and a freeware offering. Supporting context comes from references that Unsloth Studio supports fine-tuning with QLoRA/LoRA workflows, which indicates practical use of the open-source engine for training tasks, and from export capabilities to adapters and GGUF formats, which are part of the broader tooling around optimized model training and deployment. The offline/local operation and no-code UI reinforce the practical deployment scenario for such optimizations, though they do not directly state the performance claims. Combined, these excerpts connect the performance-focused claim to evidence about open-source development, tuning workflows, and export options, while acknowledging that the exact wording of the core kernel optimization is implied by the performance figures provided. \n",
+        "citations": [
+          {
+            "url": "http://vast.ai/article/unsloth-studio-now-available-on-vast-ai",
+            "excerpts": [
+              "new/studio) is an open-source, no-code web UI for running and fine-tuning more than 500 open-source AI models across text, vision, audio, and embeddings. It delivers 2x faster training with 70% less VRAM than standard approaches, which makes it possible to fine-tune larger models on more affordable hardware.\nVa",
+              "* **Fine-tune** \u2014 Train with QLoRA, LoRA, or full fine-tuning. Upload datasets or build them from raw documents using Data Recipes. Monitor training with real-time loss curves and GPU stats.",
+              "xport** \u2014 Save fine-tuned models as merged safetensors, LoRA adapters, or GGUF files. Upload directly to Hugging Face Hub"
+            ],
+            "title": "Unsloth Studio Is Now Available on Vast.ai"
+          },
+          {
+            "url": "http://unsloth.ai/",
+            "excerpts": [
+              "Export any model, including your fine-tuned models, to safetensors, or GGUF for use with llama.cpp, vLLM, Ollama, and more.",
+              "No-code training\nAuto-create datasets from PDF, CSV, JSON docs and start training with real-time observability.\nStudio runs 100% offline on your **Mac** and **Windows** device. Run GGUF and Safetensors models with tool-calling, web search, and OpenAI compatible API\nUnsloth is an open-source, no-code web UI for training, running and exporting open models in one unified local interface.",
+              "Unsloth is an open-source, no-code web UI for training, running and exporting open models in one unified local interface.",
+              "Unsloth Studio runs 100% offline on your **Mac** and **Windows** device. Run GGUF and Safetensors models with tool-calling, web search, and OpenAI compatible API.",
+              " No-code training\nAuto-create datasets from PDF, CSV, JSON docs and start training with real-time observability.\n"
+            ],
+            "title": "Unsloth - Train and Run Models Locally"
+          },
+          {
+            "url": "http://unsloth.ai/docs",
+            "excerpts": [
+              "Unsloth lets you run and train AI models on your own local hardware. Our docs will guide you through running & training your own model locally."
+            ],
+            "title": "Unsloth Docs | Unsloth Documentation"
+          }
+        ],
+        "confidence": "medium"
+      },
+      {
+        "field": "unsloth_studio_vs_open_source.studio_platforms",
+        "reasoning": "The field value claims cross-platform support including Mac, Windows, and Linux. The most directly supporting information comes from excerpts that explicitly state that Unsloth Studio runs offline on Mac and Windows devices, indicating macOS and Windows support. These lines show concrete, platform-specific compatibility for two major desktop operating systems, which aligns with the portion of the field value referring to Mac and Windows. However, there is no explicit mention of Linux in the provided excerpts, which means the Linux portion of the field value is not directly evidenced. Some excerpts describe the product as cross-platform and cross-reference open-source, local hardware usage, and runs on multiple environments, but without explicit OS names beyond Mac and Windows, those statements are less concrete in confirming Linux support. Therefore, the strongest support comes from the Mac/Windows mentions, while Linux remains unverified from the given excerpts.",
+        "citations": [
+          {
+            "url": "http://unsloth.ai/",
+            "excerpts": [
+              "No-code training\nAuto-create datasets from PDF, CSV, JSON docs and start training with real-time observability.\nStudio runs 100% offline on your **Mac** and **Windows** device. Run GGUF and Safetensors models with tool-calling, web search, and OpenAI compatible API\nUnsloth is an open-source, no-code web UI for training, running and exporting open models in one unified local interface.",
+              "Unsloth Studio runs 100% offline on your **Mac** and **Windows** device. Run GGUF and Safetensors models with tool-calling, web search, and OpenAI compatible API."
+            ],
+            "title": "Unsloth - Train and Run Models Locally"
+          }
+        ],
+        "confidence": "medium"
+      },
+      {
+        "field": "gemma_4_support_details.supported_variants",
+        "reasoning": "The statement clearly identifying the Gemma 4 family and listing the exact variants is the strongest support for the fine-grained field value. It explicitly names the family as Gemma 4 and enumerates the variants E2B, E4B, 26B-A4B, and 31B, which matches the requested field value. Additional confirmation comes from a second excerpt that reiterates the Gemma 4 family and lists the same variants within a variant-row context, reinforcing that these models are part of the Gemma 4 ecosystem and are among the supported configurations. A variant table further corroborates the available variants by presenting a structured layout that includes E2B, E4B, 26B A4B, and 31B, aligning with the target set of models described in the field value. Supporting context about variant-specific resource guidelines (such as RAM/VRAM) from related content helps corroborate practical aspects of using these variants, though it is not as direct as the explicit variant listing. Taken together, these excerpts directly support the claim that Unsloth/Gemma 4 supports the specified set of open-model variants and present clear alignment with the finegrained field value.",
+        "citations": [
+          {
+            "url": "https://unsloth.ai/docs/models/gemma-4",
+            "excerpts": [
+              "Gemma 4 is Google DeepMind\u2019s new family of open models, including **E2B** , **E4B** , **26B-A4B** , and **31B.**",
+              "Gemma 4 is Google DeepMind\u2019s new family of open models, including E2B, E4B, 26B-A4B, and 31B. The multimodal, hybrid-thinking models support 140+ languages, up to 256K context, and have dense and MoE variants. Gemma 4 is Apache-2.0 licensed and can run on your local device.",
+              "Gemma 4 variant\n4-bit\n8-bit\nBF16 / FP16\n**E2B**\n4 GB\n5\u20138 GB\n10 GB\n**E4B**\n5.5\u20136 GB\n9\u201312 GB\n16 GB\n**26B A4B**\n16\u201318 GB\n28\u201330 GB\n52 GB\n**31B**\n17\u201320 GB\n34\u201338 GB\n62 GB"
+            ],
+            "title": "Gemma 4 - How to Run Locally | Unsloth Documentation"
+          },
+          {
+            "url": "http://unsloth.ai/docs/models/gemma-4/train",
+            "excerpts": [
+              "* Gemma 4 E2B trains on **8GB VRAM**. E4B requires 10GB VRAM."
+            ],
+            "title": "Gemma 4 Fine-tuning Guide | Unsloth Documentation"
+          }
+        ],
+        "confidence": "high"
+      },
+      {
+        "field": "nextjs_offline_demo_implementation_guide.engine_option_llama_cpp_wasm",
+        "reasoning": "The most directly relevant information describes exporting models to GGUF format for local inference and deployment across ecosystems such as Unsloth, llama.cpp, Ollama, and more, which aligns with exporting the fine-tuned model into GGUF and using it in a local setup. Specific passages state that models can be exported to GGUF, Safetensors, or LoRA for local inference, and that a merged model or LoRA adapter weights can be exported for local use. Additional passages confirm that Unsloth Studio can run models locally on common OSes and that GGUFs can be used with local tooling, which supports the offline demo architecture. Also, there are notes about running GGUFs and fine-tuning Gemma 4 in Unsloth Studio, reinforcing the availability of GGUF-based workflows in a local environment. A separate note explicitly mentions that Unsloth Studio supports running models locally and that you can export models to GGUFs, which is directly compatible with a Next.js offline demo that calls a local server. Finally, a mention of a fetched page indicates GGUFs, LoRA adapters, and safetensors can be searched, downloaded, and run, which corroborates the offline-first deployment path. Taken together, these excerpts collectively validate the core steps: exporting to GGUF, leveraging llama.cpp-compatible tooling (llama-server) for a local API endpoint, and hosting a Next.js frontend that interacts with that local endpoint to preserve privacy and offline operation.",
+        "citations": [
+          {
+            "url": "https://unsloth.ai/docs/new/studio/export",
+            "excerpts": [
+              "GGUF / llama.cpp | Converts the model to **GGUF format** for Unsloth / llama.cpp **/** Ollama / LM Studio inference.",
+              "Use Unsloth Studio to export, save, or convert models to GGUF, Safetensors, or LoRA for deployment, sharing, or local inference in Unsloth, llama.cpp, Ollama, vLLM, and more.",
+              "export a merged model, LoRA adapter weights, or a GGUF model for local inference.",
+              "Merged Model | **16-bit model** with the LoRA adapter merged into the base weights."
+            ],
+            "title": "Export models with Unsloth Studio | Unsloth Documentation"
+          },
+          {
+            "url": "https://unsloth.ai/docs/models/gemma-4",
+            "excerpts": [
+              "Unsloth Studio lets you run models locally on **MacOS, Windows** , Linux and:",
+              "\n* Search, download, run GGUFs and safetensor models",
+              "You can now run GGUFs and fine-tune Gemma 4 in Unsloth Studio \u2728"
+            ],
+            "title": "Gemma 4 - How to Run Locally | Unsloth Documentation"
+          },
+          {
+            "url": "https://unsloth.ai/docs",
+            "excerpts": [
+              "* Search + download + run any model like GGUFs, LoRA adapters, safetensors."
+            ],
+            "title": "Fetched web page"
+          }
+        ],
+        "confidence": "high"
+      },
+      {
+        "field": "model_export_formats.gguf_export",
+        "reasoning": "The field value describes exporting to GGUF as an optimized format for local inference and offline deployments, compatible with runtimes such as llama.cpp, Ollama, and LM Studio. The most relevant excerpts explicitly state that Unsloth Studio can export or convert models to GGUF for local inference, sharing, or deployment, which directly supports the existence and utility of a GGUF export option. Additional excerpts reinforce the GGUF export pathway by noting it as a supported export target and by situating GGUF within the broader export workflow (including conversion to GGUF and use with supporting runtimes). One excerpt highlights exporting a model to GGUF as part of a broader set of export formats, underscoring GGUF as a recommended path for offline-first applications and edge deployment. A closely related excerpt confirms that GGUF is a supported format for local inference across multiple tooling ecosystems (Unsloth, llama.cpp, Ollama, LM Studio). Together, these excerpts cohere to support the presence and practical value of a GGUF export option for Gemma-4 models, and provide concrete implications for how a Next.js/offline web demo could leverage GGUF exports for local/offline inference with a LoRA/adapter workflow. The remaining excerpts reiterate or extend the same points, confirming the export-to-GGUF capability and its ecosystem compatibility, further strengthening the relevance of the field value to practical use cases.",
+        "citations": [
+          {
+            "url": "https://unsloth.ai/docs/new/studio/export",
+            "excerpts": [
+              "export a merged model, LoRA adapter weights, or a GGUF model for local inference.",
+              "GGUF / llama.cpp | Converts the model to **GGUF format** for Unsloth / llama.cpp **/** Ollama / LM Studio inference.",
+              "Use Unsloth Studio to export, save, or convert models to GGUF, Safetensors, or LoRA for deployment, sharing, or local inference in Unsloth, llama.cpp, Ollama, vLLM, and more."
+            ],
+            "title": "Export models with Unsloth Studio | Unsloth Documentation"
+          },
+          {
+            "url": "http://unsloth.ai/docs/models/gemma-4/train",
+            "excerpts": [
+              "#### Export your fine-tuned model\nOnce done, Unsloth Studio allows you to export the model to GGUF, safetensor etc formats."
+            ],
+            "title": "Gemma 4 Fine-tuning Guide | Unsloth Documentation"
+          },
+          {
+            "url": "http://vast.ai/article/unsloth-studio-now-available-on-vast-ai",
+            "excerpts": [
+              "xport** \u2014 Save fine-tuned models as merged safetensors, LoRA adapters, or GGUF files. Upload directly to Hugging Face Hub"
+            ],
+            "title": "Unsloth Studio Is Now Available on Vast.ai"
+          },
+          {
+            "url": "http://unsloth.ai/",
+            "excerpts": [
+              "Export any model, including your fine-tuned models, to safetensors, or GGUF for use with llama.cpp, vLLM, Ollama, and more."
+            ],
+            "title": "Unsloth - Train and Run Models Locally"
+          }
+        ],
+        "confidence": "high"
+      },
+      {
+        "field": "nextjs_offline_demo_implementation_guide.engine_option_transformers_js",
+        "reasoning": "To support a pure web-based, client-side inference solution, the approach described involves exporting a merged model where the LoRA adapter weights are integrated into the base weights, then using a lightweight runtime suitable for browser environments. An excerpt explicitly states that you can export a merged model, LoRA adapter weights, or a GGUF model for local inference, which aligns with the need to bundle the LoRA effects into the base weights for offline browser deployment. Another excerpt confirms that a 16-bit model with the LoRA adapter merged into base weights is a supported export format, which directly corresponds to creating a single merged artifact suitable for client-side loading. Additional excerpts describe exporting formats like GGUF and safetensors and note that these formats are used for local inference and deployment across different runtimes, which provides practical pathways for bundling the model in a Next.js app. Background explanations about LoRA and QLoRA establish that LoRA is a parameter-efficient method and that QLoRA combines LoRA with 4-bit precision, which helps justify the feasibility of a small, quantized model suitable for a browser-based offline demo. There are explicit statements that GGUFs can be run and Gemma 4 can be run locally in Unsloth Studio, which supports the broader feasibility of the offline demo. Entries describing running Gemma 4 locally, including RAM requirements and the ability to run on various OS, provide essential constraints for sizing the offline artifact and the client-side runtime. Other excerpts discuss training and fine-tuning workflows (QLoRA/LoRA) and the availability of data recipes, which, while not required for the offline demo itself, help in understanding the broader tooling ecosystem when preparing the model prior to export. Taken together, these excerpts provide a cohesive set of guidance points: export a merged model with LoRA weights, prefer a portable inference format like GGUF or safetensors for local/browser use, leverage a browser-friendly runtime (Transformers.js with WebGPU) for client-side inference, and anticipate the need for offline caching and a small, quantized Gemma 4 variant for the browser experience. The most directly applicable portions describe the export of a merged model or LoRA weights into a local inference bundle, and the feasibility notes around running GGUFs and Gemma 4 in Unsloth Studio, which collectively map well onto implementing the Next.js offline demo scenario.",
+        "citations": [
+          {
+            "url": "https://unsloth.ai/docs/new/studio/export",
+            "excerpts": [
+              "export a merged model, LoRA adapter weights, or a GGUF model for local inference.",
+              "Merged Model | **16-bit model** with the LoRA adapter merged into the base weights.",
+              "GGUF / llama.cpp | Converts the model to **GGUF format** for Unsloth / llama.cpp **/** Ollama / LM Studio inference.",
+              "Use Unsloth Studio to export, save, or convert models to GGUF, Safetensors, or LoRA for deployment, sharing, or local inference in Unsloth, llama.cpp, Ollama, vLLM, and more."
+            ],
+            "title": "Export models with Unsloth Studio | Unsloth Documentation"
+          },
+          {
+            "url": "https://unsloth.ai/docs/get-started/fine-tuning-llms-guide",
+            "excerpts": [
+              "* **LoRA** is a parameter efficient training method that typically keeps the base model\u2019s weights frozen and trains a small set of added low-rank adapter weights (in 16-bit precision).",
+              "* **QLoRA** combines LoRA with 4-bit precision to handle very large models with minimal resources."
+            ],
+            "title": "Fine-tuning LLMs Guide | Unsloth Documentation"
+          },
+          {
+            "url": "https://unsloth.ai/docs/models/gemma-4",
+            "excerpts": [
+              "You can now run GGUFs and fine-tune Gemma 4 in Unsloth Studio \u2728",
+              "Gemma 4 is Google DeepMind\u2019s new family of open models, including E2B, E4B, 26B-A4B, and 31B. The multimodal, hybrid-thinking models support 140+ languages, up to 256K context, and have dense and MoE variants. Gemma 4 is Apache-2.0 licensed and can run on your local device.",
+              "Gemma-4-E2B** and **E4B** support image and audi",
+              "Run on **5GB RAM** (4-bit) or 15GB (full 16-bit).",
+              "B-A4B** runs on **18GB** (4-bit) or 28GB (8-bit).",
+              "B** needs **20GB RAM** (4-bit) or 34GB (8-bit)."
+            ],
+            "title": "Gemma 4 - How to Run Locally | Unsloth Documentation"
+          },
+          {
+            "url": "http://vast.ai/article/unsloth-studio-now-available-on-vast-ai",
+            "excerpts": [
+              "* **Fine-tune** \u2014 Train with QLoRA, LoRA, or full fine-tuning. Upload datasets or build them from raw documents using Data Recipes. Monitor training with real-time loss curves and GPU stats."
+            ],
+            "title": "Unsloth Studio Is Now Available on Vast.ai"
+          }
+        ],
+        "confidence": "high"
+      },
+      {
+        "field": "nextjs_offline_demo_implementation_guide.ui_integration_summary",
+        "reasoning": "The target field value describes a practical, code-level integration flow for a Next.js offline demo that connects to an inference engine, including how to submit prompts via a local or custom server and how to update UI state with model responses. Content that explains how Unsloth Studio enables running and fine-tuning models locally, exporting models and adapters, and using LoRA/QLoRA workflows directly informs the steps and considerations for building a similar Next.js-based demo. Specifically: the notion of a web UI for training and running models provides the architectural precedent for a Next.js frontend that initiates model inference, mirrors the interactive chat interface concept, and supports offline/local deployment scenarios. References about exporting to GGUF or safetensors and adapters describe the artifact formats the UI could manage or display, which matters for a demo that ships with downloadable/usable model components. Insights about QLoRA/LoRA workflows and 4-bit precision give realistic constraints and performance expectations for a client-side or near-client-side demo, aligning with the aim of a lightweight, offline-capable Next.js app. Additionally, mentions of data recipe capabilities and local running environments underscore practical paths for dataset handling and local inference, which are relevant to a complete offline demo workflow. While there is no explicit Next.js snippet, the described UI-first model training/running paradigm and artifact management provide concrete guidance for implementing the integration and outlining required backend endpoints, data formats, and UI state management in the Next.js project.",
+        "citations": [
+          {
+            "url": "https://unsloth.ai/docs/get-started/fine-tuning-llms-guide",
+            "excerpts": [
+              "> [**Introducing Unsloth Studio:** ](/docs/new/studio.md) Our new open-source web UI for training and running models. This means you can now fine-tune models with no-code and have observability and automatic dataset creation features.",
+              "* **LoRA** is a parameter efficient training method that typically keeps the base model\u2019s weights frozen and trains a small set of added low-rank adapter weights (in 16-bit precision).",
+              "* **QLoRA** combines LoRA with 4-bit precision to handle very large models with minimal resources.",
+              "Enables LLMs to predict if a headline impacts a company positively or negatively. Can use historical customer interactions for more accurate and custom responses. Fine-tune LLM on legal texts for contract analysis, case law research, and compliance.",
+              "With [Unsloth](https://github.com/unslothai/unsloth), you can fine-tune or do RL for free on Colab, Kaggle, or locally with just 3GB VRAM by using our [notebooks](https://docs.unsloth.ai/get-started/unsloth-notebooks)."
+            ],
+            "title": "Fine-tuning LLMs Guide | Unsloth Documentation"
+          },
+          {
+            "url": "https://unsloth.ai/docs/new/studio/export",
+            "excerpts": [
+              "GGUF / llama.cpp | Converts the model to **GGUF format** for Unsloth / llama.cpp **/** Ollama / LM Studio inference.",
+              "Use Unsloth Studio to export, save, or convert models to GGUF, Safetensors, or LoRA for deployment, sharing, or local inference in Unsloth, llama.cpp, Ollama, vLLM, and more.",
+              "export a merged model, LoRA adapter weights, or a GGUF model for local inference.",
+              "Merged Model | **16-bit model** with the LoRA adapter merged into the base weights.",
+              "LoRA Only | Exports **only the adapter weights**. Requires the original base model."
+            ],
+            "title": "Export models with Unsloth Studio | Unsloth Documentation"
+          },
+          {
+            "url": "http://vast.ai/article/unsloth-studio-now-available-on-vast-ai",
+            "excerpts": [
+              "* **Fine-tune** \u2014 Train with QLoRA, LoRA, or full fine-tuning. Upload datasets or build them from raw documents using Data Recipes. Monitor training with real-time loss curves and GPU stats.",
+              "xport** \u2014 Save fine-tuned models as merged safetensors, LoRA adapters, or GGUF files. Upload directly to Hugging Face Hub"
+            ],
+            "title": "Unsloth Studio Is Now Available on Vast.ai"
+          },
+          {
+            "url": "https://unsloth.ai/docs/models/gemma-4",
+            "excerpts": [
+              "Gemma 4 is Google DeepMind\u2019s new family of open models, including **E2B** , **E4B** , **26B-A4B** , and **31B.**",
+              "You can now run GGUFs and fine-tune Gemma 4 in Unsloth Studio \u2728",
+              "* **Self-healing** tool calling + **web search**",
+              "* **Code execution** (Python, Bash)",
+              "* Automatic inference parameter tuning (temp, top-p, etc.)",
+              "* Fast CPU + GPU inference via llama.cpp",
+              "* Train LLMs 2x faster with 70% less VRAM",
+              "Gemma 4 is Google DeepMind\u2019s new family of open models, including E2B, E4B, 26B-A4B, and 31B. The multimodal, hybrid-thinking models support 140+ languages, up to 256K context, and have dense and MoE variants. Gemma 4 is Apache-2.0 licensed and can run on your local device.",
+              "Gemma-4-E2B** and **E4B** support image and audi",
+              "Run on **5GB RAM** (4-bit) or 15GB (full 16-bit).",
+              "B-A4B** runs on **18GB** (4-bit) or 28GB (8-bit).",
+              "B** needs **20GB RAM** (4-bit) or 34GB (8-bit).",
+              "Unsloth Studio lets you run models locally on **MacOS, Windows** , Linux and:",
+              "\n* Search, download, run GGUFs and safetensor models"
+            ],
+            "title": "Gemma 4 - How to Run Locally | Unsloth Documentation"
+          },
+          {
+            "url": "https://github.com/unslothai/unsloth",
+            "excerpts": [
+              "* **Search + download + run models** including GGUF, LoRA adapters, safetensors",
+              "* Train and RL **500+ models** up to **2x faster** with up to **70% less VRAM** , with no accuracy loss.",
+              "* **Export models** : [Save or export](https://unsloth.ai/docs/new/studio/export) models to GGUF, 16-bit safetensors and other formats.",
+              "* **Data Recipes** : [Auto-create datasets](https://unsloth.ai/docs/new/studio/data-recipe) from **PDF, CSV, DOCX** etc. Edit data in a visual-node workflow.",
+              "Unsloth Studio (Beta) lets you run and train text, audio, embedding, vision models on Windows, Linux and macOS. Export models: Save or export models to GGUF, 16-bit safetensors and other formats. Auto set inference settings and customize chat templates.",
+              "Finetune Mistral, Llama 2-5x faster with 70% less memory!",
+              "## \u2b50 Features"
+            ],
+            "title": "GitHub - unslothai/unsloth: Unsloth Studio is a web UI for ..."
+          },
+          {
+            "url": "https://unsloth.ai/docs/new/studio/data-recipe",
+            "excerpts": [
+              "Unsloth Studio's Data Recipes lets you upload documents like PDFs or CSVs files and transforms them into useable / synthetic datasets. Create and edit datasets visually via a graph-node workflow. This guide will get you started with the basics before you dive into Unsloth Data Recipes.",
+              "Unsloth Studio's Data Recipes lets you upload documents like PDFs or CSVs files and transforms them into useable / synthetic datasets."
+            ],
+            "title": "Unsloth Data Recipes | Unsloth Documentation"
+          },
+          {
+            "url": "https://unsloth.ai/docs/basics/unsloth-benchmarks",
+            "excerpts": [
+              "## Context length benchmarks\n### **Llama 3.3 (70B) max. context length**\nWe tested Llama 3.3 (70B) Instruct on a 80GB A100 and did 4bit QLoRA on all linear layers (Q, K, V, O, gate, up and down) with rank = 32 with a batch size of 1. We padded all sequences to a certain maximum sequence length to mimic long context finetuning workloads.",
+              "| GPU VRAM | \ud83e\udda5Unsloth context length | Hugging Face + FA2 |\n| 48 GB | 12,106 | OOM |\n| 80 GB | 89,389 | 6,916 |"
+            ],
+            "title": "Unsloth Benchmarks | Unsloth Documentation"
+          },
+          {
+            "url": "http://tech-insider.org/google-gemma-4-open-model-benchmarks-2026",
+            "excerpts": [
+              "Google released Gemma 4 on April 2, 2026, delivering what the company calls its most intelligent open AI model family to date."
+            ],
+            "title": "Gemma 4: How a 31B Model Beats 400B Rivals [2026]"
+          },
+          {
+            "url": "https://deepwiki.com/unslothai/unsloth-studio/4.2-benchmarking-and-evaluation",
+            "excerpts": [
+              "This document covers the benchmarking and evaluation systems in unsloth-studio, focusing on model performance assessment through standardized benchmarks. The primary evaluation system implements MMLU"
+            ],
+            "title": "Benchmarking and Evaluation | unslothai/unsloth-studio | DeepWiki"
+          },
+          {
+            "url": "https://www.crunchbase.com/organization/unsloth-ai",
+            "excerpts": [
+              "At Unsloth, we're focusing on making AI more accessible. We have over 150 million total downloads (4th most), and partner with Google, OpenAI, Meta,"
+            ],
+            "title": "Unsloth AI - Crunchbase Company Profile & Funding"
+          },
+          {
+            "url": "https://unsloth.ai/docs",
+            "excerpts": [
+              "* Search + download + run any model like GGUFs, LoRA adapters, safetensors."
+            ],
+            "title": "Fetched web page"
+          }
+        ],
+        "confidence": "medium"
+      },
+      {
+        "field": "nextjs_offline_demo_implementation_guide.model_loading_workflow",
+        "reasoning": "The field value describes three concrete loading workflows after an Unsloth Studio fine-tuning: (a) using GGUF with llama.cpp, where the GGUF file is loaded by the llama-server executable via a model path argument, and the Next.js app merely communicates with the server that has loaded it; (b) using Transformers.js by exporting a 16-bit safetensors merge (base Gemma 4 plus LoRA) and placing it in the Next.js project public directory, then loading via Transformers.js with a service worker to enable offline caching; and (c) a Node.js server approach where the base Gemma 4 model is loaded with the transformers library and a LoRA adapter is applied at runtime via the peft library. The most directly relevant excerpts explicitly mention exporting to GGUF and loading with llama.cpp, including notes that there are command-line invocations and a server process involved, which directly map to the first workflow. Other excerpts describe exporting to GGUF, safetensors, or LoRA for use with different runtimes (llama.cpp, Transformers.js, Unsloth/peft stack), which align with the second and third workflows. The content describing \u201cMerged Model\u201d or \u201cLoRA Only\u201d exports supports the idea of combining base and adapter weights or exporting adapters separately, which is pertinent to the Transformers.js workflow and to runtime adapter swapping in Node.js. Collectively, these excerpts provide concrete steps and formats (GGUF for llama.cpp; merged safetensors for Transformers.js; runtime LoRA app via peft) that directly support the three loading workflows described in the field value.",
+        "citations": [
+          {
+            "url": "https://unsloth.ai/docs/new/studio/export",
+            "excerpts": [
+              "GGUF / llama.cpp | Converts the model to **GGUF format** for Unsloth / llama.cpp **/** Ollama / LM Studio inference.",
+              "Use Unsloth Studio to export, save, or convert models to GGUF, Safetensors, or LoRA for deployment, sharing, or local inference in Unsloth, llama.cpp, Ollama, vLLM, and more.",
+              "export a merged model, LoRA adapter weights, or a GGUF model for local inference.",
+              "Merged Model | **16-bit model** with the LoRA adapter merged into the base weights."
+            ],
+            "title": "Export models with Unsloth Studio | Unsloth Documentation"
+          },
+          {
+            "url": "https://github.com/unslothai/unsloth",
+            "excerpts": [
+              "* **Data Recipes** : [Auto-create datasets](https://unsloth.ai/docs/new/studio/data-recipe) from **PDF, CSV, DOCX** etc. Edit data in a visual-node workflow.",
+              "* **Export models** : [Save or export](https://unsloth.ai/docs/new/studio/export) models to GGUF, 16-bit safetensors and other formats."
+            ],
+            "title": "GitHub - unslothai/unsloth: Unsloth Studio is a web UI for ..."
+          },
+          {
+            "url": "https://unsloth.ai/docs",
+            "excerpts": [
+              "* Search + download + run any model like GGUFs, LoRA adapters, safetensors."
+            ],
+            "title": "Fetched web page"
+          }
+        ],
+        "confidence": "high"
+      },
+      {
+        "field": "unsloth_studio_vs_open_source.studio_description",
+        "reasoning": "- The most directly relevant evidence states that Unsloth Studio is an open-source, no-code web UI for training, running and exporting models locally, which aligns with the core parts of the field value describing no-code, offline operation, and local model management. It also mentions offline capability and local use on Mac/Windows, supporting the offline aspect of the field value. - Another entry emphasizes that Studio runs 100% offline on personal hardware and supports running GGUF and Safetensors models, which directly supports both offline use and the specified model formats. - Additional content notes that Unsloth Studio is an open-source, no-code web UI for running and fine-tuning a broad set of open-source models, reinforcing the open-source nature and no-code workflow, as well as the scope of use for training/fine-tuning. - A separate excerpt highlights that Unsloth Studio is available on Vast.ai and enables fine-tuning with QLoRA/LoRA, and mentions uploading datasets, which connects to the field value\u2019s training workflows and cloud-GPU contexts via Vast.ai. - Further evidence shows the exportability of models in safetensors and GGUF formats, directly supporting the field value\u2019s mention of supported formats and the export path for deployments. - Additional notes discuss faster training and VRAM efficiency on vast-scale setups, which supports the practical implications of using Studio for training with limited hardware and aligns with the field value\u2019s practical recommendations for hardware- and performance-aware workflows. - The combination of offline/local operation, no-code UI, open-source status, support for GGUF/safetensors, and cloud-GPU integration via Vast.ai all align with the field value\u2019s composite description, including the pre-configured cloud-template notion implied by Vast.ai availability. - While not every sentence in every excerpt is an exact match to every clause of the field value, together they form a cohesive, well-supported picture of Unsloth Studio\u2019s capabilities as described in the field value. ",
+        "citations": [
+          {
+            "url": "http://unsloth.ai/",
+            "excerpts": [
+              "No-code training\nAuto-create datasets from PDF, CSV, JSON docs and start training with real-time observability.\nStudio runs 100% offline on your **Mac** and **Windows** device. Run GGUF and Safetensors models with tool-calling, web search, and OpenAI compatible API\nUnsloth is an open-source, no-code web UI for training, running and exporting open models in one unified local interface.",
+              "Unsloth is an open-source, no-code web UI for training, running and exporting open models in one unified local interface.",
+              " No-code training\nAuto-create datasets from PDF, CSV, JSON docs and start training with real-time observability.\n",
+              "Export any model, including your fine-tuned models, to safetensors, or GGUF for use with llama.cpp, vLLM, Ollama, and more."
+            ],
+            "title": "Unsloth - Train and Run Models Locally"
+          },
+          {
+            "url": "http://vast.ai/article/unsloth-studio-now-available-on-vast-ai",
+            "excerpts": [
+              "new/studio) is an open-source, no-code web UI for running and fine-tuning more than 500 open-source AI models across text, vision, audio, and embeddings. It delivers 2x faster training with 70% less VRAM than standard approaches, which makes it possible to fine-tune larger models on more affordable hardware.\nVa",
+              "* **Fine-tune** \u2014 Train with QLoRA, LoRA, or full fine-tuning. Upload datasets or build them from raw documents using Data Recipes. Monitor training with real-time loss curves and GPU stats.",
+              "xport** \u2014 Save fine-tuned models as merged safetensors, LoRA adapters, or GGUF files. Upload directly to Hugging Face Hub"
+            ],
+            "title": "Unsloth Studio Is Now Available on Vast.ai"
+          },
+          {
+            "url": "http://unsloth.ai/docs",
+            "excerpts": [
+              "Unsloth lets you run and train AI models on your own local hardware. Our docs will guide you through running & training your own model locally."
+            ],
+            "title": "Unsloth Docs | Unsloth Documentation"
+          }
+        ],
+        "confidence": "high"
+      }
+    ],
+    "type": "json",
+    "beta_fields": null,
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "executive_summary": {
+          "type": "string",
+          "description": "A high-level overview of Unsloth's capabilities for fine-tuning Gemma 4, summarizing its key advantages, and confirming its suitability for the proposed Next.js offline demo project."
+        },
+        "unsloth_capabilities_overview": {
+          "type": "string",
+          "description": "A detailed breakdown of Unsloth's features, including inference capabilities (running GGUF/safetensors), training optimizations (2x faster, 70% less VRAM), Reinforcement Learning (RL) support, and data processing with 'Data Recipes'."
+        },
+        "pricing_and_licensing": {
+          "type": "object",
+          "properties": {
+            "free_tier_summary": {
+              "type": "string",
+              "description": "Summary of the Free (open-source) tier, including its core features like support for major models and LoRA training."
+            },
+            "pro_tier_summary": {
+              "type": "string",
+              "description": "Summary of the Unsloth Pro tier, highlighting its speed and VRAM improvements for multi-GPU setups."
+            },
+            "enterprise_tier_summary": {
+              "type": "string",
+              "description": "Summary of the Unsloth Enterprise tier, detailing its benefits like multi-node support, accuracy boosts, and faster inference."
+            },
+            "license_type": {
+              "type": "string",
+              "description": "The name of the license for the open-source version, identified as 'Community License'."
+            }
+          },
+          "required": [
+            "free_tier_summary",
+            "pro_tier_summary",
+            "enterprise_tier_summary",
+            "license_type"
+          ],
+          "additionalProperties": false
+        },
+        "unsloth_studio_vs_open_source": {
+          "type": "object",
+          "properties": {
+            "studio_description": {
+              "type": "string",
+              "description": "Description of Unsloth Studio as a no-code, offline web UI for training and running models."
+            },
+            "studio_platforms": {
+              "type": "string",
+              "description": "The operating systems Unsloth Studio runs on, such as Mac and Windows."
+            },
+            "studio_key_features": {
+              "type": "string",
+              "description": "Key features of Unsloth Studio, including the visual UI, 'Data Recipes' for dataset creation, and real-time observability."
+            },
+            "open_source_description": {
+              "type": "string",
+              "description": "Description of the open-source Unsloth library, which provides optimized kernels for faster training via code."
+            },
+            "open_source_use_case": {
+              "type": "string",
+              "description": "Typical use case for the open-source library, such as running in Google Colab, Kaggle, or local scripted environments."
+            }
+          },
+          "required": [
+            "studio_description",
+            "studio_platforms",
+            "studio_key_features",
+            "open_source_description",
+            "open_source_use_case"
+          ],
+          "additionalProperties": false
+        },
+        "gemma_4_support_details": {
+          "type": "object",
+          "properties": {
+            "supported_variants": {
+              "type": "string",
+              "description": "A list of the supported Gemma 4 model variants, including E2B, E4B, 26B-A4B, and 31B."
+            },
+            "supported_modalities": {
+              "type": "string",
+              "description": "The modalities supported for Gemma 4 fine-tuning, such as vision, text, and audio."
+            },
+            "performance_gains": {
+              "type": "string",
+              "description": "Unsloth's claimed performance improvements for training Gemma 4, such as being ~1.5x faster with ~60% less VRAM."
+            },
+            "key_bug_fixes": {
+              "type": "string",
+              "description": "A summary of universal Gemma 4 training bugs that Unsloth has addressed, such as issues with gradient accumulation."
+            }
+          },
+          "required": [
+            "supported_variants",
+            "supported_modalities",
+            "performance_gains",
+            "key_bug_fixes"
+          ],
+          "additionalProperties": false
+        },
+        "qlora_and_lora_workflows": {
+          "type": "string",
+          "description": "An in-depth guide to using QLoRA and LoRA fine-tuning methods with Unsloth. This includes recommended hyperparameters (rank, alpha), targeting specific modules, and Unsloth's specific optimizations and bug fixes."
+        },
+        "supported_dataset_formats": {
+          "type": "string",
+          "description": "Information on the dataset formats compatible with Unsloth, such as conversational formats (ShareGPT, ChatML), instruction formats (Alpaca), and how to use the 'Data Recipes' feature to convert documents (PDF, CSV, JSON) into trainable datasets."
+        },
+        "hardware_requirements": {
+          "type": "object",
+          "properties": {
+            "gemma_4_e2b_training_vram": {
+              "type": "string",
+              "description": "VRAM required for fine-tuning the Gemma 4 E2B model, noted as working on 8GB of VRAM."
+            },
+            "gemma_4_31b_qlora_training_vram": {
+              "type": "string",
+              "description": "VRAM required for fine-tuning the Gemma 4 31B model using QLoRA, noted as working with 22GB."
+            },
+            "inference_ram_summary_e2b": {
+              "type": "string",
+              "description": "Recommended RAM/VRAM for running inference on a 4-bit quantized Gemma 4 E2B GGUF model, noted as 4 GB."
+            },
+            "inference_ram_summary_31b": {
+              "type": "string",
+              "description": "Recommended RAM/VRAM for running inference on a 4-bit quantized Gemma 4 31B GGUF model, noted as 17-20 GB."
+            }
+          },
+          "required": [
+            "gemma_4_e2b_training_vram",
+            "gemma_4_31b_qlora_training_vram",
+            "inference_ram_summary_e2b",
+            "inference_ram_summary_31b"
+          ],
+          "additionalProperties": false
+        },
+        "training_scripts_and_process": {
+          "type": "string",
+          "description": "A guide on how to initiate and manage a training process using Unsloth, including example code snippets from Unsloth's Colab notebooks for setting up the model, tokenizer, dataset, and trainer for a fine-tuning job."
+        },
+        "model_evaluation_guidance": {
+          "type": "string",
+          "description": "Methods for evaluating a fine-tuned model within the Unsloth ecosystem. This covers monitoring training loss and GPU usage in real-time and using the 'Model Arena' in Unsloth Studio for side-by-side qualitative comparisons."
+        },
+        "model_export_formats": {
+          "type": "object",
+          "properties": {
+            "merged_model_export": {
+              "type": "string",
+              "description": "Details on exporting a 'Merged Model', which combines the base model and LoRA adapter into a single 16-bit safetensors file."
+            },
+            "lora_only_export": {
+              "type": "string",
+              "description": "Details on exporting 'LoRA Only', which saves only the lightweight adapter weights and requires the original base model for inference."
+            },
+            "gguf_export": {
+              "type": "string",
+              "description": "Details on exporting to GGUF format, which is optimized for local CPU/GPU inference with tools like llama.cpp, Ollama, and Unsloth Studio."
+            }
+          },
+          "required": [
+            "merged_model_export",
+            "lora_only_export",
+            "gguf_export"
+          ],
+          "additionalProperties": false
+        },
+        "project_plan_title": {
+          "type": "string",
+          "description": "Title for the project implementation section: 'Project Plan: Fine-Tuning Gemma 4 for a Clinical Urge Surfing Web App'."
+        },
+        "project_fine_tuning_strategy": {
+          "type": "string",
+          "description": "A recommended strategy for fine-tuning the Gemma 4 E2B-it model for the clinical urge surfing app. This includes using QLoRA for efficiency, suggestions for dataset creation focused on cognitive behavioral therapy and urge surfing techniques, and example data structures."
+        },
+        "nextjs_offline_demo_implementation_guide": {
+          "type": "object",
+          "properties": {
+            "engine_option_transformers_js": {
+              "type": "string",
+              "description": "Guidance on using the Transformers.js library with WebGPU to load and run the model and LoRA adapter directly in the browser."
+            },
+            "engine_option_llama_cpp_wasm": {
+              "type": "string",
+              "description": "Guidance on using a WebAssembly-based engine like llama.cpp.wasm to run an exported GGUF model file for efficient offline inference."
+            },
+            "model_loading_workflow": {
+              "type": "string",
+              "description": "An overview of the process for loading the chosen model format (GGUF or LoRA adapter) within the Next.js application for offline access."
+            },
+            "ui_integration_summary": {
+              "type": "string",
+              "description": "A summary of how to connect the inference engine to the Next.js UI components to create the interactive chat functionality for the app."
+            }
+          },
+          "required": [
+            "engine_option_transformers_js",
+            "engine_option_llama_cpp_wasm",
+            "model_loading_workflow",
+            "ui_integration_summary"
+          ],
+          "additionalProperties": false
+        },
+        "practical_recommendations_summary": {
+          "type": "string",
+          "description": "A bulleted list of key, actionable recommendations for successfully completing the project, from model selection and training to deployment in the web app."
+        }
+      },
+      "required": [
+        "executive_summary",
+        "unsloth_capabilities_overview",
+        "pricing_and_licensing",
+        "unsloth_studio_vs_open_source",
+        "gemma_4_support_details",
+        "qlora_and_lora_workflows",
+        "supported_dataset_formats",
+        "hardware_requirements",
+        "training_scripts_and_process",
+        "model_evaluation_guidance",
+        "model_export_formats",
+        "project_plan_title",
+        "project_fine_tuning_strategy",
+        "nextjs_offline_demo_implementation_guide",
+        "practical_recommendations_summary"
+      ],
+      "additionalProperties": false
+    },
+    "content_file": "unsloth-gemma-4-finetuning.md"
+  }
+}

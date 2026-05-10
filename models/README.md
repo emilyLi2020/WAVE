@@ -206,6 +206,16 @@ On Windows, the script automatically re-launches itself in Python UTF-8 mode
 before importing TRL. That avoids a known `cp1252` import crash in TRL's bundled
 chat-template files.
 
+### Unified session synthetic data
+
+`generate_wave_session_synthetic.py` creates targeted synthetic draft rows for
+the unified `lora-wave-session` dataset only where EDA shows coverage gaps. It
+uses an OpenAI model as a draft generator, then applies local duplicate,
+schema, safety, and medical-quality gates before accepting any row.
+
+Read the full process, commands, and disclosure rules in
+[`SYNTHETIC_DATA.md`](SYNTHETIC_DATA.md).
+
 ## Notebooks
 
 - `01_gemma4_smoke_test.ipynb` — downloads the smallest Gemma 4 (`google/gemma-4-E2B-it`) and runs one generic and one WAVE-style prompt to confirm the base model works on this machine before any LoRA work begins.

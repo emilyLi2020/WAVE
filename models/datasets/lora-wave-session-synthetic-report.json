@@ -1,0 +1,224 @@
+{
+  "createdAt": "2026-05-10T13:29:47.170380+00:00",
+  "sourceData": "datasets\\lora-wave-session-expanded.jsonl",
+  "generatorModel": "gpt-5-mini",
+  "generationCalled": true,
+  "counts": {
+    "originalRows": 3757,
+    "coverageGaps": 86,
+    "totalRequestedByCoveragePlan": 917,
+    "acceptedSyntheticRows": 175,
+    "rejectedCandidates": 45,
+    "expandedRows": 3932
+  },
+  "acceptedBySurface": {
+    "phase_narration": 175
+  },
+  "rejectionReasons": {
+    "duplicate_or_near_duplicate": 27,
+    "quality_errors": 18
+  },
+  "sampleRejections": [
+    {
+      "gapId": "91c9a3dbaf6e",
+      "reason": "duplicate_or_near_duplicate",
+      "rubricScore": 0,
+      "duplicateMetrics": {
+        "canonicalHash": "400e6090152945f9d27119e6ffe9e60d16f9bfb4f96c71e69f0b08c95dbca0e4",
+        "normalizedTextHash": "060a9ec627a7503b891de5fb1da34796546622f3685cbe3e1daf93260674594e",
+        "scenarioHash": "54d6eadbc7db4c4a5d961993cba0359ed8b630aaeef41822325b4fcda9370350",
+        "exactDuplicate": false,
+        "textDuplicate": false,
+        "scenarioDuplicate": true,
+        "maxNgramJaccard": 0.02097902097902098,
+        "maxRougeL": 0.26849315068493146,
+        "ngramThreshold": 0.55,
+        "rougeThreshold": 0.72,
+        "nearDuplicate": false
+      },
+      "qualityMetrics": {}
+    },
+    {
+      "gapId": "1c590f93a57e",
+      "reason": "duplicate_or_near_duplicate",
+      "rubricScore": 0,
+      "duplicateMetrics": {
+        "canonicalHash": "79cd9c8cfc49c98c990b0b0bb08a189d983e260ab5338f9a066104b9ba8b1d52",
+        "normalizedTextHash": "5306e7b115876d41ddd3e3f8fc347c49e701bf874d2dd5cd4a208b2c21c8cd6c",
+        "scenarioHash": "fcf7a85201ae41f2ebc5058c744f4b11beaf35068e22260d71c858a10b34510e",
+        "exactDuplicate": false,
+        "textDuplicate": false,
+        "scenarioDuplicate": true,
+        "maxNgramJaccard": 0.031914893617021274,
+        "maxRougeL": 0.3356643356643357,
+        "ngramThreshold": 0.55,
+        "rougeThreshold": 0.72,
+        "nearDuplicate": false
+      },
+      "qualityMetrics": {}
+    },
+    {
+      "gapId": "d42138a6a901",
+      "reason": "duplicate_or_near_duplicate",
+      "rubricScore": 0,
+      "duplicateMetrics": {
+        "canonicalHash": "4b949e9a3447f392ac354e49771e2c1632699640a99d71e70043e57b5075564c",
+        "normalizedTextHash": "b474938e960207481c45b7ed09991c918895ee92b792028003bd348b99f87225",
+        "scenarioHash": "0d708302f9e3f67665043a94d15601e30d4af9ffd308a455affeca4f11ef6fcf",
+        "exactDuplicate": false,
+        "textDuplicate": false,
+        "scenarioDuplicate": true,
+        "maxNgramJaccard": 0.046153846153846156,
+        "maxRougeL": 0.47659574468085103,
+        "ngramThreshold": 0.55,
+        "rougeThreshold": 0.72,
+        "nearDuplicate": false
+      },
+      "qualityMetrics": {}
+    },
+    {
+      "gapId": "6823a753b3ed",
+      "reason": "duplicate_or_near_duplicate",
+      "rubricScore": 0,
+      "duplicateMetrics": {
+        "canonicalHash": "1a6607896789f335d1dfe41f583f257865ffc7645528d3ff722520bbfb5f029c",
+        "normalizedTextHash": "e3151b7ea14b7c7902089cd466a97944ee143c38616adba2e23d3e55fd981a2c",
+        "scenarioHash": "5680a468999040ac1a80fa10adec942f8acb94487d9be5586ae3b4a714e4d2b7",
+        "exactDuplicate": false,
+        "textDuplicate": false,
+        "scenarioDuplicate": true,
+        "maxNgramJaccard": 0.023026315789473683,
+        "maxRougeL": 0.2922077922077922,
+        "ngramThreshold": 0.55,
+        "rougeThreshold": 0.72,
+        "nearDuplicate": false
+      },
+      "qualityMetrics": {}
+    },
+    {
+      "gapId": "8ca849c83073",
+      "reason": "duplicate_or_near_duplicate",
+      "rubricScore": 0,
+      "duplicateMetrics": {
+        "canonicalHash": "6bb8ee33b78d0d99937091c2349baf88ad847ee9f3203f76974a074d072f6b77",
+        "normalizedTextHash": "c89ad4a089bf1d6a7ec2fe2b04617a20cb1481d7b86e94eddfa317a450cd0ba3",
+        "scenarioHash": "1458f832c8a6e24ed3f52e3f0ef831bc73880fae4e76005d0542e395a6356564",
+        "exactDuplicate": false,
+        "textDuplicate": false,
+        "scenarioDuplicate": true,
+        "maxNgramJaccard": 0.039711191335740074,
+        "maxRougeL": 0.2905405405405405,
+        "ngramThreshold": 0.55,
+        "rougeThreshold": 0.72,
+        "nearDuplicate": false
+      },
+      "qualityMetrics": {}
+    },
+    {
+      "gapId": "8ca849c83073",
+      "reason": "duplicate_or_near_duplicate",
+      "rubricScore": 0,
+      "duplicateMetrics": {
+        "canonicalHash": "618929e9fe8442fb31ef94e8412b30c3d83e00c924f94ca3954f64a18d9823ea",
+        "normalizedTextHash": "35192efeb369ce94be379e6434cf5c442c2fbc3ca8359174292d8515741006d2",
+        "scenarioHash": "54361197dc28728b067090cfdb1e7bbc8936f83ca956def87e6a663546262e0b",
+        "exactDuplicate": false,
+        "textDuplicate": false,
+        "scenarioDuplicate": true,
+        "maxNgramJaccard": 0.018604651162790697,
+        "maxRougeL": 0.2857142857142857,
+        "ngramThreshold": 0.55,
+        "rougeThreshold": 0.72,
+        "nearDuplicate": false
+      },
+      "qualityMetrics": {}
+    },
+    {
+      "gapId": "b0e2d13c32eb",
+      "reason": "duplicate_or_near_duplicate",
+      "rubricScore": 0,
+      "duplicateMetrics": {
+        "canonicalHash": "66f162b55ba2f23b99ac5d277c844eeb2ccc6f1e13bc70338dbd94027a7629f7",
+        "normalizedTextHash": "a657f4e52678a0bcf323a814e7c6fb1c509ccea30da53d98dc4ca91a1a90a31f",
+        "scenarioHash": "f0b4bdfa82b774cb9b8d6f60ae5962e387d11162ed843467380c7c42ad5b920e",
+        "exactDuplicate": false,
+        "textDuplicate": false,
+        "scenarioDuplicate": true,
+        "maxNgramJaccard": 0.05791505791505792,
+        "maxRougeL": 0.3680555555555556,
+        "ngramThreshold": 0.55,
+        "rougeThreshold": 0.72,
+        "nearDuplicate": false
+      },
+      "qualityMetrics": {}
+    },
+    {
+      "gapId": "b0e2d13c32eb",
+      "reason": "duplicate_or_near_duplicate",
+      "rubricScore": 0,
+      "duplicateMetrics": {
+        "canonicalHash": "bc1c125b1e4a1b68de42560b0b572782ffca12c21b5d31a7e46ddeb3917f3ca2",
+        "normalizedTextHash": "390b8974004848b860a6e1476ec929a5d9895c196581cfd53a69ef5b41f26330",
+        "scenarioHash": "f3940a0561d916f6de2bf7458adabbfb444e97d95325bfa749e2dae46e80a816",
+        "exactDuplicate": false,
+        "textDuplicate": false,
+        "scenarioDuplicate": true,
+        "maxNgramJaccard": 0.03225806451612903,
+        "maxRougeL": 0.3712121212121212,
+        "ngramThreshold": 0.55,
+        "rougeThreshold": 0.72,
+        "nearDuplicate": false
+      },
+      "qualityMetrics": {}
+    },
+    {
+      "gapId": "344d41e8ba7f",
+      "reason": "duplicate_or_near_duplicate",
+      "rubricScore": 0,
+      "duplicateMetrics": {
+        "canonicalHash": "d03d143f40fa87188a9bb93f13c4207f8b652f1b54022e621f64658943c56c94",
+        "normalizedTextHash": "5ef603bb0582d9d8f1a9aa2192fdb8c2b8ff7e6efe9ab882a200490a122f7243",
+        "scenarioHash": "1b246cfdd52587a387c4a15d2eb0066e55d128ab332c6675916e396384b59842",
+        "exactDuplicate": false,
+        "textDuplicate": false,
+        "scenarioDuplicate": true,
+        "maxNgramJaccard": 0.01606425702811245,
+        "maxRougeL": 0.3357664233576642,
+        "ngramThreshold": 0.55,
+        "rougeThreshold": 0.72,
+        "nearDuplicate": false
+      },
+      "qualityMetrics": {}
+    },
+    {
+      "gapId": "4cde9e88e131",
+      "reason": "duplicate_or_near_duplicate",
+      "rubricScore": 0,
+      "duplicateMetrics": {
+        "canonicalHash": "f010442f7499be29adaae93ca409405fa86a2eb26a89b139ef04c6bd9f5ef34b",
+        "normalizedTextHash": "0a06451d9424e077b6c35365ea00775a5e6d71515c5eb2493e03ec1d22af6c7d",
+        "scenarioHash": "9db439af1612b10bff82efdc993a8a6b7732e7bc224119f237af7536a92c0772",
+        "exactDuplicate": false,
+        "textDuplicate": false,
+        "scenarioDuplicate": true,
+        "maxNgramJaccard": 0.043478260869565216,
+        "maxRougeL": 0.49339207048458145,
+        "ngramThreshold": 0.55,
+        "rougeThreshold": 0.72,
+        "nearDuplicate": false
+      },
+      "qualityMetrics": {}
+    }
+  ],
+  "qualityThresholds": {
+    "minRubricScore": 85,
+    "ngramThresholdShort": 0.65,
+    "ngramThresholdLong": 0.55,
+    "rougeThreshold": 0.72
+  },
+  "limitations": [
+    "Synthetic rows are clinical-adjacent drafts, not clinician-approved content.",
+    "Uniqueness is enforced by exact and near-duplicate gates, but semantic uniqueness cannot be proven absolutely.",
+    "The frozen final test split should remain clinician-source only where possible."
+  ]
+}

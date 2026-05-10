@@ -1,0 +1,815 @@
+{
+  "createdAt": "2026-05-10T13:36:22.365049+00:00",
+  "rawSources": {
+    "aggregate": {
+      "rows": 338,
+      "byLoraId": {
+        "lora-check-in-1": 48,
+        "lora-check-in-2": 48,
+        "lora-check-in-3": 48,
+        "lora-check-in-4": 48,
+        "lora-check-in-5": 48,
+        "lora-phase-narration": 50,
+        "lora-reflection": 48
+      },
+      "byStatus": {
+        "draft": 280,
+        "ready": 58
+      },
+      "byMedicationStatus": {
+        "None": 10,
+        "late": 82,
+        "missed": 82,
+        "none": 82,
+        "on_time": 82
+      },
+      "byTrigger": {
+        "None": 10,
+        "other": 8,
+        "physical": 80,
+        "social": 76,
+        "stress": 84,
+        "unknown": 8,
+        "unknown_or_other": 72
+      },
+      "byChunkNumber": {
+        "1": 58,
+        "2": 58,
+        "3": 58,
+        "4": 58,
+        "5": 58,
+        "None": 48
+      },
+      "dialogueTurnCounts": {
+        "10": 48,
+        "12": 50,
+        "14": 142
+      },
+      "agentReplyLengths": {
+        "count": 1534,
+        "min": 38.0,
+        "p25": 79.0,
+        "median": 136.0,
+        "p75": 186.75,
+        "p95": 331.59999999999854,
+        "max": 843.0,
+        "mean": 167.52737940026077
+      },
+      "phaseLineLengths": {
+        "count": 300,
+        "min": 79.0,
+        "p25": 95.0,
+        "median": 106.0,
+        "p75": 123.0,
+        "p95": 181.0,
+        "max": 200.0,
+        "mean": 114.7
+      },
+      "reflectionInsightLengths": {
+        "count": 48,
+        "min": 218.0,
+        "p25": 233.25,
+        "median": 245.5,
+        "p75": 258.25,
+        "p95": 277.54999999999995,
+        "max": 368.0,
+        "mean": 250.45833333333334
+      },
+      "issueCounts": {
+        "dash_chars": 245
+      }
+    },
+    "files": {
+      "C:\\Users\\Bill\\Downloads\\lora-check-in-1-clinician.jsonl": {
+        "rows": 48,
+        "byLoraId": {
+          "lora-check-in-1": 48
+        },
+        "byStatus": {
+          "draft": 48
+        },
+        "byMedicationStatus": {
+          "late": 12,
+          "missed": 12,
+          "none": 12,
+          "on_time": 12
+        },
+        "byTrigger": {
+          "physical": 12,
+          "social": 12,
+          "stress": 12,
+          "unknown_or_other": 12
+        },
+        "byChunkNumber": {
+          "1": 48
+        },
+        "dialogueTurnCounts": {
+          "12": 48
+        },
+        "agentReplyLengths": {
+          "count": 288,
+          "min": 68.0,
+          "p25": 79.0,
+          "median": 118.0,
+          "p75": 277.25,
+          "p95": 685.4499999999997,
+          "max": 753.0,
+          "mean": 217.77430555555554
+        },
+        "phaseLineLengths": [],
+        "reflectionInsightLengths": [],
+        "issueCounts": {
+          "dash_chars": 48
+        },
+        "inputFieldCoverage": {
+          "chunkNumber": 48,
+          "currentIntensity": 48,
+          "intakeIntensity": 48,
+          "matType": 48,
+          "medicationStatus": 48,
+          "priorChunkSummary": 48,
+          "scoreTrend": 48,
+          "surface": 48,
+          "trigger": 48,
+          "triggerOther": 12,
+          "usedSubstanceToday": 48
+        },
+        "outputFieldCoverage": {
+          "dialogueTurns": 48,
+          "endConversation": 48,
+          "reply": 48
+        }
+      },
+      "C:\\Users\\Bill\\Downloads\\lora-check-in-2-clinician (1).jsonl": {
+        "rows": 48,
+        "byLoraId": {
+          "lora-check-in-2": 48
+        },
+        "byStatus": {
+          "draft": 48
+        },
+        "byMedicationStatus": {
+          "late": 12,
+          "missed": 12,
+          "none": 12,
+          "on_time": 12
+        },
+        "byTrigger": {
+          "physical": 12,
+          "social": 12,
+          "stress": 12,
+          "unknown_or_other": 12
+        },
+        "byChunkNumber": {
+          "2": 48
+        },
+        "dialogueTurnCounts": {
+          "14": 48
+        },
+        "agentReplyLengths": {
+          "count": 336,
+          "min": 50.0,
+          "p25": 76.0,
+          "median": 130.0,
+          "p75": 179.0,
+          "p95": 287.0,
+          "max": 305.0,
+          "mean": 145.00892857142858
+        },
+        "phaseLineLengths": [],
+        "reflectionInsightLengths": [],
+        "issueCounts": {
+          "dash_chars": 48
+        },
+        "inputFieldCoverage": {
+          "chunkNumber": 48,
+          "currentIntensity": 48,
+          "intakeIntensity": 48,
+          "matType": 48,
+          "medicationStatus": 48,
+          "priorChunkSummary": 48,
+          "scoreTrend": 48,
+          "surface": 48,
+          "trigger": 48,
+          "triggerOther": 12,
+          "usedSubstanceToday": 48
+        },
+        "outputFieldCoverage": {
+          "dialogueTurns": 48,
+          "endConversation": 48,
+          "reply": 48
+        }
+      },
+      "C:\\Users\\Bill\\Downloads\\lora-check-in-3-clinician (1).jsonl": {
+        "rows": 48,
+        "byLoraId": {
+          "lora-check-in-3": 48
+        },
+        "byStatus": {
+          "draft": 48
+        },
+        "byMedicationStatus": {
+          "late": 12,
+          "missed": 12,
+          "none": 12,
+          "on_time": 12
+        },
+        "byTrigger": {
+          "physical": 12,
+          "social": 11,
+          "stress": 13,
+          "unknown_or_other": 12
+        },
+        "byChunkNumber": {
+          "3": 48
+        },
+        "dialogueTurnCounts": {
+          "12": 1,
+          "14": 47
+        },
+        "agentReplyLengths": {
+          "count": 335,
+          "min": 50.0,
+          "p25": 73.0,
+          "median": 166.0,
+          "p75": 180.0,
+          "p95": 304.0,
+          "max": 323.0,
+          "mean": 149.1820895522388
+        },
+        "phaseLineLengths": [],
+        "reflectionInsightLengths": [],
+        "issueCounts": {
+          "dash_chars": 48
+        },
+        "inputFieldCoverage": {
+          "chunkNumber": 48,
+          "currentIntensity": 48,
+          "intakeIntensity": 48,
+          "matType": 48,
+          "medicationStatus": 48,
+          "priorChunkSummary": 48,
+          "scoreTrend": 48,
+          "surface": 48,
+          "trigger": 48,
+          "triggerOther": 12,
+          "usedSubstanceToday": 48
+        },
+        "outputFieldCoverage": {
+          "dialogueTurns": 48,
+          "endConversation": 48,
+          "reply": 48
+        }
+      },
+      "C:\\Users\\Bill\\Downloads\\lora-check-in-4-clinician.jsonl": {
+        "rows": 48,
+        "byLoraId": {
+          "lora-check-in-4": 48
+        },
+        "byStatus": {
+          "draft": 48
+        },
+        "byMedicationStatus": {
+          "late": 12,
+          "missed": 12,
+          "none": 12,
+          "on_time": 12
+        },
+        "byTrigger": {
+          "physical": 12,
+          "social": 11,
+          "stress": 13,
+          "unknown_or_other": 12
+        },
+        "byChunkNumber": {
+          "4": 48
+        },
+        "dialogueTurnCounts": {
+          "12": 1,
+          "14": 47
+        },
+        "agentReplyLengths": {
+          "count": 335,
+          "min": 50.0,
+          "p25": 82.0,
+          "median": 134.0,
+          "p75": 187.0,
+          "p95": 313.0,
+          "max": 362.0,
+          "mean": 153.4686567164179
+        },
+        "phaseLineLengths": [],
+        "reflectionInsightLengths": [],
+        "issueCounts": {
+          "dash_chars": 48
+        },
+        "inputFieldCoverage": {
+          "chunkNumber": 48,
+          "currentIntensity": 48,
+          "intakeIntensity": 48,
+          "matType": 48,
+          "medicationStatus": 48,
+          "priorChunkSummary": 48,
+          "scoreTrend": 48,
+          "surface": 48,
+          "trigger": 48,
+          "triggerOther": 12,
+          "usedSubstanceToday": 48
+        },
+        "outputFieldCoverage": {
+          "dialogueTurns": 48,
+          "endConversation": 48,
+          "reply": 48
+        }
+      },
+      "C:\\Users\\Bill\\Downloads\\lora-check-in-5-clinician.jsonl": {
+        "rows": 48,
+        "byLoraId": {
+          "lora-check-in-5": 48
+        },
+        "byStatus": {
+          "draft": 48
+        },
+        "byMedicationStatus": {
+          "late": 12,
+          "missed": 12,
+          "none": 12,
+          "on_time": 12
+        },
+        "byTrigger": {
+          "physical": 12,
+          "social": 11,
+          "stress": 13,
+          "unknown_or_other": 12
+        },
+        "byChunkNumber": {
+          "5": 48
+        },
+        "dialogueTurnCounts": {
+          "10": 48
+        },
+        "agentReplyLengths": {
+          "count": 240,
+          "min": 38.0,
+          "p25": 92.0,
+          "median": 126.5,
+          "p75": 161.0,
+          "p95": 656.6499999999967,
+          "max": 843.0,
+          "mean": 183.9875
+        },
+        "phaseLineLengths": [],
+        "reflectionInsightLengths": [],
+        "issueCounts": {
+          "dash_chars": 48
+        },
+        "inputFieldCoverage": {
+          "chunkNumber": 48,
+          "currentIntensity": 48,
+          "intakeIntensity": 48,
+          "matType": 48,
+          "medicationStatus": 48,
+          "priorChunkSummary": 48,
+          "scoreTrend": 48,
+          "surface": 48,
+          "trigger": 48,
+          "triggerOther": 12,
+          "usedSubstanceToday": 48
+        },
+        "outputFieldCoverage": {
+          "dialogueTurns": 48,
+          "endConversation": 48,
+          "reply": 48
+        }
+      },
+      "C:\\Users\\Bill\\Downloads\\lora-reflection-clinician.jsonl": {
+        "rows": 48,
+        "byLoraId": {
+          "lora-reflection": 48
+        },
+        "byStatus": {
+          "ready": 48
+        },
+        "byMedicationStatus": {
+          "late": 12,
+          "missed": 12,
+          "none": 12,
+          "on_time": 12
+        },
+        "byTrigger": {
+          "physical": 12,
+          "social": 11,
+          "stress": 13,
+          "unknown_or_other": 12
+        },
+        "byChunkNumber": {
+          "None": 48
+        },
+        "dialogueTurnCounts": {},
+        "agentReplyLengths": [],
+        "phaseLineLengths": [],
+        "reflectionInsightLengths": {
+          "count": 48,
+          "min": 218.0,
+          "p25": 233.25,
+          "median": 245.5,
+          "p75": 258.25,
+          "p95": 277.54999999999995,
+          "max": 368.0,
+          "mean": 250.45833333333334
+        },
+        "issueCounts": {},
+        "inputFieldCoverage": {
+          "durationSeconds": 48,
+          "endingIntensity": 48,
+          "intakeIntensity": 48,
+          "matType": 48,
+          "medicationStatus": 48,
+          "scoreHistorySummary": 48,
+          "sessionsCount": 48,
+          "surface": 48,
+          "trigger": 48,
+          "usedSubstanceToday": 48
+        },
+        "outputFieldCoverage": {
+          "insight": 48,
+          "journalPromptQuestion": 48,
+          "nextSteps": 48
+        }
+      },
+      "datasets\\lora-phase-narration-expanded.jsonl": {
+        "rows": 50,
+        "byLoraId": {
+          "lora-phase-narration": 50
+        },
+        "byStatus": {
+          "draft": 40,
+          "ready": 10
+        },
+        "byMedicationStatus": {
+          "None": 10,
+          "late": 10,
+          "missed": 10,
+          "none": 10,
+          "on_time": 10
+        },
+        "byTrigger": {
+          "None": 10,
+          "other": 8,
+          "physical": 8,
+          "social": 8,
+          "stress": 8,
+          "unknown": 8
+        },
+        "byChunkNumber": {
+          "1": 10,
+          "2": 10,
+          "3": 10,
+          "4": 10,
+          "5": 10
+        },
+        "dialogueTurnCounts": {},
+        "agentReplyLengths": [],
+        "phaseLineLengths": {
+          "count": 300,
+          "min": 79.0,
+          "p25": 95.0,
+          "median": 106.0,
+          "p75": 123.0,
+          "p95": 181.0,
+          "max": 200.0,
+          "mean": 114.7
+        },
+        "reflectionInsightLengths": [],
+        "issueCounts": {
+          "dash_chars": 5
+        },
+        "inputFieldCoverage": {
+          "chunkNumber": 50,
+          "intakeIntensity": 40,
+          "latestCravingScore": 40,
+          "matType": 40,
+          "medicationStatus": 40,
+          "obstacleHint": 32,
+          "priorSessionSummary": 45,
+          "scoreHistorySummary": 40,
+          "startingIntensityBand": 50,
+          "surface": 50,
+          "trigger": 40,
+          "triggerOther": 8,
+          "usedSubstanceToday": 40
+        },
+        "outputFieldCoverage": {
+          "lines": 50
+        }
+      }
+    }
+  },
+  "normalized": {
+    "rows": 4277,
+    "bySurface": {
+      "check_in": 1534,
+      "phase_narration": 1553,
+      "reflection": 1190
+    },
+    "bySourceLoraId": {
+      "lora-check-in-1": 288,
+      "lora-check-in-2": 336,
+      "lora-check-in-3": 335,
+      "lora-check-in-4": 335,
+      "lora-check-in-5": 240,
+      "lora-phase-narration": 1553,
+      "lora-reflection": 1190
+    },
+    "bySourceStatus": {
+      "draft": 1574,
+      "ready": 58,
+      "synthetic_draft": 2645
+    },
+    "byMedicationStatus": {
+      "late": 1084,
+      "missed": 1069,
+      "none": 1035,
+      "on_time": 1089
+    },
+    "byTrigger": {
+      "other": 585,
+      "physical": 962,
+      "social": 926,
+      "stress": 919,
+      "unknown": 885
+    },
+    "byChunkNumber": {
+      "1": 603,
+      "2": 647,
+      "3": 650,
+      "4": 643,
+      "5": 544,
+      "None": 1190
+    },
+    "byDerivedKind": {
+      "check_in_turn": 1534,
+      "phase_narration_row": 50,
+      "reflection_row": 48,
+      "synthetic_phase_narration": 1503,
+      "synthetic_reflection": 1142
+    },
+    "byFinalTurnFlag": {
+      "False": 1294,
+      "None": 2743,
+      "True": 240
+    },
+    "splitKeyCount": 320,
+    "splitKeySizeStats": {
+      "count": 320,
+      "min": 2.0,
+      "p25": 3.0,
+      "median": 14.0,
+      "p75": 16.0,
+      "p95": 38.600000000000136,
+      "max": 77.0,
+      "mean": 13.365625
+    },
+    "examplesPerSourceRowStats": {
+      "count": 2983,
+      "min": 1.0,
+      "p25": 1.0,
+      "median": 1.0,
+      "p75": 1.0,
+      "p95": 6.0,
+      "max": 7.0,
+      "mean": 1.433791485082132
+    },
+    "promptLengthChars": {
+      "count": 4277,
+      "min": 614.0,
+      "p25": 650.0,
+      "median": 814.0,
+      "p75": 5129.0,
+      "p95": 6790.0,
+      "max": 8386.0,
+      "mean": 2520.892447977554
+    },
+    "promptLengthWords": {
+      "count": 4277,
+      "min": 86.0,
+      "p25": 89.0,
+      "median": 95.0,
+      "p75": 778.0,
+      "p95": 1038.0,
+      "max": 1315.0,
+      "mean": 377.00303951367783
+    },
+    "outputLengthChars": {
+      "count": 4277,
+      "min": 75.0,
+      "p25": 215.0,
+      "median": 568.0,
+      "p75": 712.0,
+      "p95": 939.0,
+      "max": 1109.0,
+      "mean": 519.7381342062193
+    },
+    "schemaShapeKeyCounts": {
+      "endConversation": 1534,
+      "insight": 1190,
+      "journalPromptQuestion": 1190,
+      "lines": 1553,
+      "nextSteps": 1190,
+      "reply": 1534
+    },
+    "topCleanupNotes": {
+      "replaced \\u2014 in text": 1539,
+      "replaced \\u2013 in text": 1534,
+      "mapped trigger unknown_or_other to unknown": 396,
+      "filled missing phase input matType=none": 10,
+      "filled missing phase input medicationStatus=none": 10,
+      "filled missing phase input trigger=unknown": 10,
+      "filled missing phase input usedSubstanceToday=False": 10
+    },
+    "coverageGrid": {
+      "lora-check-in-1": {
+        "late|physical": 18,
+        "late|social": 18,
+        "late|stress": 18,
+        "late|unknown": 18,
+        "missed|physical": 18,
+        "missed|social": 18,
+        "missed|stress": 18,
+        "missed|unknown": 18,
+        "none|physical": 18,
+        "none|social": 18,
+        "none|stress": 18,
+        "none|unknown": 18,
+        "on_time|physical": 18,
+        "on_time|social": 18,
+        "on_time|stress": 18,
+        "on_time|unknown": 18
+      },
+      "lora-check-in-2": {
+        "late|physical": 21,
+        "late|social": 21,
+        "late|stress": 21,
+        "late|unknown": 21,
+        "missed|physical": 21,
+        "missed|social": 21,
+        "missed|stress": 21,
+        "missed|unknown": 21,
+        "none|physical": 21,
+        "none|social": 21,
+        "none|stress": 21,
+        "none|unknown": 21,
+        "on_time|physical": 21,
+        "on_time|social": 21,
+        "on_time|stress": 21,
+        "on_time|unknown": 21
+      },
+      "lora-check-in-3": {
+        "late|physical": 21,
+        "late|social": 21,
+        "late|stress": 21,
+        "late|unknown": 21,
+        "missed|physical": 21,
+        "missed|social": 21,
+        "missed|stress": 21,
+        "missed|unknown": 21,
+        "none|physical": 21,
+        "none|social": 21,
+        "none|stress": 21,
+        "none|unknown": 21,
+        "on_time|physical": 21,
+        "on_time|social": 14,
+        "on_time|stress": 27,
+        "on_time|unknown": 21
+      },
+      "lora-check-in-4": {
+        "late|physical": 21,
+        "late|social": 21,
+        "late|stress": 21,
+        "late|unknown": 21,
+        "missed|physical": 21,
+        "missed|social": 21,
+        "missed|stress": 21,
+        "missed|unknown": 21,
+        "none|physical": 21,
+        "none|social": 21,
+        "none|stress": 21,
+        "none|unknown": 21,
+        "on_time|physical": 21,
+        "on_time|social": 14,
+        "on_time|stress": 27,
+        "on_time|unknown": 21
+      },
+      "lora-check-in-5": {
+        "late|physical": 15,
+        "late|social": 15,
+        "late|stress": 15,
+        "late|unknown": 15,
+        "missed|physical": 15,
+        "missed|social": 15,
+        "missed|stress": 15,
+        "missed|unknown": 15,
+        "none|physical": 15,
+        "none|social": 15,
+        "none|stress": 15,
+        "none|unknown": 15,
+        "on_time|physical": 15,
+        "on_time|social": 10,
+        "on_time|stress": 20,
+        "on_time|unknown": 15
+      },
+      "lora-phase-narration": {
+        "late|other": 78,
+        "late|physical": 79,
+        "late|social": 77,
+        "late|stress": 79,
+        "late|unknown": 75,
+        "missed|other": 75,
+        "missed|physical": 80,
+        "missed|social": 78,
+        "missed|stress": 76,
+        "missed|unknown": 78,
+        "none|other": 73,
+        "none|physical": 79,
+        "none|social": 78,
+        "none|stress": 77,
+        "none|unknown": 77,
+        "on_time|other": 80,
+        "on_time|physical": 78,
+        "on_time|social": 80,
+        "on_time|stress": 80,
+        "on_time|unknown": 76
+      },
+      "lora-reflection": {
+        "late|other": 63,
+        "late|physical": 64,
+        "late|social": 65,
+        "late|stress": 60,
+        "late|unknown": 60,
+        "missed|other": 75,
+        "missed|physical": 68,
+        "missed|social": 61,
+        "missed|stress": 41,
+        "missed|unknown": 53,
+        "none|other": 64,
+        "none|physical": 61,
+        "none|social": 60,
+        "none|stress": 41,
+        "none|unknown": 41,
+        "on_time|other": 77,
+        "on_time|physical": 69,
+        "on_time|social": 62,
+        "on_time|stress": 64,
+        "on_time|unknown": 41
+      }
+    },
+    "largestSplitKeys": {
+      "surface=reflection|source=lora-reflection|chunk=none|med=on_time|trigger=other|kind=synthetic_reflection|turn=single": 77,
+      "surface=reflection|source=lora-reflection|chunk=none|med=missed|trigger=other|kind=synthetic_reflection|turn=single": 75,
+      "surface=reflection|source=lora-reflection|chunk=none|med=on_time|trigger=physical|kind=synthetic_reflection|turn=single": 66,
+      "surface=reflection|source=lora-reflection|chunk=none|med=missed|trigger=physical|kind=synthetic_reflection|turn=single": 65,
+      "surface=reflection|source=lora-reflection|chunk=none|med=none|trigger=other|kind=synthetic_reflection|turn=single": 64,
+      "surface=reflection|source=lora-reflection|chunk=none|med=late|trigger=other|kind=synthetic_reflection|turn=single": 63,
+      "surface=reflection|source=lora-reflection|chunk=none|med=late|trigger=social|kind=synthetic_reflection|turn=single": 62,
+      "surface=reflection|source=lora-reflection|chunk=none|med=late|trigger=physical|kind=synthetic_reflection|turn=single": 61,
+      "surface=reflection|source=lora-reflection|chunk=none|med=on_time|trigger=social|kind=synthetic_reflection|turn=single": 60,
+      "surface=reflection|source=lora-reflection|chunk=none|med=on_time|trigger=stress|kind=synthetic_reflection|turn=single": 60,
+      "surface=reflection|source=lora-reflection|chunk=none|med=missed|trigger=social|kind=synthetic_reflection|turn=single": 58,
+      "surface=reflection|source=lora-reflection|chunk=none|med=none|trigger=physical|kind=synthetic_reflection|turn=single": 58,
+      "surface=reflection|source=lora-reflection|chunk=none|med=late|trigger=stress|kind=synthetic_reflection|turn=single": 57,
+      "surface=reflection|source=lora-reflection|chunk=none|med=late|trigger=unknown|kind=synthetic_reflection|turn=single": 57,
+      "surface=reflection|source=lora-reflection|chunk=none|med=none|trigger=social|kind=synthetic_reflection|turn=single": 57,
+      "surface=reflection|source=lora-reflection|chunk=none|med=missed|trigger=unknown|kind=synthetic_reflection|turn=single": 50,
+      "surface=reflection|source=lora-reflection|chunk=none|med=missed|trigger=stress|kind=synthetic_reflection|turn=single": 38,
+      "surface=reflection|source=lora-reflection|chunk=none|med=none|trigger=stress|kind=synthetic_reflection|turn=single": 38,
+      "surface=reflection|source=lora-reflection|chunk=none|med=none|trigger=unknown|kind=synthetic_reflection|turn=single": 38,
+      "surface=reflection|source=lora-reflection|chunk=none|med=on_time|trigger=unknown|kind=synthetic_reflection|turn=single": 38
+    },
+    "smallestSplitKeys": {
+      "surface=check_in|source=lora-check-in-3|chunk=3|med=on_time|trigger=social|kind=check_in_turn|turn=final": 2,
+      "surface=check_in|source=lora-check-in-4|chunk=4|med=on_time|trigger=social|kind=check_in_turn|turn=final": 2,
+      "surface=check_in|source=lora-check-in-5|chunk=5|med=on_time|trigger=social|kind=check_in_turn|turn=final": 2,
+      "surface=reflection|source=lora-reflection|chunk=none|med=on_time|trigger=social|kind=reflection_row|turn=single": 2,
+      "surface=phase_narration|source=lora-phase-narration|chunk=4|med=none|trigger=unknown|kind=phase_narration_row|turn=single": 2,
+      "surface=phase_narration|source=lora-phase-narration|chunk=3|med=none|trigger=unknown|kind=phase_narration_row|turn=single": 2,
+      "surface=phase_narration|source=lora-phase-narration|chunk=2|med=none|trigger=unknown|kind=phase_narration_row|turn=single": 2,
+      "surface=phase_narration|source=lora-phase-narration|chunk=1|med=none|trigger=unknown|kind=phase_narration_row|turn=single": 2,
+      "surface=phase_narration|source=lora-phase-narration|chunk=1|med=on_time|trigger=stress|kind=phase_narration_row|turn=single": 2,
+      "surface=phase_narration|source=lora-phase-narration|chunk=2|med=late|trigger=other|kind=phase_narration_row|turn=single": 2,
+      "surface=phase_narration|source=lora-phase-narration|chunk=3|med=missed|trigger=physical|kind=phase_narration_row|turn=single": 2,
+      "surface=phase_narration|source=lora-phase-narration|chunk=4|med=none|trigger=social|kind=phase_narration_row|turn=single": 2,
+      "surface=phase_narration|source=lora-phase-narration|chunk=5|med=on_time|trigger=unknown|kind=phase_narration_row|turn=single": 2,
+      "surface=phase_narration|source=lora-phase-narration|chunk=1|med=late|trigger=stress|kind=phase_narration_row|turn=single": 2,
+      "surface=phase_narration|source=lora-phase-narration|chunk=2|med=missed|trigger=other|kind=phase_narration_row|turn=single": 2,
+      "surface=phase_narration|source=lora-phase-narration|chunk=3|med=none|trigger=physical|kind=phase_narration_row|turn=single": 2,
+      "surface=phase_narration|source=lora-phase-narration|chunk=4|med=on_time|trigger=social|kind=phase_narration_row|turn=single": 2,
+      "surface=phase_narration|source=lora-phase-narration|chunk=5|med=late|trigger=unknown|kind=phase_narration_row|turn=single": 2,
+      "surface=phase_narration|source=lora-phase-narration|chunk=1|med=missed|trigger=stress|kind=phase_narration_row|turn=single": 2,
+      "surface=phase_narration|source=lora-phase-narration|chunk=2|med=none|trigger=other|kind=phase_narration_row|turn=single": 2
+    }
+  },
+  "findings": [
+    "Raw outputs contain dash punctuation in 245 rows; normalization replaces those because the app strips em/en dashes.",
+    "1574 normalized examples come from draft source rows. This is acceptable for the experiment but should be named clearly in results."
+  ]
+}
