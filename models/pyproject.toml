@@ -17,6 +17,7 @@ dependencies = [
     "unsloth>=2025.7.2",
     "unsloth-zoo>=2025.7.4",
     "torchvision==0.25.*",
+    "triton-windows>=3.6.0.post26",
 ]
 
 [tool.uv]

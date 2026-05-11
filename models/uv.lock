@@ -2429,6 +2429,14 @@ wheels = [
 ]
 
 [[package]]
+name = "triton-windows"
+version = "3.6.0.post26"
+source = { registry = "https://pypi.org/simple" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/5e/20/acab7b4f50abe68d93f632b2e29cfb9e76284eaf9b4041a6eabbbd4afdc7/triton_windows-3.6.0.post26-cp311-cp311-win_amd64.whl", hash = "sha256:369a47ed3ca25f6d405387a058b8fbc62e6ff4592bbf87b0c5f6de372ab68931", size = 47401354, upload-time = "2026-03-10T02:51:33.9Z" },
+]
+
+[[package]]
 name = "trl"
 version = "0.24.0"
 source = { registry = "https://pypi.org/simple" }
@@ -2606,6 +2614,7 @@ dependencies = [
     { name = "torch", version = "2.10.0+cu128", source = { registry = "https://download.pytorch.org/whl/cu128" }, marker = "sys_platform == 'linux' or sys_platform == 'win32'" },
     { name = "torchvision" },
     { name = "transformers" },
+    { name = "triton-windows" },
     { name = "trl" },
     { name = "unsloth" },
     { name = "unsloth-zoo" },
@@ -2624,6 +2633,7 @@ requires-dist = [
     { name = "torch", marker = "sys_platform == 'linux' or sys_platform == 'win32'", specifier = ">=2.4.0", index = "https://download.pytorch.org/whl/cu128" },
     { name = "torchvision", specifier = "==0.25.*" },
     { name = "transformers", specifier = ">=4.46.0" },
+    { name = "triton-windows", specifier = ">=3.6.0.post26" },
     { name = "trl", specifier = ">0.19.0,<=0.24.0" },
     { name = "unsloth", git = "https://github.com/unslothai/unsloth.git" },
     { name = "unsloth-zoo", git = "https://github.com/unslothai/unsloth-zoo.git" },

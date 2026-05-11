@@ -41,7 +41,7 @@ from prepare_wave_session_dataset import (
 )
 
 
-DEFAULT_MODEL_ID = "google/gemma-4-E2B-it"
+DEFAULT_MODEL_ID = "unsloth/gemma-4-E2B-it"
 JSON_FENCE_RE = re.compile(r"^```(?:json)?\s*|\s*```$", re.IGNORECASE | re.MULTILINE)
 WORD_RE = re.compile(r"[a-z0-9']+")
 MARKDOWN_OR_BULLET_RE = re.compile(r"(^|\n)\s*(?:#{1,6}\s|[-*]\s|\d+\.\s)")
@@ -137,7 +137,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--final-eval-mode",
         choices=("generation", "completion"),
-        default="generation",
+        default="completion",
         help="Use generation gates or completion-only base-vs-LoRA comparison for the final test eval.",
     )
     parser.add_argument("--hparam-search", action="store_true")
@@ -156,17 +156,32 @@ def parse_args() -> argparse.Namespace:
         default="completion",
         help="Use completion NLL only for fast hyperparameter selection, or generation for full validation gates.",
     )
-    parser.add_argument("--max-seq-length", type=int, default=4096)
+    parser.add_argument("--max-seq-length", type=int, default=3072)
     parser.add_argument("--max-new-tokens", type=int, default=420)
     parser.add_argument("--epochs", type=float, default=3.0)
     parser.add_argument("--max-steps", type=int, default=-1)
     parser.add_argument("--batch-size", type=int, default=1)
     parser.add_argument("--gradient-accumulation-steps", type=int, default=8)
     parser.add_argument("--learning-rate", type=float, default=2e-4)
-    parser.add_argument("--warmup-steps", type=int, default=10)
+    parser.add_argument(
+        "--warmup-steps",
+        type=int,
+        default=-1,
+        help="Warmup steps. Use -1 to auto-compute 5%% of total optimizer steps.",
+    )
+    parser.add_argument("--weight-decay", type=float, default=0.001)
+    parser.add_argument("--max-grad-norm", type=float, default=0.3)
     parser.add_argument("--lora-r", type=int, default=16)
     parser.add_argument("--lora-alpha", type=int, default=32)
-    parser.add_argument("--lora-dropout", type=float, default=0.05)
+    parser.add_argument("--lora-dropout", type=float, default=0.0)
+    parser.add_argument("--save-steps", type=int, default=50)
+    parser.add_argument("--save-total-limit", type=int, default=5)
+    parser.add_argument("--resume-from-checkpoint", type=Path, default=None)
+    parser.add_argument(
+        "--allow-truncation",
+        action="store_true",
+        help="Allow training to continue when tokenized rows exceed --max-seq-length.",
+    )
     parser.add_argument(
         "--no-4bit",
         action="store_true",
@@ -344,6 +359,25 @@ def write_jsonl(path: Path, examples: list[Example]) -> None:
             file_handle.write("\n")
 
 
+def estimate_total_training_steps(train_count: int, config: TrainConfig) -> int:
+    if config.max_steps and config.max_steps > 0:
+        return config.max_steps
+    effective_batch_size = max(1, config.batch_size * config.gradient_accumulation_steps)
+    steps_per_epoch = math.ceil(train_count / effective_batch_size)
+    return max(1, math.ceil(steps_per_epoch * config.epochs))
+
+
+def resolve_warmup_steps(train_count: int, config: TrainConfig) -> int:
+    if config.warmup_steps >= 0:
+        return config.warmup_steps
+    total_steps = estimate_total_training_steps(train_count, config)
+    return min(total_steps, max(5, round(total_steps * 0.05)))
+
+
+def resolve_train_config(train_count: int, config: TrainConfig) -> TrainConfig:
+    return replace(config, warmup_steps=resolve_warmup_steps(train_count, config))
+
+
 def write_run_config(
     path: Path,
     args: argparse.Namespace,
@@ -353,6 +387,38 @@ def write_run_config(
     test: list[Example],
 ) -> None:
     summary = {
+        "resolvedTraining": {
+            "totalSteps": estimate_total_training_steps(
+                len(train),
+                TrainConfig(
+                    label="primary",
+                    epochs=args.epochs,
+                    max_steps=args.max_steps,
+                    batch_size=args.batch_size,
+                    gradient_accumulation_steps=args.gradient_accumulation_steps,
+                    learning_rate=args.learning_rate,
+                    warmup_steps=args.warmup_steps,
+                    lora_r=args.lora_r,
+                    lora_alpha=args.lora_alpha,
+                    lora_dropout=args.lora_dropout,
+                ),
+            ),
+            "warmupSteps": resolve_warmup_steps(
+                len(train),
+                TrainConfig(
+                    label="primary",
+                    epochs=args.epochs,
+                    max_steps=args.max_steps,
+                    batch_size=args.batch_size,
+                    gradient_accumulation_steps=args.gradient_accumulation_steps,
+                    learning_rate=args.learning_rate,
+                    warmup_steps=args.warmup_steps,
+                    lora_r=args.lora_r,
+                    lora_alpha=args.lora_alpha,
+                    lora_dropout=args.lora_dropout,
+                ),
+            ),
+        },
         "loraId": DEMO_LORA_ID,
         "sourceData": str(args.data),
         "modelId": args.model_id,
@@ -376,6 +442,13 @@ def write_run_config(
             "validationEvalLimit": args.validation_eval_limit,
             "validationEvalMode": args.validation_eval_mode,
             "finalEvalMode": args.final_eval_mode,
+            "warmupSteps": args.warmup_steps,
+            "weightDecay": args.weight_decay,
+            "maxGradNorm": args.max_grad_norm,
+            "saveSteps": args.save_steps,
+            "saveTotalLimit": args.save_total_limit,
+            "resumeFromCheckpoint": str(args.resume_from_checkpoint) if args.resume_from_checkpoint else None,
+            "allowTruncation": args.allow_truncation,
         },
     }
     path.write_text(json.dumps(summary, indent=2, ensure_ascii=False), encoding="utf-8")
@@ -397,6 +470,7 @@ def summarize_examples(examples: list[Example]) -> dict[str, Any]:
 
 def import_training_dependencies() -> tuple[Any, ...]:
     from unsloth import FastModel
+    from unsloth.chat_templates import get_chat_template, train_on_responses_only
 
     import torch
     from datasets import Dataset
@@ -408,6 +482,8 @@ def import_training_dependencies() -> tuple[Any, ...]:
         torch,
         Dataset,
         FastModel,
+        get_chat_template,
+        train_on_responses_only,
         LoraConfig,
         prepare_model_for_kbit_training,
         AutoModelForCausalLM,
@@ -460,11 +536,99 @@ def build_hf_dataset(Dataset: Any, tokenizer: Any, examples: list[Example]) -> A
         {
             "id": example.example_id,
             "surface": example.surface,
-            "text": render_chat_text(tokenizer, build_full_messages(example), add_generation_prompt=False),
+            "text": render_chat_text(
+                tokenizer,
+                build_full_messages(example),
+                add_generation_prompt=False,
+            ).removeprefix("<bos>"),
         }
         for example in examples
     ]
     return Dataset.from_list(rows)
+
+
+def percentile(sorted_values: list[int], value: float) -> int:
+    if not sorted_values:
+        return 0
+    index = min(len(sorted_values) - 1, max(0, round((len(sorted_values) - 1) * value)))
+    return int(sorted_values[index])
+
+
+def count_input_ids(value: Any) -> int:
+    shape = getattr(value, "shape", None)
+    if shape is not None:
+        if len(shape) == 0:
+            return 1
+        if len(shape) == 1:
+            return int(shape[0])
+        return int(shape[-1])
+    if isinstance(value, list):
+        if not value:
+            return 0
+        first = value[0]
+        if isinstance(first, list):
+            return len(first)
+        return len(value)
+    return len(value)
+
+
+def write_token_length_report(
+    path: Path,
+    tokenizer: Any,
+    examples: list[Example],
+    max_seq_length: int,
+    allow_truncation: bool = False,
+) -> dict[str, Any]:
+    rows: list[dict[str, Any]] = []
+    for example in examples:
+        text = render_chat_text(
+            tokenizer,
+            build_full_messages(example),
+            add_generation_prompt=False,
+        ).removeprefix("<bos>")
+        tokenized = tokenize_text(tokenizer, text, add_special_tokens=False)
+        token_count = count_input_ids(tokenized["input_ids"])
+        rows.append(
+            {
+                "id": example.example_id,
+                "surface": example.surface,
+                "sourceLoraId": example.metadata.get("sourceLoraId"),
+                "sourceStatus": example.metadata.get("sourceStatus"),
+                "tokens": token_count,
+            }
+        )
+
+    lengths = sorted(row["tokens"] for row in rows)
+    over_limit = [row for row in rows if row["tokens"] > max_seq_length]
+    report = {
+        "maxSeqLength": max_seq_length,
+        "count": len(rows),
+        "overLimitCount": len(over_limit),
+        "stats": {
+            "p50": percentile(lengths, 0.50),
+            "p90": percentile(lengths, 0.90),
+            "p95": percentile(lengths, 0.95),
+            "p99": percentile(lengths, 0.99),
+            "max": max(lengths) if lengths else 0,
+        },
+        "longestExamples": sorted(rows, key=lambda row: row["tokens"], reverse=True)[:20],
+        "overLimitExamples": sorted(over_limit, key=lambda row: row["tokens"], reverse=True)[:50],
+    }
+    path.write_text(json.dumps(report, indent=2, ensure_ascii=False), encoding="utf-8")
+    if over_limit:
+        message = (
+            f"Token length preflight failed: {len(over_limit)} examples exceed "
+            f"max_seq_length={max_seq_length}. See {path}."
+        )
+        if not allow_truncation:
+            raise ValueError(f"{message} Re-run with --allow-truncation to continue anyway.")
+        print(f"{message} Continuing because --allow-truncation was set.")
+    else:
+        print(
+            f"Token length preflight passed: max={report['stats']['max']} <= "
+            f"max_seq_length={max_seq_length}. Wrote {path}."
+        )
+    return report
 
 
 def train_and_eval(
@@ -478,6 +642,8 @@ def train_and_eval(
         torch,
         Dataset,
         FastModel,
+        get_chat_template,
+        train_on_responses_only,
         LoraConfig,
         prepare_model_for_kbit_training,
         AutoModelForCausalLM,
@@ -491,7 +657,8 @@ def train_and_eval(
     tuning_summary: list[dict[str, Any]] = []
     best_run: dict[str, Any] | None = None
 
-    for index, config in enumerate(search_configs, start=1):
+    for index, requested_config in enumerate(search_configs, start=1):
+        config = resolve_train_config(len(train), requested_config)
         candidate_dir = output_dir if len(search_configs) == 1 else output_dir / f"candidate-{index:02d}-{config.label}"
         candidate_dir.mkdir(parents=True, exist_ok=True)
         print(f"Training candidate {index}/{len(search_configs)}: {config}")
@@ -501,7 +668,7 @@ def train_and_eval(
             torch.cuda.reset_peak_memory_stats()
 
         if args.backend == "unsloth":
-            model, tokenizer = load_unsloth_model(args, FastModel)
+            model, tokenizer = load_unsloth_model(args, FastModel, get_chat_template)
             model = add_unsloth_lora(model, FastModel, config, args.max_seq_length)
         else:
             tokenizer = AutoTokenizer.from_pretrained(args.model_id)
@@ -512,6 +679,14 @@ def train_and_eval(
             if not args.no_4bit:
                 model = prepare_model_for_kbit_training(model, use_gradient_checkpointing=True)
         model.config.use_cache = False
+
+        write_token_length_report(
+            candidate_dir / "token-length-report.json",
+            tokenizer,
+            [*train, *validation, *test],
+            args.max_seq_length,
+            args.allow_truncation,
+        )
 
         train_dataset = build_hf_dataset(Dataset, tokenizer, train)
         validation_dataset = build_hf_dataset(Dataset, tokenizer, validation)
@@ -541,12 +716,17 @@ def train_and_eval(
             max_steps=config.max_steps,
             learning_rate=config.learning_rate,
             warmup_steps=config.warmup_steps,
-            lr_scheduler_type="cosine",
+            lr_scheduler_type="linear",
             logging_steps=1,
             eval_strategy="no",
-            save_strategy="no",
+            save_strategy="steps",
+            save_steps=args.save_steps,
+            save_total_limit=args.save_total_limit,
             report_to=[],
             optim="adamw_8bit" if not args.no_4bit else "adamw_torch",
+            weight_decay=args.weight_decay,
+            max_grad_norm=args.max_grad_norm,
+            seed=args.seed,
             gradient_checkpointing=True,
             gradient_checkpointing_kwargs={"use_reentrant": False},
         )
@@ -560,7 +740,17 @@ def train_and_eval(
         if peft_config is not None:
             trainer_kwargs["peft_config"] = peft_config
         trainer = SFTTrainer(**trainer_kwargs)
-        trainer.train()
+        if args.backend == "unsloth":
+            trainer = train_on_responses_only(
+                trainer,
+                instruction_part="<|turn>user\n",
+                response_part="<|turn>model\n",
+            )
+        trainer.train(
+            resume_from_checkpoint=str(args.resume_from_checkpoint)
+            if args.resume_from_checkpoint
+            else None
+        )
         validation_metrics: dict[str, Any] = {}
         adapter_dir = candidate_dir / "adapter"
         trainer.save_model(str(adapter_dir))
@@ -733,7 +923,7 @@ def build_search_configs(args: argparse.Namespace) -> list[TrainConfig]:
     return deduped[: args.max_search_runs]
 
 
-def load_unsloth_model(args: argparse.Namespace, FastModel: Any) -> tuple[Any, Any]:
+def load_unsloth_model(args: argparse.Namespace, FastModel: Any, get_chat_template: Any) -> tuple[Any, Any]:
     model, tokenizer = FastModel.from_pretrained(
         model_name=args.model_id,
         dtype=None,
@@ -741,6 +931,7 @@ def load_unsloth_model(args: argparse.Namespace, FastModel: Any) -> tuple[Any, A
         load_in_4bit=not args.no_4bit,
         full_finetuning=False,
     )
+    tokenizer = get_chat_template(tokenizer, chat_template="gemma-4")
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
     tokenizer.padding_side = "right"
@@ -758,6 +949,7 @@ def add_unsloth_lora(model: Any, FastModel: Any, config: TrainConfig, max_seq_le
         lora_alpha=config.lora_alpha,
         lora_dropout=config.lora_dropout,
         bias="none",
+        use_gradient_checkpointing="unsloth",
         random_state=3407,
         max_seq_length=max_seq_length,
     )
@@ -933,14 +1125,19 @@ def evaluate_model_on_examples(
         prompt_messages = build_prompt_messages(example)
         prompt_text = render_chat_text(tokenizer, prompt_messages, add_generation_prompt=True)
         device = next(model.parameters()).device
-        inputs = tokenize_text(tokenizer, prompt_text, return_tensors="pt").to(device)
+        inputs = tokenize_text(
+            tokenizer,
+            prompt_text,
+            return_tensors="pt",
+            add_special_tokens=False,
+        ).to(device)
         start = time.perf_counter()
         with torch.no_grad():
             output_ids = model.generate(
                 **inputs,
                 max_new_tokens=args.max_new_tokens,
                 do_sample=False,
-                use_cache=False,
+                use_cache=True,
                 pad_token_id=tokenizer.pad_token_id,
                 eos_token_id=tokenizer.eos_token_id,
             )
