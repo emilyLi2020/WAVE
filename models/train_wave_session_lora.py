@@ -91,6 +91,9 @@ class EvalResult:
     generated_text: str
     parsed_output: dict[str, Any] | None
     latency_seconds: float
+    prompt_token_count: int
+    generated_token_count: int
+    tokens_per_second: float
     json_valid: bool
     schema_pass: bool
     safety_pass: bool
@@ -156,6 +159,31 @@ def parse_args() -> argparse.Namespace:
         default="completion",
         help="Use completion NLL only for fast hyperparameter selection, or generation for full validation gates.",
     )
+    parser.add_argument(
+        "--generation-eval-limit",
+        type=int,
+        default=0,
+        help="Limit final generation examples. 0 evaluates the full frozen test split.",
+    )
+    parser.add_argument(
+        "--generation-eval-include-base",
+        action="store_true",
+        help="Also run slow base-model generation for final generation eval.",
+    )
+    parser.add_argument(
+        "--generation-eval-include-completion-loss",
+        action="store_true",
+        help="Compute completion NLL inside generation eval. Completion eval mode already does this faster.",
+    )
+    parser.add_argument(
+        "--generation-eval-load-mode",
+        choices=("reuse", "4bit", "bf16"),
+        default="4bit",
+        help="How to load the selected adapter for generation eval. 4bit is safest; bf16 can be faster on large GPUs.",
+    )
+    parser.add_argument("--generation-eval-check-in-max-new-tokens", type=int, default=96)
+    parser.add_argument("--generation-eval-phase-max-new-tokens", type=int, default=160)
+    parser.add_argument("--generation-eval-reflection-max-new-tokens", type=int, default=192)
     parser.add_argument("--max-seq-length", type=int, default=3072)
     parser.add_argument("--max-new-tokens", type=int, default=420)
     parser.add_argument("--epochs", type=float, default=3.0)
@@ -442,6 +470,15 @@ def write_run_config(
             "validationEvalLimit": args.validation_eval_limit,
             "validationEvalMode": args.validation_eval_mode,
             "finalEvalMode": args.final_eval_mode,
+            "generationEvalLimit": args.generation_eval_limit,
+            "generationEvalIncludeBase": args.generation_eval_include_base,
+            "generationEvalIncludeCompletionLoss": args.generation_eval_include_completion_loss,
+            "generationEvalLoadMode": args.generation_eval_load_mode,
+            "generationEvalMaxNewTokensBySurface": {
+                "check_in": args.generation_eval_check_in_max_new_tokens,
+                "phase_narration": args.generation_eval_phase_max_new_tokens,
+                "reflection": args.generation_eval_reflection_max_new_tokens,
+            },
             "warmupSteps": args.warmup_steps,
             "weightDecay": args.weight_decay,
             "maxGradNorm": args.max_grad_norm,
@@ -851,12 +888,12 @@ def train_and_eval(
         "validationNll": best_run["validationNll"],
     }
     if not args.skip_generation_eval:
-        if "model" not in best_run or "tokenizer" not in best_run:
-            raise RuntimeError(
-                "Generation eval after hparam search requires reloading the selected adapter. "
-                "Run the selected config as a single final training job without --hparam-search."
-            )
         if args.final_eval_mode == "completion":
+            if "model" not in best_run or "tokenizer" not in best_run:
+                raise RuntimeError(
+                    "Completion eval after hparam search requires reusing the selected model. "
+                    "Run the selected config as a single final training job without --hparam-search."
+                )
             eval_report = run_completion_eval(
                 model=best_run["model"],
                 tokenizer=best_run["tokenizer"],
@@ -865,14 +902,41 @@ def train_and_eval(
                 selected_config=best_run["config"],
             )
         else:
+            generation_loaded_fresh = False
+            if args.generation_eval_load_mode == "reuse":
+                if "model" not in best_run or "tokenizer" not in best_run:
+                    raise RuntimeError(
+                        "Generation eval load mode 'reuse' requires an in-memory selected model. "
+                        "Use --generation-eval-load-mode 4bit or bf16 after hparam search."
+                    )
+                generation_model = best_run["model"]
+                generation_tokenizer = best_run["tokenizer"]
+                generation_model = prepare_generation_model(generation_model, generation_tokenizer, FastModel)
+            else:
+                if "model" in best_run and "tokenizer" in best_run:
+                    unload_model(best_run["model"], best_run["tokenizer"], torch)
+                    del best_run["model"]
+                    del best_run["tokenizer"]
+                generation_model, generation_tokenizer, actual_load_mode = load_unsloth_generation_model(
+                    args=args,
+                    adapter_dir=final_adapter_dir,
+                    FastModel=FastModel,
+                    get_chat_template=get_chat_template,
+                    torch=torch,
+                )
+                args.generation_eval_load_mode = actual_load_mode
+                generation_loaded_fresh = True
             eval_report = run_generation_eval(
                 args=args,
-                model=best_run["model"],
-                tokenizer=best_run["tokenizer"],
+                model=generation_model,
+                tokenizer=generation_tokenizer,
                 test=test,
                 torch=torch,
                 selected_config=best_run["config"],
+                output_dir=output_dir,
             )
+            if generation_loaded_fresh:
+                unload_model(generation_model, generation_tokenizer, torch)
         eval_report["adapterUpdateCheck"] = inspect_adapter_update(final_adapter_dir, torch)
         eval_report["trainingBackend"] = args.backend
         (output_dir / "eval.json").write_text(
@@ -936,6 +1000,81 @@ def load_unsloth_model(args: argparse.Namespace, FastModel: Any, get_chat_templa
         tokenizer.pad_token = tokenizer.eos_token
     tokenizer.padding_side = "right"
     return model, tokenizer
+
+
+def load_unsloth_generation_model(
+    args: argparse.Namespace,
+    adapter_dir: Path,
+    FastModel: Any,
+    get_chat_template: Any,
+    torch: Any,
+) -> tuple[Any, Any, str]:
+    load_mode = args.generation_eval_load_mode
+    attempted_modes = [load_mode]
+    if load_mode == "bf16":
+        attempted_modes.append("4bit")
+
+    last_error: Exception | None = None
+    for mode in attempted_modes:
+        kwargs: dict[str, Any] = {
+            "model_name": str(adapter_dir),
+            "dtype": torch.bfloat16 if mode == "bf16" and torch.cuda.is_available() else None,
+            "max_seq_length": args.max_seq_length,
+            "load_in_4bit": mode != "bf16",
+            "full_finetuning": False,
+        }
+        if mode == "bf16":
+            kwargs["load_in_16bit"] = True
+        try:
+            model, tokenizer = FastModel.from_pretrained(**kwargs)
+        except TypeError as error:
+            if mode != "bf16" or "load_in_16bit" not in kwargs:
+                last_error = error
+                continue
+            kwargs.pop("load_in_16bit")
+            try:
+                model, tokenizer = FastModel.from_pretrained(**kwargs)
+            except Exception as fallback_error:  # pragma: no cover - depends on local runtime
+                last_error = fallback_error
+                continue
+        except Exception as error:  # pragma: no cover - depends on local runtime
+            last_error = error
+            continue
+
+        tokenizer = get_chat_template(tokenizer, chat_template="gemma-4")
+        if tokenizer.pad_token is None:
+            tokenizer.pad_token = tokenizer.eos_token
+        tokenizer.padding_side = "right"
+        return prepare_generation_model(model, tokenizer, FastModel), tokenizer, mode
+
+    raise RuntimeError(f"Could not load generation adapter from {adapter_dir}: {last_error}")
+
+
+def prepare_generation_model(model: Any, tokenizer: Any, FastModel: Any | None = None) -> Any:
+    disable_gradient_checkpointing = getattr(model, "gradient_checkpointing_disable", None)
+    if callable(disable_gradient_checkpointing):
+        disable_gradient_checkpointing()
+
+    config = getattr(model, "config", None)
+    if config is not None:
+        config.use_cache = True
+
+    generation_config = getattr(model, "generation_config", None)
+    if generation_config is not None:
+        generation_config.use_cache = True
+
+    if FastModel is not None:
+        for_inference = getattr(FastModel, "for_inference", None)
+        if callable(for_inference):
+            maybe_model = for_inference(model)
+            if maybe_model is not None:
+                model = maybe_model
+
+    model.eval()
+    if tokenizer.pad_token is None:
+        tokenizer.pad_token = tokenizer.eos_token
+    tokenizer.padding_side = "right"
+    return model
 
 
 def add_unsloth_lora(model: Any, FastModel: Any, config: TrainConfig, max_seq_length: int) -> Any:
@@ -1044,11 +1183,43 @@ def run_generation_eval(
     test: list[Example],
     torch: Any,
     selected_config: TrainConfig,
+    output_dir: Path,
 ) -> dict[str, Any]:
-    lora_report = evaluate_model_on_examples(args, model, tokenizer, test, torch, "lora-test")
-    with adapter_disabled_context(model):
-        base_report = evaluate_model_on_examples(args, model, tokenizer, test, torch, "base-test")
-    comparison = compare_eval_reports(base_report, lora_report)
+    generation_examples = limit_examples(test, args.generation_eval_limit, args.seed)
+    progress_path = output_dir / "generation-eval-progress.jsonl"
+    if progress_path.exists():
+        progress_path.unlink()
+
+    lora_report = evaluate_model_on_examples(
+        args=args,
+        model=model,
+        tokenizer=tokenizer,
+        examples=generation_examples,
+        torch=torch,
+        label="lora-test-generation",
+        include_completion_loss=args.generation_eval_include_completion_loss,
+        progress_path=progress_path,
+    )
+    base_report = None
+    if args.generation_eval_include_base:
+        with adapter_disabled_context(model):
+            base_report = evaluate_model_on_examples(
+                args=args,
+                model=model,
+                tokenizer=tokenizer,
+                examples=generation_examples,
+                torch=torch,
+                label="base-test-generation",
+                include_completion_loss=args.generation_eval_include_completion_loss,
+                progress_path=progress_path,
+            )
+        comparison = compare_eval_reports(base_report, lora_report)
+    else:
+        comparison = {
+            "baseGenerationSkipped": True,
+            "reason": "Pass --generation-eval-include-base to run slow base-model generation gates.",
+            "betterThanBase": None,
+        }
     return {
         "loraId": DEMO_LORA_ID,
         "createdAt": datetime.now(timezone.utc).isoformat(),
@@ -1057,10 +1228,19 @@ def run_generation_eval(
         "comparison": comparison,
         "base": base_report,
         "lora": lora_report,
+        "generationEval": {
+            "exampleLimit": args.generation_eval_limit,
+            "evaluatedExamples": len(generation_examples),
+            "includeBase": args.generation_eval_include_base,
+            "includeCompletionLoss": args.generation_eval_include_completion_loss,
+            "loadMode": args.generation_eval_load_mode,
+            "progressPath": str(progress_path),
+        },
         "notes": [
-            "Base and LoRA are evaluated on the same frozen test prompts.",
+            "LoRA generation gates are evaluated on the frozen test prompts.",
+            "Base generation is skipped by default because completion eval already provides the base-vs-LoRA numeric comparison.",
             "Validation selected the LoRA candidate; the test split is used only for the final claim.",
-            "Completion NLL/perplexity measure likelihood of the reference JSON completion.",
+            "Completion NLL/perplexity are included only when --generation-eval-include-completion-loss is set.",
             "Schema, safety, medication, and surface-specific rates verify WAVE behavior.",
         ],
     }
@@ -1105,6 +1285,16 @@ def run_completion_eval(
     }
 
 
+def generation_max_new_tokens(args: argparse.Namespace, surface: str) -> int:
+    per_surface = {
+        "check_in": args.generation_eval_check_in_max_new_tokens,
+        "phase_narration": args.generation_eval_phase_max_new_tokens,
+        "reflection": args.generation_eval_reflection_max_new_tokens,
+    }
+    surface_limit = per_surface.get(surface, args.max_new_tokens)
+    return max(1, min(args.max_new_tokens, surface_limit))
+
+
 def evaluate_model_on_examples(
     args: argparse.Namespace,
     model: Any,
@@ -1112,16 +1302,21 @@ def evaluate_model_on_examples(
     examples: list[Example],
     torch: Any,
     label: str,
+    include_completion_loss: bool = True,
+    progress_path: Path | None = None,
 ) -> dict[str, Any]:
     model.eval()
     results: list[EvalResult] = []
-    for example in examples:
-        completion_nll, completion_ppl, completion_token_count = compute_completion_loss(
-            model=model,
-            tokenizer=tokenizer,
-            example=example,
-            torch=torch,
-        )
+    for index, example in enumerate(examples, start=1):
+        if include_completion_loss:
+            completion_nll, completion_ppl, completion_token_count = compute_completion_loss(
+                model=model,
+                tokenizer=tokenizer,
+                example=example,
+                torch=torch,
+            )
+        else:
+            completion_nll, completion_ppl, completion_token_count = 0.0, 0.0, 0
         prompt_messages = build_prompt_messages(example)
         prompt_text = render_chat_text(tokenizer, prompt_messages, add_generation_prompt=True)
         device = next(model.parameters()).device
@@ -1131,11 +1326,18 @@ def evaluate_model_on_examples(
             return_tensors="pt",
             add_special_tokens=False,
         ).to(device)
+        prompt_token_count = int(inputs["input_ids"].shape[-1])
+        max_new_tokens = generation_max_new_tokens(args, example.surface)
+        print(
+            f"[{label}] {index}/{len(examples)} {example.surface} "
+            f"prompt_tokens={prompt_token_count} max_new_tokens={max_new_tokens}",
+            flush=True,
+        )
         start = time.perf_counter()
-        with torch.no_grad():
+        with torch.inference_mode():
             output_ids = model.generate(
                 **inputs,
-                max_new_tokens=args.max_new_tokens,
+                max_new_tokens=max_new_tokens,
                 do_sample=False,
                 use_cache=True,
                 pad_token_id=tokenizer.pad_token_id,
@@ -1143,6 +1345,8 @@ def evaluate_model_on_examples(
             )
         latency_seconds = time.perf_counter() - start
         generated_ids = output_ids[0][inputs["input_ids"].shape[-1] :]
+        generated_token_count = int(generated_ids.shape[-1])
+        tokens_per_second = generated_token_count / latency_seconds if latency_seconds > 0 else 0.0
         generated_text = tokenizer.decode(generated_ids, skip_special_tokens=True).strip()
         parsed_output, parse_errors = extract_json_object(generated_text)
         validation_errors = (
@@ -1155,42 +1359,54 @@ def evaluate_model_on_examples(
         rouge_l_f1 = rouge_l(generated_style_text, reference_text)
         surface_passes = surface_specific_passes(example.surface, parsed_output, example.metadata)
 
-        results.append(
-            EvalResult(
-                example_id=example.example_id,
-                surface=example.surface,
-                source_lora_id=str(example.metadata.get("sourceLoraId")),
-                source_status=str(example.metadata.get("sourceStatus")),
-                prompt=example.prompt,
-                reference=example.output_payload,
-                generated_text=generated_text,
-                parsed_output=parsed_output,
-                latency_seconds=latency_seconds,
-                json_valid=parsed_output is not None,
-                schema_pass=parsed_output is not None and not validation_errors,
-                safety_pass=not any(
-                    [
-                        TOXIC_POSITIVITY_RE.search(generated_style_text),
-                        STAGE_DIRECTION_RE.search(generated_style_text),
-                        PHASE_ANNOUNCEMENT_RE.search(generated_style_text),
-                    ]
-                ),
-                medical_directive_pass=not MEDICAL_DIRECTIVE_RE.search(generated_style_text),
-                style_pass=not style_errors,
-                patient_facing_pass=bool(SECOND_PERSON_RE.search(generated_style_text)),
-                no_analysis_voice_pass=not ANALYSIS_VOICE_RE.search(generated_style_text),
-                no_markdown_pass=not MARKDOWN_OR_BULLET_RE.search(generated_style_text),
-                phase_six_line_pass=surface_passes["phaseSixLine"],
-                reflection_next_step_pass=surface_passes["reflectionNextStep"],
-                check_in_turn_sequence_pass=surface_passes["checkInTurnSequence"],
-                completion_nll=completion_nll,
-                completion_ppl=completion_ppl,
-                completion_token_count=completion_token_count,
-                token_f1=token_f1,
-                rouge_l_f1=rouge_l_f1,
-                errors=[*parse_errors, *validation_errors, *style_errors],
-            )
+        result = EvalResult(
+            example_id=example.example_id,
+            surface=example.surface,
+            source_lora_id=str(example.metadata.get("sourceLoraId")),
+            source_status=str(example.metadata.get("sourceStatus")),
+            prompt=example.prompt,
+            reference=example.output_payload,
+            generated_text=generated_text,
+            parsed_output=parsed_output,
+            latency_seconds=latency_seconds,
+            prompt_token_count=prompt_token_count,
+            generated_token_count=generated_token_count,
+            tokens_per_second=tokens_per_second,
+            json_valid=parsed_output is not None,
+            schema_pass=parsed_output is not None and not validation_errors,
+            safety_pass=not any(
+                [
+                    TOXIC_POSITIVITY_RE.search(generated_style_text),
+                    STAGE_DIRECTION_RE.search(generated_style_text),
+                    PHASE_ANNOUNCEMENT_RE.search(generated_style_text),
+                ]
+            ),
+            medical_directive_pass=not MEDICAL_DIRECTIVE_RE.search(generated_style_text),
+            style_pass=not style_errors,
+            patient_facing_pass=bool(SECOND_PERSON_RE.search(generated_style_text)),
+            no_analysis_voice_pass=not ANALYSIS_VOICE_RE.search(generated_style_text),
+            no_markdown_pass=not MARKDOWN_OR_BULLET_RE.search(generated_style_text),
+            phase_six_line_pass=surface_passes["phaseSixLine"],
+            reflection_next_step_pass=surface_passes["reflectionNextStep"],
+            check_in_turn_sequence_pass=surface_passes["checkInTurnSequence"],
+            completion_nll=completion_nll,
+            completion_ppl=completion_ppl,
+            completion_token_count=completion_token_count,
+            token_f1=token_f1,
+            rouge_l_f1=rouge_l_f1,
+            errors=[*parse_errors, *validation_errors, *style_errors],
         )
+        results.append(result)
+        print(
+            f"[{label}] {index}/{len(examples)} done "
+            f"latency={latency_seconds:.2f}s generated_tokens={generated_token_count} "
+            f"tokens_per_second={tokens_per_second:.2f} json={result.json_valid} "
+            f"schema={result.schema_pass} errors={len(result.errors)}",
+            flush=True,
+        )
+        if progress_path is not None:
+            with progress_path.open("a", encoding="utf-8") as progress_handle:
+                progress_handle.write(json.dumps({"label": label, **asdict(result)}, ensure_ascii=False) + "\n")
     return aggregate_eval(results, label)
 
 
@@ -1477,13 +1693,13 @@ def aggregate_eval(results: list[EvalResult], label: str) -> dict[str, Any]:
 
 def compute_eval_metrics(results: list[EvalResult]) -> dict[str, Any]:
     latencies = sorted(result.latency_seconds for result in results)
+    generated_token_counts = [result.generated_token_count for result in results]
+    completion_nll = weighted_mean(
+        (result.completion_nll, result.completion_token_count) for result in results
+    )
     metrics = {
         "exampleCount": len(results),
         "bySurface": dict(sorted(Counter(result.surface for result in results).items())),
-        "completionNll": weighted_mean((result.completion_nll, result.completion_token_count) for result in results),
-        "completionPpl": safe_exp(
-            weighted_mean((result.completion_nll, result.completion_token_count) for result in results)
-        ),
         "jsonValidityRate": mean_bool(result.json_valid for result in results),
         "schemaPassRate": mean_bool(result.schema_pass for result in results),
         "safetyPassRate": mean_bool(result.safety_pass for result in results),
@@ -1500,7 +1716,13 @@ def compute_eval_metrics(results: list[EvalResult]) -> dict[str, Any]:
         "meanLatencySeconds": mean_float(result.latency_seconds for result in results),
         "p50LatencySeconds": percentile(latencies, 0.50),
         "p95LatencySeconds": percentile(latencies, 0.95),
+        "totalGeneratedTokens": sum(generated_token_counts),
+        "meanGeneratedTokens": mean_float(generated_token_counts),
+        "meanTokensPerSecond": mean_float(result.tokens_per_second for result in results),
     }
+    if math.isfinite(completion_nll):
+        metrics["completionNll"] = completion_nll
+        metrics["completionPpl"] = safe_exp(completion_nll)
     metrics["pass"] = (
         metrics["jsonValidityRate"] >= 0.98
         and metrics["schemaPassRate"] == 1.0
@@ -1638,6 +1860,10 @@ def paired_nll_stats(base_examples: list[dict[str, Any]], lora_examples: list[di
         example_id = str(lora_example["example_id"])
         base_example = base_by_id.get(example_id)
         if base_example is None:
+            continue
+        if int(base_example.get("completion_token_count", 0)) <= 0 or int(
+            lora_example.get("completion_token_count", 0)
+        ) <= 0:
             continue
         base_nll = float(base_example.get("completion_nll", float("nan")))
         lora_nll = float(lora_example.get("completion_nll", float("nan")))
@@ -1816,8 +2042,9 @@ def percentile(sorted_values: list[float], q: float) -> float:
 
 
 def write_readme(path: Path, eval_report: dict[str, Any]) -> None:
-    comparison = eval_report["comparison"]
-    base = eval_report["base"]["metrics"]
+    comparison = eval_report.get("comparison", {})
+    base_report = eval_report.get("base")
+    base = base_report["metrics"] if isinstance(base_report, dict) else None
     lora = eval_report["lora"]["metrics"]
     lines = [
         "# lora-wave-session Results",
@@ -1826,10 +2053,26 @@ def write_readme(path: Path, eval_report: dict[str, Any]) -> None:
         "",
         "## Summary",
         "",
-        f"- Base completion NLL: {base['completionNll']:.4f}",
-        f"- LoRA completion NLL: {lora['completionNll']:.4f}",
-        f"- NLL improvement rate: {comparison['completionNllImprovementRate']:.2%}",
     ]
+    if (
+        base is not None
+        and "completionNll" in base
+        and "completionNll" in lora
+        and "completionNllImprovementRate" in comparison
+    ):
+        lines.extend(
+            [
+                f"- Base completion NLL: {base['completionNll']:.4f}",
+                f"- LoRA completion NLL: {lora['completionNll']:.4f}",
+                f"- NLL improvement rate: {comparison['completionNllImprovementRate']:.2%}",
+            ]
+        )
+    elif comparison.get("baseGenerationSkipped"):
+        lines.append("- Base generation eval: skipped for speed. Use completion eval for base-vs-LoRA numeric proof.")
+    if "meanLatencySeconds" in lora:
+        lines.append(f"- Mean generation latency: {lora['meanLatencySeconds']:.2f}s")
+    if "meanTokensPerSecond" in lora:
+        lines.append(f"- Mean generation speed: {lora['meanTokensPerSecond']:.2f} tokens/s")
     if "baseWaveSessionScore" in comparison:
         lines.extend(
             [
