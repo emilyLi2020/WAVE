@@ -57,13 +57,16 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--source",
         type=Path,
-        required=True,
-        help="Existing clinician seed JSONL used as the style template.",
+        default=Path("datasets/clinician-seeds/lora-phase-narration-clinician.jsonl"),
+        help=(
+            "Clinician-only phase seed JSONL (e.g. status=ready rows). "
+            "Defaults to the checked-in `lora-phase-narration-clinician.jsonl`."
+        ),
     )
     parser.add_argument(
         "--output",
         type=Path,
-        default=Path("datasets/lora-phase-narration-expanded.jsonl"),
+        default=Path("datasets/clinician-seeds/lora-phase-narration-expanded.jsonl"),
         help="Where to write source rows plus synthetic draft rows.",
     )
     parser.add_argument(

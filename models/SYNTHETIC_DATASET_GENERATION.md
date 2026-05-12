@@ -21,7 +21,7 @@ Check-in dialogue at scale is primarily grown in the **client Synthetix** loop (
 
 ## 2. End-to-end data flow (unified session)
 
-1. **Clinician and curated sources** are listed in [`prepare_wave_session_dataset.py`](prepare_wave_session_dataset.py) (`DEFAULT_SOURCE_FILES`). That script normalizes each row into the same **prompt + strict JSON output** shape the app uses for on-device JSON mode.
+1. **Clinician and curated sources** are listed in [`prepare_wave_session_dataset.py`](prepare_wave_session_dataset.py) (`DEFAULT_SOURCE_FILES`), with portable paths under [`datasets/clinician-seeds/`](datasets/clinician-seeds/). That script normalizes each row into the same **prompt + strict JSON output** shape the app uses for on-device JSON mode.
 2. **Normalization output** is typically `datasets/lora-wave-session-normalized.jsonl` (regenerable; see [`SYNTHETIC_DATA.md`](SYNTHETIC_DATA.md)).
 3. **`generate_wave_session_synthetic.py`** (without `--generate`) reads the normalized file, computes **coverage gaps** by `surface`, `sourceLoraId`, `chunkNumber`, `medicationStatus`, `trigger`, and optional final-turn flags, and writes `lora-wave-session-coverage-plan.json` plus audit stubs.
 4. With **`--generate`** and **`OPENAI_API_KEY`**, the script proposes candidates, then **only merges rows that pass local gates** into `lora-wave-session-expanded.jsonl`, alongside machine and human-readable reports.

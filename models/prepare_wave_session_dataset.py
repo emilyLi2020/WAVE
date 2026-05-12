@@ -28,14 +28,16 @@ DEMO_LORA_ID = "lora-wave-session"
 DEFAULT_OUTPUT = Path("datasets/lora-wave-session-normalized.jsonl")
 DEFAULT_SUMMARY_OUTPUT = Path("datasets/lora-wave-session-normalized-summary.json")
 
+# Canonical clinician / seed JSONL checked into `datasets/clinician-seeds/` (portable paths).
+CLINICIAN_SEEDS_DIR = Path("datasets/clinician-seeds")
 DEFAULT_SOURCE_FILES = [
-    Path(r"C:\Users\Bill\Downloads\lora-check-in-1-clinician.jsonl"),
-    Path(r"C:\Users\Bill\Downloads\lora-check-in-2-clinician (1).jsonl"),
-    Path(r"C:\Users\Bill\Downloads\lora-check-in-3-clinician (1).jsonl"),
-    Path(r"C:\Users\Bill\Downloads\lora-check-in-4-clinician.jsonl"),
-    Path(r"C:\Users\Bill\Downloads\lora-check-in-5-clinician.jsonl"),
-    Path(r"C:\Users\Bill\Downloads\lora-reflection-clinician.jsonl"),
-    Path("datasets/lora-phase-narration-expanded.jsonl"),
+    CLINICIAN_SEEDS_DIR / "lora-check-in-1-clinician.jsonl",
+    CLINICIAN_SEEDS_DIR / "lora-check-in-2-clinician.jsonl",
+    CLINICIAN_SEEDS_DIR / "lora-check-in-3-clinician.jsonl",
+    CLINICIAN_SEEDS_DIR / "lora-check-in-4-clinician.jsonl",
+    CLINICIAN_SEEDS_DIR / "lora-check-in-5-clinician.jsonl",
+    CLINICIAN_SEEDS_DIR / "lora-reflection-clinician.jsonl",
+    CLINICIAN_SEEDS_DIR / "lora-phase-narration-expanded.jsonl",
 ]
 
 CHECK_IN_LORA_IDS = {

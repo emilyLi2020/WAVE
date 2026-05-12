@@ -3,7 +3,7 @@
   "baseModel": "google/gemma-4-E2B-it",
   "runPath": "models/runs/lora-phase-narration/contest-r8-a16-lr5e-5-0p5",
   "dataset": {
-    "path": "models/datasets/lora-phase-narration-expanded.jsonl",
+    "path": "models/datasets/clinician-seeds/lora-phase-narration-expanded.jsonl",
     "totalExamples": 50,
     "trainExamples": 40,
     "heldOutExamples": 10,

@@ -1,6 +1,6 @@
 # WAVE Session LoRA EDA
 
-Generated: 2026-05-10T13:36:22.365614+00:00
+Generated: 2026-05-12T07:25:00.084512+00:00
 
 ## High-Level Findings
 
@@ -13,12 +13,6 @@ Generated: 2026-05-10T13:36:22.365614+00:00
 - By surface: `{"check_in": 1534, "phase_narration": 1553, "reflection": 1190}`
 - By source LoRA: `{"lora-check-in-1": 288, "lora-check-in-2": 336, "lora-check-in-3": 335, "lora-check-in-4": 335, "lora-check-in-5": 240, "lora-phase-narration": 1553, "lora-reflection": 1190}`
 - By source status: `{"draft": 1574, "ready": 58, "synthetic_draft": 2645}`
-- User-provided / source rows: `1632`
-- Accepted synthetic draft rows: `2645`
-- Final composition by surface:
-  - `check_in`: `1534` user-provided, `0` synthetic, `1534` total
-  - `phase_narration`: `50` user-provided, `1503` synthetic, `1553` total
-  - `reflection`: `48` user-provided, `1142` synthetic, `1190` total
 - Split-key count: 320
 - Prompt length stats (words): `{"count": 4277, "max": 1315.0, "mean": 377.00303951367783, "median": 95.0, "min": 86.0, "p25": 89.0, "p75": 778.0, "p95": 1038.0}`
 - Output length stats (chars): `{"count": 4277, "max": 1109.0, "mean": 519.7381342062193, "median": 568.0, "min": 75.0, "p25": 215.0, "p75": 712.0, "p95": 939.0}`

@@ -20,17 +20,17 @@
 ## 1. Dataset
 
 ### 1.1 Source files
-The combined training corpus comes from six per-surface clinician/synthetic datasets, all under `models/datasets/`:
+The combined training corpus comes from seven per-surface clinician/synthetic datasets under `models/datasets/clinician-seeds/` (plus the unified `lora-wave-session-expanded.jsonl` built from them):
 
 | Surface | Source file | Purpose |
 |---|---|---|
-| Check-in 1 | `lora-check-in-1-clinician.jsonl` | First check-in after grounding |
-| Check-in 2 | `lora-check-in-2-clinician (1).jsonl` | After body-scan |
-| Check-in 3 | `lora-check-in-3-clinician (1).jsonl` | After sound/visualization anchor |
-| Check-in 4 | `lora-check-in-4-clinician.jsonl` | Late-session check |
-| Check-in 5 | `lora-check-in-5-clinician.jsonl` | Final session check |
-| Phase narration | `lora-phase-narration-expanded.jsonl` | 6-line clinician narration per phase |
-| Reflection | `lora-reflection-clinician.jsonl` | End-of-session insight + journaling prompt |
+| Check-in 1 | `datasets/clinician-seeds/lora-check-in-1-clinician.jsonl` | First check-in after grounding |
+| Check-in 2 | `datasets/clinician-seeds/lora-check-in-2-clinician.jsonl` | After body-scan |
+| Check-in 3 | `datasets/clinician-seeds/lora-check-in-3-clinician.jsonl` | After sound/visualization anchor |
+| Check-in 4 | `datasets/clinician-seeds/lora-check-in-4-clinician.jsonl` | Late-session check |
+| Check-in 5 | `datasets/clinician-seeds/lora-check-in-5-clinician.jsonl` | Final session check |
+| Phase narration | `datasets/clinician-seeds/lora-phase-narration-expanded.jsonl` | 6-line clinician narration per phase |
+| Reflection | `datasets/clinician-seeds/lora-reflection-clinician.jsonl` | End-of-session insight + journaling prompt |
 
 ### 1.2 Combined dataset
 - `models/datasets/lora-wave-session-expanded.jsonl` is the unified training file used by the trainer.

@@ -270,6 +270,7 @@ state:
 ## Main Artifacts
 
 - `generate_wave_session_synthetic.py`: pipeline implementation.
+- `datasets/clinician-seeds/`: portable per-surface clinician JSONL used as defaults for `prepare_wave_session_dataset.py` (see [`clinician-seeds/README.md`](datasets/clinician-seeds/README.md)).
 - `datasets/lora-wave-session-coverage-plan.json`: gap plan.
 - `datasets/lora-wave-session-expanded.jsonl`: normalized plus accepted synthetic rows.
 - `datasets/lora-wave-session-synthetic-report.json`: machine-readable summary.
@@ -277,20 +278,25 @@ state:
 
 ## Regenerable Intermediates
 
-To keep `models/datasets/` small, these large intermediate files are not kept by
-default:
+These files are produced by scripts and may be absent on a fresh clone until you
+regenerate them (they can be large):
 
 - `lora-wave-session-normalized.jsonl`
 - `lora-wave-session-synthetic-draft.jsonl`
 
+**Clinician seed JSONL** for `prepare_wave_session_dataset.py` defaults is
+checked in under `datasets/clinician-seeds/` (portable paths).
+
 Regenerate the normalized source rows:
 
 ```powershell
-python prepare_wave_session_dataset.py
+cd models
+uv run python prepare_wave_session_dataset.py
 ```
 
 Extract accepted synthetic rows from the expanded dataset if needed:
 
 ```powershell
-python -c "import json; from pathlib import Path; src=Path('datasets/lora-wave-session-expanded.jsonl'); out=Path('datasets/lora-wave-session-synthetic-draft.jsonl'); rows=[json.loads(line) for line in src.read_text(encoding='utf-8').splitlines() if line.strip()]; out.write_text('\n'.join(json.dumps(row, ensure_ascii=False, separators=(',',':')) for row in rows if row.get('input',{}).get('metadata',{}).get('sourceStatus')=='synthetic_draft') + '\n', encoding='utf-8')"
+cd models
+uv run python -c "import json; from pathlib import Path; src=Path('datasets/lora-wave-session-expanded.jsonl'); out=Path('datasets/lora-wave-session-synthetic-draft.jsonl'); rows=[json.loads(line) for line in src.read_text(encoding='utf-8').splitlines() if line.strip()]; out.write_text('\n'.join(json.dumps(row, ensure_ascii=False, separators=(',',':')) for row in rows if row.get('input',{}).get('metadata',{}).get('sourceStatus')=='synthetic_draft') + '\n', encoding='utf-8')"
 ```

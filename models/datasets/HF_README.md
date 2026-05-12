@@ -67,6 +67,8 @@ This is computed at training time, not pre-baked in the file. To reproduce, use 
 
 Earlier WAVE iterations had per-surface LoRAs (`lora-check-in-1` through `lora-check-in-5`, `lora-phase-narration`, `lora-reflection`). This dataset unifies their training data so a single adapter can serve all surfaces.
 
+If you build the dataset from source: check-in, reflection, and phase narration **seed** JSONL files are maintained under `models/datasets/clinician-seeds/` in the Wave repository (see `prepare_wave_session_dataset.py` defaults).
+
 | Source LoRA | Count |
 |---|---|
 | `lora-phase-narration` | 1,553 |

@@ -4,6 +4,8 @@ Ad-hoc model experiments and smoke tests for WAVE. **Nothing in this folder ship
 
 ## Setup
 
+For **full local vs remote GPU onboarding**, troubleshooting (Windows CUDA, Linux VM caches, Unsloth Studio dataset choice), and a concise list of issues we already hit in this stack, see [`setup.md`](./setup.md).
+
 This folder supports **two interchangeable workflows** — pick whichever you already have installed:
 
 - **uv** (recommended, fastest) — uses `pyproject.toml` + `.python-version`, auto-downloads Python 3.11, installs into `models/.venv`.
@@ -137,23 +139,42 @@ conda env remove -n wave-models
 
 Gemma weights are gated — accept the license at <https://huggingface.co/google/gemma-4-E2B-it> once and either run `huggingface-cli login` in your shell or paste a token in the notebook's auth cell.
 
+### Dataset layout and extras
+
+- **Clinician seeds** (check-in, reflection, phase inputs for `prepare_wave_session_dataset.py`): [`datasets/clinician-seeds/`](./datasets/clinician-seeds/) and [`datasets/clinician-seeds/README.md`](./datasets/clinician-seeds/README.md).
+- **Hugging Face dataset card** (for publishing the unified JSONL): [`datasets/HF_README.md`](./datasets/HF_README.md).
+- **EDA snapshot** (regenerate with `analyze_wave_session_dataset.py`): [`datasets/lora-wave-session-expanded-eda.md`](./datasets/lora-wave-session-expanded-eda.md).
+- **Synthetic quality audit:** [`datasets/lora-wave-session-synthetic-quality-audit.md`](./datasets/lora-wave-session-synthetic-quality-audit.md).
+- **Training setup, remote VM notes, and utility scripts** (merge, GGUF, eval helpers): [`setup.md`](./setup.md).
+
 ## LoRA Experiments
+
+### Clinician seed files (`datasets/clinician-seeds/`)
+
+Check-in, reflection, and phase narration **source** JSONL files live under
+[`datasets/clinician-seeds/`](./datasets/clinician-seeds/). They are the inputs
+to `prepare_wave_session_dataset.py` (defaults) and to phase synthetic
+generation. Paths are repo-relative so macOS, Linux, and Windows clones behave
+the same.
 
 ### Phase narration
 
-Generate draft synthetic rows from the first clinician seed file:
+Generate draft synthetic rows from the checked-in clinician-only phase seed
+(`lora-phase-narration-clinician.jsonl`, 10 `ready` rows):
 
 ```powershell
 cd models
-uv run python generate_phase_narration_synthetic.py --source "C:\Users\Bill\Downloads\lora-phase-narration-clinician.jsonl"
+uv run python generate_phase_narration_synthetic.py
 ```
+
+Optional: pass `--source` / `--output` / `--synthetic-only-output` to override paths.
 
 This writes:
 
-- `datasets/lora-phase-narration-synthetic-draft.jsonl` - 40 synthetic draft
+- `datasets/lora-phase-narration-synthetic-draft.jsonl` — 40 synthetic draft
   rows only.
-- `datasets/lora-phase-narration-expanded.jsonl` - the 10 source rows plus the
-  40 synthetic draft rows.
+- `datasets/clinician-seeds/lora-phase-narration-expanded.jsonl` — the 10
+  clinician rows plus the 40 synthetic draft rows.
 
 Synthetic rows are deterministic for the same `--seed`, marked `draft`, and
 carry provenance notes because they need clinician review before they should be
@@ -174,19 +195,19 @@ First validate the dataset and split without loading Gemma:
 
 ```powershell
 cd models
-uv run python train_phase_narration_lora.py --data "C:\Users\Bill\Downloads\lora-phase-narration-clinician.jsonl" --dry-run
+uv run python train_phase_narration_lora.py --data "datasets/clinician-seeds/lora-phase-narration-clinician.jsonl" --dry-run
 ```
 
 To run an experimental split that includes synthetic draft rows:
 
 ```powershell
-uv run python train_phase_narration_lora.py --data "datasets\lora-phase-narration-expanded.jsonl" --include-drafts --dry-run
+uv run python train_phase_narration_lora.py --data "datasets/clinician-seeds/lora-phase-narration-expanded.jsonl" --include-drafts --dry-run
 ```
 
 Then run the full QLoRA experiment against whichever dataset you want to test:
 
 ```powershell
-uv run python train_phase_narration_lora.py --data "C:\Users\Bill\Downloads\lora-phase-narration-clinician.jsonl"
+uv run python train_phase_narration_lora.py --data "datasets/clinician-seeds/lora-phase-narration-clinician.jsonl"
 ```
 
 The script accepts both raw training-seed JSONL and the ShareGPT-style
