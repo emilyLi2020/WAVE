@@ -1,0 +1,155 @@
+{
+  "maxSeqLength": 4096,
+  "count": 4277,
+  "overLimitCount": 0,
+  "stats": {
+    "p50": 518,
+    "p90": 1752.0,
+    "p95": 1833.0,
+    "p99": 2103.959999999999,
+    "max": 2227
+  },
+  "longestExamples": [
+    {
+      "id": "5355e0fc-2fe4-517d-b12b-17eb6ebe14ee",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-5",
+      "sourceStatus": "draft",
+      "tokens": 2227
+    },
+    {
+      "id": "6f6cfdd4-7e15-5d26-a955-594eec267d51",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-5",
+      "sourceStatus": "draft",
+      "tokens": 2225
+    },
+    {
+      "id": "2af5eee7-c854-5119-84d4-9701c164e592",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-5",
+      "sourceStatus": "draft",
+      "tokens": 2213
+    },
+    {
+      "id": "28a2f853-52c1-5cc0-bd7c-632c8aaba4be",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-5",
+      "sourceStatus": "draft",
+      "tokens": 2213
+    },
+    {
+      "id": "5b3048b0-84d7-5538-b946-7cfde71cce88",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-5",
+      "sourceStatus": "draft",
+      "tokens": 2209
+    },
+    {
+      "id": "3c2717c9-a31e-5c10-b3a8-29ba15bfa552",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-5",
+      "sourceStatus": "draft",
+      "tokens": 2208
+    },
+    {
+      "id": "eaf21b8a-1ad4-5705-825a-9d9c9d30ef57",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-5",
+      "sourceStatus": "draft",
+      "tokens": 2206
+    },
+    {
+      "id": "5336f3ab-3306-51f0-b8bd-a8bcceb633fb",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-5",
+      "sourceStatus": "draft",
+      "tokens": 2204
+    },
+    {
+      "id": "c64cf285-4890-5e6e-9768-8f67239bfad8",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-5",
+      "sourceStatus": "draft",
+      "tokens": 2202
+    },
+    {
+      "id": "7ef9e19a-6dd4-573f-9863-932cfbfb0e23",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-5",
+      "sourceStatus": "draft",
+      "tokens": 2192
+    },
+    {
+      "id": "f1e2a062-1b33-5848-9e3c-07d0bf691821",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-5",
+      "sourceStatus": "draft",
+      "tokens": 2189
+    },
+    {
+      "id": "69ec0854-9a34-5afc-a7c4-e5d7ccd97b4c",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-5",
+      "sourceStatus": "draft",
+      "tokens": 2185
+    },
+    {
+      "id": "9199a13e-ac71-5b84-a747-83dfc18685f8",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-5",
+      "sourceStatus": "draft",
+      "tokens": 2174
+    },
+    {
+      "id": "ce4fec20-9f18-5ba0-9cd4-d7cf005d0a2f",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-5",
+      "sourceStatus": "draft",
+      "tokens": 2173
+    },
+    {
+      "id": "6fda7aa3-a6ea-5347-a1c6-575f69dc0085",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-5",
+      "sourceStatus": "draft",
+      "tokens": 2167
+    },
+    {
+      "id": "dd62a6e4-f0cd-5473-9fd4-0f208852b450",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-5",
+      "sourceStatus": "draft",
+      "tokens": 2165
+    },
+    {
+      "id": "28330a90-5eae-5a99-87bd-4e8ec771cb12",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-5",
+      "sourceStatus": "draft",
+      "tokens": 2164
+    },
+    {
+      "id": "faeb9cfe-820d-5282-9319-83c6ad962f83",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-5",
+      "sourceStatus": "draft",
+      "tokens": 2162
+    },
+    {
+      "id": "3f041b35-5f77-5d90-b2bd-81f05bae7153",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-5",
+      "sourceStatus": "draft",
+      "tokens": 2161
+    },
+    {
+      "id": "061a46c8-58a6-514a-a9e6-0126a430a1b4",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-5",
+      "sourceStatus": "draft",
+      "tokens": 2159
+    }
+  ],
+  "overLimitExamples": []
+}

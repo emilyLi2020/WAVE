@@ -1,0 +1,3869 @@
+{
+  "label": "primary-validation-completion",
+  "loraId": "lora-wave-session",
+  "createdAt": "2026-05-11T18:54:34.823673+00:00",
+  "metrics": {
+    "exampleCount": 428,
+    "bySurface": {
+      "check_in": 165,
+      "phase_narration": 155,
+      "reflection": 108
+    },
+    "completionNll": 4.704016534538492,
+    "completionPpl": 110.38966712036559
+  },
+  "examples": [
+    {
+      "exampleId": "e2d39002-7ac6-55c4-9147-86a3e6038a33",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-1",
+      "sourceStatus": "draft",
+      "completionNll": 4.830177307128906,
+      "completionPpl": 125.23316341900251,
+      "completionTokenCount": 1737
+    },
+    {
+      "exampleId": "a0926b64-3547-5d96-a104-bd648d2f3fd2",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-1",
+      "sourceStatus": "draft",
+      "completionNll": 5.019903182983398,
+      "completionPpl": 151.39664531294633,
+      "completionTokenCount": 1535
+    },
+    {
+      "exampleId": "6a0c30a0-07f6-58f2-92fb-4d40db2e6ecf",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-1",
+      "sourceStatus": "draft",
+      "completionNll": 4.758153915405273,
+      "completionPpl": 116.53060185804067,
+      "completionTokenCount": 1799
+    },
+    {
+      "exampleId": "fd07f98a-14a6-52cd-b88c-f353c9cb8da9",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-1",
+      "sourceStatus": "draft",
+      "completionNll": 5.091397762298584,
+      "completionPpl": 162.61700318801573,
+      "completionTokenCount": 1399
+    },
+    {
+      "exampleId": "23b9f372-e68e-5c37-852c-6f2030420060",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-1",
+      "sourceStatus": "draft",
+      "completionNll": 5.097253799438477,
+      "completionPpl": 163.57208817543565,
+      "completionTokenCount": 1393
+    },
+    {
+      "exampleId": "8a058fc3-ec9d-5d92-aa28-1ee858efe43b",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-1",
+      "sourceStatus": "draft",
+      "completionNll": 5.1036295890808105,
+      "completionPpl": 164.6183211374687,
+      "completionTokenCount": 1390
+    },
+    {
+      "exampleId": "a290f3b0-9c6e-5758-b44a-dece22a3528b",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-1",
+      "sourceStatus": "draft",
+      "completionNll": 5.010919570922852,
+      "completionPpl": 150.0426475855623,
+      "completionTokenCount": 1581
+    },
+    {
+      "exampleId": "fabe2763-033a-5df6-8960-52a79564a584",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-1",
+      "sourceStatus": "draft",
+      "completionNll": 4.735859394073486,
+      "completionPpl": 113.96135435926092,
+      "completionTokenCount": 1850
+    },
+    {
+      "exampleId": "17917c6a-6641-5c23-b51f-3c152655a4ba",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-1",
+      "sourceStatus": "draft",
+      "completionNll": 5.103641986846924,
+      "completionPpl": 164.62036204956348,
+      "completionTokenCount": 1388
+    },
+    {
+      "exampleId": "31c6728b-ab4c-5b99-82b9-8a6db51624a1",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-1",
+      "sourceStatus": "draft",
+      "completionNll": 4.850228309631348,
+      "completionPpl": 127.76955753684848,
+      "completionTokenCount": 1701
+    },
+    {
+      "exampleId": "50de820b-c20d-5c6f-bd6a-8e6d7eea71a2",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-1",
+      "sourceStatus": "draft",
+      "completionNll": 4.725627899169922,
+      "completionPpl": 112.80130398748977,
+      "completionTokenCount": 1816
+    },
+    {
+      "exampleId": "7cdeeb34-444d-5cb9-a0af-3b879846071b",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-1",
+      "sourceStatus": "draft",
+      "completionNll": 5.03170108795166,
+      "completionPpl": 153.1933865975891,
+      "completionTokenCount": 1602
+    },
+    {
+      "exampleId": "da266038-db53-5350-85c5-a5e67189ef2d",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-1",
+      "sourceStatus": "draft",
+      "completionNll": 4.859626293182373,
+      "completionPpl": 128.97599389184225,
+      "completionTokenCount": 1752
+    },
+    {
+      "exampleId": "f78a54f9-e973-597d-b2ab-019369ea97e8",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-1",
+      "sourceStatus": "draft",
+      "completionNll": 5.031563758850098,
+      "completionPpl": 153.17235013193488,
+      "completionTokenCount": 1541
+    },
+    {
+      "exampleId": "faa1b8db-130b-5773-8ad1-47f4050cbe00",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-1",
+      "sourceStatus": "draft",
+      "completionNll": 4.862666130065918,
+      "completionPpl": 129.36865638776553,
+      "completionTokenCount": 1749
+    },
+    {
+      "exampleId": "9ab774e7-09de-56cf-91cd-7f9ead1092f1",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-1",
+      "sourceStatus": "draft",
+      "completionNll": 4.991170406341553,
+      "completionPpl": 147.1084994973378,
+      "completionTokenCount": 1689
+    },
+    {
+      "exampleId": "7adad4b8-3d68-5062-92a7-591b5308ec13",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-1",
+      "sourceStatus": "draft",
+      "completionNll": 4.972224235534668,
+      "completionPpl": 144.34759362266115,
+      "completionTokenCount": 1605
+    },
+    {
+      "exampleId": "37af175f-748e-584e-82de-67530237929c",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-1",
+      "sourceStatus": "draft",
+      "completionNll": 5.108419895172119,
+      "completionPpl": 165.40878505444655,
+      "completionTokenCount": 1393
+    },
+    {
+      "exampleId": "73727286-33a6-52c4-80bb-14ff4b52cbfa",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-1",
+      "sourceStatus": "draft",
+      "completionNll": 4.802487373352051,
+      "completionPpl": 121.81303549919234,
+      "completionTokenCount": 1819
+    },
+    {
+      "exampleId": "0c934886-0188-5db5-bd02-67a1271fd755",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-1",
+      "sourceStatus": "draft",
+      "completionNll": 4.877612113952637,
+      "completionPpl": 131.31671984061043,
+      "completionTokenCount": 1716
+    },
+    {
+      "exampleId": "47a8900d-7be3-5dc3-a597-b2df05ff221e",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-1",
+      "sourceStatus": "draft",
+      "completionNll": 4.8309454917907715,
+      "completionPpl": 125.32940257428672,
+      "completionTokenCount": 1777
+    },
+    {
+      "exampleId": "86edd92f-f0e5-5349-bce1-1778b8eb1557",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-1",
+      "sourceStatus": "draft",
+      "completionNll": 5.117094993591309,
+      "completionPpl": 166.8499646935302,
+      "completionTokenCount": 1389
+    },
+    {
+      "exampleId": "80cda895-b9fc-53c0-a52d-34b0a4a73cef",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-1",
+      "sourceStatus": "draft",
+      "completionNll": 4.933819770812988,
+      "completionPpl": 138.90910117237462,
+      "completionTokenCount": 1657
+    },
+    {
+      "exampleId": "5e128dd5-4ff1-50e9-8c6a-561066ac22a0",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-1",
+      "sourceStatus": "draft",
+      "completionNll": 5.037298679351807,
+      "completionPpl": 154.05330507177533,
+      "completionTokenCount": 1576
+    },
+    {
+      "exampleId": "97a1de85-d5dc-5c73-ab01-92a400882b68",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-1",
+      "sourceStatus": "draft",
+      "completionNll": 5.135462284088135,
+      "completionPpl": 169.94286360026146,
+      "completionTokenCount": 1387
+    },
+    {
+      "exampleId": "e841229e-afdf-5d82-9b51-2a9163206763",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-1",
+      "sourceStatus": "draft",
+      "completionNll": 4.915120601654053,
+      "completionPpl": 136.3357511281917,
+      "completionTokenCount": 1717
+    },
+    {
+      "exampleId": "3b763f0b-2872-58ae-94da-50a4a1c3cedf",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-1",
+      "sourceStatus": "draft",
+      "completionNll": 5.132604598999023,
+      "completionPpl": 169.45791366007973,
+      "completionTokenCount": 1382
+    },
+    {
+      "exampleId": "686e7b39-56f1-5cca-8e33-e2cca05386b1",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-1",
+      "sourceStatus": "draft",
+      "completionNll": 4.9388532638549805,
+      "completionPpl": 139.6100618269198,
+      "completionTokenCount": 1713
+    },
+    {
+      "exampleId": "54cceb50-3ddb-5e90-941a-dd904a6a80eb",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-1",
+      "sourceStatus": "draft",
+      "completionNll": 4.915419101715088,
+      "completionPpl": 136.37645343274272,
+      "completionTokenCount": 1670
+    },
+    {
+      "exampleId": "ff4192fb-abd5-57da-827a-09141aaa6638",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-1",
+      "sourceStatus": "draft",
+      "completionNll": 5.038283824920654,
+      "completionPpl": 154.205144782462,
+      "completionTokenCount": 1587
+    },
+    {
+      "exampleId": "29a63198-c5b7-5824-86d5-9e2b25e3809c",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-1",
+      "sourceStatus": "draft",
+      "completionNll": 4.937628746032715,
+      "completionPpl": 139.4392114440629,
+      "completionTokenCount": 1673
+    },
+    {
+      "exampleId": "eb990b6d-6bea-5a1d-b133-92e2eece555e",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-1",
+      "sourceStatus": "draft",
+      "completionNll": 4.829250335693359,
+      "completionPpl": 125.11712964203709,
+      "completionTokenCount": 1788
+    },
+    {
+      "exampleId": "c052bf29-76d7-57cc-a982-1f964192da16",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-1",
+      "sourceStatus": "draft",
+      "completionNll": 5.0362443923950195,
+      "completionPpl": 153.8909742682488,
+      "completionTokenCount": 1586
+    },
+    {
+      "exampleId": "9ac33c6f-8bb4-5d97-abbc-076d65761717",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-2",
+      "sourceStatus": "draft",
+      "completionNll": 4.870284080505371,
+      "completionPpl": 130.35794378745115,
+      "completionTokenCount": 1458
+    },
+    {
+      "exampleId": "4dc6b8ed-22c1-54a6-b073-c1658a11572f",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-2",
+      "sourceStatus": "draft",
+      "completionNll": 5.093795299530029,
+      "completionPpl": 163.00735125765743,
+      "completionTokenCount": 1271
+    },
+    {
+      "exampleId": "87d7a89a-bb23-5243-a587-f8851034ab9e",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-2",
+      "sourceStatus": "draft",
+      "completionNll": 5.016677379608154,
+      "completionPpl": 150.90905635935428,
+      "completionTokenCount": 1330
+    },
+    {
+      "exampleId": "26e91e3d-190a-52ea-a091-fbd7ce7d0931",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-2",
+      "sourceStatus": "draft",
+      "completionNll": 4.6449809074401855,
+      "completionPpl": 104.06137896834633,
+      "completionTokenCount": 1643
+    },
+    {
+      "exampleId": "9e97a799-0593-5838-b2da-3fd67fdfa9fd",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-2",
+      "sourceStatus": "draft",
+      "completionNll": 4.8061017990112305,
+      "completionPpl": 122.25411630702544,
+      "completionTokenCount": 1529
+    },
+    {
+      "exampleId": "79096f76-2211-52a6-a615-7db74c376a86",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-2",
+      "sourceStatus": "draft",
+      "completionNll": 4.891355037689209,
+      "completionPpl": 133.13385327002067,
+      "completionTokenCount": 1430
+    },
+    {
+      "exampleId": "70456f34-80dd-5264-a04b-ab5562c110cc",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-2",
+      "sourceStatus": "draft",
+      "completionNll": 4.739401817321777,
+      "completionPpl": 114.36576959240269,
+      "completionTokenCount": 1516
+    },
+    {
+      "exampleId": "e2628805-7d34-5878-8363-37418c721381",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-2",
+      "sourceStatus": "draft",
+      "completionNll": 4.714110851287842,
+      "completionPpl": 111.50961844806459,
+      "completionTokenCount": 1577
+    },
+    {
+      "exampleId": "f427263f-5d66-5da8-b33b-f213a366a037",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-2",
+      "sourceStatus": "draft",
+      "completionNll": 4.924559593200684,
+      "completionPpl": 137.6287156716306,
+      "completionTokenCount": 1467
+    },
+    {
+      "exampleId": "99c1d74b-3ae1-5a93-b28b-f7698868e648",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-2",
+      "sourceStatus": "draft",
+      "completionNll": 4.765763282775879,
+      "completionPpl": 117.42070829599616,
+      "completionTokenCount": 1594
+    },
+    {
+      "exampleId": "d1d297ce-5d22-5b83-8cd4-eccd292fa10d",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-2",
+      "sourceStatus": "draft",
+      "completionNll": 4.9238409996032715,
+      "completionPpl": 137.52985208335392,
+      "completionTokenCount": 1459
+    },
+    {
+      "exampleId": "5bc88747-4026-52be-9ef4-b65b1342cb5e",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-2",
+      "sourceStatus": "draft",
+      "completionNll": 5.072658061981201,
+      "completionPpl": 159.59798537640802,
+      "completionTokenCount": 1317
+    },
+    {
+      "exampleId": "c4562b2f-37f4-5a13-be93-2d4a066025bf",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-2",
+      "sourceStatus": "draft",
+      "completionNll": 4.784111499786377,
+      "completionPpl": 119.59505563127861,
+      "completionTokenCount": 1518
+    },
+    {
+      "exampleId": "197519cc-fb56-5cbc-b157-496cc8cb1ac8",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-2",
+      "sourceStatus": "draft",
+      "completionNll": 4.862131118774414,
+      "completionPpl": 129.29946120758325,
+      "completionTokenCount": 1544
+    },
+    {
+      "exampleId": "05a2b7ca-3ed6-5999-b885-9025650df708",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-2",
+      "sourceStatus": "draft",
+      "completionNll": 4.788263320922852,
+      "completionPpl": 120.092625106055,
+      "completionTokenCount": 1605
+    },
+    {
+      "exampleId": "2538ec80-a669-5378-8e02-c8458b324bf4",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-2",
+      "sourceStatus": "draft",
+      "completionNll": 4.800683498382568,
+      "completionPpl": 121.59349808205508,
+      "completionTokenCount": 1517
+    },
+    {
+      "exampleId": "7359ecb6-aba1-5165-9198-bba64de6c315",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-2",
+      "sourceStatus": "draft",
+      "completionNll": 4.759069919586182,
+      "completionPpl": 116.63739327977372,
+      "completionTokenCount": 1615
+    },
+    {
+      "exampleId": "3395814a-e30c-5bc9-9ed6-abfffe2956f2",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-2",
+      "sourceStatus": "draft",
+      "completionNll": 5.007552623748779,
+      "completionPpl": 149.53831143032357,
+      "completionTokenCount": 1316
+    },
+    {
+      "exampleId": "58d441f0-2063-53ed-847f-86e4a215eb2c",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-2",
+      "sourceStatus": "draft",
+      "completionNll": 4.725314140319824,
+      "completionPpl": 112.76591713182101,
+      "completionTokenCount": 1515
+    },
+    {
+      "exampleId": "b01717e8-ef10-5239-9d5a-c0ccd6198801",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-2",
+      "sourceStatus": "draft",
+      "completionNll": 4.709070205688477,
+      "completionPpl": 110.94895222752791,
+      "completionTokenCount": 1576
+    },
+    {
+      "exampleId": "acc480a1-5b02-5296-a95b-7c1c143a5a30",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-2",
+      "sourceStatus": "draft",
+      "completionNll": 4.913424015045166,
+      "completionPpl": 136.1046418224273,
+      "completionTokenCount": 1409
+    },
+    {
+      "exampleId": "23165659-1aef-5b54-8eb6-19d1780f2b9e",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-2",
+      "sourceStatus": "draft",
+      "completionNll": 4.800326824188232,
+      "completionPpl": 121.55013655251916,
+      "completionTokenCount": 1530
+    },
+    {
+      "exampleId": "846017a9-e750-58d9-ab21-c436e840b3b2",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-2",
+      "sourceStatus": "draft",
+      "completionNll": 5.034753799438477,
+      "completionPpl": 153.66175634368193,
+      "completionTokenCount": 1319
+    },
+    {
+      "exampleId": "949bd143-f5a8-5698-869a-f40231c87ecc",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-2",
+      "sourceStatus": "draft",
+      "completionNll": 4.634634017944336,
+      "completionPpl": 102.9902185250962,
+      "completionTokenCount": 1660
+    },
+    {
+      "exampleId": "77c0464d-3c36-5e23-bbe7-815ba6eabf00",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-2",
+      "sourceStatus": "draft",
+      "completionNll": 4.758321762084961,
+      "completionPpl": 116.55016277421602,
+      "completionTokenCount": 1521
+    },
+    {
+      "exampleId": "e11ec37a-1590-5460-ba66-ba73f08c9d06",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-2",
+      "sourceStatus": "draft",
+      "completionNll": 5.058815956115723,
+      "completionPpl": 157.40403266050131,
+      "completionTokenCount": 1323
+    },
+    {
+      "exampleId": "f0451df6-257b-5270-861d-1badcdf23be1",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-2",
+      "sourceStatus": "draft",
+      "completionNll": 4.822046279907227,
+      "completionPpl": 124.21901776852674,
+      "completionTokenCount": 1569
+    },
+    {
+      "exampleId": "fa778bed-5616-55e6-8bb3-4de6ba516163",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-2",
+      "sourceStatus": "draft",
+      "completionNll": 4.834351539611816,
+      "completionPpl": 125.75700832225725,
+      "completionTokenCount": 1596
+    },
+    {
+      "exampleId": "1466e1a8-a942-5781-a2a9-19cf1f03fb72",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-2",
+      "sourceStatus": "draft",
+      "completionNll": 5.056417942047119,
+      "completionPpl": 157.0270277878837,
+      "completionTokenCount": 1311
+    },
+    {
+      "exampleId": "e560bcc3-1833-5c97-8b4f-1c3dda4a03c3",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-2",
+      "sourceStatus": "draft",
+      "completionNll": 4.867492198944092,
+      "completionPpl": 129.99450741954195,
+      "completionTokenCount": 1439
+    },
+    {
+      "exampleId": "06f81ec2-bc65-5cc5-87e8-05fba16321f3",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-2",
+      "sourceStatus": "draft",
+      "completionNll": 4.732181072235107,
+      "completionPpl": 113.54293782788878,
+      "completionTokenCount": 1627
+    },
+    {
+      "exampleId": "455665ee-53d6-5751-9283-35a57597c621",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-3",
+      "sourceStatus": "draft",
+      "completionNll": 4.883502960205078,
+      "completionPpl": 132.09256940919732,
+      "completionTokenCount": 1372
+    },
+    {
+      "exampleId": "44130e08-defb-5d21-8016-7a54582bc8cb",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-3",
+      "sourceStatus": "draft",
+      "completionNll": 4.695397853851318,
+      "completionPpl": 109.44234203855112,
+      "completionTokenCount": 1465
+    },
+    {
+      "exampleId": "657b3d68-7d16-5838-8bba-1de7f4a89c48",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-3",
+      "sourceStatus": "draft",
+      "completionNll": 4.59046745300293,
+      "completionPpl": 98.54048244189707,
+      "completionTokenCount": 1563
+    },
+    {
+      "exampleId": "e8749334-0b28-56c8-955e-7d052900fc5e",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-3",
+      "sourceStatus": "draft",
+      "completionNll": 4.341405868530273,
+      "completionPpl": 76.8154558943566,
+      "completionTokenCount": 1722
+    },
+    {
+      "exampleId": "04c65ac1-ceb4-564c-8c12-1ace6419e33b",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-3",
+      "sourceStatus": "draft",
+      "completionNll": 4.55483865737915,
+      "completionPpl": 95.09141170024417,
+      "completionTokenCount": 1667
+    },
+    {
+      "exampleId": "d78adbeb-4ca8-5ee4-888d-f6026addfc0a",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-3",
+      "sourceStatus": "draft",
+      "completionNll": 4.569374084472656,
+      "completionPpl": 96.48370022307407,
+      "completionTokenCount": 1628
+    },
+    {
+      "exampleId": "c194d108-35fe-55c2-8f63-fc16bcbf0cef",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-3",
+      "sourceStatus": "draft",
+      "completionNll": 4.692087650299072,
+      "completionPpl": 109.08066455247368,
+      "completionTokenCount": 1562
+    },
+    {
+      "exampleId": "2fa08a86-ef53-542e-bb8b-2fdb9a82c934",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-3",
+      "sourceStatus": "draft",
+      "completionNll": 4.5681047439575195,
+      "completionPpl": 96.36130724894458,
+      "completionTokenCount": 1637
+    },
+    {
+      "exampleId": "08eef3a5-2df4-59d2-bcb7-4ed5140b10e1",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-3",
+      "sourceStatus": "draft",
+      "completionNll": 4.905718803405762,
+      "completionPpl": 135.05995668073638,
+      "completionTokenCount": 1375
+    },
+    {
+      "exampleId": "1376ad08-ed96-5936-8b11-ec00e50b9109",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-3",
+      "sourceStatus": "draft",
+      "completionNll": 4.696681499481201,
+      "completionPpl": 109.58291742782238,
+      "completionTokenCount": 1576
+    },
+    {
+      "exampleId": "c37dc4aa-17e2-5d5b-a53d-1fa6fa68c832",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-3",
+      "sourceStatus": "draft",
+      "completionNll": 4.537473678588867,
+      "completionPpl": 93.45440577488138,
+      "completionTokenCount": 1733
+    },
+    {
+      "exampleId": "11536f13-4ff3-57db-a0d7-d8d2bbc77b1b",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-3",
+      "sourceStatus": "draft",
+      "completionNll": 4.534735679626465,
+      "completionPpl": 93.19887768629198,
+      "completionTokenCount": 1711
+    },
+    {
+      "exampleId": "4278007f-74f2-57c8-85fa-c55460f9b00e",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-3",
+      "sourceStatus": "draft",
+      "completionNll": 4.764546871185303,
+      "completionPpl": 117.27796322143399,
+      "completionTokenCount": 1473
+    },
+    {
+      "exampleId": "cd6872f4-3c37-5fa1-8db7-9e530c3f541a",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-3",
+      "sourceStatus": "draft",
+      "completionNll": 4.821315288543701,
+      "completionPpl": 124.12824791938213,
+      "completionTokenCount": 1436
+    },
+    {
+      "exampleId": "906b5c73-35d0-5d25-a935-400cbde65971",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-3",
+      "sourceStatus": "draft",
+      "completionNll": 4.75049352645874,
+      "completionPpl": 115.64134250846998,
+      "completionTokenCount": 1566
+    },
+    {
+      "exampleId": "7758511a-7189-5981-919a-f29d81bac129",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-3",
+      "sourceStatus": "draft",
+      "completionNll": 4.581229209899902,
+      "completionPpl": 97.63433356601807,
+      "completionTokenCount": 1699
+    },
+    {
+      "exampleId": "219a6464-6a6f-57c4-a68b-5e29b2099491",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-3",
+      "sourceStatus": "draft",
+      "completionNll": 4.448686599731445,
+      "completionPpl": 85.51455537273668,
+      "completionTokenCount": 1743
+    },
+    {
+      "exampleId": "9724b72b-8124-5c6b-9731-1ce692607a1e",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-3",
+      "sourceStatus": "draft",
+      "completionNll": 4.844472408294678,
+      "completionPpl": 127.0362410431176,
+      "completionTokenCount": 1423
+    },
+    {
+      "exampleId": "f67a351e-7e4d-5492-a04e-78fcfa2c044f",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-3",
+      "sourceStatus": "draft",
+      "completionNll": 4.648420810699463,
+      "completionPpl": 104.41995642732414,
+      "completionTokenCount": 1569
+    },
+    {
+      "exampleId": "bd44d2cd-e134-584a-96eb-d7aaa87be579",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-3",
+      "sourceStatus": "draft",
+      "completionNll": 4.530235767364502,
+      "completionPpl": 92.78043310184597,
+      "completionTokenCount": 1724
+    },
+    {
+      "exampleId": "e334ca86-6c00-5d63-8e7e-3e0842a0d9e7",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-3",
+      "sourceStatus": "draft",
+      "completionNll": 4.549290657043457,
+      "completionPpl": 94.5653052849697,
+      "completionTokenCount": 1697
+    },
+    {
+      "exampleId": "cdc833b9-2e85-5ed3-be17-f3eb48c7f9ea",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-3",
+      "sourceStatus": "draft",
+      "completionNll": 4.516160488128662,
+      "completionPpl": 91.48367015736997,
+      "completionTokenCount": 1766
+    },
+    {
+      "exampleId": "23d4491d-88e4-5282-b829-8736ebb12725",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-3",
+      "sourceStatus": "draft",
+      "completionNll": 4.917285919189453,
+      "completionPpl": 136.63128116352692,
+      "completionTokenCount": 1362
+    },
+    {
+      "exampleId": "646a4b27-4870-5a8d-be3e-6fe1012ca54b",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-3",
+      "sourceStatus": "draft",
+      "completionNll": 4.861163139343262,
+      "completionPpl": 129.17436254490934,
+      "completionTokenCount": 1444
+    },
+    {
+      "exampleId": "2c931ed7-fcab-5532-a3cf-737bf79bdbf5",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-3",
+      "sourceStatus": "draft",
+      "completionNll": 4.644015789031982,
+      "completionPpl": 103.96099586450353,
+      "completionTokenCount": 1652
+    },
+    {
+      "exampleId": "a1fc3000-937d-5c1f-9cb3-20cf48b98632",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-3",
+      "sourceStatus": "draft",
+      "completionNll": 4.506934642791748,
+      "completionPpl": 90.64353739219064,
+      "completionTokenCount": 1775
+    },
+    {
+      "exampleId": "84bd7c16-c108-5a9e-b26a-f30fafb334fd",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-3",
+      "sourceStatus": "draft",
+      "completionNll": 4.800099849700928,
+      "completionPpl": 121.52255090333107,
+      "completionTokenCount": 1426
+    },
+    {
+      "exampleId": "30f2565c-063f-52e9-a8f6-80ef42a81678",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-3",
+      "sourceStatus": "draft",
+      "completionNll": 4.778374671936035,
+      "completionPpl": 118.91092363541254,
+      "completionTokenCount": 1463
+    },
+    {
+      "exampleId": "e5d8a460-a754-5057-9022-971733899218",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-3",
+      "sourceStatus": "draft",
+      "completionNll": 4.703847885131836,
+      "completionPpl": 110.37105153830234,
+      "completionTokenCount": 1541
+    },
+    {
+      "exampleId": "762f8dc8-b10b-5ea4-92a4-57ced4d18e76",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-3",
+      "sourceStatus": "draft",
+      "completionNll": 4.555114269256592,
+      "completionPpl": 95.11762363474574,
+      "completionTokenCount": 1698
+    },
+    {
+      "exampleId": "0f261448-5ae7-5405-9d4d-bf841a64d05d",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-3",
+      "sourceStatus": "draft",
+      "completionNll": 4.714205741882324,
+      "completionPpl": 111.52020016409435,
+      "completionTokenCount": 1533
+    },
+    {
+      "exampleId": "2511024c-f228-5a3b-af20-173b016c8f60",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-3",
+      "sourceStatus": "draft",
+      "completionNll": 4.596134662628174,
+      "completionPpl": 99.10051743141098,
+      "completionTokenCount": 1628
+    },
+    {
+      "exampleId": "c38e63fb-e996-55aa-9857-a641b58b13d1",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-3",
+      "sourceStatus": "draft",
+      "completionNll": 4.5448784828186035,
+      "completionPpl": 94.14898579487154,
+      "completionTokenCount": 1736
+    },
+    {
+      "exampleId": "342ad538-6f9b-5def-b41a-ca7dfa11a3fd",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-3",
+      "sourceStatus": "draft",
+      "completionNll": 4.829901218414307,
+      "completionPpl": 125.19859272839729,
+      "completionTokenCount": 1431
+    },
+    {
+      "exampleId": "6bb540a8-e2f8-53f9-bb23-0b3c69540c6b",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-3",
+      "sourceStatus": "draft",
+      "completionNll": 4.840402603149414,
+      "completionPpl": 126.52027894046543,
+      "completionTokenCount": 1419
+    },
+    {
+      "exampleId": "0649b939-a433-568a-9a13-216cad61e454",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-3",
+      "sourceStatus": "draft",
+      "completionNll": 4.92179536819458,
+      "completionPpl": 137.2488042564368,
+      "completionTokenCount": 1363
+    },
+    {
+      "exampleId": "f817363a-2fb6-57a8-94a5-c4fe55dcb707",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-3",
+      "sourceStatus": "draft",
+      "completionNll": 4.691695213317871,
+      "completionPpl": 109.03786566425181,
+      "completionTokenCount": 1553
+    },
+    {
+      "exampleId": "f2abdaa5-bdff-584b-acc5-02795e8058f9",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-3",
+      "sourceStatus": "draft",
+      "completionNll": 4.822140693664551,
+      "completionPpl": 124.23074630638433,
+      "completionTokenCount": 1423
+    },
+    {
+      "exampleId": "7f6c4c74-b103-5b42-a32c-649b10acd156",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-3",
+      "sourceStatus": "draft",
+      "completionNll": 4.550746917724609,
+      "completionPpl": 94.70311734164234,
+      "completionTokenCount": 1691
+    },
+    {
+      "exampleId": "22dab973-17ee-5527-928a-0f7da6cbe3b0",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-3",
+      "sourceStatus": "draft",
+      "completionNll": 4.486093997955322,
+      "completionPpl": 88.77401630087593,
+      "completionTokenCount": 1740
+    },
+    {
+      "exampleId": "954b3d00-dc96-541e-8455-4ea7b7cc5598",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-3",
+      "sourceStatus": "draft",
+      "completionNll": 4.859250545501709,
+      "completionPpl": 128.92754056495875,
+      "completionTokenCount": 1418
+    },
+    {
+      "exampleId": "582d839a-6f3e-564d-9572-48583e9a0963",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-3",
+      "sourceStatus": "draft",
+      "completionNll": 4.973561763763428,
+      "completionPpl": 144.54079177907664,
+      "completionTokenCount": 1357
+    },
+    {
+      "exampleId": "d4d552db-c2e1-53ff-aef8-13503aada062",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-3",
+      "sourceStatus": "draft",
+      "completionNll": 4.615935802459717,
+      "completionPpl": 101.08237742346556,
+      "completionTokenCount": 1684
+    },
+    {
+      "exampleId": "10d86cd2-42fb-5152-9f80-98ae5d24d799",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-3",
+      "sourceStatus": "draft",
+      "completionNll": 4.974526882171631,
+      "completionPpl": 144.68035809613647,
+      "completionTokenCount": 1357
+    },
+    {
+      "exampleId": "20623c30-c054-584e-a2d6-d5052ac48fd3",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-3",
+      "sourceStatus": "draft",
+      "completionNll": 4.79578971862793,
+      "completionPpl": 120.9998999368152,
+      "completionTokenCount": 1419
+    },
+    {
+      "exampleId": "b7190c9d-f7a7-5de2-9a4f-5c5a38d721cd",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-4",
+      "sourceStatus": "draft",
+      "completionNll": 4.860372543334961,
+      "completionPpl": 129.07227816857403,
+      "completionTokenCount": 1440
+    },
+    {
+      "exampleId": "be2fc9f3-582b-5339-ae2f-f6c9f068a1cc",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-4",
+      "sourceStatus": "draft",
+      "completionNll": 4.549600124359131,
+      "completionPpl": 94.59457468487982,
+      "completionTokenCount": 1745
+    },
+    {
+      "exampleId": "ce45481c-e71b-56d3-82db-2e74c7554165",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-4",
+      "sourceStatus": "draft",
+      "completionNll": 4.51547384262085,
+      "completionPpl": 91.42087486773723,
+      "completionTokenCount": 1806
+    },
+    {
+      "exampleId": "d80ea3a6-78a3-594e-a051-f778a05ff8f3",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-4",
+      "sourceStatus": "draft",
+      "completionNll": 4.623538494110107,
+      "completionPpl": 101.85380431493613,
+      "completionTokenCount": 1629
+    },
+    {
+      "exampleId": "dd848f2c-f6d2-512b-99af-e4a992eecb62",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-4",
+      "sourceStatus": "draft",
+      "completionNll": 4.5232954025268555,
+      "completionPpl": 92.13873244049736,
+      "completionTokenCount": 1695
+    },
+    {
+      "exampleId": "efa3560f-8903-56a5-9303-0afdf463d559",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-4",
+      "sourceStatus": "draft",
+      "completionNll": 4.635754585266113,
+      "completionPpl": 103.10569068351886,
+      "completionTokenCount": 1630
+    },
+    {
+      "exampleId": "fba7ddaa-0025-5886-b8b0-0203fe826d1a",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-4",
+      "sourceStatus": "draft",
+      "completionNll": 4.50557804107666,
+      "completionPpl": 90.52065358494055,
+      "completionTokenCount": 1778
+    },
+    {
+      "exampleId": "da798dac-f5d0-5be6-97d6-9e844449c808",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-4",
+      "sourceStatus": "draft",
+      "completionNll": 4.783656597137451,
+      "completionPpl": 119.5406638960837,
+      "completionTokenCount": 1487
+    },
+    {
+      "exampleId": "5d67ebc3-3b9d-59a6-87ea-1eef804cbcfb",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-4",
+      "sourceStatus": "draft",
+      "completionNll": 4.696262359619141,
+      "completionPpl": 109.53699648324896,
+      "completionTokenCount": 1534
+    },
+    {
+      "exampleId": "d3164f06-7bd5-59fe-8ae3-520534fac6fa",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-4",
+      "sourceStatus": "draft",
+      "completionNll": 4.818982124328613,
+      "completionPpl": 123.83897392634516,
+      "completionTokenCount": 1484
+    },
+    {
+      "exampleId": "4dbc0920-1617-5e81-aee0-b20a2ac47993",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-4",
+      "sourceStatus": "draft",
+      "completionNll": 4.541351318359375,
+      "completionPpl": 93.81749179889725,
+      "completionTokenCount": 1753
+    },
+    {
+      "exampleId": "975e96db-54b3-5a31-b65e-0394f515bf4b",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-4",
+      "sourceStatus": "draft",
+      "completionNll": 4.887978553771973,
+      "completionPpl": 132.68508700799984,
+      "completionTokenCount": 1432
+    },
+    {
+      "exampleId": "63aa1e47-c3ca-5d0d-9b38-a7ef6c951104",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-4",
+      "sourceStatus": "draft",
+      "completionNll": 4.8210601806640625,
+      "completionPpl": 124.09658586404376,
+      "completionTokenCount": 1483
+    },
+    {
+      "exampleId": "95a182b9-1c23-540e-8977-ba683b79dc20",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-4",
+      "sourceStatus": "draft",
+      "completionNll": 4.585250377655029,
+      "completionPpl": 98.02772802240659,
+      "completionTokenCount": 1735
+    },
+    {
+      "exampleId": "8ee235dd-334c-5ae6-aaaf-59dade080efc",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-4",
+      "sourceStatus": "draft",
+      "completionNll": 4.717090606689453,
+      "completionPpl": 111.84238537176786,
+      "completionTokenCount": 1542
+    },
+    {
+      "exampleId": "0d473d06-3505-5e13-9d3f-99d3a65f6cd0",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-4",
+      "sourceStatus": "draft",
+      "completionNll": 4.4358415603637695,
+      "completionPpl": 84.42314217167043,
+      "completionTokenCount": 1812
+    },
+    {
+      "exampleId": "fb7f6357-4d91-5344-90c4-ad64849ec507",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-4",
+      "sourceStatus": "draft",
+      "completionNll": 4.57795524597168,
+      "completionPpl": 97.31520497257587,
+      "completionTokenCount": 1731
+    },
+    {
+      "exampleId": "be8b17e3-873a-58be-8742-ad8492d53f6f",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-4",
+      "sourceStatus": "draft",
+      "completionNll": 4.52532958984375,
+      "completionPpl": 92.32635064200981,
+      "completionTokenCount": 1792
+    },
+    {
+      "exampleId": "43f5e52d-60a1-5118-9aae-990ac8d2f8db",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-4",
+      "sourceStatus": "draft",
+      "completionNll": 4.796265602111816,
+      "completionPpl": 121.05749549404734,
+      "completionTokenCount": 1495
+    },
+    {
+      "exampleId": "c4552e4c-d750-5461-9b4d-47dd9d17d753",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-4",
+      "sourceStatus": "draft",
+      "completionNll": 4.503768444061279,
+      "completionPpl": 90.3569958023604,
+      "completionTokenCount": 1766
+    },
+    {
+      "exampleId": "e18c88b7-1433-5359-829e-1569fa61c7bb",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-4",
+      "sourceStatus": "draft",
+      "completionNll": 4.535519599914551,
+      "completionPpl": 93.27196682162216,
+      "completionTokenCount": 1789
+    },
+    {
+      "exampleId": "4151ea60-2afa-53cd-a160-4daa2a7647a9",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-4",
+      "sourceStatus": "draft",
+      "completionNll": 4.799282550811768,
+      "completionPpl": 121.42327123357815,
+      "completionTokenCount": 1483
+    },
+    {
+      "exampleId": "e715b8c6-4ad4-513e-9465-df837923c15a",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-4",
+      "sourceStatus": "draft",
+      "completionNll": 4.663971424102783,
+      "completionPpl": 106.05644200056787,
+      "completionTokenCount": 1607
+    },
+    {
+      "exampleId": "4d77f085-a7e5-5f90-9785-b436e3108a61",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-4",
+      "sourceStatus": "draft",
+      "completionNll": 4.535501003265381,
+      "completionPpl": 93.27023229170607,
+      "completionTokenCount": 1767
+    },
+    {
+      "exampleId": "023b0c39-2891-5ae2-88eb-c146d65ff31f",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-4",
+      "sourceStatus": "draft",
+      "completionNll": 4.565617084503174,
+      "completionPpl": 96.12189104838897,
+      "completionTokenCount": 1711
+    },
+    {
+      "exampleId": "d427b017-2865-5500-b671-8508f7113019",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-4",
+      "sourceStatus": "draft",
+      "completionNll": 4.714107990264893,
+      "completionPpl": 111.50929941694352,
+      "completionTokenCount": 1530
+    },
+    {
+      "exampleId": "f967d097-08b7-597e-ba3b-d74637560c53",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-4",
+      "sourceStatus": "draft",
+      "completionNll": 4.593383312225342,
+      "completionPpl": 98.82823193103091,
+      "completionTokenCount": 1687
+    },
+    {
+      "exampleId": "511da34e-4cff-553a-9298-03a8fe40743e",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-4",
+      "sourceStatus": "draft",
+      "completionNll": 4.471486568450928,
+      "completionPpl": 87.48668133388603,
+      "completionTokenCount": 1803
+    },
+    {
+      "exampleId": "dea6e6d8-051a-52b1-bfef-0044f876c35e",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-4",
+      "sourceStatus": "draft",
+      "completionNll": 4.502696514129639,
+      "completionPpl": 90.2601913271033,
+      "completionTokenCount": 1824
+    },
+    {
+      "exampleId": "e291d8a1-a275-59ec-b103-8732cd4e8614",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-4",
+      "sourceStatus": "draft",
+      "completionNll": 4.741921901702881,
+      "completionPpl": 114.65434444585183,
+      "completionTokenCount": 1532
+    },
+    {
+      "exampleId": "5af5378e-249c-5fc6-8908-be9c99fdf2f6",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-4",
+      "sourceStatus": "draft",
+      "completionNll": 4.502761363983154,
+      "completionPpl": 90.26604487708804,
+      "completionTokenCount": 1734
+    },
+    {
+      "exampleId": "971498df-e012-5d5e-8c99-1e3fc2c1937d",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-5",
+      "sourceStatus": "draft",
+      "completionNll": 5.072823524475098,
+      "completionPpl": 159.62439504193355,
+      "completionTokenCount": 1822
+    },
+    {
+      "exampleId": "5355e0fc-2fe4-517d-b12b-17eb6ebe14ee",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-5",
+      "sourceStatus": "draft",
+      "completionNll": 4.702172756195068,
+      "completionPpl": 110.186320563387,
+      "completionTokenCount": 2227
+    },
+    {
+      "exampleId": "26878abf-8d3b-55da-b04e-4402e0af5bb5",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-5",
+      "sourceStatus": "draft",
+      "completionNll": 4.7337236404418945,
+      "completionPpl": 113.71822071203205,
+      "completionTokenCount": 2099
+    },
+    {
+      "exampleId": "0cd51361-f019-5b00-88ec-f63508de69b2",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-5",
+      "sourceStatus": "draft",
+      "completionNll": 5.089354038238525,
+      "completionPpl": 162.2849982847902,
+      "completionTokenCount": 1825
+    },
+    {
+      "exampleId": "e616ed15-148f-597b-9ef2-cede155da574",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-5",
+      "sourceStatus": "draft",
+      "completionNll": 4.820906639099121,
+      "completionPpl": 124.07753334276072,
+      "completionTokenCount": 2045
+    },
+    {
+      "exampleId": "cfeb715d-b0a8-5812-a845-f595c20f0cf9",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-5",
+      "sourceStatus": "draft",
+      "completionNll": 5.081780910491943,
+      "completionPpl": 161.06063524195187,
+      "completionTokenCount": 1819
+    },
+    {
+      "exampleId": "24465525-9527-503e-a51c-a1ee9e74d1a9",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-5",
+      "sourceStatus": "draft",
+      "completionNll": 4.836724281311035,
+      "completionPpl": 126.05575149991205,
+      "completionTokenCount": 2031
+    },
+    {
+      "exampleId": "de88216d-1da6-58f8-a5f0-a555b7ce4cc7",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-5",
+      "sourceStatus": "draft",
+      "completionNll": 5.060159206390381,
+      "completionPpl": 157.6156077379328,
+      "completionTokenCount": 1822
+    },
+    {
+      "exampleId": "2606b446-b64b-5769-bd98-d7e8cb3f4202",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-5",
+      "sourceStatus": "draft",
+      "completionNll": 4.961845397949219,
+      "completionPpl": 142.85718114606155,
+      "completionTokenCount": 1903
+    },
+    {
+      "exampleId": "bd39dbb9-15f3-5e1d-82fd-4865906b7f1a",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-5",
+      "sourceStatus": "draft",
+      "completionNll": 4.854344367980957,
+      "completionPpl": 128.29654830933842,
+      "completionTokenCount": 2022
+    },
+    {
+      "exampleId": "5b3048b0-84d7-5538-b946-7cfde71cce88",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-5",
+      "sourceStatus": "draft",
+      "completionNll": 4.686948776245117,
+      "completionPpl": 108.52155059414775,
+      "completionTokenCount": 2209
+    },
+    {
+      "exampleId": "36d57100-28f2-53bf-b7f2-d5aefcab0371",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-5",
+      "sourceStatus": "draft",
+      "completionNll": 4.922304153442383,
+      "completionPpl": 137.31865219061353,
+      "completionTokenCount": 1960
+    },
+    {
+      "exampleId": "f0acaa8c-a004-516e-8465-7d102a190db2",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-5",
+      "sourceStatus": "draft",
+      "completionNll": 4.925967693328857,
+      "completionPpl": 137.82264718926254,
+      "completionTokenCount": 1991
+    },
+    {
+      "exampleId": "d9bc945b-8fd8-596b-ac8d-f3ea7da7bb6f",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-5",
+      "sourceStatus": "draft",
+      "completionNll": 5.083495616912842,
+      "completionPpl": 161.3370438594457,
+      "completionTokenCount": 1818
+    },
+    {
+      "exampleId": "b2733ca8-6246-5226-9a0a-0141951db299",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-5",
+      "sourceStatus": "draft",
+      "completionNll": 4.89517879486084,
+      "completionPpl": 133.64389932091774,
+      "completionTokenCount": 1975
+    },
+    {
+      "exampleId": "45ad1a3d-ba59-5e43-a604-7ede58f1b56c",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-5",
+      "sourceStatus": "draft",
+      "completionNll": 4.952512264251709,
+      "completionPpl": 141.53007862078056,
+      "completionTokenCount": 1964
+    },
+    {
+      "exampleId": "f54e981a-e5a7-56a4-9982-577c16d71802",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-5",
+      "sourceStatus": "draft",
+      "completionNll": 5.06920051574707,
+      "completionPpl": 159.0471208316925,
+      "completionTokenCount": 1816
+    },
+    {
+      "exampleId": "3868b51b-7501-5c04-941b-c2ec12437574",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-5",
+      "sourceStatus": "draft",
+      "completionNll": 4.8009867668151855,
+      "completionPpl": 121.63037914378309,
+      "completionTokenCount": 2060
+    },
+    {
+      "exampleId": "9777399b-a234-5f49-9c57-95eb20efcd76",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-5",
+      "sourceStatus": "draft",
+      "completionNll": 5.076892852783203,
+      "completionPpl": 160.2752825506304,
+      "completionTokenCount": 1815
+    },
+    {
+      "exampleId": "e7b707a7-bc93-56d8-afe8-6ed332cb34a5",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-5",
+      "sourceStatus": "draft",
+      "completionNll": 4.709038257598877,
+      "completionPpl": 110.94540767708227,
+      "completionTokenCount": 2139
+    },
+    {
+      "exampleId": "7049ea8e-79d9-587b-8657-dd0b87da5b52",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-5",
+      "sourceStatus": "draft",
+      "completionNll": 4.806362628936768,
+      "completionPpl": 122.2860079980513,
+      "completionTokenCount": 2061
+    },
+    {
+      "exampleId": "b196e5a7-835d-5937-81bc-611367ab87e4",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-5",
+      "sourceStatus": "draft",
+      "completionNll": 5.080322265625,
+      "completionPpl": 160.8258762297273,
+      "completionTokenCount": 1822
+    },
+    {
+      "exampleId": "6caf180c-da66-5d64-806d-607fd61ea940",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-5",
+      "sourceStatus": "draft",
+      "completionNll": 4.903397560119629,
+      "completionPpl": 134.7468132447209,
+      "completionTokenCount": 1983
+    },
+    {
+      "exampleId": "3f041b35-5f77-5d90-b2bd-81f05bae7153",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-5",
+      "sourceStatus": "draft",
+      "completionNll": 4.764376640319824,
+      "completionPpl": 117.25800059142935,
+      "completionTokenCount": 2161
+    },
+    {
+      "exampleId": "a6c82ab4-8155-55fe-aa5f-b0e18b92b388",
+      "surface": "check_in",
+      "sourceLoraId": "lora-check-in-5",
+      "sourceStatus": "draft",
+      "completionNll": 4.792898654937744,
+      "completionPpl": 120.6505867062943,
+      "completionTokenCount": 2092
+    },
+    {
+      "exampleId": "13ad79aa-4028-51d8-8c30-b67b30b0e585",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "ready",
+      "completionNll": 4.743104457855225,
+      "completionPpl": 114.79000984643629,
+      "completionTokenCount": 473
+    },
+    {
+      "exampleId": "139a6c3b-b16d-57c1-9747-83d330c6b724",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "ready",
+      "completionNll": 4.835859298706055,
+      "completionPpl": 125.94676261114876,
+      "completionTokenCount": 470
+    },
+    {
+      "exampleId": "9e8e202c-1c84-5d2f-a3bb-0661edaade97",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "ready",
+      "completionNll": 4.820933818817139,
+      "completionPpl": 124.08090578096004,
+      "completionTokenCount": 565
+    },
+    {
+      "exampleId": "9f25aadd-fa89-503f-a0ca-684046e8687d",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "draft",
+      "completionNll": 4.294888019561768,
+      "completionPpl": 73.32400313127577,
+      "completionTokenCount": 526
+    },
+    {
+      "exampleId": "49c6eff8-f116-5d01-b9a5-49ebd1ea82de",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "draft",
+      "completionNll": 4.584863662719727,
+      "completionPpl": 97.98982656490871,
+      "completionTokenCount": 537
+    },
+    {
+      "exampleId": "7b1a1cae-5e7c-563c-8006-d0ba018ab0f2",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "draft",
+      "completionNll": 4.506067752838135,
+      "completionPpl": 90.56499346965286,
+      "completionTokenCount": 562
+    },
+    {
+      "exampleId": "10875673-a4f9-562d-bbf0-e25a4e4db322",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "draft",
+      "completionNll": 4.433185577392578,
+      "completionPpl": 84.19921325102545,
+      "completionTokenCount": 548
+    },
+    {
+      "exampleId": "064f3361-a99e-587d-80ad-1cef1482245e",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.230894565582275,
+      "completionPpl": 68.77873174825847,
+      "completionTokenCount": 545
+    },
+    {
+      "exampleId": "0c9ef10e-5b50-50a2-91eb-0bf6347c2efa",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.163327217102051,
+      "completionPpl": 64.28505750719066,
+      "completionTokenCount": 544
+    },
+    {
+      "exampleId": "bc14e5bb-8334-5acc-a379-6841db9d836c",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.059244155883789,
+      "completionPpl": 57.93050809323878,
+      "completionTokenCount": 536
+    },
+    {
+      "exampleId": "13a03ad1-f6f6-527b-8b0f-d0f799aef3d5",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.184798240661621,
+      "completionPpl": 65.68024797645413,
+      "completionTokenCount": 531
+    },
+    {
+      "exampleId": "3066008a-1554-5a07-9d94-7e63693d3e83",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.2511420249938965,
+      "completionPpl": 70.18552021368183,
+      "completionTokenCount": 551
+    },
+    {
+      "exampleId": "9e618f09-0394-5e64-80b1-b95a2112d481",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.165503978729248,
+      "completionPpl": 64.4251431648026,
+      "completionTokenCount": 531
+    },
+    {
+      "exampleId": "7d6a6d17-a64b-54f4-b7a9-d777351b103a",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 3.917879343032837,
+      "completionPpl": 50.29367597371643,
+      "completionTokenCount": 532
+    },
+    {
+      "exampleId": "413707c8-5bf2-5bd3-b8a3-2f4ad9c63573",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.404486179351807,
+      "completionPpl": 81.81709272936489,
+      "completionTokenCount": 514
+    },
+    {
+      "exampleId": "6f0a6ad5-6bfb-5e12-b2cd-cf0bcc455bb6",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.181214332580566,
+      "completionPpl": 65.4452773130999,
+      "completionTokenCount": 523
+    },
+    {
+      "exampleId": "040703b8-e200-5f6d-a4c2-7b51c47c9273",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.087169170379639,
+      "completionPpl": 59.5710173891726,
+      "completionTokenCount": 563
+    },
+    {
+      "exampleId": "205acbec-d2d9-52a0-9eab-b8e9c03b77a5",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.053440570831299,
+      "completionPpl": 57.59527717388764,
+      "completionTokenCount": 540
+    },
+    {
+      "exampleId": "c0c929ed-5c98-5a03-bd7f-f824cacb6eb1",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.10167932510376,
+      "completionPpl": 60.44170368855233,
+      "completionTokenCount": 548
+    },
+    {
+      "exampleId": "c90bec56-ac82-5504-9845-462e5b9ef960",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 3.9956140518188477,
+      "completionPpl": 54.35920974919591,
+      "completionTokenCount": 540
+    },
+    {
+      "exampleId": "b53812b9-7640-5110-ae1b-ca7212b55d43",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 3.958078145980835,
+      "completionPpl": 52.35660744052488,
+      "completionTokenCount": 509
+    },
+    {
+      "exampleId": "692ddefe-cf0f-55fe-8348-720706ad3cc2",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.175008773803711,
+      "completionPpl": 65.04041031030692,
+      "completionTokenCount": 544
+    },
+    {
+      "exampleId": "cbe972ad-7e7e-5e8f-a7d6-12554108ca06",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.258250713348389,
+      "completionPpl": 70.68622477168343,
+      "completionTokenCount": 511
+    },
+    {
+      "exampleId": "2c99977d-c167-581f-b972-a477a54d321b",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.042191982269287,
+      "completionPpl": 56.95104176034677,
+      "completionTokenCount": 546
+    },
+    {
+      "exampleId": "c44eef68-01e1-5d67-af23-35388c419afa",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.0009684562683105,
+      "completionPpl": 54.651051566057845,
+      "completionTokenCount": 553
+    },
+    {
+      "exampleId": "99964fe9-358f-5545-ab1b-6c085b1197e1",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.017852783203125,
+      "completionPpl": 55.58163179099136,
+      "completionTokenCount": 533
+    },
+    {
+      "exampleId": "464b13ae-bdf3-5d40-82e3-b65eb88d54a2",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.057382106781006,
+      "completionPpl": 57.82273900942123,
+      "completionTokenCount": 546
+    },
+    {
+      "exampleId": "0f214d03-c184-5aa3-af2b-ef73e584b646",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.1938066482543945,
+      "completionPpl": 66.27459546389059,
+      "completionTokenCount": 525
+    },
+    {
+      "exampleId": "bc154706-254b-5b16-8715-13a2ab9c69d4",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.044102668762207,
+      "completionPpl": 57.05996136907231,
+      "completionTokenCount": 553
+    },
+    {
+      "exampleId": "b46601b5-1e96-589a-8337-72d4de992a84",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.196514129638672,
+      "completionPpl": 66.4542758282188,
+      "completionTokenCount": 536
+    },
+    {
+      "exampleId": "7c9c549b-295b-5712-ac99-e2ebca005054",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.278712749481201,
+      "completionPpl": 72.14750828948111,
+      "completionTokenCount": 530
+    },
+    {
+      "exampleId": "08970b6f-9b43-5b03-9533-6cd940d850a7",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.340751647949219,
+      "completionPpl": 76.76521807726618,
+      "completionTokenCount": 530
+    },
+    {
+      "exampleId": "275659f6-1d13-5858-abb4-d1e7caf3d2ca",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.1950531005859375,
+      "completionPpl": 66.35725509287029,
+      "completionTokenCount": 549
+    },
+    {
+      "exampleId": "5b457c8e-bc48-5cb2-b567-fe9adff176cf",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.275787353515625,
+      "completionPpl": 71.93675667606448,
+      "completionTokenCount": 511
+    },
+    {
+      "exampleId": "881a3d82-ee65-58d0-8536-11f5b83c17cd",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.3169379234313965,
+      "completionPpl": 74.95874709164308,
+      "completionTokenCount": 522
+    },
+    {
+      "exampleId": "c74cf169-64c0-5a20-ba8b-9938c1cfac12",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.33665657043457,
+      "completionPpl": 76.4515013443904,
+      "completionTokenCount": 509
+    },
+    {
+      "exampleId": "d0f22a4d-413a-5a5c-8f3b-06c0a5db4bbc",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.1751203536987305,
+      "completionPpl": 65.04766791735537,
+      "completionTokenCount": 555
+    },
+    {
+      "exampleId": "2a699062-d968-53cb-9cfe-51ff648e8a36",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.282604694366455,
+      "completionPpl": 72.4288495425492,
+      "completionTokenCount": 517
+    },
+    {
+      "exampleId": "b7feb6cc-ff23-5c35-967f-aad0e855244e",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.193532466888428,
+      "completionPpl": 66.25642669566007,
+      "completionTokenCount": 522
+    },
+    {
+      "exampleId": "61e221f6-1e22-5460-ab3e-643e7674039a",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.200005531311035,
+      "completionPpl": 66.68669990478408,
+      "completionTokenCount": 529
+    },
+    {
+      "exampleId": "1cd3c434-6efd-5cac-a243-731d1723d1ff",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.469156742095947,
+      "completionPpl": 87.2830898165387,
+      "completionTokenCount": 521
+    },
+    {
+      "exampleId": "ce017cb7-5836-5a8f-aa58-04c10653dbe5",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.456664085388184,
+      "completionPpl": 86.1994748469375,
+      "completionTokenCount": 519
+    },
+    {
+      "exampleId": "877e9998-3e83-5a9d-b4af-0f54c4b5a4d2",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.178956031799316,
+      "completionPpl": 65.29764894958002,
+      "completionTokenCount": 534
+    },
+    {
+      "exampleId": "188f1b26-873d-54cd-a1a0-a2c0b479d7d5",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.170817852020264,
+      "completionPpl": 64.76840142005112,
+      "completionTokenCount": 546
+    },
+    {
+      "exampleId": "422f6e05-eb03-55fd-a508-b5d77c5ee4cd",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.381152153015137,
+      "completionPpl": 79.93007204711279,
+      "completionTokenCount": 544
+    },
+    {
+      "exampleId": "17b0705f-d7d9-5d93-8c66-d5fb08c36dca",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.260608673095703,
+      "completionPpl": 70.85309670571942,
+      "completionTokenCount": 568
+    },
+    {
+      "exampleId": "eebe7cc8-7324-5ec6-95de-8b7ede5e61b6",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.314612865447998,
+      "completionPpl": 74.78466611090107,
+      "completionTokenCount": 533
+    },
+    {
+      "exampleId": "86d66c59-b616-570c-800f-c751c37e6949",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.072010517120361,
+      "completionPpl": 58.67481079591867,
+      "completionTokenCount": 522
+    },
+    {
+      "exampleId": "65214a12-1bbf-5576-8f1d-60bc6162e835",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.302186489105225,
+      "completionPpl": 73.86111379362224,
+      "completionTokenCount": 524
+    },
+    {
+      "exampleId": "eb1b8c2d-2539-58da-a091-893ca849f84a",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.17547607421875,
+      "completionPpl": 65.07081082357226,
+      "completionTokenCount": 535
+    },
+    {
+      "exampleId": "04b928a7-be3b-5934-96b2-19cbc39cef39",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.318411350250244,
+      "completionPpl": 75.06927472711011,
+      "completionTokenCount": 500
+    },
+    {
+      "exampleId": "53071749-95cf-5e9b-8e56-e8b0fc5606ea",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.515905857086182,
+      "completionPpl": 91.46037854057805,
+      "completionTokenCount": 499
+    },
+    {
+      "exampleId": "1fef2f3a-5e71-5ed4-a1fb-24c227c66460",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 3.935868740081787,
+      "completionPpl": 51.206615878863,
+      "completionTokenCount": 569
+    },
+    {
+      "exampleId": "3f71177b-46ce-5ad1-b196-a12a6a11692e",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.42117166519165,
+      "completionPpl": 83.19370344299838,
+      "completionTokenCount": 529
+    },
+    {
+      "exampleId": "5a58e921-f4aa-536e-9e2e-9840b8037f01",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.21390962600708,
+      "completionPpl": 67.6203941396914,
+      "completionTokenCount": 525
+    },
+    {
+      "exampleId": "785aaa14-c65f-52d4-8cf7-fc91c784ebb3",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.239604473114014,
+      "completionPpl": 69.38040459567353,
+      "completionTokenCount": 542
+    },
+    {
+      "exampleId": "91f7594c-58e6-5fc6-8317-ef1dadeff8c1",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.336625099182129,
+      "completionPpl": 76.44909535775197,
+      "completionTokenCount": 534
+    },
+    {
+      "exampleId": "991622e6-ac77-5e82-871c-aee3327c5fe5",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.33176851272583,
+      "completionPpl": 76.07871383957156,
+      "completionTokenCount": 522
+    },
+    {
+      "exampleId": "cdf4c553-f8b5-59f0-be5d-328749955b53",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.204195022583008,
+      "completionPpl": 66.96666930717771,
+      "completionTokenCount": 529
+    },
+    {
+      "exampleId": "5810f835-f483-549a-ada9-dfcc0072471d",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.177252292633057,
+      "completionPpl": 65.1864935044305,
+      "completionTokenCount": 520
+    },
+    {
+      "exampleId": "00d18da0-b4e1-5f11-af80-f17e4f2ae0e9",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.338548183441162,
+      "completionPpl": 76.5962548643644,
+      "completionTokenCount": 501
+    },
+    {
+      "exampleId": "4fed24ca-57d0-5f6e-a6f3-f366cdec1e0a",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.382899761199951,
+      "completionPpl": 80.06988062495977,
+      "completionTokenCount": 524
+    },
+    {
+      "exampleId": "39f8f395-0e5d-532b-abb1-2aa758db5a40",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.266512393951416,
+      "completionPpl": 71.27263079798465,
+      "completionTokenCount": 534
+    },
+    {
+      "exampleId": "7ade4b15-5c86-590e-aff1-96d1389d198d",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.310685634613037,
+      "completionPpl": 74.49154541721812,
+      "completionTokenCount": 509
+    },
+    {
+      "exampleId": "3fb061f9-ce19-586b-bb48-cbad251ef4b5",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.1989240646362305,
+      "completionPpl": 66.61461944451744,
+      "completionTokenCount": 526
+    },
+    {
+      "exampleId": "f9f03fa0-517f-5b99-859e-4220a54e36ce",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.079782009124756,
+      "completionPpl": 59.13257808233786,
+      "completionTokenCount": 532
+    },
+    {
+      "exampleId": "e05928a1-de41-5f04-a74d-bf1c96843f09",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.339649200439453,
+      "completionPpl": 76.68063508648085,
+      "completionTokenCount": 504
+    },
+    {
+      "exampleId": "cb7a8402-bc4a-55b7-9954-81779c2b24ca",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.303106784820557,
+      "completionPpl": 73.92911914789451,
+      "completionTokenCount": 539
+    },
+    {
+      "exampleId": "a72ddb79-e721-5acf-81e0-e1baa69a25da",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.4926533699035645,
+      "completionPpl": 89.3582320426339,
+      "completionTokenCount": 518
+    },
+    {
+      "exampleId": "2d1f13f8-f8f1-5711-83e5-f8d1c3166538",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.6819024085998535,
+      "completionPpl": 107.97529042648034,
+      "completionTokenCount": 489
+    },
+    {
+      "exampleId": "e38db8ec-85bf-5d44-9ab6-bba6a605293c",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.687057018280029,
+      "completionPpl": 108.53329782337642,
+      "completionTokenCount": 515
+    },
+    {
+      "exampleId": "874a489f-8702-5ac5-bbe9-2e815f769656",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.5982160568237305,
+      "completionPpl": 99.30699948389865,
+      "completionTokenCount": 490
+    },
+    {
+      "exampleId": "2fc2fbbb-69c5-55d8-a5a9-f471c621e602",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.761967182159424,
+      "completionPpl": 116.97581244182201,
+      "completionTokenCount": 478
+    },
+    {
+      "exampleId": "c06354b1-a956-57fc-bf19-7c1f59b408e9",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.692711353302002,
+      "completionPpl": 109.14871971141396,
+      "completionTokenCount": 485
+    },
+    {
+      "exampleId": "c2777b0e-2799-5653-9de9-4e74a05ac0b5",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.594221115112305,
+      "completionPpl": 98.9110652031883,
+      "completionTokenCount": 509
+    },
+    {
+      "exampleId": "2e389d75-5709-5d63-ad06-6501863d8e4e",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.607720375061035,
+      "completionPpl": 100.25534435710381,
+      "completionTokenCount": 517
+    },
+    {
+      "exampleId": "20986ce4-ddb9-5ddd-aab6-3eb58f9a42c1",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.668710708618164,
+      "completionPpl": 106.56026659492112,
+      "completionTokenCount": 485
+    },
+    {
+      "exampleId": "cf50749c-2e29-5b39-ad6e-f2187f92b04c",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.530999183654785,
+      "completionPpl": 92.8512902392006,
+      "completionTokenCount": 478
+    },
+    {
+      "exampleId": "cda0d352-9477-50e1-baa5-092e5af2bc22",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.635167121887207,
+      "completionPpl": 103.04513765417055,
+      "completionTokenCount": 536
+    },
+    {
+      "exampleId": "22809a0b-389b-5ad3-86f3-73582a28c185",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.734357833862305,
+      "completionPpl": 113.79036293303135,
+      "completionTokenCount": 516
+    },
+    {
+      "exampleId": "06951d9e-df7c-504a-be0d-7824c3dfdad5",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.645209312438965,
+      "completionPpl": 104.08514982207014,
+      "completionTokenCount": 507
+    },
+    {
+      "exampleId": "e2b6f993-8f73-5eb0-b6e0-c38e43268b61",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.8418965339660645,
+      "completionPpl": 126.70943274027118,
+      "completionTokenCount": 491
+    },
+    {
+      "exampleId": "598fe848-13fe-54c3-a935-cea0f95386f1",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.772302150726318,
+      "completionPpl": 118.19102254910275,
+      "completionTokenCount": 503
+    },
+    {
+      "exampleId": "f2189b18-5e70-5b1d-8a0e-db77d5adebcc",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.596922397613525,
+      "completionPpl": 99.1786131313773,
+      "completionTokenCount": 501
+    },
+    {
+      "exampleId": "8e5b4f64-aa74-53ba-9188-ea788ee687b2",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.753547668457031,
+      "completionPpl": 115.99506747755004,
+      "completionTokenCount": 489
+    },
+    {
+      "exampleId": "641de379-23e8-5092-bfa7-07bd33ebacd6",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.786900997161865,
+      "completionPpl": 119.92913146027901,
+      "completionTokenCount": 473
+    },
+    {
+      "exampleId": "3544aab4-5c48-5600-8b3c-bc8be3d25283",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.778341293334961,
+      "completionPpl": 118.9069546213696,
+      "completionTokenCount": 459
+    },
+    {
+      "exampleId": "59fa3348-8fa3-5239-b2f6-a989e75df4a6",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.971822261810303,
+      "completionPpl": 144.2895813433366,
+      "completionTokenCount": 448
+    },
+    {
+      "exampleId": "dbef505b-1932-5425-9a02-f71d8e79d6cc",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.826398849487305,
+      "completionPpl": 124.76086805162316,
+      "completionTokenCount": 448
+    },
+    {
+      "exampleId": "223b0fc4-9e84-5448-a16f-23c8e82060ab",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.650716781616211,
+      "completionPpl": 104.65997704514965,
+      "completionTokenCount": 485
+    },
+    {
+      "exampleId": "0bbd7ea1-ca5a-53d6-b164-f6d9b48c9481",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.780782222747803,
+      "completionPpl": 119.19755262461786,
+      "completionTokenCount": 477
+    },
+    {
+      "exampleId": "af34ca0e-ef24-5235-b97e-6859d3f28f63",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.765439510345459,
+      "completionPpl": 117.38269686174883,
+      "completionTokenCount": 500
+    },
+    {
+      "exampleId": "690107f4-366c-5149-989c-62168a93fde6",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.811755657196045,
+      "completionPpl": 122.94728142529199,
+      "completionTokenCount": 498
+    },
+    {
+      "exampleId": "49cfcb87-3654-54a9-99c8-68c6d8008b06",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.793115615844727,
+      "completionPpl": 120.67676600685377,
+      "completionTokenCount": 463
+    },
+    {
+      "exampleId": "bc5a07b4-7572-5fc6-bf86-83d190fb432c",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.830437183380127,
+      "completionPpl": 125.26571277325925,
+      "completionTokenCount": 447
+    },
+    {
+      "exampleId": "4094ef52-992a-5132-b4f6-b91580954cbf",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.650656700134277,
+      "completionPpl": 104.65368910752584,
+      "completionTokenCount": 512
+    },
+    {
+      "exampleId": "d751b142-f32f-5814-8258-c99c43c75b49",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.722777843475342,
+      "completionPpl": 112.4802716859809,
+      "completionTokenCount": 487
+    },
+    {
+      "exampleId": "15fbea88-1d82-5d23-ad1f-41db9aeef446",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.867371082305908,
+      "completionPpl": 129.97876387524278,
+      "completionTokenCount": 454
+    },
+    {
+      "exampleId": "758f4ae2-5bea-5e55-8043-41078fd25654",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.7671709060668945,
+      "completionPpl": 117.58610880333397,
+      "completionTokenCount": 460
+    },
+    {
+      "exampleId": "487f8ca1-2f65-590c-adb4-2754e3f15201",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.632897853851318,
+      "completionPpl": 102.81156573591532,
+      "completionTokenCount": 472
+    },
+    {
+      "exampleId": "ded1bf1b-01bb-5c32-a671-dc50b3d60f70",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.854389190673828,
+      "completionPpl": 128.30229903500026,
+      "completionTokenCount": 450
+    },
+    {
+      "exampleId": "bd04a499-5baa-5f83-b9d1-ce24219ad46a",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.869516849517822,
+      "completionPpl": 130.25796749086484,
+      "completionTokenCount": 467
+    },
+    {
+      "exampleId": "f58e0570-dded-59f4-b384-778eb4fc8372",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.870054244995117,
+      "completionPpl": 130.32798634569895,
+      "completionTokenCount": 450
+    },
+    {
+      "exampleId": "b6fdc512-607d-5a5d-a18e-e87207fbf2c6",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.86479377746582,
+      "completionPpl": 129.64420029935508,
+      "completionTokenCount": 451
+    },
+    {
+      "exampleId": "a41e175f-391f-517d-bd3e-37796fb2174d",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.840536594390869,
+      "completionPpl": 126.53723268551121,
+      "completionTokenCount": 458
+    },
+    {
+      "exampleId": "781f4cce-d5c5-50bb-8abe-81a5938d10eb",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.842971324920654,
+      "completionPpl": 126.84569210449075,
+      "completionTokenCount": 447
+    },
+    {
+      "exampleId": "8d15f4d3-bd31-5fc7-9c7b-80fd3377e2ea",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.8466477394104,
+      "completionPpl": 127.31288772105393,
+      "completionTokenCount": 446
+    },
+    {
+      "exampleId": "0671a0f1-963b-5989-bf9f-3f61ed472ea6",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.716452121734619,
+      "completionPpl": 111.77099848354744,
+      "completionTokenCount": 511
+    },
+    {
+      "exampleId": "9c8b9522-dd67-5584-b206-aa726e206684",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.644906520843506,
+      "completionPpl": 104.05363848441678,
+      "completionTokenCount": 530
+    },
+    {
+      "exampleId": "59bc6cec-376e-5f38-9dea-26f2d6b82559",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.806361198425293,
+      "completionPpl": 122.28583306663879,
+      "completionTokenCount": 507
+    },
+    {
+      "exampleId": "22a58f09-88c6-5cf1-a782-90e48150ef28",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.890481472015381,
+      "completionPpl": 133.0176028893433,
+      "completionTokenCount": 449
+    },
+    {
+      "exampleId": "c9ac11bb-3b46-50e6-8bde-62ae8ca2d762",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.862330436706543,
+      "completionPpl": 129.32523547736827,
+      "completionTokenCount": 454
+    },
+    {
+      "exampleId": "f08d416b-7e20-51dd-b190-3a33ba3e23eb",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.685771942138672,
+      "completionPpl": 108.39391385049157,
+      "completionTokenCount": 479
+    },
+    {
+      "exampleId": "d4f4bc9d-2a40-54ee-9b93-f61578022364",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.858605861663818,
+      "completionPpl": 128.84444984979592,
+      "completionTokenCount": 459
+    },
+    {
+      "exampleId": "0e4bd194-d300-5aa6-a0b8-85cc9b713106",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.896739959716797,
+      "completionPpl": 133.85270242537632,
+      "completionTokenCount": 460
+    },
+    {
+      "exampleId": "ed06c237-1ebf-55f2-98eb-8a501bc903bf",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.651647567749023,
+      "completionPpl": 104.75743845126999,
+      "completionTokenCount": 476
+    },
+    {
+      "exampleId": "bceb50ad-3dd4-50e3-bb75-f5eb412c5379",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.649952411651611,
+      "completionPpl": 104.58000866880668,
+      "completionTokenCount": 482
+    },
+    {
+      "exampleId": "18a84021-0969-53f1-a43a-f4f420b49fd2",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.808506965637207,
+      "completionPpl": 122.54851172054822,
+      "completionTokenCount": 455
+    },
+    {
+      "exampleId": "ea5e4238-aca8-5052-ae49-99ecd7540fff",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.758573055267334,
+      "completionPpl": 116.57945471580412,
+      "completionTokenCount": 472
+    },
+    {
+      "exampleId": "661f4f3f-50cc-5c9d-b10c-f6d460f9c63c",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.839244365692139,
+      "completionPpl": 126.37382324589998,
+      "completionTokenCount": 482
+    },
+    {
+      "exampleId": "3969294b-f8b3-5907-8c8b-3b0a2134f424",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.642083168029785,
+      "completionPpl": 103.76027268387918,
+      "completionTokenCount": 473
+    },
+    {
+      "exampleId": "00068563-e082-5f60-8536-7a867870010d",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.8398284912109375,
+      "completionPpl": 126.44766298470442,
+      "completionTokenCount": 456
+    },
+    {
+      "exampleId": "9771293c-386c-5a1b-9b1f-37cbf1d8d339",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.61411714553833,
+      "completionPpl": 100.8987103224798,
+      "completionTokenCount": 521
+    },
+    {
+      "exampleId": "5b0d0600-a66a-5285-9d77-b9bfab1c5b69",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.864479064941406,
+      "completionPpl": 129.6034060653681,
+      "completionTokenCount": 444
+    },
+    {
+      "exampleId": "0099fc52-35fb-5653-aa7e-fb41bac3aa62",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.852301120758057,
+      "completionPpl": 128.03467437100352,
+      "completionTokenCount": 460
+    },
+    {
+      "exampleId": "6d77d631-9d0c-571b-96d8-1155dc8987c6",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.83398962020874,
+      "completionPpl": 125.7115026560611,
+      "completionTokenCount": 451
+    },
+    {
+      "exampleId": "780287b4-801a-5b83-8bbb-e19e155e0736",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.995545387268066,
+      "completionPpl": 147.75350629417338,
+      "completionTokenCount": 437
+    },
+    {
+      "exampleId": "d1933bf6-7038-5122-8bc3-f02ac3cb856a",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.745068073272705,
+      "completionPpl": 115.01563472729404,
+      "completionTokenCount": 506
+    },
+    {
+      "exampleId": "98b27240-4ef7-5c34-839b-955cf2c04c74",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.737912654876709,
+      "completionPpl": 114.19558712944044,
+      "completionTokenCount": 491
+    },
+    {
+      "exampleId": "5ce7ce1a-b249-5ec9-8364-a616a4636dfb",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.803452014923096,
+      "completionPpl": 121.93059811090492,
+      "completionTokenCount": 489
+    },
+    {
+      "exampleId": "e1820204-764d-5109-8aaa-51467aef4526",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.631268501281738,
+      "completionPpl": 102.64418584455886,
+      "completionTokenCount": 508
+    },
+    {
+      "exampleId": "5427cc1d-d30c-5696-b59f-3277d4fa1405",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.6830549240112305,
+      "completionPpl": 108.09980535164718,
+      "completionTokenCount": 497
+    },
+    {
+      "exampleId": "629ecfc0-8501-5d85-b3c6-26cf235c43bb",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.733916282653809,
+      "completionPpl": 113.74012975184013,
+      "completionTokenCount": 508
+    },
+    {
+      "exampleId": "cdc93df0-5ea4-52a7-a676-00d66dbbddfa",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.630917549133301,
+      "completionPpl": 102.60816896748197,
+      "completionTokenCount": 497
+    },
+    {
+      "exampleId": "c8694b83-f771-51bc-859a-1b08db5e4e47",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.689305305480957,
+      "completionPpl": 108.7775863602402,
+      "completionTokenCount": 497
+    },
+    {
+      "exampleId": "e03e7c66-cb11-5ec0-a564-3f180d5f6c80",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.886623382568359,
+      "completionPpl": 132.50539778127026,
+      "completionTokenCount": 485
+    },
+    {
+      "exampleId": "1955c0e9-a72c-5074-b075-4bb221a16bf8",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.873627185821533,
+      "completionPpl": 130.7944733979944,
+      "completionTokenCount": 480
+    },
+    {
+      "exampleId": "7b76cd26-d5b7-5cf6-bd65-5efcc6ef7176",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.715852737426758,
+      "completionPpl": 111.70402477448263,
+      "completionTokenCount": 477
+    },
+    {
+      "exampleId": "a3a33971-ebaf-50e1-a8e1-513a5b2667ed",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.483318328857422,
+      "completionPpl": 88.52795066350701,
+      "completionTokenCount": 495
+    },
+    {
+      "exampleId": "f62608c7-ea8c-578b-851f-43488ebdfb16",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.8463358879089355,
+      "completionPpl": 127.27319119589448,
+      "completionTokenCount": 454
+    },
+    {
+      "exampleId": "fb4bf204-52da-5c3f-947a-43fce2ae421d",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.672669410705566,
+      "completionPpl": 106.98294301775186,
+      "completionTokenCount": 458
+    },
+    {
+      "exampleId": "677bb05f-29e4-5fc0-a681-85be237d7006",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.837817668914795,
+      "completionPpl": 126.19365467305613,
+      "completionTokenCount": 451
+    },
+    {
+      "exampleId": "82eb7178-636e-5b4e-a287-b718e08b2de3",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.793308258056641,
+      "completionPpl": 120.7000156853468,
+      "completionTokenCount": 449
+    },
+    {
+      "exampleId": "2a560c38-6595-5e6d-b7ce-ba408db23ffd",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.7465105056762695,
+      "completionPpl": 115.1816567147028,
+      "completionTokenCount": 460
+    },
+    {
+      "exampleId": "c76407db-6b9f-55eb-8ca9-011947a31e33",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.875277519226074,
+      "completionPpl": 131.01050610053298,
+      "completionTokenCount": 449
+    },
+    {
+      "exampleId": "5c608b5a-2d86-5125-9fbe-27deec7d0477",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.812265396118164,
+      "completionPpl": 123.00996841564529,
+      "completionTokenCount": 457
+    },
+    {
+      "exampleId": "a8280212-a6e4-5917-b3dc-d81a864f3fdd",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 5.053208351135254,
+      "completionPpl": 156.52384320686943,
+      "completionTokenCount": 441
+    },
+    {
+      "exampleId": "1726a631-9492-5cf7-960b-f5f58602929b",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.909811019897461,
+      "completionPpl": 135.6137836799471,
+      "completionTokenCount": 441
+    },
+    {
+      "exampleId": "c88fe88b-092c-5710-be4f-ca6a02121e65",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.957483291625977,
+      "completionPpl": 142.23538009996867,
+      "completionTokenCount": 437
+    },
+    {
+      "exampleId": "2c341c7c-c432-5811-941b-7c39325e2fc6",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.670166015625,
+      "completionPpl": 106.71545739528646,
+      "completionTokenCount": 508
+    },
+    {
+      "exampleId": "245fa882-8218-50e8-984f-7a34b9879a9e",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.82852840423584,
+      "completionPpl": 125.02683624701672,
+      "completionTokenCount": 500
+    },
+    {
+      "exampleId": "fdaa5bd1-dca2-5365-a68a-624be9942423",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 5.026176929473877,
+      "completionPpl": 152.349455203797,
+      "completionTokenCount": 446
+    },
+    {
+      "exampleId": "1a111fb5-e593-5610-856f-eab72ecbe0bc",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.995469093322754,
+      "completionPpl": 147.74223402625282,
+      "completionTokenCount": 444
+    },
+    {
+      "exampleId": "3b96df27-24fa-5a16-8bf4-b94fc4311c65",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.922727584838867,
+      "completionPpl": 137.376809531227,
+      "completionTokenCount": 441
+    },
+    {
+      "exampleId": "13649f83-2e0b-56fd-8e97-2a8556887f79",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.975167274475098,
+      "completionPpl": 144.77303995713186,
+      "completionTokenCount": 441
+    },
+    {
+      "exampleId": "a08047a1-6587-5626-9618-4530099a1f8c",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.55763053894043,
+      "completionPpl": 95.3572666042222,
+      "completionTokenCount": 545
+    },
+    {
+      "exampleId": "336d2365-9f95-5ae3-ae10-9f1a0a96d5a3",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.5595879554748535,
+      "completionPpl": 95.54410329350812,
+      "completionTokenCount": 520
+    },
+    {
+      "exampleId": "21af1274-7c24-50fe-8538-1eeb55599138",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.776852130889893,
+      "completionPpl": 118.73001462898442,
+      "completionTokenCount": 505
+    },
+    {
+      "exampleId": "37a70a88-f5cb-573f-8ff6-106dfa407992",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.681759834289551,
+      "completionPpl": 107.95989702129619,
+      "completionTokenCount": 500
+    },
+    {
+      "exampleId": "f163ac48-c868-5af7-bb9b-e8d5c6894268",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.926048278808594,
+      "completionPpl": 137.83375414092833,
+      "completionTokenCount": 445
+    },
+    {
+      "exampleId": "2aefa81b-c136-59d4-90bd-29c1b0d9c1ca",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.932116985321045,
+      "completionPpl": 138.672770037916,
+      "completionTokenCount": 459
+    },
+    {
+      "exampleId": "dbffae00-c518-5a16-a110-0f9c0dbafc00",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.891507148742676,
+      "completionPpl": 133.15410594098216,
+      "completionTokenCount": 485
+    },
+    {
+      "exampleId": "26c1c5d4-7bed-5165-b459-dedb21bfa04b",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.959267616271973,
+      "completionPpl": 142.48940075447464,
+      "completionTokenCount": 494
+    },
+    {
+      "exampleId": "c871dfc0-86a2-57a7-af46-b1218c2c162a",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.8991618156433105,
+      "completionPpl": 134.17726725200808,
+      "completionTokenCount": 499
+    },
+    {
+      "exampleId": "16cea5b8-15c1-53e5-9567-0990389125ff",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 5.110917568206787,
+      "completionPpl": 165.8224384870428,
+      "completionTokenCount": 448
+    },
+    {
+      "exampleId": "209ff26b-c403-5395-8af4-938f1458aa01",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.586881637573242,
+      "completionPpl": 98.18776722328107,
+      "completionTokenCount": 489
+    },
+    {
+      "exampleId": "d224dc67-d3b8-5972-843c-8a8e807e4932",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.718546390533447,
+      "completionPpl": 112.00532228114987,
+      "completionTokenCount": 475
+    },
+    {
+      "exampleId": "95981a93-be95-5337-bcbb-e7cfb8aec4da",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.7742815017700195,
+      "completionPpl": 118.42519575197394,
+      "completionTokenCount": 506
+    },
+    {
+      "exampleId": "9a26c7f2-5e39-5797-b72b-b871f17aa4ef",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.948548316955566,
+      "completionPpl": 140.97017130300415,
+      "completionTokenCount": 479
+    },
+    {
+      "exampleId": "3a2e3814-76d5-5a6d-b0b7-f4d597e82f37",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.718448162078857,
+      "completionPpl": 111.99432071177878,
+      "completionTokenCount": 513
+    },
+    {
+      "exampleId": "1a9253f0-440d-5a12-85f4-1b8de389b038",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.819911003112793,
+      "completionPpl": 123.954058763537,
+      "completionTokenCount": 484
+    },
+    {
+      "exampleId": "88904bc3-3ef6-5222-8c80-26bb076c197c",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.783391952514648,
+      "completionPpl": 119.50903228792946,
+      "completionTokenCount": 489
+    },
+    {
+      "exampleId": "bcc04774-41c5-59fa-b3a1-76e357c57718",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.774096488952637,
+      "completionPpl": 118.40328759956576,
+      "completionTokenCount": 471
+    },
+    {
+      "exampleId": "5a6763a5-b34d-5bf4-bcfd-418a8d8d7c88",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.603518486022949,
+      "completionPpl": 99.83496633405514,
+      "completionTokenCount": 527
+    },
+    {
+      "exampleId": "cd405ed6-db58-5977-be13-43fcd4648b35",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.2673163414001465,
+      "completionPpl": 71.32995328672584,
+      "completionTokenCount": 495
+    },
+    {
+      "exampleId": "b1c715c3-3c76-5f15-8db3-23fc00d3766a",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.395416259765625,
+      "completionPpl": 81.07837340409871,
+      "completionTokenCount": 469
+    },
+    {
+      "exampleId": "24cdffff-90a3-51fe-929e-8d280ef3a748",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.370283603668213,
+      "completionPpl": 79.06605194254462,
+      "completionTokenCount": 484
+    },
+    {
+      "exampleId": "8391b5e1-b046-5587-b900-815ce22fb366",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.230935096740723,
+      "completionPpl": 68.7815194864275,
+      "completionTokenCount": 488
+    },
+    {
+      "exampleId": "e7ebafbf-80d7-51f4-bf11-17927dec3330",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.332718372344971,
+      "completionPpl": 76.15101226896739,
+      "completionTokenCount": 473
+    },
+    {
+      "exampleId": "f33ccfe8-7133-56c5-b71d-e7db15a912bb",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.476583957672119,
+      "completionPpl": 87.93377353371532,
+      "completionTokenCount": 476
+    },
+    {
+      "exampleId": "b3f318bc-24e4-5747-b06b-92f25f05682f",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.06402063369751,
+      "completionPpl": 58.207873768044415,
+      "completionTokenCount": 517
+    },
+    {
+      "exampleId": "c01a1eb0-349d-5598-9b26-e28047ef2041",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.0687031745910645,
+      "completionPpl": 58.48107365292083,
+      "completionTokenCount": 577
+    },
+    {
+      "exampleId": "d7f1755a-06e4-55f6-9c86-f715328dee03",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.160158157348633,
+      "completionPpl": 64.08165678345057,
+      "completionTokenCount": 553
+    },
+    {
+      "exampleId": "b459d30e-8ec6-5be3-be62-42f2d237b0b3",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.374602794647217,
+      "completionPpl": 79.40829188863215,
+      "completionTokenCount": 493
+    },
+    {
+      "exampleId": "a59b68e5-64c0-590e-a407-2243276de3d8",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 3.9057059288024902,
+      "completionPpl": 49.68514170774272,
+      "completionTokenCount": 586
+    },
+    {
+      "exampleId": "ca785022-ad56-5ed0-b056-c1bcc4bca916",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.260773658752441,
+      "completionPpl": 70.86478741478449,
+      "completionTokenCount": 508
+    },
+    {
+      "exampleId": "af16caac-7ebb-52b2-bbf0-a504a5aa5df1",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.358062267303467,
+      "completionPpl": 78.10563984038153,
+      "completionTokenCount": 473
+    },
+    {
+      "exampleId": "b083271d-eeda-52b6-811c-6779b8f0e5c1",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.472506999969482,
+      "completionPpl": 87.57600106555701,
+      "completionTokenCount": 479
+    },
+    {
+      "exampleId": "ce9ef61a-9302-5d90-b1af-42b1567597be",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.575254917144775,
+      "completionPpl": 97.05277640047562,
+      "completionTokenCount": 468
+    },
+    {
+      "exampleId": "cb397e64-0525-531b-9d72-9c12f848f74f",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.3882365226745605,
+      "completionPpl": 80.49833674631138,
+      "completionTokenCount": 489
+    },
+    {
+      "exampleId": "84f3cad5-bd56-5fa5-b9a0-a703e9b37abd",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.173735618591309,
+      "completionPpl": 64.95765646332752,
+      "completionTokenCount": 507
+    },
+    {
+      "exampleId": "bb728a1e-f8fe-560e-9307-bf2ea15808a1",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.356663227081299,
+      "completionPpl": 77.99644331164556,
+      "completionTokenCount": 482
+    },
+    {
+      "exampleId": "a9a91b07-19a8-5a93-a52e-996b32948f98",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.455073833465576,
+      "completionPpl": 86.06250490355761,
+      "completionTokenCount": 464
+    },
+    {
+      "exampleId": "078283d3-f110-50e3-98b3-1bf264de4868",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.387051582336426,
+      "completionPpl": 80.40300751083036,
+      "completionTokenCount": 468
+    },
+    {
+      "exampleId": "887b8cfd-222f-5896-a097-a1c47ebdea04",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.456520080566406,
+      "completionPpl": 86.18706260065798,
+      "completionTokenCount": 474
+    },
+    {
+      "exampleId": "e053775a-5454-5346-b844-cd713ad8834e",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.276009559631348,
+      "completionPpl": 71.95274323943345,
+      "completionTokenCount": 487
+    },
+    {
+      "exampleId": "5d5bdf48-22ab-54ea-9d37-3d385793c81a",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.041098117828369,
+      "completionPpl": 56.88877910055498,
+      "completionTokenCount": 546
+    },
+    {
+      "exampleId": "6bb2d7c4-4b9d-5df9-bf2e-2126c2aa12cb",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.433455467224121,
+      "completionPpl": 84.221940829339,
+      "completionTokenCount": 473
+    },
+    {
+      "exampleId": "7eea5f9e-42a8-5cbf-bc48-f4e16676f811",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.351297378540039,
+      "completionPpl": 77.5790470541119,
+      "completionTokenCount": 506
+    },
+    {
+      "exampleId": "0892bf83-78db-5343-9382-f87c1e047ade",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.063089847564697,
+      "completionPpl": 58.15371989306829,
+      "completionTokenCount": 577
+    },
+    {
+      "exampleId": "05b7f733-18b7-5611-988d-cc4ea9ea6a53",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.321655750274658,
+      "completionPpl": 75.31322500602525,
+      "completionTokenCount": 537
+    },
+    {
+      "exampleId": "36130418-822b-5ce5-8648-94165835eeb9",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.40156888961792,
+      "completionPpl": 81.57875638181069,
+      "completionTokenCount": 516
+    },
+    {
+      "exampleId": "209aa49c-9119-5c84-9ad3-c626460b73b3",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.414658069610596,
+      "completionPpl": 82.65357430493091,
+      "completionTokenCount": 487
+    },
+    {
+      "exampleId": "60768b8c-b01b-5d75-9210-04a91b65df7e",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.660444736480713,
+      "completionPpl": 105.68307282453175,
+      "completionTokenCount": 458
+    },
+    {
+      "exampleId": "cf29e545-44d8-53fd-9957-328cca7b418d",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.629386901855469,
+      "completionPpl": 102.45123219103374,
+      "completionTokenCount": 474
+    },
+    {
+      "exampleId": "b3138a7c-a765-5c16-8e22-9bfe631f91a1",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.4139509201049805,
+      "completionPpl": 82.59514653174409,
+      "completionTokenCount": 484
+    },
+    {
+      "exampleId": "f4655f2d-386a-5acb-9c1d-e9aa0770e7d8",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.284008026123047,
+      "completionPpl": 72.53056259909452,
+      "completionTokenCount": 504
+    },
+    {
+      "exampleId": "faa3c2f1-a59a-5bab-8c8e-ec454448c136",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.417789936065674,
+      "completionPpl": 82.91284004260302,
+      "completionTokenCount": 491
+    },
+    {
+      "exampleId": "ddd56374-0897-5c3c-8f77-2e69806accd9",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.582133769989014,
+      "completionPpl": 97.72268964315475,
+      "completionTokenCount": 483
+    },
+    {
+      "exampleId": "1d7618a1-1bcc-5239-9658-af9c5115b92a",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.785458087921143,
+      "completionPpl": 119.75620939368882,
+      "completionTokenCount": 456
+    },
+    {
+      "exampleId": "fc7ffa43-b148-5446-ab7c-b6110d72419d",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.358847618103027,
+      "completionPpl": 78.16700426022445,
+      "completionTokenCount": 498
+    },
+    {
+      "exampleId": "ba098a91-b4fb-5918-a6e0-009ad5822a96",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.6096673011779785,
+      "completionPpl": 100.45072423877703,
+      "completionTokenCount": 484
+    },
+    {
+      "exampleId": "8babdc15-cc3c-54bf-8c21-6517c74a3b32",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.387800216674805,
+      "completionPpl": 80.46322249985383,
+      "completionTokenCount": 511
+    },
+    {
+      "exampleId": "5892846c-309c-5b40-a462-43450028a9dd",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.509838104248047,
+      "completionPpl": 90.90709984582963,
+      "completionTokenCount": 487
+    },
+    {
+      "exampleId": "0eaf6952-fa8a-5b4e-8462-e372e2cfd8d8",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.65280294418335,
+      "completionPpl": 104.8785426739877,
+      "completionTokenCount": 469
+    },
+    {
+      "exampleId": "55873a2a-0d88-5ee0-a6ff-a12eefc65f02",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 5.041325569152832,
+      "completionPpl": 154.67491148505704,
+      "completionTokenCount": 452
+    },
+    {
+      "exampleId": "3bb60a31-28f5-5729-9c8d-fb567e944fcf",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.372236728668213,
+      "completionPpl": 79.22062873000027,
+      "completionTokenCount": 489
+    },
+    {
+      "exampleId": "21880092-433b-5a0d-8bbe-646fca28b82c",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.524864673614502,
+      "completionPpl": 92.28343659969944,
+      "completionTokenCount": 453
+    },
+    {
+      "exampleId": "e0a1aa9b-0d2f-58c0-b7fe-7521a630f87e",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.452124118804932,
+      "completionPpl": 85.80901911028656,
+      "completionTokenCount": 481
+    },
+    {
+      "exampleId": "114e9cbd-3ac9-542c-a6af-45bb535cafeb",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.568938732147217,
+      "completionPpl": 96.44170496184556,
+      "completionTokenCount": 451
+    },
+    {
+      "exampleId": "5b8c5481-f593-5297-8ff8-bf1e4087f44e",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.442490577697754,
+      "completionPpl": 84.98634339982458,
+      "completionTokenCount": 454
+    },
+    {
+      "exampleId": "f153bb20-fe73-598b-8624-6672ee3cc9e9",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.63729190826416,
+      "completionPpl": 103.26431933353064,
+      "completionTokenCount": 470
+    },
+    {
+      "exampleId": "e40e7d80-901b-5a42-98d7-24971572f88f",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.883772850036621,
+      "completionPpl": 132.12822466178187,
+      "completionTokenCount": 459
+    },
+    {
+      "exampleId": "f6a8671d-d786-5f62-8a0d-f82076286a07",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.513906002044678,
+      "completionPpl": 91.27765381383821,
+      "completionTokenCount": 479
+    },
+    {
+      "exampleId": "c4ce06fd-0b0e-55e7-8eaa-5861c676e488",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.412850379943848,
+      "completionPpl": 82.5042972566788,
+      "completionTokenCount": 486
+    },
+    {
+      "exampleId": "cda9a2fc-074b-5d9f-a695-aab0d31a138d",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.558185577392578,
+      "completionPpl": 95.41020824484332,
+      "completionTokenCount": 458
+    },
+    {
+      "exampleId": "4a973cab-13ce-57f4-99c5-945073bd1bc3",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.639936447143555,
+      "completionPpl": 103.53776725332496,
+      "completionTokenCount": 464
+    },
+    {
+      "exampleId": "f9470d69-bccb-503f-b79c-b7d8e6b23177",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.352400779724121,
+      "completionPpl": 77.66469510988478,
+      "completionTokenCount": 514
+    },
+    {
+      "exampleId": "c9e5e1d1-277d-5a76-8d7c-5913473da844",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.531550884246826,
+      "completionPpl": 92.90253048433445,
+      "completionTokenCount": 489
+    },
+    {
+      "exampleId": "97dfd41d-d7d2-5cbe-bbe1-4fb9c163617f",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.531113624572754,
+      "completionPpl": 92.8619168341372,
+      "completionTokenCount": 473
+    },
+    {
+      "exampleId": "7d9f3863-d10c-58df-8c0e-c33a9e9688f7",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.629922389984131,
+      "completionPpl": 102.50610830108029,
+      "completionTokenCount": 471
+    },
+    {
+      "exampleId": "3d037c31-58b1-5c7b-b5c1-4f100b8642e2",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.562296390533447,
+      "completionPpl": 95.80322904674348,
+      "completionTokenCount": 482
+    },
+    {
+      "exampleId": "24f40ce7-30a4-50ee-bfd8-cfa635ce1bb5",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.608114719390869,
+      "completionPpl": 100.29488727993785,
+      "completionTokenCount": 476
+    },
+    {
+      "exampleId": "ceff9c78-3905-58c9-b564-066b3524e8f5",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.5019145011901855,
+      "completionPpl": 90.18963428142507,
+      "completionTokenCount": 457
+    },
+    {
+      "exampleId": "216b18c8-fcaf-5a51-a57c-9ba250eb435b",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.450709819793701,
+      "completionPpl": 85.68774527834925,
+      "completionTokenCount": 478
+    },
+    {
+      "exampleId": "32a265b4-2284-54a7-9cd4-fcebe434a583",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.6628336906433105,
+      "completionPpl": 105.93584665360045,
+      "completionTokenCount": 456
+    },
+    {
+      "exampleId": "e0b796f9-f9f4-5af5-96fd-47136960b3d0",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.53466796875,
+      "completionPpl": 93.19256732224086,
+      "completionTokenCount": 484
+    },
+    {
+      "exampleId": "8d0e6d2e-83d4-5728-abe0-5a21214999b7",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.554237365722656,
+      "completionPpl": 95.03425121456833,
+      "completionTokenCount": 473
+    },
+    {
+      "exampleId": "20825d5b-8794-5c6a-9832-83cf986bb342",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.590111255645752,
+      "completionPpl": 98.50538883297267,
+      "completionTokenCount": 499
+    },
+    {
+      "exampleId": "1606496b-bcac-5138-8717-2b41c9677b70",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.628123760223389,
+      "completionPpl": 102.32190347183568,
+      "completionTokenCount": 447
+    },
+    {
+      "exampleId": "a8e9dc5e-ac63-5dc8-877e-3b2fe6ff554e",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.65290641784668,
+      "completionPpl": 104.889395402479,
+      "completionTokenCount": 466
+    },
+    {
+      "exampleId": "6688eb69-8d1a-5222-9789-ad586dbb9c59",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.716160297393799,
+      "completionPpl": 111.73838574441915,
+      "completionTokenCount": 478
+    },
+    {
+      "exampleId": "e1f58c07-cfc8-5a46-8724-60a5dda41cb2",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.367128372192383,
+      "completionPpl": 78.81697340365027,
+      "completionTokenCount": 501
+    },
+    {
+      "exampleId": "0ffdd4df-44b6-53c4-bd92-d2096b913c77",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.482407093048096,
+      "completionPpl": 88.44731756819756,
+      "completionTokenCount": 494
+    },
+    {
+      "exampleId": "31f268ea-33e6-5449-925b-70aefe6a29a6",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.481688499450684,
+      "completionPpl": 88.38378272268538,
+      "completionTokenCount": 481
+    },
+    {
+      "exampleId": "2732ecd8-afd1-55bc-af50-4d9c08f4ae4a",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.38854455947876,
+      "completionPpl": 80.5231370162079,
+      "completionTokenCount": 489
+    },
+    {
+      "exampleId": "d5fa60bc-11ce-5b2c-8759-c47289dab90a",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.465765953063965,
+      "completionPpl": 86.9876324727554,
+      "completionTokenCount": 476
+    },
+    {
+      "exampleId": "629c7377-3562-5532-9bb9-74b7bdbbfcf3",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.708741664886475,
+      "completionPpl": 110.91250695698882,
+      "completionTokenCount": 461
+    },
+    {
+      "exampleId": "a2bfba97-b291-5e87-aeea-de940a8a8b3b",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.473541736602783,
+      "completionPpl": 87.66666606116425,
+      "completionTokenCount": 471
+    },
+    {
+      "exampleId": "95540bdb-8ed2-5a70-ad37-94a047662dfc",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.7284135818481445,
+      "completionPpl": 113.11597070341344,
+      "completionTokenCount": 453
+    },
+    {
+      "exampleId": "7e2cb114-6bd4-5adb-b2af-cbdd616afaa3",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.6599555015563965,
+      "completionPpl": 105.63138161999922,
+      "completionTokenCount": 447
+    },
+    {
+      "exampleId": "6564d4de-9c6a-5177-8ae0-eb0d5954cd3c",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.692688941955566,
+      "completionPpl": 109.14627356905429,
+      "completionTokenCount": 456
+    },
+    {
+      "exampleId": "e0c34f84-2b42-56fd-a4c0-840d8f4bd9ae",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.254452228546143,
+      "completionPpl": 70.41823352372688,
+      "completionTokenCount": 503
+    },
+    {
+      "exampleId": "6b71cc96-b82d-5627-8f68-1db245e7c7c1",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.427744388580322,
+      "completionPpl": 83.74231359978599,
+      "completionTokenCount": 500
+    },
+    {
+      "exampleId": "6a560b94-d47b-5895-b8c1-a865af4f0b27",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.481355667114258,
+      "completionPpl": 88.35437063669781,
+      "completionTokenCount": 469
+    },
+    {
+      "exampleId": "cbe74286-de68-50a3-a3b2-b3be2a3261b1",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.642541408538818,
+      "completionPpl": 103.80783073973292,
+      "completionTokenCount": 465
+    },
+    {
+      "exampleId": "895c9f7c-2ae3-5355-bce1-d0f914734733",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.880577087402344,
+      "completionPpl": 131.70664820640923,
+      "completionTokenCount": 465
+    },
+    {
+      "exampleId": "e81b195d-2fa0-5a72-9ad9-1a422000c2e8",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.639634609222412,
+      "completionPpl": 103.50652034488564,
+      "completionTokenCount": 467
+    },
+    {
+      "exampleId": "ac2485f9-7f3d-5e6a-add3-98bd93b0bb87",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.648833274841309,
+      "completionPpl": 104.46303479857448,
+      "completionTokenCount": 468
+    },
+    {
+      "exampleId": "df8045ee-bce0-5d09-8ffe-6ce7aa0004a6",
+      "surface": "phase_narration",
+      "sourceLoraId": "lora-phase-narration",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.592343330383301,
+      "completionPpl": 98.7255057902609,
+      "completionTokenCount": 477
+    },
+    {
+      "exampleId": "25022db6-8924-57de-883d-df37dfeba7bd",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.74926233291626,
+      "completionPpl": 115.49905324511484,
+      "completionTokenCount": 499
+    },
+    {
+      "exampleId": "196f1c6e-b3b5-569e-936d-4294fb0ffbce",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.732418537139893,
+      "completionPpl": 113.56990349238187,
+      "completionTokenCount": 460
+    },
+    {
+      "exampleId": "d6a4d4ab-419e-5ef3-83cd-38c70e228f62",
+      "surface": "reflection",
+      "sourceLoraId": "lora-reflection",
+      "sourceStatus": "synthetic_draft",
+      "completionNll": 4.860743045806885,
+      "completionPpl": 129.12010862679668,
+      "completionTokenCount": 440
+    }
+  ]
+}

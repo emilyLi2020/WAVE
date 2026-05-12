@@ -1,0 +1,134 @@
+{
+  "resolvedTraining": {
+    "totalSteps": 428,
+    "warmupSteps": 21
+  },
+  "loraId": "lora-wave-session",
+  "sourceData": "datasets/lora-wave-session-expanded.jsonl",
+  "modelId": "unsloth/gemma-4-E2B-it",
+  "seed": 7,
+  "validationSize": 0.1,
+  "testSize": 0.1,
+  "counts": {
+    "total": 4277,
+    "train": {
+      "count": 3421,
+      "bySurface": {
+        "check_in": 1225,
+        "phase_narration": 1251,
+        "reflection": 945
+      },
+      "bySourceLoraId": {
+        "lora-check-in-1": 236,
+        "lora-check-in-2": 268,
+        "lora-check-in-3": 266,
+        "lora-check-in-4": 269,
+        "lora-check-in-5": 186,
+        "lora-phase-narration": 1251,
+        "lora-reflection": 945
+      },
+      "byStatus": {
+        "draft": 1260,
+        "ready": 45,
+        "synthetic_draft": 2116
+      },
+      "splitKeyCount": 320
+    },
+    "validation": {
+      "count": 428,
+      "bySurface": {
+        "check_in": 165,
+        "phase_narration": 155,
+        "reflection": 108
+      },
+      "bySourceLoraId": {
+        "lora-check-in-1": 33,
+        "lora-check-in-2": 31,
+        "lora-check-in-3": 45,
+        "lora-check-in-4": 31,
+        "lora-check-in-5": 25,
+        "lora-phase-narration": 155,
+        "lora-reflection": 108
+      },
+      "byStatus": {
+        "draft": 169,
+        "ready": 3,
+        "synthetic_draft": 256
+      },
+      "splitKeyCount": 194
+    },
+    "test": {
+      "count": 428,
+      "bySurface": {
+        "check_in": 144,
+        "phase_narration": 147,
+        "reflection": 137
+      },
+      "bySourceLoraId": {
+        "lora-check-in-1": 19,
+        "lora-check-in-2": 37,
+        "lora-check-in-3": 24,
+        "lora-check-in-4": 35,
+        "lora-check-in-5": 29,
+        "lora-phase-narration": 147,
+        "lora-reflection": 137
+      },
+      "byStatus": {
+        "draft": 145,
+        "ready": 10,
+        "synthetic_draft": 273
+      },
+      "splitKeyCount": 198
+    },
+    "all": {
+      "count": 4277,
+      "bySurface": {
+        "check_in": 1534,
+        "phase_narration": 1553,
+        "reflection": 1190
+      },
+      "bySourceLoraId": {
+        "lora-check-in-1": 288,
+        "lora-check-in-2": 336,
+        "lora-check-in-3": 335,
+        "lora-check-in-4": 335,
+        "lora-check-in-5": 240,
+        "lora-phase-narration": 1553,
+        "lora-reflection": 1190
+      },
+      "byStatus": {
+        "draft": 1574,
+        "ready": 58,
+        "synthetic_draft": 2645
+      },
+      "splitKeyCount": 320
+    }
+  },
+  "training": {
+    "promptStyle": "wave_session_input_output_json",
+    "backend": "unsloth",
+    "maxSeqLength": 4096,
+    "maxNewTokens": 420,
+    "loadIn4bit": true,
+    "hparamSearch": false,
+    "validationEvalLimit": 0,
+    "validationEvalMode": "completion",
+    "finalEvalMode": "completion",
+    "generationEvalLimit": 60,
+    "generationEvalIncludeBase": false,
+    "generationEvalIncludeCompletionLoss": false,
+    "generationEvalLoadMode": "4bit",
+    "generationEvalMaxNewTokensBySurface": {
+      "check_in": 96,
+      "phase_narration": 160,
+      "reflection": 192
+    },
+    "warmupSteps": -1,
+    "weightDecay": 0.001,
+    "maxGradNorm": 0.3,
+    "saveSteps": 50,
+    "saveTotalLimit": 5,
+    "resumeFromCheckpoint": null,
+    "allowTruncation": false
+  }
+}
