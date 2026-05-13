@@ -57,7 +57,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--source",
         type=Path,
-        default=Path("datasets/clinician-seeds/lora-phase-narration-clinician.jsonl"),
+        default=Path("datasets/human/lora-phase-narration-clinician.jsonl"),
         help=(
             "Clinician-only phase seed JSONL (e.g. status=ready rows). "
             "Defaults to the checked-in `lora-phase-narration-clinician.jsonl`."
@@ -66,13 +66,13 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--output",
         type=Path,
-        default=Path("datasets/clinician-seeds/lora-phase-narration-expanded.jsonl"),
+        default=Path("datasets/human/lora-phase-narration-expanded.jsonl"),
         help="Where to write source rows plus synthetic draft rows.",
     )
     parser.add_argument(
         "--synthetic-only-output",
         type=Path,
-        default=Path("datasets/lora-phase-narration-synthetic-draft.jsonl"),
+        default=Path("datasets/synthetic/lora-phase-narration-synthetic-draft.jsonl"),
         help="Where to write only the synthetic draft rows.",
     )
     parser.add_argument("--count", type=int, default=40)

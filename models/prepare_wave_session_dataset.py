@@ -28,8 +28,8 @@ DEMO_LORA_ID = "lora-wave-session"
 DEFAULT_OUTPUT = Path("datasets/lora-wave-session-normalized.jsonl")
 DEFAULT_SUMMARY_OUTPUT = Path("datasets/lora-wave-session-normalized-summary.json")
 
-# Canonical clinician / seed JSONL checked into `datasets/clinician-seeds/` (portable paths).
-CLINICIAN_SEEDS_DIR = Path("datasets/clinician-seeds")
+# Canonical clinician / seed JSONL checked into `datasets/human/` (portable paths).
+CLINICIAN_SEEDS_DIR = Path("datasets/human")
 DEFAULT_SOURCE_FILES = [
     CLINICIAN_SEEDS_DIR / "lora-check-in-1-clinician.jsonl",
     CLINICIAN_SEEDS_DIR / "lora-check-in-2-clinician.jsonl",

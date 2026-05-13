@@ -46,11 +46,11 @@ from prepare_wave_session_dataset import (
 )
 
 
-DEFAULT_COVERAGE_PLAN = Path("datasets/lora-wave-session-coverage-plan.json")
-DEFAULT_SYNTHETIC_DRAFT = Path("datasets/lora-wave-session-synthetic-draft.jsonl")
+DEFAULT_COVERAGE_PLAN = Path("datasets/reports/lora-wave-session-coverage-plan.json")
+DEFAULT_SYNTHETIC_DRAFT = Path("datasets/synthetic/lora-wave-session-synthetic-draft.jsonl")
 DEFAULT_EXPANDED = Path("datasets/lora-wave-session-expanded.jsonl")
-DEFAULT_REPORT = Path("datasets/lora-wave-session-synthetic-report.json")
-DEFAULT_QUALITY_AUDIT = Path("datasets/lora-wave-session-synthetic-quality-audit.md")
+DEFAULT_REPORT = Path("datasets/synthetic/lora-wave-session-synthetic-report.json")
+DEFAULT_QUALITY_AUDIT = Path("datasets/synthetic/lora-wave-session-synthetic-quality-audit.md")
 DEFAULT_CACHE = Path("datasets/.wave-session-synthetic-cache.json")
 DEFAULT_ENV_PATH = Path("../client/.env.local")
 
