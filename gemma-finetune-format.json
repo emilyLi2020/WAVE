@@ -1,0 +1,87 @@
+{
+  "search_id": "search_bf5d7f81f69a455bb4276ebc38ba96c6",
+  "status": "ok",
+  "results": [
+    {
+      "url": "https://unsloth.ai/docs/models/gemma-4/train",
+      "title": "Gemma 4 Fine-tuning Guide | Unsloth Documentation",
+      "publish_date": null,
+      "excerpts": [
+        "Gemma-4 renders multi turn conversations like below: ``` &lt;bos&gt;&lt;|turn&gt;user Hello&lt;turn|&gt; &lt;|turn&gt;model Hey there!&lt;turn|&gt; ``` <strong>We use our `get_chat_template` function to get the correct chat template</strong>."
+      ]
+    },
+    {
+      "url": "https://ai.google.dev/gemma/docs/core/huggingface_text_finetune_qlora",
+      "title": "Fine-Tune Gemma using Hugging Face Transformers and QloRA | Google AI for Developers",
+      "publish_date": null,
+      "excerpts": [
+        "Hugging Face TRL SFTTrainer makes it straightforward to supervise fine-tune open LLMs. The SFTTrainer is a subclass of the Trainer from the transformers library and supports all the same features, including logging, evaluation, and checkpointing, but adds additional quality of life features, including: Dataset formatting, including conversational and instruction formats ... The following code loads the Gemma model and tokenizer from Hugging Face and initializes the quantization configuration."
+      ]
+    },
+    {
+      "url": "https://huggingface.co/google/gemma-3-4b-it",
+      "title": "google/gemma-3-4b-it \u00b7 Hugging Face",
+      "publish_date": null,
+      "excerpts": [
+        "from transformers import pipeline import torch pipe = pipeline( &quot;image-text-to-text&quot;, model=&quot;google/gemma-3-4b-it&quot;, device=&quot;cuda&quot;, torch_dtype=torch.bfloat16 ) With instruction-tuned models, you need to <strong>use chat templates to process our inputs first</strong>."
+      ]
+    },
+    {
+      "url": "https://www.philschmid.de/fine-tune-google-gemma",
+      "title": "How to fine-tune Google Gemma with ChatML and Hugging Face TRL",
+      "publish_date": null,
+      "excerpts": [
+        "Philschmid\n\nSearch `\u2318 k`\n\nBlog Projects Newsletter About Me\n\nToggle Menu\n\n# How to fine-tune Google Gemma with ChatML and Hugging Face TRL\n\nMarch 1, 2024 10 minute read [View Code](https://github.com/philschmid/deep-learning-pytorch-huggingface/blob/main/training/gemma-lora-example.ipynb)\n\nLast week, Google released [Gemma](https://huggingface.co/blog/gemma) , a new family of state-of-the-art open LLMs. Gemma comes in two sizes: 7B parameters, for efficient deployment and development on consumer-size GPU and TPU and 2B versions for CPU and on-device applications. Both come in base and instruction-tuned variants.\n\nAfter the first week it seemed that Gemma is not very friendly to fine-tune using the [ChatML format](https://github.com/MicrosoftDocs/azure-docs/blob/main/articles/ai-services/openai/includes/chat-markup-language.md) , which is adapted and used by the open soruce community, e.g. OpenHermes or Dolphin.\nI created this blog post to show you how to fine-tune Gemma using ChatML and Hugging Face TRL.\n\nThis blog post is derived from my [How to Fine-Tune LLMs in 2024 with Hugging Face](https://www.philschmid.de/fine-tune-llms-in-2024-with-trl) blog tailored to fine-tune Gemma 7B. We will use Hugging Face [TRL](https://huggingface.co/docs/trl/index) , [Transformers](https://huggingface.co/docs/transformers/index) & [datasets](https://huggingface.co/docs/datasets/index) .\n\n1. Setup development environment\n2. Create and prepare the dataset\n3. Fine-tune LLM using `trl` and the `SFTTrainer`\n4. Test and evaluate the LLM\n\n_Note: This blog was created to run on consumer size GPUs (24GB), e.g. NVIDIA A10G or RTX 4090/3090, but can be easily adapted to run on bigger GPUs._\n\n##  1\\. Setup development environment\n\nOur first step is to install Hugging Face Libraries and Pyroch, including trl, transformers and datasets. If you haven't heard of trl yet, don't worry.\nIt is a new library on top of transformers and datasets, which makes it easier to fine-tune, rlhf, align open LLMs.\n\n```\n# Install Pytorch & other libraries ! pip install  \"torch==2.1.2\"  tensorboard # Install Hugging Face libraries ! pip install   -- upgrade \\   \"transformers==4.38.2\"  \\   \"datasets==2.16.1\"  \\   \"accelerate==0.26.1\"  \\   \"evaluate==0.4.1\"  \\   \"bitsandbytes==0.42.0\"  \\   \"trl==0.7.11\"  \\   \"peft==0.8.2\"\n```\n\nIf you are using a GPU with Ampere architecture (e.g. NVIDIA A10G or RTX 4090/3090) or newer you can use Flash attention. Flash Attention is a an method that reorders the attention computation and leverages classical techniques (tiling, recomputation) to significantly speed it up and reduce memory usage from quadratic to linear in sequence length. The TL;DR; accelerates training up to 3x. Learn more at [FlashAttention](https://github.com/Dao-AILab/flash-attention/tree/main) ."
+      ]
+    },
+    {
+      "url": "https://huggingface.co/google/gemma-2-2b-it",
+      "title": "google/gemma-2-2b-it",
+      "publish_date": null,
+      "excerpts": [
+        "google/gemma-2-2b-it\nThe instruction-tuned models use a chat template that must be adhered to for conversational use. The easiest way to apply it is using the tokenizer's built-in"
+      ]
+    },
+    {
+      "url": "https://www.reddit.com/r/unsloth/comments/1shtx7x/gemma_chat_template_updates",
+      "title": "Gemma chat template updates : r/unsloth",
+      "publish_date": null,
+      "excerpts": [
+        "Gemma chat template updates : r/unsloth\nGoogle updated all the gemma chat templates 16hr ago that fixes tool calling. Will Unsloth be updating the ggufs?"
+      ]
+    },
+    {
+      "url": "https://discuss.ai.google.dev/t/gemma-3-support-for-packed-sequence-training-with-flashattention-2/114172",
+      "title": "Gemma 3 support for packed sequence training with FlashAttention 2?",
+      "publish_date": null,
+      "excerpts": [
+        "Gemma 3 support for packed sequence training with FlashAttention 2?\nHi everyone, I have a question about finetuning Gemma 3 models on Hugging Face with sequence packing and FlashAttention 2."
+      ]
+    },
+    {
+      "url": "https://avenchat.com/blog/fine-tune-gemma-4-with-unsloth",
+      "title": "How to Fine-Tune Gemma 4 with Unsloth: Step-by-Step Guide",
+      "publish_date": "2026-04-05",
+      "excerpts": [
+        "Always use the same chat template at inference that you used during training.\n\n* * *\n\n## Free Colab notebooks\n\nUnsloth provides free Google Colab notebooks for all Gemma 4 sizes. The E2B/E4B notebooks run on a free T4 GPU. The 26B-A4B and 31B notebooks require an A100 (Colab Pro).\n\n|Model |Task |Link |\n| --- | --- | --- |\n|E2B |Text |[Open in Colab](https://colab.research.google.com/github/unslothai/notebooks/blob/main/nb/Gemma4_\\(E2B\\)-Text.ipynb) |\n|E2B |Vision |[Open in Colab](https://colab.research.google.com/github/unslothai/notebooks/blob/main/nb/Gemma4_\\(E2B\\)-Vision.ipynb) |\n|E2B |Audio |[Open in Colab](https://colab.research.google.com/github/unslothai/notebooks/blob/main/nb/Gemma4_\\(E2B\\)-Audio.ipynb) |\n|26B-A4B |Vision (A100) |[Open in Colab](https://colab.research.google.com/github/unslothai/notebooks/blob/main/nb/Gemma4_\\(26B_A4B\\)-Vision.ipynb) |\n|31B |Vision (A100) |[Open in Colab](https://colab.research.google.\ncom/github/unslothai/notebooks/blob/main/nb/Gemma4_\\(31B\\)-Vision.ipynb) |\n\n* * *\n\n## Common issues\n\n**Out of memory during training.** Reduce `max_seq_length` first, then reduce `per_device_train_batch_size` to 1. Make sure `use_gradient_checkpointing=\"unsloth\"` is set \u2014 it is specifically designed to extend context length and reduce VRAM, not just a generic flag.\n\n**Using QLoRA on 26B-A4B.** The MoE architecture and 4-bit quantization interact poorly. Stick to 16-bit LoRA ( `load_in_16bit=True` ) for the MoE model.\n\n**Chat template mismatch after export.** If your exported model responds incorrectly in Ollama or llama.cpp, check that the inference runtime is using the same Gemma 4 chat template you trained with. This is the most common cause of degraded post-export behavior.\n\n**Reasoning ability degraded after fine-tuning.** If you want to preserve Gemma 4's built-in reasoning capability, mix reasoning-style examples with direct-answer examples in your training data.\nUnsloth recommends at least 75% reasoning examples to maintain the thinking behavior.\n\n* * *\n\nFor the official training reference, see [Unsloth documentation](https://unsloth.ai/docs/models/gemma-4/train) .\n\n## Related guides\n\n* Gemma 4 Unsloth guide: when it makes sense and what to watch\n* Gemma 4 model comparison: 31B vs 26B vs E4B vs E2B\n* Gemma 4 hardware requirements\n* Gemma 4 GGUF download guide\n\n## Related guides\n\nContinue through the Gemma 4 cluster with the next guide that matches your current decision.\n\n### Gemma 4 Unsloth Guide: When It Makes Sense and What to Watch\n\nUse this guide to understand where Unsloth fits into a Gemma 4 workflow and what to decide before you jump into tuning.\n\nRead article\n\n### Gemma 4 GGUF Download Guide: Safe Sources, Quant Tips, and Local Setup\n\nUse this Gemma 4 GGUF download guide to pick a trusted source, choose the right file, and get from download to first local response with less guesswork.\n\nRead article\n\n### How to Run Gemma 4 with llama."
+      ]
+    },
+    {
+      "url": "https://github.com/unslothai/notebooks/blob/main/nb/Gemma3_(4B).ipynb",
+      "title": "notebooks/nb/Gemma3_(4B).ipynb at main \u00b7 unslothai/notebooks \u00b7 GitHub",
+      "publish_date": null,
+      "excerpts": [
+        "## Navigation Menu\n\nToggle navigation\n\nAppearance settings\n\nSearch or jump to...\n\n# Search code, repositories, users, issues, pull requests...\n\nSearch\n\nClear\n\n[Search syntax tips](https://docs.github.com/search-github/github-code-search/understanding-github-code-search-syntax)\n\nAppearance settings\n\nResetting focus\n\nYou signed in with another tab or window. Reload to refresh your session. You signed out in another tab or window. Reload to refresh your session. You switched accounts on another tab or window. Reload to refresh your session. Dismiss alert\n\n## Footer\n\nYou can\u2019t perform that action at this time."
+      ]
+    },
+    {
+      "url": "https://www.codecademy.com/article/how-to-fine-tune-google-gemma-270m-with-unsloth-and-qlora",
+      "title": "How to Fine-Tune Google Gemma 270M with Unsloth and QLoRA   | Codecademy",
+      "publish_date": null,
+      "excerpts": [
+        "total_memory / 1e9 : .2f } GB\" )\n```\n\nCopy to clipboard\n\nCopy to clipboard\n```\n\nExpected output shows CUDA available:\n\n```\n```\nCUDA available: True\n\nGPU name: Tesla T4\n\nVRAM: 15.64 GB\n```\n\nCopy to clipboard\n\nCopy to clipboard\n```\n\nThe environment setup completes in under two minutes. Free Colab T4 instances work perfectly for Gemma 270M and 1B models. With GPU confirmed and Unsloth installed, the next step covers loading models with 4-bit quantization.\n\n## Loading Gemma 270M with 4-bit quantization\n\nNow let\u2019s load the model. In a new cell, add:\n\n```\n```\nfrom unsloth import FastLanguageModel\n\nmodel , tokenizer = FastLanguageModel . from_pretrained (\n\nmodel_name = \"unsloth/gemma-3-270m-it\" ,\n\nmax_seq_length = 2048 ,\n\ndtype = None ,\n\nload_in_4bit = True ,\n\n)\n```\n\nCopy to clipboard\n\nCopy to clipboard\n```\n\nRun this cell. The model downloads (takes 1-2 minutes on first run) and loads with 4-bit quantization, reducing memory from 2GB to approximately 500MB.\nThe `max_seq_length = 2048` sets the context window, and `dtype = None` lets Unsloth choose the optimal data type automatically.\n\nInstruction dataset format requirements:\n\n* Conversational structure with user/assistant turns\n* Clear question-answer pairs for supervised fine-tuning\n* System prompts optional but can improve task-specific behavior\n* Token lengths must fit within the 2048 context window\n\nIn the next cell, load a pre-existing instruction dataset:\n\n```\n```\nfrom datasets import load_dataset\n\ndataset = load_dataset ( \"mlabonne/guanaco-llama2-1k\" , split = \"train\" )\n\nprint ( f\"Dataset size: { len ( dataset ) } \" )\n\nprint ( \"Dataset columns:\" , dataset . column_names )\n\nprint ( \"\\nFirst example:\" )\n\nprint ( dataset [ 0 ] )\n```\n\nCopy to clipboard\n\nCopy to clipboard\n```\n\nThe dataset loads with 1,000 high-quality instruction examples. The output shows dataset size, column names, and first example structure.\nThe guanaco dataset already contains formatted conversations in a \u201ctext\u201d field, so we can use it directly. If you want to use a dataset with separate instruction/output fields (like `tatsu-lab/alpaca` ), load it instead:\n\n```\n```\n# Alternative: use alpaca format dataset\n\n# dataset = load_dataset(\"tatsu-lab/alpaca\", split=\"train[:1000]\")\n```\n\nCopy to clipboard\n\nCopy to clipboard\n```\n\nFor the guanaco dataset, the conversations are already formatted. In a new cell, verify it\u2019s ready:\n\n```\n```\n# Guanaco dataset is already formatted in the \"text\" column\n\nformatted_dataset = dataset\n\n# Verify the format\n\nprint ( \"Sample conversation:\" )\n\nprint ( formatted_dataset [ 0 ] [ \"text\" ] [ : 500 ] ) # Print first 500 characters\n```\n\nCopy to clipboard\n\nCopy to clipboard\n```\n\nThe dataset is ready to use as-is. In another cell, check token lengths to avoid truncation:\n\n```\n```\n# Check token lengths of first 100 examples\n\nsample_texts = [ x [ \"text\" ] for x in formatted_dataset ."
+      ]
+    }
+  ],
+  "warnings": []
+}
