@@ -4,16 +4,21 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+patchedDependencies:
+  '@huggingface/transformers@4.2.0':
+    hash: d72cc83466d24824b4f60b5b7bfb219b49254fed127625c49c8e8dcaa17645bd
+    path: patches/@huggingface__transformers@4.2.0.patch
+
 importers:
 
   .:
     dependencies:
       '@browser-ai/transformers-js':
         specifier: ^2.2.2
-        version: 2.2.2(@huggingface/transformers@4.2.0)(ai@6.0.174(zod@4.3.6))
+        version: 2.2.2(@huggingface/transformers@4.2.0(patch_hash=d72cc83466d24824b4f60b5b7bfb219b49254fed127625c49c8e8dcaa17645bd))(ai@6.0.174(zod@4.3.6))
       '@huggingface/transformers':
         specifier: ^4.2.0
-        version: 4.2.0
+        version: 4.2.0(patch_hash=d72cc83466d24824b4f60b5b7bfb219b49254fed127625c49c8e8dcaa17645bd)
       '@mlc-ai/web-llm':
         specifier: ^0.2.83
         version: 0.2.83
@@ -2486,9 +2491,9 @@ snapshots:
       '@babel/helper-string-parser': 7.27.1
       '@babel/helper-validator-identifier': 7.28.5
 
-  '@browser-ai/transformers-js@2.2.2(@huggingface/transformers@4.2.0)(ai@6.0.174(zod@4.3.6))':
+  '@browser-ai/transformers-js@2.2.2(@huggingface/transformers@4.2.0(patch_hash=d72cc83466d24824b4f60b5b7bfb219b49254fed127625c49c8e8dcaa17645bd))(ai@6.0.174(zod@4.3.6))':
     dependencies:
-      '@huggingface/transformers': 4.2.0
+      '@huggingface/transformers': 4.2.0(patch_hash=d72cc83466d24824b4f60b5b7bfb219b49254fed127625c49c8e8dcaa17645bd)
       ai: 6.0.174(zod@4.3.6)
 
   '@emnapi/core@1.10.0':
@@ -2642,7 +2647,7 @@ snapshots:
       onnxruntime-web: 1.22.0-dev.20250409-89f8206ba4
       sharp: 0.34.5
 
-  '@huggingface/transformers@4.2.0':
+  '@huggingface/transformers@4.2.0(patch_hash=d72cc83466d24824b4f60b5b7bfb219b49254fed127625c49c8e8dcaa17645bd)':
     dependencies:
       '@huggingface/jinja': 0.5.8
       '@huggingface/tokenizers': 0.1.3

@@ -1,3 +1,6 @@
 ignoredBuiltDependencies:
   - sharp
   - unrs-resolver
+
+patchedDependencies:
+  '@huggingface/transformers@4.2.0': patches/@huggingface__transformers@4.2.0.patch

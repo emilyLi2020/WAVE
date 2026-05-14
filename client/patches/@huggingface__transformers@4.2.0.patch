@@ -1,0 +1,52 @@
+diff --git a/dist/transformers.js b/dist/transformers.js
+index 3274d9cfc2453aeb6b1ee64e61c85f6984aaad88..861615f6399229d539ed888a54b4f39847a7fac7 100644
+--- a/dist/transformers.js
++++ b/dist/transformers.js
+@@ -25716,7 +25716,7 @@ async function decoder_forward(self2, model_inputs, is_encoder_decoder = false)
+     new_model_inputs.position_ids = create_position_ids(new_model_inputs, past_key_values, start_index);
+   }
+   if (session.inputNames.includes("num_logits_to_keep") && !new_model_inputs.num_logits_to_keep) {
+-    new_model_inputs.num_logits_to_keep = new Tensor3("int64", [0n], []);
++    new_model_inputs.num_logits_to_keep = new Tensor3("int64", [1n], []);
+   }
+   addPastKeyValues(self2, new_model_inputs, past_key_values);
+   const fixed = pick(new_model_inputs, session.inputNames);
+diff --git a/dist/transformers.node.cjs b/dist/transformers.node.cjs
+index 6cb09aecb7364f1b909fb6ceed8daff52bba345b..3a662c12576cd39e68df19340bed01f9727b5ab3 100644
+--- a/dist/transformers.node.cjs
++++ b/dist/transformers.node.cjs
+@@ -25899,7 +25899,7 @@ async function decoder_forward(self2, model_inputs, is_encoder_decoder = false)
+     new_model_inputs.position_ids = create_position_ids(new_model_inputs, past_key_values, start_index);
+   }
+   if (session.inputNames.includes("num_logits_to_keep") && !new_model_inputs.num_logits_to_keep) {
+-    new_model_inputs.num_logits_to_keep = new Tensor2("int64", [0n], []);
++    new_model_inputs.num_logits_to_keep = new Tensor2("int64", [1n], []);
+   }
+   addPastKeyValues(self2, new_model_inputs, past_key_values);
+   const fixed = pick(new_model_inputs, session.inputNames);
+diff --git a/dist/transformers.node.mjs b/dist/transformers.node.mjs
+index bacb354fe1b898d4c535a39f5ef1ba5c6a463d75..6e9dc4c27029330b349ffa86633e9a45d12e7b87 100644
+--- a/dist/transformers.node.mjs
++++ b/dist/transformers.node.mjs
+@@ -24939,7 +24939,7 @@ async function decoder_forward(self2, model_inputs, is_encoder_decoder = false)
+     new_model_inputs.position_ids = create_position_ids(new_model_inputs, past_key_values, start_index);
+   }
+   if (session.inputNames.includes("num_logits_to_keep") && !new_model_inputs.num_logits_to_keep) {
+-    new_model_inputs.num_logits_to_keep = new Tensor2("int64", [0n], []);
++    new_model_inputs.num_logits_to_keep = new Tensor2("int64", [1n], []);
+   }
+   addPastKeyValues(self2, new_model_inputs, past_key_values);
+   const fixed = pick(new_model_inputs, session.inputNames);
+diff --git a/dist/transformers.web.js b/dist/transformers.web.js
+index bb7b32717a42475a5f66411a33d5e5964dfda3e2..ce52d2492209607107f000719bd78b87df503987 100644
+--- a/dist/transformers.web.js
++++ b/dist/transformers.web.js
+@@ -21053,7 +21053,7 @@ async function decoder_forward(self2, model_inputs, is_encoder_decoder = false)
+     new_model_inputs.position_ids = create_position_ids(new_model_inputs, past_key_values, start_index);
+   }
+   if (session.inputNames.includes("num_logits_to_keep") && !new_model_inputs.num_logits_to_keep) {
+-    new_model_inputs.num_logits_to_keep = new Tensor2("int64", [0n], []);
++    new_model_inputs.num_logits_to_keep = new Tensor2("int64", [1n], []);
+   }
+   addPastKeyValues(self2, new_model_inputs, past_key_values);
+   const fixed = pick(new_model_inputs, session.inputNames);
