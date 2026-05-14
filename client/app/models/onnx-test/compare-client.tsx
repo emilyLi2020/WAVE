@@ -287,9 +287,20 @@ export function OnnxCompareClient() {
           }
         }
         const cleaned = stripThinking(text).trim();
-        const approxTokens = Math.max(1, Math.round(cleaned.length / 4));
+        // Fallback so the page never silently displays empty output: if
+        // stripping removed everything, show the raw model text instead.
+        const display = cleaned.length > 0 ? cleaned : text.trim();
+        const approxTokens = Math.max(1, Math.round(display.length / 4));
+        if (typeof console !== "undefined") {
+          console.info(
+            "[tasks-compare] raw output (len=%d) cleaned (len=%d):",
+            text.length,
+            cleaned.length,
+            text,
+          );
+        }
         return {
-          text: cleaned,
+          text: display,
           elapsedMs,
           approxTokens,
           tokensPerSecond:
@@ -352,6 +363,11 @@ export function OnnxCompareClient() {
     const startedAt = performance.now();
 
     // Build the static framing once; agent-turn count grows per loop.
+    // The contextBlock is per-conversation framing; the chat template
+    // requires strict user/assistant/user/... alternation after the system
+    // message, so we fold the contextBlock into the FIRST patient message
+    // instead of sending it as its own user turn (which would duplicate the
+    // user role on turn 1).
     let agentTurns = 0;
     for (const patientText of CHECK_IN_PATIENT_SCRIPT) {
       const built = buildCheckInPrompt(CHECK_IN_CONTEXT, {
@@ -360,17 +376,23 @@ export function OnnxCompareClient() {
       const messages: Array<{
         role: "system" | "user" | "assistant";
         content: string;
-      }> = [
-        { role: "system", content: built.systemPrompt },
-        { role: "user", content: built.contextBlock },
-      ];
-      // Replay prior turns
-      for (const t of turns) {
-        messages.push({ role: "user", content: t.patient });
-        messages.push({ role: "assistant", content: t.agent.text });
+      }> = [{ role: "system", content: built.systemPrompt }];
+      // First patient message carries the contextBlock as its prefix.
+      const firstPatient = turns[0]?.patient ?? patientText;
+      const firstPatientContent = `${built.contextBlock}\n\n${firstPatient}`;
+      messages.push({ role: "user", content: firstPatientContent });
+      // Replay remaining alternating turns (after the first patient turn).
+      for (let i = 0; i < turns.length; i += 1) {
+        messages.push({ role: "assistant", content: turns[i].agent.text });
+        const nextPatient = turns[i + 1]?.patient;
+        if (nextPatient !== undefined) {
+          messages.push({ role: "user", content: nextPatient });
+        }
       }
-      // Add the new patient turn
-      messages.push({ role: "user", content: patientText });
+      // Add the new patient turn unless it's already in `turns` as the first.
+      if (turns.length > 0) {
+        messages.push({ role: "user", content: patientText });
+      }
 
       const agent = await generateOne(messages, MAX_TOKENS_BY_TASK.checkin);
       turns.push({ patient: patientText, agent });
@@ -676,9 +698,17 @@ function CheckInOutput({ result }: { result: CheckInResult }) {
 }
 
 function stripThinking(text: string): string {
-  return text
-    .replace(/<\|think\|>[\s\S]*?<\/?\|think\|>/g, "")
-    .replace(/<\|think\|>[\s\S]*$/g, "");
+  // Gemma 4's chat template uses `<|channel>...<channel|>` for thinking
+  // segments (asymmetric brace direction). The older `<|think|>...</|think|>`
+  // markers don't apply here.
+  let out = text.replace(/<\|channel>[\s\S]*?<channel\|>/g, "");
+  out = out.replace(/<\|channel>[\s\S]*$/g, "");
+  // Defensive: also strip the legacy <|think|>...</|think|> form, and any
+  // stray turn/eos sentinels the model may include in its output.
+  out = out.replace(/<\|think\|>[\s\S]*?<\/?\|think\|>/g, "");
+  out = out.replace(/<\|think\|>[\s\S]*$/g, "");
+  out = out.replace(/<turn\|>[\s\S]*$/g, "");
+  return out;
 }
 
 function tryPrettyJSON(text: string): string {
