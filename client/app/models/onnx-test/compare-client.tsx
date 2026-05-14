@@ -191,6 +191,12 @@ export function OnnxCompareClient() {
       // Both models load from HuggingFace Hub now (the finetune lives at
       // Maelstrome/lora-wave-session-r32-onnx). Local serve of external-data
       // files is blocked by transformers.js v4's MountedFiles bug on WebGPU.
+      // Re-assert env on every load: another route (e.g. /benchmark) might
+      // have set allowLocalModels=true + localModelPath in this SPA session,
+      // and transformers.js then short-circuits to the local path and 404s
+      // instead of falling through to HF.
+      env.allowLocalModels = false;
+      env.allowRemoteModels = true;
       setSlotLoad(slot, {
         phase: "loading",
         message: "Initializing on WebGPU…",
