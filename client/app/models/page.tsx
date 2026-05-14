@@ -26,9 +26,9 @@ const ONNX_PAGES: TestPage[] = [
     href: "/models/onnx-test/compare",
     title: "ONNX A/B · upstream vs our fine-tune",
     blurb:
-      "Prompt-by-prompt comparison of onnx-community/gemma-4-E2B-it-ONNX vs the Gather-quantized fine-tune. One model active at a time.",
+      "Side-by-side comparison on the real WAVE prompts: phase narration (chunk 2), a 4-turn check-in, and end-of-session reflection. Load one model at a time; outputs accumulate across switches.",
     details:
-      "Both run on WebGPU at q4f16 with int4 Gather/PLE. Loads one pipeline at a time and accumulates trials across switches.",
+      "Both run on WebGPU at q4f16 with int4 Gather/PLE. Uses buildChunkPrompt / buildCheckInPrompt / buildReflectionPrompt so the JSON contract + WAVE voice are exposed.",
   },
 ];
 

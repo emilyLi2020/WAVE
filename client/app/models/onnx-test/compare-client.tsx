@@ -7,83 +7,154 @@ import {
   type TextGenerationPipeline,
 } from "@huggingface/transformers";
 
+import { buildChunkPrompt } from "@/lib/prompts/chunk-generator";
+import { buildCheckInPrompt } from "@/lib/prompts/check-in";
+import { buildReflectionPrompt } from "@/lib/prompts/reflection";
+import type {
+  CheckInContextPayload,
+  ChunkGenerationContextPayload,
+  ReflectionContext,
+  SessionHistoryEntry,
+} from "@/lib/prompts/schemas";
+
 const UPSTREAM_ID = "onnx-community/gemma-4-E2B-it-ONNX";
 const FINETUNE_LOCAL_ID = "onnx-finetune-export";
 
-const PROMPTS = [
-  {
-    label: "anxiety",
-    text: "I'm feeling anxious right now. What's one small thing I can do in the next minute?",
+type Slot = "upstream" | "finetune";
+type TaskKey = "phase" | "checkin" | "reflection";
+
+const SLOT_META: Record<
+  Slot,
+  { title: string; subtitle: string; accent: string }
+> = {
+  upstream: {
+    title: "Upstream base",
+    subtitle: "onnx-community/gemma-4-E2B-it-ONNX",
+    accent: "#3b82f6",
   },
-  {
-    label: "breathing",
-    text: "Walk me through a 30-second breathing exercise. Keep it concrete.",
+  finetune: {
+    title: "Our fine-tune",
+    subtitle: "models/runs/onnx-export-v3 (Maelstrome/lora-wave-session-r32)",
+    accent: "#a855f7",
   },
+};
+
+const PATIENT_PROFILE = {
+  matType: "buprenorphine",
+  medicationStatus: "on_time",
+  trigger: "stress",
+  triggerOther: null,
+  usedSubstanceToday: false,
+} as const;
+
+const SESSION_HISTORY: SessionHistoryEntry[] = [
   {
-    label: "factual",
-    text: "What is the capital of France? Answer in one sentence.",
+    kind: "chunk",
+    chunkNumber: 1,
+    lines: [
+      "Welcome back. You showing up for this is the practice.",
+      "Find a position your body can rest in for a few minutes.",
+      "Urges arrive like waves. They build, they crest, and they fall.",
+      "Notice what is already here in the body, without trying to fix anything.",
+      "Let your breath be ordinary for one slow round.",
+      "When you are ready, we will move into the body together.",
+    ],
   },
-  { label: "haiku", text: "Write a haiku about ocean waves." },
 ];
 
-const MAX_NEW_TOKENS = 80;
+const PHASE_CONTEXT: ChunkGenerationContextPayload = {
+  chunkNumber: 2,
+  intakeIntensity: 7,
+  profile: PATIENT_PROFILE,
+  sessionHistory: SESSION_HISTORY,
+};
 
-type Slot = "upstream" | "finetune";
+const CHECK_IN_CONTEXT: CheckInContextPayload = {
+  chunkNumber: 1,
+  cravingScore: 7,
+  scoreHistory: [],
+  obstacleHint: null,
+  profile: PATIENT_PROFILE,
+  intakeIntensity: 7,
+  sessionHistory: SESSION_HISTORY,
+  demoMode: false,
+};
 
-interface Trial {
-  slot: Slot;
-  prompt: string;
-  output: string;
+const CHECK_IN_PATIENT_SCRIPT: readonly string[] = [
+  "It's around a 7. It's been building for a couple hours.",
+  "Honestly probably stress from work. Long day.",
+  "I noticed my chest got tight, kind of holding my breath.",
+  "Yeah, I think I'm ready to keep going.",
+];
+
+const REFLECTION_CONTEXT: ReflectionContext = {
+  intakeIntensity: 7,
+  matType: "buprenorphine",
+  medicationStatus: "on_time",
+  trigger: "stress",
+  usedSubstanceToday: false,
+  bodyLocation: "chest",
+  currentIntensity: 4,
+  endingIntensity: 3,
+  durationSeconds: 600,
+};
+
+interface LoadState {
+  phase: "idle" | "loading" | "ready" | "error";
+  message: string;
+  percent: number;
+}
+
+const INITIAL_LOAD: LoadState = {
+  phase: "idle",
+  message: "Not loaded.",
+  percent: 0,
+};
+
+interface SimpleResult {
+  text: string;
   elapsedMs: number;
   approxTokens: number;
   tokensPerSecond: number;
   error?: string;
 }
 
-type LoadState = {
-  phase: "idle" | "loading" | "ready" | "error";
-  message: string;
-  percent: number;
+interface CheckInTurnRecord {
+  patient: string;
+  agent: SimpleResult;
+}
+
+interface CheckInResult {
+  turns: CheckInTurnRecord[];
+  totalElapsedMs: number;
+}
+
+type TaskResults = {
+  phase?: SimpleResult;
+  checkin?: CheckInResult;
+  reflection?: SimpleResult;
 };
 
-const INITIAL: LoadState = {
-  phase: "idle",
-  message: "Not loaded.",
-  percent: 0,
-};
-
-const SLOT_META: Record<
-  Slot,
-  { title: string; subtitle: string; color: string; backend: string }
-> = {
-  upstream: {
-    title: "Upstream base",
-    subtitle: "onnx-community/gemma-4-E2B-it-ONNX • ~3 GB • from HuggingFace",
-    color: "#3b82f6",
-    backend: "WebGPU",
-  },
-  finetune: {
-    title: "Our fine-tune (Gather-quantized)",
-    subtitle:
-      "lora-wave-session-r32 ONNX • ~2.8 GB after PLE quant • served locally",
-    color: "#a855f7",
-    backend: "WebGPU",
-  },
+const MAX_TOKENS_BY_TASK: Record<TaskKey, number> = {
+  phase: 320,
+  checkin: 220,
+  reflection: 320,
 };
 
 export function OnnxCompareClient() {
   const pipeRef = useRef<TextGenerationPipeline | null>(null);
-  const [upstreamState, setUpstreamState] = useState<LoadState>(INITIAL);
-  const [finetuneState, setFinetuneState] = useState<LoadState>(INITIAL);
-  const [trials, setTrials] = useState<Trial[]>([]);
-  const [running, setRunning] = useState(false);
+  const [upstreamLoad, setUpstreamLoad] = useState<LoadState>(INITIAL_LOAD);
+  const [finetuneLoad, setFinetuneLoad] = useState<LoadState>(INITIAL_LOAD);
   const [busy, setBusy] = useState(false);
+  const [running, setRunning] = useState<TaskKey | null>(null);
+  const [results, setResults] = useState<
+    Record<Slot, TaskResults>
+  >({ upstream: {}, finetune: {} });
 
-  // Single source of truth: whichever card is ready is the active slot.
   const activeSlot: Slot | null =
-    upstreamState.phase === "ready"
+    upstreamLoad.phase === "ready"
       ? "upstream"
-      : finetuneState.phase === "ready"
+      : finetuneLoad.phase === "ready"
         ? "finetune"
         : null;
 
@@ -96,9 +167,9 @@ export function OnnxCompareClient() {
     env.useBrowserCache = true;
   }, []);
 
-  const setSlotState = useCallback((slot: Slot, state: LoadState) => {
-    if (slot === "upstream") setUpstreamState(state);
-    else setFinetuneState(state);
+  const setSlotLoad = useCallback((slot: Slot, state: LoadState) => {
+    if (slot === "upstream") setUpstreamLoad(state);
+    else setFinetuneLoad(state);
   }, []);
 
   const loadSlot = useCallback(
@@ -106,38 +177,48 @@ export function OnnxCompareClient() {
       if (busy) return;
       setBusy(true);
 
-      // Unload prior pipeline (any non-target slot's "ready" state means it's loaded).
       if (pipeRef.current) {
         try {
-          await (pipeRef.current as unknown as { dispose?: () => Promise<void> }).dispose?.();
+          await (
+            pipeRef.current as unknown as { dispose?: () => Promise<void> }
+          ).dispose?.();
         } catch {
           /* ignore */
         }
         pipeRef.current = null;
-        if (slot === "upstream") setFinetuneState(INITIAL);
-        else setUpstreamState(INITIAL);
+        if (slot === "upstream") setFinetuneLoad(INITIAL_LOAD);
+        else setUpstreamLoad(INITIAL_LOAD);
       }
 
       const modelId = slot === "upstream" ? UPSTREAM_ID : FINETUNE_LOCAL_ID;
-      // Both models now use com.microsoft.GatherBlockQuantized after our
-      // post-export gather quantization → both need WebGPU (no WASM kernel
-      // for the op). If WebGPU + external data hits MountedFiles, we'll need
-      // to address that separately.
-      const device: "webgpu" | "wasm" = "webgpu";
-      setSlotState(slot, {
+      // Resolve upstream from HuggingFace and the finetune from /public.
+      // If allowLocalModels stays true while loading upstream, transformers.js
+      // tries `${origin}/onnx-community/gemma-4-E2B-it-ONNX/...` first and
+      // 404s on the dev server instead of falling through to the HF CDN.
+      env.allowLocalModels = slot === "finetune";
+      env.allowRemoteModels = slot === "upstream";
+      setSlotLoad(slot, {
         phase: "loading",
-        message: `Initializing on ${device.toUpperCase()}…`,
+        message: "Initializing on WebGPU…",
         percent: 0,
       });
 
       try {
         const pipe = (await pipeline("text-generation", modelId, {
           dtype: "q4f16",
-          device,
+          device: "webgpu",
           progress_callback: (info: unknown) => {
-            const i = info as { status?: string; file?: string; progress?: number };
-            if (i.status === "progress" && i.file && typeof i.progress === "number") {
-              setSlotState(slot, {
+            const i = info as {
+              status?: string;
+              file?: string;
+              progress?: number;
+            };
+            if (
+              i.status === "progress" &&
+              i.file &&
+              typeof i.progress === "number"
+            ) {
+              setSlotLoad(slot, {
                 phase: "loading",
                 message: `${i.file} ${i.progress.toFixed(0)}%`,
                 percent: Math.round(i.progress),
@@ -146,9 +227,13 @@ export function OnnxCompareClient() {
           },
         })) as TextGenerationPipeline;
         pipeRef.current = pipe;
-        setSlotState(slot, { phase: "ready", message: "Loaded and ready.", percent: 100 });
+        setSlotLoad(slot, {
+          phase: "ready",
+          message: "Loaded and ready.",
+          percent: 100,
+        });
       } catch (err) {
-        setSlotState(slot, {
+        setSlotLoad(slot, {
           phase: "error",
           message: err instanceof Error ? err.message : String(err),
           percent: 0,
@@ -157,17 +242,18 @@ export function OnnxCompareClient() {
         setBusy(false);
       }
     },
-    [busy, setSlotState],
+    [busy, setSlotLoad],
   );
 
-  const runOne = useCallback(
-    async (slot: Slot, prompt: string): Promise<Trial> => {
+  const generateOne = useCallback(
+    async (
+      messages: Array<{ role: "system" | "user" | "assistant"; content: string }>,
+      maxNewTokens: number,
+    ): Promise<SimpleResult> => {
       const pipe = pipeRef.current;
       if (!pipe) {
         return {
-          slot,
-          prompt,
-          output: "",
+          text: "",
           elapsedMs: 0,
           approxTokens: 0,
           tokensPerSecond: 0,
@@ -176,38 +262,42 @@ export function OnnxCompareClient() {
       }
       const startedAt = performance.now();
       try {
-        const result = (await pipe([{ role: "user", content: prompt }], {
-          max_new_tokens: MAX_NEW_TOKENS,
+        const out = (await pipe(messages, {
+          max_new_tokens: maxNewTokens,
           do_sample: false,
           return_full_text: false,
         })) as unknown;
         const elapsedMs = performance.now() - startedAt;
-        const r = result as Array<{ generated_text?: unknown }>;
-        let output = "";
-        if (Array.isArray(r) && r.length > 0) {
-          const gen = r[0]?.generated_text;
-          if (typeof gen === "string") output = gen;
+        let text = "";
+        const arr = out as Array<{ generated_text?: unknown }>;
+        if (Array.isArray(arr) && arr.length > 0) {
+          const gen = arr[0]?.generated_text;
+          if (typeof gen === "string") text = gen;
           else if (Array.isArray(gen)) {
-            const last = gen[gen.length - 1] as { role?: string; content?: string };
-            if (last?.role === "assistant" && typeof last.content === "string") {
-              output = last.content;
+            const last = gen[gen.length - 1] as {
+              role?: string;
+              content?: string;
+            };
+            if (
+              last?.role === "assistant" &&
+              typeof last.content === "string"
+            ) {
+              text = last.content;
             }
           }
         }
-        const approxTokens = Math.max(1, Math.round(output.length / 4));
+        const cleaned = stripThinking(text).trim();
+        const approxTokens = Math.max(1, Math.round(cleaned.length / 4));
         return {
-          slot,
-          prompt,
-          output,
+          text: cleaned,
           elapsedMs,
           approxTokens,
-          tokensPerSecond: elapsedMs > 0 ? (approxTokens / elapsedMs) * 1000 : 0,
+          tokensPerSecond:
+            elapsedMs > 0 ? (approxTokens / elapsedMs) * 1000 : 0,
         };
       } catch (err) {
         return {
-          slot,
-          prompt,
-          output: "",
+          text: "",
           elapsedMs: 0,
           approxTokens: 0,
           tokensPerSecond: 0,
@@ -218,155 +308,201 @@ export function OnnxCompareClient() {
     [],
   );
 
-  const runActive = useCallback(async () => {
-    if (!activeSlot) return;
-    setRunning(true);
-    const results = [...trials];
-    for (const p of PROMPTS) {
-      const trial = await runOne(activeSlot, p.text);
-      results.push(trial);
-      setTrials([...results]);
-    }
-    setRunning(false);
-  }, [activeSlot, trials, runOne]);
+  const runPhase = useCallback(async () => {
+    if (!activeSlot || running) return;
+    setRunning("phase");
+    const built = buildChunkPrompt(PHASE_CONTEXT);
+    const result = await generateOne(
+      [
+        { role: "system", content: built.systemPrompt },
+        { role: "user", content: built.userPrompt },
+      ],
+      MAX_TOKENS_BY_TASK.phase,
+    );
+    setResults((prev) => ({
+      ...prev,
+      [activeSlot]: { ...prev[activeSlot], phase: result },
+    }));
+    setRunning(null);
+  }, [activeSlot, running, generateOne]);
 
-  const canRun = activeSlot !== null && !busy && !running;
+  const runReflection = useCallback(async () => {
+    if (!activeSlot || running) return;
+    setRunning("reflection");
+    const built = buildReflectionPrompt(REFLECTION_CONTEXT);
+    const result = await generateOne(
+      [
+        { role: "system", content: built.systemPrompt },
+        { role: "user", content: built.userPrompt },
+      ],
+      MAX_TOKENS_BY_TASK.reflection,
+    );
+    setResults((prev) => ({
+      ...prev,
+      [activeSlot]: { ...prev[activeSlot], reflection: result },
+    }));
+    setRunning(null);
+  }, [activeSlot, running, generateOne]);
+
+  const runCheckIn = useCallback(async () => {
+    if (!activeSlot || running) return;
+    setRunning("checkin");
+
+    const turns: CheckInTurnRecord[] = [];
+    const startedAt = performance.now();
+
+    // Build the static framing once; agent-turn count grows per loop.
+    let agentTurns = 0;
+    for (const patientText of CHECK_IN_PATIENT_SCRIPT) {
+      const built = buildCheckInPrompt(CHECK_IN_CONTEXT, {
+        agentTurnsInHistory: agentTurns,
+      });
+      const messages: Array<{
+        role: "system" | "user" | "assistant";
+        content: string;
+      }> = [
+        { role: "system", content: built.systemPrompt },
+        { role: "user", content: built.contextBlock },
+      ];
+      // Replay prior turns
+      for (const t of turns) {
+        messages.push({ role: "user", content: t.patient });
+        messages.push({ role: "assistant", content: t.agent.text });
+      }
+      // Add the new patient turn
+      messages.push({ role: "user", content: patientText });
+
+      const agent = await generateOne(messages, MAX_TOKENS_BY_TASK.checkin);
+      turns.push({ patient: patientText, agent });
+      agentTurns += 1;
+      if (agent.error) break;
+    }
+
+    const totalElapsedMs = performance.now() - startedAt;
+    setResults((prev) => ({
+      ...prev,
+      [activeSlot]: {
+        ...prev[activeSlot],
+        checkin: { turns, totalElapsedMs },
+      },
+    }));
+    setRunning(null);
+  }, [activeSlot, running, generateOne]);
+
+  const runAll = useCallback(async () => {
+    if (!activeSlot || running) return;
+    await runPhase();
+    await runCheckIn();
+    await runReflection();
+  }, [activeSlot, running, runPhase, runCheckIn, runReflection]);
+
+  const canRun = activeSlot !== null && !busy && running === null;
 
   return (
-    <div
-      style={{
-        padding: 32,
-        fontFamily:
-          "ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
-        maxWidth: 1100,
-        margin: "0 auto",
-        color: "#1f2937",
-      }}
-    >
-      <header style={{ marginBottom: 24 }}>
-        <h1 style={{ margin: 0, fontSize: 26, letterSpacing: -0.3 }}>
-          ONNX A/B: Upstream Base vs Our Fine-tune
-        </h1>
-        <p style={{ color: "#6b7280", marginTop: 8, lineHeight: 1.5, fontSize: 14 }}>
-          Both run through <code>@huggingface/transformers</code> with the WASM (CPU)
-          backend. Only one model can be active at a time — switching unloads the other.
-          Results accumulate across switches so you can compare prompt-by-prompt.
+    <div className="mx-auto max-w-6xl space-y-8 p-8">
+      <header>
+        <p className="text-xs uppercase tracking-wide text-foreground/50">
+          Browser-runtime task comparison
         </p>
-        <div
-          style={{
-            background: "#dcfce7",
-            border: "1px solid #86efac",
-            color: "#166534",
-            padding: "10px 14px",
-            borderRadius: 6,
-            fontSize: 13,
-            marginTop: 12,
-            lineHeight: 1.5,
-          }}
-        >
-          ✅ <strong>Both run on WebGPU after the post-export Gather quantization.</strong>{" "}
-          Apples-to-apples comparison: same backend, same architecture, same precision
-          (q4f16 with int4 Gather/PLE). If you see <code>MountedFiles</code> errors,
-          that's a known transformers.js v4 issue with external data on WebGPU; can
-          retry or fall back to per-model device override.
-        </div>
+        <h1 className="mt-2 text-3xl font-semibold tracking-tight">
+          ONNX A/B · production tasks
+        </h1>
+        <p className="mt-3 max-w-3xl text-sm text-foreground/70 leading-relaxed">
+          Runs the actual WAVE prompts (
+          <code className="font-mono">buildChunkPrompt</code>,{" "}
+          <code className="font-mono">buildCheckInPrompt</code>,{" "}
+          <code className="font-mono">buildReflectionPrompt</code>) against
+          upstream and our fine-tune, side by side. One model is active at a
+          time; load each, run the three tasks, compare. Outputs accumulate so
+          you can switch models without losing the other column.
+        </p>
       </header>
 
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "1fr 1fr",
-          gap: 16,
-          marginBottom: 20,
-        }}
-      >
+      <div className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-900">
+        <strong>Backend = WebGPU only.</strong> Both models use{" "}
+        <code>com.microsoft.GatherBlockQuantized</code> for the int4 embed/PLE
+        tables, and onnxruntime-web has no CPU kernel for it — the WASM path
+        fails with{" "}
+        <code>Failed to find kernel for com.microsoft.GatherBlockQuantized</code>
+        . So this page can't A/B WebGPU vs WASM. If WebGPU tok/s looks low on
+        Windows-NVIDIA, the bottleneck is likely Dawn's shader for that op
+        itself, not a CPU fallback.
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <RuntimeCard
           slot="upstream"
-          state={upstreamState}
+          state={upstreamLoad}
           isActive={activeSlot === "upstream"}
           busy={busy}
           onLoad={() => loadSlot("upstream")}
         />
         <RuntimeCard
           slot="finetune"
-          state={finetuneState}
+          state={finetuneLoad}
           isActive={activeSlot === "finetune"}
           busy={busy}
           onLoad={() => loadSlot("finetune")}
         />
       </div>
 
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: 12,
-          padding: 16,
-          background: "#f9fafb",
-          border: "1px solid #e5e7eb",
-          borderRadius: 8,
-          marginBottom: 20,
-        }}
-      >
+      <div className="flex flex-wrap items-center gap-3">
         <button
-          onClick={runActive}
+          type="button"
           disabled={!canRun}
-          style={{
-            padding: "10px 20px",
-            fontSize: 15,
-            fontWeight: 500,
-            background: canRun ? "#10b981" : "#d1d5db",
-            color: "white",
-            border: "none",
-            borderRadius: 6,
-            cursor: canRun ? "pointer" : "not-allowed",
-          }}
+          onClick={runAll}
+          className="inline-flex items-center rounded-md border border-accent bg-accent px-4 py-2 text-sm font-semibold text-white shadow-sm disabled:cursor-not-allowed disabled:opacity-50 hover:opacity-90"
         >
-          {running
-            ? `Running on ${activeSlot}…`
-            : activeSlot
-              ? `▶ Run ${PROMPTS.length} prompts on ${SLOT_META[activeSlot].title}`
-              : "Load a model first"}
+          {running !== null
+            ? `Running ${running}…`
+            : "Run all 3 tasks on this model"}
         </button>
-        <button
-          onClick={() => setTrials([])}
-          disabled={trials.length === 0 || running}
-          style={{
-            padding: "10px 16px",
-            fontSize: 14,
-            background: "transparent",
-            color: trials.length === 0 || running ? "#9ca3af" : "#6b7280",
-            border: "1px solid #e5e7eb",
-            borderRadius: 6,
-            cursor: trials.length === 0 || running ? "not-allowed" : "pointer",
-          }}
-        >
-          Clear results
-        </button>
-        <div style={{ marginLeft: "auto", color: "#6b7280", fontSize: 13 }}>
-          {trials.length > 0 && `${trials.length} trial${trials.length === 1 ? "" : "s"} recorded`}
-        </div>
+        {!activeSlot ? (
+          <span className="text-xs text-foreground/55">
+            Load a model above to run tasks.
+          </span>
+        ) : (
+          <span className="text-xs text-foreground/55">
+            Active: <strong>{SLOT_META[activeSlot].title}</strong>
+            {" · "}phase → check-in ({CHECK_IN_PATIENT_SCRIPT.length} turns) →
+            reflection
+          </span>
+        )}
       </div>
 
-      {trials.length > 0 ? (
-        <ResultsTable trials={trials} />
-      ) : (
-        <div
-          style={{
-            padding: 32,
-            textAlign: "center",
-            background: "#f9fafb",
-            border: "1px dashed #d1d5db",
-            borderRadius: 8,
-            color: "#9ca3af",
-            fontSize: 14,
-          }}
-        >
-          No trials yet. Load a model and click Run to begin.
-        </div>
-      )}
+      <TaskRow
+        title="Phase · chunk 2 narration"
+        description="Single call. Expected: strict JSON { lines: string[6] }."
+        upstream={results.upstream.phase}
+        finetune={results.finetune.phase}
+        renderResult={(r) => <SimpleOutput result={r} />}
+      />
+
+      <TaskRow
+        title="Check-in · 4 patient turns"
+        description="Multi-turn. Script: craving 7 → stress → tight chest → ready."
+        upstream={results.upstream.checkin}
+        finetune={results.finetune.checkin}
+        renderResult={(r) => <CheckInOutput result={r} />}
+      />
+
+      <TaskRow
+        title="Reflection · end-of-session insight"
+        description="Single call. Expected: strict JSON insight + nextSteps."
+        upstream={results.upstream.reflection}
+        finetune={results.finetune.reflection}
+        renderResult={(r) => <SimpleOutput result={r} />}
+      />
     </div>
   );
+}
+
+interface RuntimeCardProps {
+  slot: Slot;
+  state: LoadState;
+  isActive: boolean;
+  busy: boolean;
+  onLoad: () => void;
 }
 
 function RuntimeCard({
@@ -375,203 +511,209 @@ function RuntimeCard({
   isActive,
   busy,
   onLoad,
-}: {
-  slot: Slot;
-  state: LoadState;
-  isActive: boolean;
-  busy: boolean;
-  onLoad: () => void;
-}) {
+}: RuntimeCardProps) {
   const meta = SLOT_META[slot];
-  const buttonLabel = isActive
-    ? "✓ Active"
-    : state.phase === "loading"
-      ? "Loading…"
+  const borderClass = isActive
+    ? "border-accent"
+    : state.phase === "error"
+      ? "border-red-300"
+      : "border-border";
+  const buttonLabel =
+    state.phase === "loading"
+      ? `Loading… ${state.percent || 0}%`
       : state.phase === "ready"
-        ? "Switch to this"
+        ? "Active"
         : state.phase === "error"
           ? "Retry"
           : "Load";
-  return (
-    <div
-      style={{
-        padding: 16,
-        background: isActive ? "#f0fdf4" : "white",
-        border: `2px solid ${isActive ? meta.color : "#e5e7eb"}`,
-        borderRadius: 8,
-        transition: "border-color 0.2s, background 0.2s",
-      }}
-    >
-      <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
-        <h3 style={{ margin: 0, fontSize: 17, color: meta.color }}>{meta.title}</h3>
-        {isActive && (
-          <span
-            style={{
-              fontSize: 11,
-              padding: "2px 8px",
-              background: meta.color,
-              color: "white",
-              borderRadius: 999,
-              fontWeight: 600,
-              letterSpacing: 0.5,
-            }}
-          >
-            ACTIVE
-          </span>
-        )}
-      </div>
-      <div style={{ color: "#6b7280", fontSize: 12, marginTop: 4, lineHeight: 1.4 }}>
-        {meta.subtitle}
-      </div>
-      <div
-        style={{
-          color: meta.color,
-          fontSize: 11,
-          marginTop: 4,
-          fontWeight: 600,
-          letterSpacing: 0.4,
-        }}
-      >
-        Backend: {meta.backend}
-      </div>
 
+  return (
+    <div className={`rounded-2xl border bg-surface p-5 ${borderClass}`}>
+      <div className="flex items-baseline justify-between gap-2">
+        <h3
+          className="font-semibold tracking-tight"
+          style={{ color: meta.accent }}
+        >
+          {meta.title}
+        </h3>
+        <span className="text-[10px] uppercase tracking-wide text-foreground/50">
+          {state.phase}
+        </span>
+      </div>
+      <p className="mt-1 break-all text-xs text-foreground/55">
+        {meta.subtitle}
+      </p>
+      <p className="mt-3 text-xs text-foreground/70">{state.message}</p>
       <button
+        type="button"
+        disabled={busy || state.phase === "ready"}
         onClick={onLoad}
-        disabled={busy || state.phase === "loading" || isActive}
-        style={{
-          marginTop: 12,
-          padding: "8px 14px",
-          fontSize: 13,
-          fontWeight: 500,
-          background: isActive ? "#e5e7eb" : meta.color,
-          color: isActive ? "#6b7280" : "white",
-          border: "none",
-          borderRadius: 6,
-          cursor: busy || isActive ? "not-allowed" : "pointer",
-          opacity: busy && !isActive ? 0.6 : 1,
-        }}
+        className="mt-3 inline-flex items-center rounded-md border border-border bg-surface-muted px-3 py-1.5 text-xs font-medium text-foreground/80 disabled:cursor-not-allowed disabled:opacity-50 hover:border-accent/60 hover:text-foreground"
       >
         {buttonLabel}
       </button>
-
-      <div style={{ marginTop: 12 }}>
-        <div
-          style={{
-            background: "#f3f4f6",
-            height: 6,
-            borderRadius: 3,
-            overflow: "hidden",
-          }}
-        >
-          <div
-            style={{
-              width: `${state.percent}%`,
-              background: state.phase === "error" ? "#ef4444" : meta.color,
-              height: "100%",
-              transition: "width 0.2s",
-            }}
-          />
-        </div>
-        <div
-          style={{
-            fontSize: 12,
-            color: state.phase === "error" ? "#b91c1c" : "#6b7280",
-            marginTop: 6,
-            wordBreak: "break-word",
-          }}
-        >
-          {state.message}
-        </div>
-      </div>
     </div>
   );
 }
 
-function ResultsTable({ trials }: { trials: Trial[] }) {
-  // Group by prompt
-  const byPrompt = new Map<string, Trial[]>();
-  for (const t of trials) {
-    const arr = byPrompt.get(t.prompt) ?? [];
-    arr.push(t);
-    byPrompt.set(t.prompt, arr);
-  }
+interface TaskRowProps<T> {
+  title: string;
+  description: string;
+  upstream?: T;
+  finetune?: T;
+  renderResult: (r: T) => React.ReactNode;
+}
 
+function TaskRow<T>({
+  title,
+  description,
+  upstream,
+  finetune,
+  renderResult,
+}: TaskRowProps<T>) {
+  return (
+    <section className="rounded-2xl border border-border bg-surface-muted/30 p-5">
+      <div className="mb-3">
+        <h2 className="text-lg font-semibold tracking-tight">{title}</h2>
+        <p className="mt-1 text-xs text-foreground/55">{description}</p>
+      </div>
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <Column slot="upstream" result={upstream} renderResult={renderResult} />
+        <Column slot="finetune" result={finetune} renderResult={renderResult} />
+      </div>
+    </section>
+  );
+}
+
+interface ColumnProps<T> {
+  slot: Slot;
+  result?: T;
+  renderResult: (r: T) => React.ReactNode;
+}
+
+function Column<T>({ slot, result, renderResult }: ColumnProps<T>) {
+  const meta = SLOT_META[slot];
+  return (
+    <div className="rounded-xl border border-border bg-surface p-4">
+      <div className="mb-2 flex items-center gap-2">
+        <span
+          className="inline-block h-2 w-2 rounded-full"
+          style={{ background: meta.accent }}
+        />
+        <span className="text-xs font-medium uppercase tracking-wide text-foreground/60">
+          {meta.title}
+        </span>
+      </div>
+      {result === undefined ? (
+        <p className="text-xs italic text-foreground/45">
+          Not run on this model yet.
+        </p>
+      ) : (
+        renderResult(result)
+      )}
+    </div>
+  );
+}
+
+function SimpleOutput({ result }: { result: SimpleResult }) {
+  if (result.error) {
+    return (
+      <p className="rounded-md bg-red-50 px-3 py-2 text-xs text-red-700">
+        {result.error}
+      </p>
+    );
+  }
+  const pretty = tryPrettyJSON(result.text);
   return (
     <div>
-      {Array.from(byPrompt.entries()).map(([prompt, group]) => (
-        <div
-          key={prompt}
-          style={{
-            border: "1px solid #e5e7eb",
-            borderRadius: 8,
-            padding: 16,
-            marginBottom: 12,
-            background: "white",
-          }}
-        >
-          <div
-            style={{
-              fontWeight: 600,
-              fontSize: 14,
-              marginBottom: 12,
-              color: "#374151",
-            }}
-          >
-            {prompt}
+      <div className="mb-2 text-[11px] text-foreground/55">
+        {result.elapsedMs.toFixed(0)} ms · ~{result.approxTokens} tok ·{" "}
+        {result.tokensPerSecond.toFixed(1)} tok/s
+      </div>
+      <pre className="max-h-[28rem] overflow-auto whitespace-pre-wrap break-words rounded-md bg-surface-muted/50 px-3 py-2 text-xs leading-relaxed text-foreground/85">
+        {pretty}
+      </pre>
+    </div>
+  );
+}
+
+function CheckInOutput({ result }: { result: CheckInResult }) {
+  return (
+    <div className="space-y-3">
+      <div className="text-[11px] text-foreground/55">
+        Total: {(result.totalElapsedMs / 1000).toFixed(1)}s ·{" "}
+        {result.turns.length} agent turns
+      </div>
+      {result.turns.map((turn, i) => (
+        <div key={i} className="space-y-1.5">
+          <div className="rounded-md bg-blue-50 px-3 py-2 text-xs text-blue-900">
+            <span className="font-semibold">Patient:</span> {turn.patient}
           </div>
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1fr 1fr",
-              gap: 12,
-            }}
-          >
-            {(["upstream", "finetune"] as Slot[]).map((slot) => {
-              const trial = group.find((t) => t.slot === slot);
-              const meta = SLOT_META[slot];
-              return (
-                <div
-                  key={slot}
-                  style={{
-                    background: "#f9fafb",
-                    border: `1px solid ${trial ? meta.color + "33" : "#f3f4f6"}`,
-                    padding: 12,
-                    borderRadius: 6,
-                    minHeight: 80,
-                  }}
-                >
-                  <div
-                    style={{
-                      fontSize: 11,
-                      fontWeight: 600,
-                      color: meta.color,
-                      marginBottom: 6,
-                      letterSpacing: 0.4,
-                      textTransform: "uppercase",
-                    }}
-                  >
-                    {meta.title}{" "}
-                    {trial && !trial.error && (
-                      <span style={{ color: "#9ca3af", fontWeight: 400, textTransform: "none", letterSpacing: 0 }}>
-                        · {(trial.elapsedMs / 1000).toFixed(1)}s · ~{trial.approxTokens} tok · {trial.tokensPerSecond.toFixed(1)} tok/s
-                      </span>
-                    )}
-                  </div>
-                  <div style={{ fontSize: 14, whiteSpace: "pre-wrap", color: "#1f2937", lineHeight: 1.5 }}>
-                    {!trial ? (
-                      <span style={{ color: "#9ca3af", fontStyle: "italic" }}>(not yet run)</span>
-                    ) : trial.error ? (
-                      <span style={{ color: "#b91c1c" }}>{trial.error}</span>
-                    ) : (
-                      trial.output
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+          {turn.agent.error ? (
+            <div className="rounded-md bg-red-50 px-3 py-2 text-xs text-red-700">
+              {turn.agent.error}
+            </div>
+          ) : (
+            <div className="rounded-md bg-surface-muted/50 px-3 py-2 text-xs text-foreground/85">
+              <div className="mb-1 flex items-baseline justify-between gap-2">
+                <span className="text-[10px] font-semibold uppercase tracking-wide text-foreground/55">
+                  Agent
+                </span>
+                <span className="text-[10px] text-foreground/45">
+                  {turn.agent.elapsedMs.toFixed(0)} ms ·{" "}
+                  {turn.agent.tokensPerSecond.toFixed(1)} tok/s
+                </span>
+              </div>
+              <div className="whitespace-pre-wrap break-words">
+                {turn.agent.text}
+              </div>
+            </div>
+          )}
         </div>
       ))}
     </div>
   );
+}
+
+function stripThinking(text: string): string {
+  return text
+    .replace(/<\|think\|>[\s\S]*?<\/?\|think\|>/g, "")
+    .replace(/<\|think\|>[\s\S]*$/g, "");
+}
+
+function tryPrettyJSON(text: string): string {
+  const start = text.indexOf("{");
+  if (start === -1) return text;
+  let depth = 0;
+  let inString = false;
+  let escaped = false;
+  for (let i = start; i < text.length; i += 1) {
+    const c = text[i];
+    if (escaped) {
+      escaped = false;
+      continue;
+    }
+    if (c === "\\") {
+      escaped = true;
+      continue;
+    }
+    if (c === '"') {
+      inString = !inString;
+      continue;
+    }
+    if (inString) continue;
+    if (c === "{") depth += 1;
+    else if (c === "}") {
+      depth -= 1;
+      if (depth === 0) {
+        const candidate = text.slice(start, i + 1);
+        try {
+          return JSON.stringify(JSON.parse(candidate), null, 2);
+        } catch {
+          return text;
+        }
+      }
+    }
+  }
+  return text;
 }
