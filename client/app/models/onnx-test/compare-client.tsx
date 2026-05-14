@@ -18,7 +18,7 @@ import type {
 } from "@/lib/prompts/schemas";
 
 const UPSTREAM_ID = "onnx-community/gemma-4-E2B-it-ONNX";
-const FINETUNE_LOCAL_ID = "onnx-finetune-export";
+const FINETUNE_LOCAL_ID = "Maelstrome/lora-wave-session-r32-onnx";
 
 type Slot = "upstream" | "finetune";
 type TaskKey = "phase" | "checkin" | "reflection";
@@ -34,7 +34,7 @@ const SLOT_META: Record<
   },
   finetune: {
     title: "Our fine-tune",
-    subtitle: "models/runs/onnx-export-v3 (Maelstrome/lora-wave-session-r32)",
+    subtitle: "Maelstrome/lora-wave-session-r32-onnx",
     accent: "#a855f7",
   },
 };
@@ -159,11 +159,8 @@ export function OnnxCompareClient() {
         : null;
 
   useEffect(() => {
-    env.allowLocalModels = true;
+    env.allowLocalModels = false;
     env.allowRemoteModels = true;
-    if (typeof window !== "undefined") {
-      env.localModelPath = `${window.location.origin}/`;
-    }
     env.useBrowserCache = true;
   }, []);
 
@@ -191,12 +188,9 @@ export function OnnxCompareClient() {
       }
 
       const modelId = slot === "upstream" ? UPSTREAM_ID : FINETUNE_LOCAL_ID;
-      // Resolve upstream from HuggingFace and the finetune from /public.
-      // If allowLocalModels stays true while loading upstream, transformers.js
-      // tries `${origin}/onnx-community/gemma-4-E2B-it-ONNX/...` first and
-      // 404s on the dev server instead of falling through to the HF CDN.
-      env.allowLocalModels = slot === "finetune";
-      env.allowRemoteModels = slot === "upstream";
+      // Both models load from HuggingFace Hub now (the finetune lives at
+      // Maelstrome/lora-wave-session-r32-onnx). Local serve of external-data
+      // files is blocked by transformers.js v4's MountedFiles bug on WebGPU.
       setSlotLoad(slot, {
         phase: "loading",
         message: "Initializing on WebGPU…",
