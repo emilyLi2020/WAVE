@@ -61,12 +61,16 @@ export default function ModelsLayout({
           <SidebarLink href="/models" label="Overview" />
 
           <div className="pt-6 pb-2 text-xs uppercase tracking-wide text-foreground/50 px-2">
-            ONNX runtime
+            Runtime benchmark
           </div>
           <SidebarLink
             href="/models/onnx-test/benchmark"
-            label="Benchmark · TTFT / tok/s"
+            label="ONNX vs MLC · TTFT / tok/s"
           />
+
+          <div className="pt-6 pb-2 text-xs uppercase tracking-wide text-foreground/50 px-2">
+            ONNX runtime
+          </div>
           <SidebarLink
             href="/models/onnx-test/compare"
             label="A/B · upstream vs fine-tune"

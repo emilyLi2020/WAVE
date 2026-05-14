@@ -15,11 +15,11 @@ interface TestPage {
 const ONNX_PAGES: TestPage[] = [
   {
     href: "/models/onnx-test/benchmark",
-    title: "ONNX benchmark · TTFT / tok/s",
+    title: "Runtime benchmark · ONNX vs MLC",
     blurb:
-      "Per-token timing on the local ONNX fine-tune (or upstream) via @huggingface/transformers + WebGPU. Reports TTFT, decode rate, total latency.",
+      "Same upstream Gemma 4 E2B IT through both browser runtimes. Reports TTFT, decode tok/s, and total latency per run; ONNX and MLC results accumulate in one comparison table.",
     details:
-      "TextStreamer.token_callback_function captures first-token wall time and per-token timestamps. Decode rate explicitly excludes the prefill window. Configurable max_new_tokens (32/64/128/256), runs (1/3/5), optional warmup.",
+      "ONNX via @huggingface/transformers (TextStreamer per-token timestamps). MLC via @mlc-ai/web-llm (stream chunks). Same q4f16 quantization, greedy decoding, identical prompt. No resetChat between MLC runs and no engine reload inside a benchmark — reload time would pollute timing.",
     badge: "primary",
   },
   {
