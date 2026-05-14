@@ -34,7 +34,7 @@ const MODELS: ModelSpec[] = [
   },
   {
     label: "ours-finetuned",
-    modelId: "onnx-export-v2", // local: models/runs/onnx-export-v2 (PEFT re-merge)
+    modelId: "onnx-export-v3", // local: models/runs/onnx-export-v3 (PEFT re-merge, inputs_embeds + 15 KV)
     dtype: "q4f16",
   },
 ];

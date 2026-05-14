@@ -1,44 +1,76 @@
 {
   "upstream-base": {
-    "loadMs": 1414.158458,
+    "loadMs": 7178.282300000001,
     "trials": [
       {
         "prompt": "anxiety_short",
         "output": "Try the 5-4-3-2-1 technique:\n\n* **Acknowledge 5 things you see.**\n* **Acknowledge 4 things you can touch.**\n* **Acknowledge 3 things you hear.**\n* **Acknowledge 2 things you can smell.**\n* **Acknowledge 1 thing you can taste.**\n\nThis exercise",
         "prefillMs": 0,
-        "decodeMs": 4304.991083999999,
+        "decodeMs": 3643.063899999999,
         "tokensGenerated": 61,
-        "tokensPerSecond": 14.169599613507588
+        "tokensPerSecond": 16.744147693923242
       },
       {
         "prompt": "breathing_guide",
         "output": "Here's a 30-second breathing exercise you can try:\n\n1. **Find a comfortable spot:** Sit or lie down in a way that feels relaxed.\n2. **Close your eyes:** Gently close your eyes to minimize distractions.\n3. **Inhale slowly:** Breathe in deeply through your nose for a count of 4. Feel your belly expand.\n4.",
         "prefillMs": 0,
-        "decodeMs": 4315.729375,
+        "decodeMs": 3523.2371000000003,
         "tokensGenerated": 76,
-        "tokensPerSecond": 17.61000132219829
+        "tokensPerSecond": 21.571071671560226
       },
       {
         "prompt": "factual",
         "output": "The capital of France is Paris.",
         "prefillMs": 0,
-        "decodeMs": 658.4069170000002,
+        "decodeMs": 483.2494999999999,
         "tokensGenerated": 8,
-        "tokensPerSecond": 12.150540635951424
+        "tokensPerSecond": 16.5545955039788
       },
       {
         "prompt": "haiku",
         "output": "Blue water crashes in,\nFoam spills on the sandy shore,\nRhythm of the tide.",
         "prefillMs": 0,
-        "decodeMs": 1261.449458000001,
+        "decodeMs": 1054.3912,
         "tokensGenerated": 19,
-        "tokensPerSecond": 15.0620382604342
+        "tokensPerSecond": 18.019877252389815
       }
     ]
   },
   "ours-finetuned": {
-    "loadMs": 39.278707999999824,
-    "trials": [],
-    "loadError": "Load model from /Users/bill.zhang/Github/Wave/models/runs/onnx-export-v2/onnx/decoder_model_merged_q4f16.onnx failed:Invalid model. Node input 'lm_head.weight' is not a graph input, initializer, or output of a previous node."
+    "loadMs": 3641.8904,
+    "trials": [
+      {
+        "prompt": "anxiety_short",
+        "output": "Here are a few small things you can try right now to help with anxiety:\n\n* **Deep breathing:** Try inhaling slowly for a count of four, holding for a count of seven, and exhaling for a count of eight. Repeat this a few times.\n* **Grounding:** Name five things you can see, four things you can touch, three things you can hear, two things",
+        "prefillMs": 0,
+        "decodeMs": 3528.4013000000014,
+        "tokensGenerated": 84,
+        "tokensPerSecond": 23.806815851700307
+      },
+      {
+        "prompt": "breathing_guide",
+        "output": "Here's a simple 30-second breathing exercise you can try:\n\n1. **Find a comfortable spot.** Sit or lie down. Close your eyes if it helps.\n2. **Take a deep breath in through your nose.** Count to 4. Feel your belly expand gently.\n3. **Hold for a second.** Count to 1.\n4. **Let",
+        "prefillMs": 0,
+        "decodeMs": 3460.894799999998,
+        "tokensGenerated": 69,
+        "tokensPerSecond": 19.937040559568594
+      },
+      {
+        "prompt": "factual",
+        "output": "The capital of France is Paris.",
+        "prefillMs": 0,
+        "decodeMs": 530.5329999999994,
+        "tokensGenerated": 8,
+        "tokensPerSecond": 15.079175093726512
+      },
+      {
+        "prompt": "haiku",
+        "output": "Blue waters rise and fall,\nCrashing on the sandy shore,\nGentle rhythm moves on.",
+        "prefillMs": 0,
+        "decodeMs": 1214.6941000000006,
+        "tokensGenerated": 20,
+        "tokensPerSecond": 16.46505074816778
+      }
+    ]
   }
 }

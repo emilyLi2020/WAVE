@@ -226,10 +226,22 @@ def run_track_b(source_path: Path, out_dir: Path) -> None:
         "head_dim",
         text_config.hidden_size // text_config.num_attention_heads,
     )
+    hidden_size = text_config.hidden_size
+    hidden_size_per_layer_input = getattr(text_config, "hidden_size_per_layer_input", 0)
+    num_kv_shared_layers = getattr(text_config, "num_kv_shared_layers", 0)
+    # In Gemma 4, the last `num_kv_shared_layers` layers reuse KV from earlier
+    # same-type layers, so the exported graph only exposes the first
+    # `first_kv_shared_layer_idx` KV pairs as IO. This matches what
+    # transformers.js v4's Gemma 4 handler expects (upstream
+    # `onnx-community/gemma-4-E2B-it-ONNX` ships 15 KV pairs, not 35).
+    first_kv_shared_layer_idx = n_layers - num_kv_shared_layers
+    n_unique_layers = first_kv_shared_layer_idx if first_kv_shared_layer_idx > 0 else n_layers
 
     print(
         f"Track B: text_model={type(text_model).__name__} "
-        f"layers={n_layers} kv_heads={n_kv_heads} head_dim={head_dim}",
+        f"layers={n_layers} kv_heads={n_kv_heads} head_dim={head_dim} "
+        f"hidden={hidden_size} hidden_per_layer_input={hidden_size_per_layer_input} "
+        f"num_kv_shared={num_kv_shared_layers} unique_kv_layers={n_unique_layers}",
         flush=True,
     )
 
@@ -246,18 +258,20 @@ def run_track_b(source_path: Path, out_dir: Path) -> None:
 
         def forward(
             self,
-            input_ids: torch.Tensor,
+            inputs_embeds: torch.Tensor,
+            per_layer_inputs: torch.Tensor,
             attention_mask: torch.Tensor,
             position_ids: torch.Tensor,
             past_kv: tuple,
         ) -> tuple:
             cache = DynamicCache()
-            for layer_idx in range(n_layers):
+            for layer_idx in range(n_unique_layers):
                 k = past_kv[layer_idx * 2]
                 v = past_kv[layer_idx * 2 + 1]
                 cache.update(k, v, layer_idx)
             outputs = self.base(
-                input_ids=input_ids,
+                inputs_embeds=inputs_embeds,
+                per_layer_inputs=per_layer_inputs,
                 attention_mask=attention_mask,
                 position_ids=position_ids,
                 past_key_values=cache,
@@ -268,19 +282,25 @@ def run_track_b(source_path: Path, out_dir: Path) -> None:
             out_kv = outputs.past_key_values
             flat = [logits]
             if hasattr(out_kv, "key_cache") and hasattr(out_kv, "value_cache"):
-                for i in range(n_layers):
+                for i in range(n_unique_layers):
                     flat.append(out_kv.key_cache[i])
                     flat.append(out_kv.value_cache[i])
             elif hasattr(out_kv, "layers"):
-                for layer in out_kv.layers:
+                for i, layer in enumerate(out_kv.layers):
+                    if i >= n_unique_layers:
+                        break
                     flat.append(layer.keys)
                     flat.append(layer.values)
             elif hasattr(out_kv, "to_legacy_cache"):
-                for layer_kv in out_kv.to_legacy_cache():
+                for i, layer_kv in enumerate(out_kv.to_legacy_cache()):
+                    if i >= n_unique_layers:
+                        break
                     flat.append(layer_kv[0])
                     flat.append(layer_kv[1])
             else:
-                for layer_kv in out_kv:
+                for i, layer_kv in enumerate(out_kv):
+                    if i >= n_unique_layers:
+                        break
                     flat.append(layer_kv[0])
                     flat.append(layer_kv[1])
             return tuple(flat)
@@ -292,7 +312,12 @@ def run_track_b(source_path: Path, out_dir: Path) -> None:
 
     batch = 1
     prefill_len = 4
-    example_input_ids = torch.zeros((batch, prefill_len), dtype=torch.long)
+    example_inputs_embeds = torch.zeros(
+        (batch, prefill_len, hidden_size), dtype=torch.float32
+    )
+    example_per_layer_inputs = torch.zeros(
+        (batch, prefill_len, n_layers, hidden_size_per_layer_input), dtype=torch.float32
+    )
     example_attention = torch.ones((batch, prefill_len), dtype=torch.long)
     example_positions = torch.arange(prefill_len, dtype=torch.long).unsqueeze(0)
 
@@ -308,12 +333,13 @@ def run_track_b(source_path: Path, out_dir: Path) -> None:
     print(
         f"Track B: per_layer_head_dim summary - "
         f"sliding={head_dim}, full={global_head_dim}, "
-        f"full_layer_count={sum(1 for d in per_layer_head_dim if d == global_head_dim)}",
+        f"full_layer_count={sum(1 for d in per_layer_head_dim if d == global_head_dim)}, "
+        f"first_15_full={sum(1 for d in per_layer_head_dim[:n_unique_layers] if d == global_head_dim)}",
         flush=True,
     )
 
     example_past: list[torch.Tensor] = []
-    for layer_idx in range(n_layers):
+    for layer_idx in range(n_unique_layers):
         dim = per_layer_head_dim[layer_idx]
         example_past.append(torch.zeros((batch, n_kv_heads, 0, dim), dtype=torch.float32))
         example_past.append(torch.zeros((batch, n_kv_heads, 0, dim), dtype=torch.float32))
@@ -325,15 +351,16 @@ def run_track_b(source_path: Path, out_dir: Path) -> None:
     total_dim = Dim("total_seq", min=1, max=131072)
 
     dynamic_shapes = (
-        {0: None, 1: seq_dim},
-        {0: None, 1: total_dim},
-        {0: None, 1: seq_dim},
-        tuple({0: None, 1: None, 2: past_dim, 3: None} for _ in range(2 * n_layers)),
+        {0: None, 1: seq_dim, 2: None},                 # inputs_embeds [B, S, H]
+        {0: None, 1: seq_dim, 2: None, 3: None},        # per_layer_inputs [B, S, L, H_pli]
+        {0: None, 1: total_dim},                        # attention_mask [B, total_seq]
+        {0: None, 1: seq_dim},                          # position_ids [B, S]
+        tuple({0: None, 1: None, 2: past_dim, 3: None} for _ in range(2 * n_unique_layers)),
     )
 
-    input_names = ["input_ids", "attention_mask", "position_ids"]
+    input_names = ["inputs_embeds", "per_layer_inputs", "attention_mask", "position_ids"]
     output_names = ["logits"]
-    for layer_idx in range(n_layers):
+    for layer_idx in range(n_unique_layers):
         for kv_name in ("key", "value"):
             input_names.append(f"past_key_values.{layer_idx}.{kv_name}")
             output_names.append(f"present.{layer_idx}.{kv_name}")
@@ -347,7 +374,8 @@ def run_track_b(source_path: Path, out_dir: Path) -> None:
     else:
         torch.onnx.export(
             wrapper,
-            (example_input_ids, example_attention, example_positions, example_past_tuple),
+            (example_inputs_embeds, example_per_layer_inputs, example_attention,
+             example_positions, example_past_tuple),
             str(decoder_path),
             input_names=input_names,
             output_names=output_names,
@@ -434,21 +462,28 @@ def _extract_text_config(model, text_model):
 
 
 def _export_embed_tokens(model, out_path: Path) -> None:
+    """Export the embed_tokens subgraph.
+
+    For Gemma 4, transformers.js v4's handler calls this subgraph and expects
+    BOTH `inputs_embeds` (the main hidden-state embedding) and
+    `per_layer_inputs` (the per-layer-input embedding, reshaped to
+    [B, S, num_hidden_layers, hidden_size_per_layer_input]) as outputs.
+    """
     import torch
 
     class EmbedWrapper(torch.nn.Module):
-        def __init__(self, embed: torch.nn.Module) -> None:
+        def __init__(self, text_model: torch.nn.Module) -> None:
             super().__init__()
-            self.embed = embed
+            self.text_model = text_model
 
-        def forward(self, input_ids: torch.Tensor) -> torch.Tensor:
-            return self.embed(input_ids)
+        def forward(self, input_ids: torch.Tensor):
+            inputs_embeds = self.text_model.embed_tokens(input_ids)
+            per_layer_inputs = self.text_model.get_per_layer_inputs(
+                input_ids, inputs_embeds
+            )
+            return inputs_embeds, per_layer_inputs
 
-    embed_module = (
-        getattr(model, "get_input_embeddings", lambda: None)()
-        or model.model.embed_tokens
-    )
-    wrapper = EmbedWrapper(embed_module).eval()
+    wrapper = EmbedWrapper(model).eval()
 
     example_ids = torch.zeros((1, 4), dtype=torch.long)
     torch.onnx.export(
@@ -456,10 +491,11 @@ def _export_embed_tokens(model, out_path: Path) -> None:
         (example_ids,),
         str(out_path),
         input_names=["input_ids"],
-        output_names=["inputs_embeds"],
+        output_names=["inputs_embeds", "per_layer_inputs"],
         dynamic_axes={
             "input_ids": {0: "batch", 1: "seq"},
             "inputs_embeds": {0: "batch", 1: "seq"},
+            "per_layer_inputs": {0: "batch", 1: "seq"},
         },
         opset_version=18,
         do_constant_folding=True,
