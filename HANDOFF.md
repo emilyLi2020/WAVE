@@ -1,4 +1,26 @@
-# Overnight autonomous run — handoff
+# Handoff
+
+> **Current state** (2026-05-14 PM): the **wllama + GGUF path is the shipping path**. The ONNX iteration documented below (v3→v7) was abandoned after v7 still failed on browser WebGPU — same `onnxruntime-web` fp16 bug class, not fixable from our side. wllama bypasses it entirely by running llama.cpp's own WebGPU kernels.
+>
+> Read [`docs/wllama.md`](docs/wllama.md) for the current architecture. The rest of this file is preserved as the historical record of what was tried in the ONNX iteration.
+
+## Current shipping path (2026-05-14 PM)
+
+| Where | What |
+|---|---|
+| HF | [`Maelstrome/lora-wave-session-r32/gguf/`](https://huggingface.co/Maelstrome/lora-wave-session-r32/tree/main/gguf) — Q4_K_M GGUF, 5 shards, ~3.2 GB. Lives next to the adapter at the repo root. |
+| Browser surface | [`client/app/models/wllama-test/`](client/app/models/wllama-test/) — Smoke / Phase / Check-in / Reflection buttons, defaults to HF, `?local=1` for the local mirror. Verified working on WebGPU. |
+| Client lib | [`client/lib/wllama/`](client/lib/wllama/) — `loadWaveWllama()` wrapper used by the test page and (eventually) the production runtime. |
+| Python pipeline | [`models/gguf/README.md`](models/gguf/README.md) — PEFT merge → f16 → Q4_K_M → split → upload. |
+| Design doc | [`docs/wllama.md`](docs/wllama.md) — end-to-end architecture, why-wllama-over-ONNX, browser support matrix, production-wiring plan. |
+
+To delete (HF web UI, your action): `lora-wave-session-r32-{merged,gguf,onnx,onnx-fused}` — all obsolete.
+
+Next step (not yet done): swap [`client/lib/gemma/local-runtime.ts`](client/lib/gemma/local-runtime.ts) from transformers.js+ONNX to `@/lib/wllama`. See `docs/wllama.md#production-wiring-next-step-not-yet-done`.
+
+---
+
+# Overnight autonomous run — handoff (historical; ONNX iteration)
 
 **Date**: 2026-05-14 03:00–03:30
 **Branch**: `main` (uncommitted changes; nothing committed/pushed)
@@ -63,13 +85,13 @@ If that also fails, the failure is genuinely an `onnxruntime-web` WebGPU kernel 
 
 | File | Change |
 |---|---|
-| `models/export_text_onnx.py` | `_optimize_graph` switched from `bert` → `gpt2` mode, `opt_level=1`→`0`, now wired into `run_track_b` after q4f16 quantization. Future re-exports will produce v4-fused-shaped decoders automatically. |
+| `models/onnx/export.py` | `_optimize_graph` switched from `bert` → `gpt2` mode, `opt_level=1`→`0`, now wired into `run_track_b` after q4f16 quantization. Future re-exports will produce v4-fused-shaped decoders automatically. |
 | `models/runs/onnx-export-v4-fused/` | New: full v4 export (decoder fused, embed_tokens copied from v3 unchanged). Ready to push to HF. |
-| `models/inspect_gbq.py` | New: byte-diffs GBQ initializers between two ONNX files. Used to prove embed_tokens matches upstream. |
-| `models/inspect_decoder.py` | New: dumps node counts + I/O signature of a decoder ONNX. Used to find the fused-vs-decomposed divergence. |
-| `models/try_fuse_decoder.py` | New: tries `optimize_model` with different `model_type` settings. `gpt2` mode wins. |
-| `models/try_fuse_decoder_v2.py` | New: tried higher `opt_level` settings; conclusion is `opt_level=0` works best. Keep for reference. |
-| `models/restage_decoder.py` | New: re-saves a fused decoder with transformers.js-compatible `.onnx_data` (underscore) filename. |
+| `models/onnx/inspect_gbq.py` | New: byte-diffs GBQ initializers between two ONNX files. Used to prove embed_tokens matches upstream. |
+| `models/onnx/inspect_decoder.py` | New: dumps node counts + I/O signature of a decoder ONNX. Used to find the fused-vs-decomposed divergence. |
+| `models/onnx/try_fuse_decoder.py` | New: tries `optimize_model` with different `model_type` settings. `gpt2` mode wins. |
+| `models/onnx/try_fuse_decoder_v2.py` | New: tried higher `opt_level` settings; conclusion is `opt_level=0` works best. Keep for reference. |
+| `models/onnx/restage_decoder.py` | New: re-saves a fused decoder with transformers.js-compatible `.onnx_data` (underscore) filename. |
 | `docs/onnx-webgpu-divergence.md` | Rewrote with the corrected diagnosis. Old version blamed packing; new version explains decomposed-ops + FastGelu fusion. |
 | `client/app/models/onnx-test/compare-client.tsx` | `FINETUNE_LOCAL_ID` switched to `Maelstrome/lora-wave-session-r32-onnx-fused`. Slot subtitle says "(v4 fused)". Also still has the smoke-test button from earlier. |
 | `client/scripts/bench-onnx-wave-prompts.ts` | `MODEL_ID` now reads `process.env.MODEL_ID` so you can A/B v3 and v4 without editing. |
@@ -102,7 +124,7 @@ Remove-Item -Recurse -Force models/runs/upstream-embed-ref
 
 - `client/app/models/onnx-test/compare-client.tsx`: chat-template alternation fix, channel-marker stripping fallback, smoke-test button.
 - `models/runs/onnx-export-v3/generation_config.json`: added (also pushed to v3 HF repo).
-- `models/export_text_onnx.py`: added `generation_config.json` to `RUNTIME_CONFIG_FILES`.
+- `models/onnx/export.py`: added `generation_config.json` to `RUNTIME_CONFIG_FILES`.
 - `client/scripts/bench-onnx-wave-prompts.ts`: created to run WAVE prompts in Node CPU (this is what proved the model is fine and isolated the bug to the browser).
 - `docs/onnx-webgpu-divergence.md`: created (now rewritten with v4 finding).
 

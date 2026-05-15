@@ -219,8 +219,10 @@ server.listen(PORT, () => {
   console.log(`local-hf mirror serving:`);
   console.log(`  HF-style mount:  ${URL_PREFIX} -> ${REPO_ROOT}`);
   console.log(`  MediaPipe mount: ${MEDIAPIPE_URL_PREFIX} -> ${MEDIAPIPE_DIR}`);
+  console.log(`  GGUF mount:      ${GGUF_URL_PREFIX} -> ${GGUF_DIR}`);
   console.log(`  base URL:        http://localhost:${PORT}`);
   console.log(`  health:          http://localhost:${PORT}/health`);
   console.log(`\n/models/onnx-test/compare?local=1 - uses HF mount.`);
   console.log(`/models/mediapipe-test            - uses MediaPipe mount.`);
+  console.log(`/models/wllama-test               - uses GGUF mount.`);
 });

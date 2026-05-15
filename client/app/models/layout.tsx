@@ -60,20 +60,30 @@ export default function ModelsLayout({
         <aside className="space-y-1">
           <SidebarLink href="/models" label="Overview" />
 
+          <div className="pt-6 pb-2 text-xs uppercase tracking-wide text-accent px-2">
+            Shipping
+          </div>
+          <SidebarLink
+            href="/models/wllama-test"
+            label="Fine-tune GGUF · wllama"
+          />
+          <SidebarLink href="/models/voice-test" label="Voice loop · STT → LLM → TTS" />
+
           <div className="pt-6 pb-2 text-xs uppercase tracking-wide text-foreground/50 px-2">
-            Runtime benchmark
+            Benchmarks
           </div>
           <SidebarLink
             href="/models/onnx-test/benchmark"
-            label="ONNX vs MLC · TTFT / tok/s"
+            label="ONNX base vs wllama fine-tune"
           />
 
           <div className="pt-6 pb-2 text-xs uppercase tracking-wide text-foreground/50 px-2">
-            ONNX runtime
+            MediaPipe runtime (LiteRT-LM)
           </div>
+          <SidebarLink href="/models/mediapipe-test" label="Chat · base Gemma 4" />
           <SidebarLink
-            href="/models/onnx-test/compare"
-            label="A/B · upstream vs fine-tune"
+            href="/models/mediapipe-finetune-test"
+            label="Chat · WAVE fine-tune"
           />
 
           <div className="pt-6 pb-2 text-xs uppercase tracking-wide text-foreground/50 px-2">
@@ -91,19 +101,13 @@ export default function ModelsLayout({
             label="3-way · finetune / unsloth / google"
           />
 
-          <div className="pt-6 pb-2 text-xs uppercase tracking-wide text-foreground/50 px-2">
-            MediaPipe runtime (LiteRT-LM)
+          <div className="pt-6 pb-2 text-xs uppercase tracking-wide text-foreground/40 px-2">
+            ONNX runtime · parked
           </div>
-          <SidebarLink href="/models/mediapipe-test" label="Chat · base Gemma 4" />
           <SidebarLink
-            href="/models/mediapipe-finetune-test"
-            label="Chat · WAVE fine-tune"
+            href="/models/onnx-test/compare"
+            label="A/B · upstream vs fine-tune (historical)"
           />
-
-          <div className="pt-6 pb-2 text-xs uppercase tracking-wide text-foreground/50 px-2">
-            Voice loop
-          </div>
-          <SidebarLink href="/models/voice-test" label="STT → LLM → TTS" />
         </aside>
 
         <section>{children}</section>

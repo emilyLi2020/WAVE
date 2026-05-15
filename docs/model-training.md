@@ -141,8 +141,8 @@ If expansion is used, every generated row must pass:
 
 For the implemented `models/` pipelines (deterministic phase narration expansion,
 gap-targeted session synthetics with local validators and deduplication), see
-[`models/SYNTHETIC_DATASET_GENERATION.md`](../models/SYNTHETIC_DATASET_GENERATION.md)
-and [`models/SYNTHETIC_DATA.md`](../models/SYNTHETIC_DATA.md).
+[`models/finetune/SYNTHETIC_DATASET_GENERATION.md`](../models/finetune/SYNTHETIC_DATASET_GENERATION.md)
+and [`models/finetune/SYNTHETIC_DATA.md`](../models/finetune/SYNTHETIC_DATA.md).
 
 ---
 

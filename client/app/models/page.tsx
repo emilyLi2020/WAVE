@@ -12,15 +12,26 @@ interface TestPage {
   badge?: string;
 }
 
+const WLLAMA_PAGES: TestPage[] = [
+  {
+    href: "/models/wllama-test",
+    title: "wllama · fine-tune GGUF (shipping path)",
+    blurb:
+      "Loads Maelstrome/lora-wave-session-r32/gguf/gemma-4-e2b-it-peft.Q4_K_M (5-shard split, ~3.2 GB) via @wllama/wllama and runs the production WAVE prompts on WebGPU. Bypasses onnxruntime-web's fp16 overflow bug entirely.",
+    details:
+      "WebGPU enabled by default (V3.1+), WASM SIMD fallback. Smoke / Phase / Check-in / Reflection buttons. Defaults to HF Hub; append ?local=1 to fetch from a local-hf mirror at localhost:8765/gguf/ for fast iteration. See docs/wllama.md.",
+    badge: "primary",
+  },
+];
+
 const ONNX_PAGES: TestPage[] = [
   {
     href: "/models/onnx-test/benchmark",
-    title: "Runtime benchmark · ONNX vs MLC",
+    title: "Runtime benchmark · ONNX base vs wllama fine-tune",
     blurb:
-      "Same upstream Gemma 4 E2B IT through both browser runtimes. Reports TTFT, decode tok/s, and total latency per run; ONNX and MLC results accumulate in one comparison table.",
+      "Same three scenarios (phase / multi-turn check-in / reflection) on both browser runtimes. Reports TTFT, decode tok/s, and total latency per turn; runs accumulate in one comparison table.",
     details:
-      "ONNX via @huggingface/transformers (TextStreamer per-token timestamps). MLC via @mlc-ai/web-llm (stream chunks). Same q4f16 quantization, greedy decoding, identical prompt. No resetChat between MLC runs and no engine reload inside a benchmark — reload time would pollute timing.",
-    badge: "primary",
+      "ONNX upstream base via @huggingface/transformers + onnxruntime-web (TextStreamer per-token timestamps). wllama WAVE fine-tune via @wllama/wllama + llama.cpp WebGPU (StreamParams.onData per-token timestamps). Same q4 quantization class, greedy decoding, identical prompts. Single-active runtime — loading one disposes the other.",
   },
   {
     href: "/models/onnx-test/compare",
@@ -28,7 +39,7 @@ const ONNX_PAGES: TestPage[] = [
     blurb:
       "Side-by-side comparison on the real WAVE prompts: phase narration (chunk 2), a 4-turn check-in, and end-of-session reflection. Load one model at a time; outputs accumulate across switches.",
     details:
-      "Both run on WebGPU at q4f16 with int4 Gather/PLE. Uses buildChunkPrompt / buildCheckInPrompt / buildReflectionPrompt so the JSON contract + WAVE voice are exposed.",
+      "Historical: the fine-tune column emits len=0 here on WebGPU (onnxruntime-web fp16 bug). The wllama path above supersedes this for the fine-tune; kept for upstream-base benchmarking.",
   },
 ];
 
@@ -110,6 +121,7 @@ export default function ModelsOverviewPage() {
         </p>
       </div>
 
+      <Section title="wllama runtime (GGUF)" pages={WLLAMA_PAGES} />
       <Section title="ONNX runtime" pages={ONNX_PAGES} />
       <Section title="MLC runtime (PR #3485)" pages={MLC_PAGES} />
       <Section title="Voice loop" pages={VOICE_PAGES} />

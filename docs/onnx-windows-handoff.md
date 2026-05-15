@@ -7,8 +7,8 @@ Pick this up on the 96 GB Windows machine. The Mac kept hitting macOS's hard mem
 1. **The unsloth-merged checkpoint on HF is broken.** `Maelstrome/lora-wave-session-r32-merged` produces 100% `<pad>` tokens in plain PyTorch on both fp16 and bf16. Don't use it. We have a working merge below.
 2. **The LoRA adapter and the GGUF version are fine.** `Maelstrome/lora-wave-session-r32` (adapter) and `Maelstrome/lora-wave-session-r32-gguf` (90 downloads, working in llama.cpp) prove training succeeded.
 3. **Every prior ONNX/MLC failure traces back to (1).** Once you re-merge with PEFT, the pipeline produces a coherent fine-tune (verified locally — see ["What we verified on Mac"](#what-we-verified-on-mac)).
-4. **`onnxconverter_common.convert_float_to_float16` cannot handle the 17 GB intermediate** — it inlines every initializer into the protobuf in memory. We wrote a streaming caster ([models/cast_fp16_streaming.py](../models/cast_fp16_streaming.py)) that walks tensors one at a time. The export script ([models/export_text_onnx.py](../models/export_text_onnx.py)) is already wired to use it.
-5. **The gather quantizer ([models/quantize_gather.py](../models/quantize_gather.py)) breaks weight-tying** between `embed_tokens` and `lm_head`. We patched it to skip Gather ops whose initializer is also consumed by non-Gather nodes. Don't undo that patch.
+4. **`onnxconverter_common.convert_float_to_float16` cannot handle the 17 GB intermediate** — it inlines every initializer into the protobuf in memory. We wrote a streaming caster ([models/onnx/cast_fp16.py](../models/onnx/cast_fp16.py)) that walks tensors one at a time. The export script ([models/onnx/export.py](../models/onnx/export.py)) is already wired to use it.
+5. **The gather quantizer ([models/onnx/quantize_gather.py](../models/onnx/quantize_gather.py)) breaks weight-tying** between `embed_tokens` and `lm_head`. We patched it to skip Gather ops whose initializer is also consumed by non-Gather nodes. Don't undo that patch.
 6. **transformers.js needs `num_kv_shared_layers: 0` in the exported config**, because our hand-rolled decoder graph emits 35 KV-cache layer pairs (not 15 with sharing like upstream). Patch this after copying the config.
 
 ## What we verified on Mac
@@ -21,7 +21,7 @@ Pick this up on the 96 GB Windows machine. The Mac kept hitting macOS's hard mem
 
 The PEFT re-merge is on the Mac at `models/runs/merge-peft/` but **isn't in git** (too big — 9.5 GB). You have two ways to get it on Windows:
 
-**Option A: Re-merge on Windows from scratch (fast on CUDA).** Run [models/merge_lora_peft.py](../models/merge_lora_peft.py) — it pulls the base + adapter from HF, merges, saves. Should take ~30 sec on GPU vs 17 sec on Mac CPU. Recommended.
+**Option A: Re-merge on Windows from scratch (fast on CUDA).** Run [models/finetune/merge_lora_peft.py](../models/finetune/merge_lora_peft.py) — it pulls the base + adapter from HF, merges, saves. Should take ~30 sec on GPU vs 17 sec on Mac CPU. Recommended.
 
 **Option B: Push the Mac merge to HF first, then pull on Windows.** ~10 min to push. Only do this if Option A behaves differently somehow.
 
@@ -29,16 +29,16 @@ The PEFT re-merge is on the Mac at `models/runs/merge-peft/` but **isn't in git*
 
 ```
 # 1. Re-merge the LoRA adapter onto the base via PEFT.
-uv run --project models python models/merge_lora_peft.py \
+uv run --project models python finetune/merge_lora_peft.py \
   --base unsloth/gemma-4-E2B-it \
   --adapter Maelstrome/lora-wave-session-r32 \
-  --out-dir models/runs/merge-peft \
+  --out-dir runs/merge-peft \
   --device cuda \
   --dtype bfloat16
 
 # 2. Sanity-check it generates coherent text (CRITICAL — gates everything else).
-uv run --project models python models/diagnose_merged_base.py \
-  --source-repo models/runs/merge-peft \
+uv run --project models python finetune/diagnose_merged_base.py \
+  --source-repo runs/merge-peft \
   --prompts "What is the capital of France? Answer in one sentence." \
             "I'm feeling anxious right now. What's one small thing I can do?" \
   --max-new-tokens 48 --device cuda --dtype bfloat16
@@ -48,14 +48,14 @@ uv run --project models python models/diagnose_merged_base.py \
 
 # 3. Export to q4f16 ONNX. Goes through fp32 -> fp16 (streaming) -> q4 MatMul.
 #    On CUDA, torch.onnx.export may pick GPU automatically — much faster than CPU.
-uv run --project models python models/export_text_onnx.py \
+uv run --project models python models/onnx/export.py \
   --source-repo models/runs/merge-peft \
   --out-dir models/runs/onnx-export-v2 \
   --track b
 
 # 4. Run the Gather quantizer post-pass — int4 compresses the PLE table.
 #    Already patched to skip lm_head.weight (tied with embed_tokens).
-uv run --project models python models/quantize_gather.py \
+uv run --project models python models/onnx/quantize_gather.py \
   models/runs/onnx-export-v2/onnx
 
 # 5. Patch config for transformers.js (it needs no-KV-sharing to match our graph).
@@ -155,17 +155,17 @@ Then flip the client constant — single line, [client/lib/gemma/local-runtime.t
 
 | Path | Purpose |
 |---|---|
-| [models/diagnose_merged_base.py](../models/diagnose_merged_base.py) | Smoke-test any merged checkpoint in plain PyTorch. Step 2 above. |
-| [models/merge_lora_peft.py](../models/merge_lora_peft.py) | Mac/Windows-friendly PEFT-based LoRA merge (no unsloth). Step 1 above. |
-| [models/cast_fp16_streaming.py](../models/cast_fp16_streaming.py) | Memory-safe fp32 → fp16 ONNX cast. Called as subprocess from `export_text_onnx.py`. |
-| [models/export_text_onnx.py](../models/export_text_onnx.py) | Modified: accepts local source dir; embed_tokens exported before PyTorch freed; cast delegates to streaming caster. Step 3 above. |
-| [models/quantize_gather.py](../models/quantize_gather.py) | Modified: skips Gather ops on tied weights (preserves lm_head); fixes `.tmp` suffix in external_data refs after atomic swap. Step 4 above. |
-| [models/finish_export.py](../models/finish_export.py) | (Mostly redundant now — `export_text_onnx.py` handles end-to-end. Keep for partial-resume scenarios.) |
+| [models/finetune/diagnose_merged_base.py](../models/finetune/diagnose_merged_base.py) | Smoke-test any merged checkpoint in plain PyTorch. Step 2 above. |
+| [models/finetune/merge_lora_peft.py](../models/finetune/merge_lora_peft.py) | Mac/Windows-friendly PEFT-based LoRA merge (no unsloth). Step 1 above. |
+| [models/onnx/cast_fp16.py](../models/onnx/cast_fp16.py) | Memory-safe fp32 → fp16 ONNX cast. Called as subprocess from `export.py`. |
+| [models/onnx/export.py](../models/onnx/export.py) | Modified: accepts local source dir; embed_tokens exported before PyTorch freed; cast delegates to streaming caster. Step 3 above. |
+| [models/onnx/quantize_gather.py](../models/onnx/quantize_gather.py) | Modified: skips Gather ops on tied weights (preserves lm_head); fixes `.tmp` suffix in external_data refs after atomic swap. Step 4 above. |
+| [models/onnx/finish_export.py](../models/onnx/finish_export.py) | (Mostly redundant now — `export.py` handles end-to-end. Keep for partial-resume scenarios.) |
 
 ## If something goes wrong on Windows
 
 - **`torch.onnx.export` OOM on GPU**: drop to `--device cpu` in step 3 (slower but ~50 GB max).
-- **fp16 cast still OOM**: the streaming caster shouldn't, but if it does, check that `export_text_onnx.py`'s `_cast_fp32_to_fp16` is the subprocess version (not the old in-memory version).
+- **fp16 cast still OOM**: the streaming caster shouldn't, but if it does, check that `export.py`'s `_cast_fp32_to_fp16` is the subprocess version (not the old in-memory version).
 - **`unsloth` install fails on Windows**: it's only marked for non-darwin, but you don't need it for this pipeline — PEFT does the merge. Comment out `unsloth` deps in [models/pyproject.toml](../models/pyproject.toml) if `uv sync` chokes.
 - **`onnxruntime` GatherBlockQuantized kernel not found**: that's a browser-side issue (onnxruntime-web), not Node. The Node bench uses CPU kernels which support it.
 - **Bench shows pad-only output**: re-run [step 2 (diagnose)](#pipeline-run-from-repo-root) on `models/runs/merge-peft/`. If THAT shows pad output, the re-merge itself is broken — different problem than the original. If diagnose passes but bench fails, the conversion broke the model — check that `num_kv_shared_layers: 0` patch is applied to `models/runs/onnx-export-v2/config.json`.

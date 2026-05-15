@@ -36,3 +36,6 @@ client/public/mlc-base-export
 client/public/mlc-google-it-export
 client/public/onnx-finetune-export
 
+# Large local eval bundles. Build per-machine; exceeds GitHub file limit.
+wave-linux-eval-bundle.zip
+

@@ -1,10 +1,21 @@
 # models/
 
-Ad-hoc model experiments and smoke tests for WAVE. **Nothing in this folder ships to users** — the production session path runs Gemma 4 E2B-it via `transformers.js` + WebGPU in the browser (web demo) or LiteRT on-device (mobile, post-hackathon). For the per-model contract see [`../docs/models.md`](../docs/models.md); for the training/eval pipeline see [`../docs/model-training.md`](../docs/model-training.md).
+Model training, eval, and export tooling for WAVE. **Nothing in this folder ships to users** — the production session path runs the Gemma 4 E2B-it fine-tune via wllama + WebGPU/WASM in the browser. For the per-model contract see [`../docs/models.md`](../docs/models.md); for the training/eval pipeline see [`../docs/model-training.md`](../docs/model-training.md).
+
+## Directory layout
+
+| Subdir | Purpose | Doc |
+|---|---|---|
+| [`finetune/`](finetune/) | Fine-tune the LoRA on Gemma 4 E2B-it: dataset prep, training, eval, merging, synthetic data. **Start here.** | [`finetune/README.md`](finetune/README.md) |
+| [`gguf/`](gguf/) | Production export path — turns the PEFT-merged base into a Q4_K_M GGUF for wllama / Ollama / llama-cli. | [`gguf/README.md`](gguf/README.md) |
+| [`onnx/`](onnx/) | ONNX export pipeline. Parked — fp16 WebGPU divergence is unfixable in onnxruntime-web. Kept for the postmortem. | [`onnx/README.md`](onnx/README.md) |
+| [`mediapipe/`](mediapipe/) | LiteRT `.task` bundle for mobile (post-hackathon path). | — |
+| `datasets/` | Clinician seeds (`datasets/human/`), expanded training JSONL, EDA reports. | [`datasets/HF_README.md`](datasets/HF_README.md) |
+| `runs/` | Training and conversion outputs (gitignored). |
+
+Everything in this folder shares one Python env (`pyproject.toml` / `uv.lock` / `environment.yml`). The setup instructions below apply to **all** subdirs.
 
 ## Setup
-
-For **full local vs remote GPU onboarding**, troubleshooting (Windows CUDA, Linux VM caches, Unsloth Studio dataset choice), and a concise list of issues we already hit in this stack, see [`setup.md`](./setup.md).
 
 This folder supports **two interchangeable workflows** — pick whichever you already have installed:
 
@@ -139,109 +150,10 @@ conda env remove -n wave-models
 
 Gemma weights are gated — accept the license at <https://huggingface.co/google/gemma-4-E2B-it> once and either run `huggingface-cli login` in your shell or paste a token in the notebook's auth cell.
 
-### Dataset layout and extras
+## Next steps
 
-- **Clinician seeds** (check-in, reflection, phase inputs for `prepare_wave_session_dataset.py`): [`datasets/clinician-seeds/`](./datasets/clinician-seeds/) and [`datasets/clinician-seeds/README.md`](./datasets/clinician-seeds/README.md).
-- **Hugging Face dataset card** (for publishing the unified JSONL): [`datasets/HF_README.md`](./datasets/HF_README.md).
-- **EDA snapshot** (regenerate with `analyze_wave_session_dataset.py`): [`datasets/lora-wave-session-expanded-eda.md`](./datasets/lora-wave-session-expanded-eda.md).
-- **Synthetic quality audit:** [`datasets/lora-wave-session-synthetic-quality-audit.md`](./datasets/lora-wave-session-synthetic-quality-audit.md).
-- **Training setup, remote VM notes, and utility scripts** (merge, GGUF, eval helpers): [`setup.md`](./setup.md).
+Pick the subdir that matches what you want to do:
 
-## LoRA Experiments
-
-### Clinician seed files (`datasets/clinician-seeds/`)
-
-Check-in, reflection, and phase narration **source** JSONL files live under
-[`datasets/clinician-seeds/`](./datasets/clinician-seeds/). They are the inputs
-to `prepare_wave_session_dataset.py` (defaults) and to phase synthetic
-generation. Paths are repo-relative so macOS, Linux, and Windows clones behave
-the same.
-
-### Phase narration
-
-Generate draft synthetic rows from the checked-in clinician-only phase seed
-(`lora-phase-narration-clinician.jsonl`, 10 `ready` rows):
-
-```powershell
-cd models
-uv run python generate_phase_narration_synthetic.py
-```
-
-Optional: pass `--source` / `--output` / `--synthetic-only-output` to override paths.
-
-This writes:
-
-- `datasets/lora-phase-narration-synthetic-draft.jsonl` — 40 synthetic draft
-  rows only.
-- `datasets/clinician-seeds/lora-phase-narration-expanded.jsonl` — the 10
-  clinician rows plus the 40 synthetic draft rows.
-
-Synthetic rows are deterministic for the same `--seed`, marked `draft`, and
-carry provenance notes because they need clinician review before they should be
-treated as ready training data.
-
-`train_phase_narration_lora.py` trains the future `lora-phase-narration`
-adapter from clinician seed JSONL and writes a frozen split plus eval report
-under `models/runs/lora-phase-narration/<timestamp>/`.
-
-The trainer does not feed bare JSON inputs to Gemma. It wraps every example in
-the same shape the app uses for chunk generation: a WAVE system prompt, a
-chunk-specific user task, and an assistant response that is strict
-`{"lines":[...]}` JSON. That mirrors the production JSON-mode contract
-(`generateText` + `Output.object()` / schema validation in AI SDK terminology)
-instead of teaching the model to analyze raw clinical data.
-
-First validate the dataset and split without loading Gemma:
-
-```powershell
-cd models
-uv run python train_phase_narration_lora.py --data "datasets/clinician-seeds/lora-phase-narration-clinician.jsonl" --dry-run
-```
-
-To run an experimental split that includes synthetic draft rows:
-
-```powershell
-uv run python train_phase_narration_lora.py --data "datasets/clinician-seeds/lora-phase-narration-expanded.jsonl" --include-drafts --dry-run
-```
-
-Then run the full QLoRA experiment against whichever dataset you want to test:
-
-```powershell
-uv run python train_phase_narration_lora.py --data "datasets/clinician-seeds/lora-phase-narration-clinician.jsonl"
-```
-
-The script accepts both raw training-seed JSONL and the ShareGPT-style
-`messages` JSONL emitted by `/api/training/export`. It records:
-
-- `train.jsonl` and `test.jsonl` - the reproducible held-out split.
-- `adapter/` - the PEFT LoRA adapter and tokenizer files.
-- `eval.json` - generation metrics on the held-out set: JSON validity, six-line
-  schema pass rate, patient-facing style pass rate, safety pass rate,
-  medication-directive pass rate, p95 latency, token F1, and ROUGE-L. It also
-  evaluates base Gemma on the same held-out prompts and records base-vs-LoRA
-  deltas for completion NLL, perplexity, schema/style/safety pass rates, and a
-  composite `loraWaveScore` out of 100.
-- `run-config.json` - model, split seed, data counts, and hyperparameters.
-
-On Windows, the script automatically re-launches itself in Python UTF-8 mode
-before importing TRL. That avoids a known `cp1252` import crash in TRL's bundled
-chat-template files.
-
-### Unified session synthetic data
-
-`generate_wave_session_synthetic.py` creates targeted synthetic draft rows for
-the unified `lora-wave-session` dataset only where EDA shows coverage gaps. It
-uses an OpenAI model as a draft generator, then applies local duplicate,
-schema, safety, and medical-quality gates before accepting any row.
-
-Read the full process, commands, and disclosure rules in
-[`SYNTHETIC_DATA.md`](SYNTHETIC_DATA.md).
-
-For a single narrative on **both** synthetic paths (phase templates vs unified
-session gap-fill), how they connect to `prepare_wave_session_dataset.py`, and
-how clinical safeguards are layered, see
-[`SYNTHETIC_DATASET_GENERATION.md`](SYNTHETIC_DATASET_GENERATION.md).
-
-## Notebooks
-
-- `01_gemma4_smoke_test.ipynb` — downloads the smallest Gemma 4 (`google/gemma-4-E2B-it`) and runs one generic and one WAVE-style prompt to confirm the base model works on this machine before any LoRA work begins.
+- **Train a new LoRA** or re-run eval against the existing one → [`finetune/README.md`](finetune/README.md).
+- **Rebuild the shipping GGUF** from a merged base → [`gguf/README.md`](gguf/README.md).
+- **Read the ONNX postmortem** → [`onnx/README.md`](onnx/README.md) and [`../docs/onnx-webgpu-divergence.md`](../docs/onnx-webgpu-divergence.md).

@@ -1,0 +1,9 @@
+# Mac-only helper scripts go here.
+#
+# The MLC pipeline (convert_weight / gen_config / compile) only runs on Mac
+# because Apple Silicon Metal is what the source-built `mlc_llm` package was
+# wired against. If you write batch wrappers, build-bootstrap helpers, or
+# anything else that automates the runbook in ../README.md, commit them here.
+#
+# This file exists only to keep the directory tracked by git. Delete it once
+# real scripts land.

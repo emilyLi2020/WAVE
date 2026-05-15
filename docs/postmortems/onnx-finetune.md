@@ -42,9 +42,9 @@ The upstream `onnx-community/gemma-4-E2B-it-ONNX` base model on the same browser
 
 ### v3 — the original Windows-handoff export
 - `torch.onnx.export(dynamo=True)` on a `MergedDecoderWrapper(text_model + lm_head)` that takes `inputs_embeds + per_layer_inputs + 15 KV pairs` (matching upstream's I/O signature; `num_kv_shared_layers=20`).
-- fp16 cast via `cast_fp16_streaming.py` (streams initializers one at a time vs. `onnxconverter_common` which OOMs by inlining everything into a single protobuf).
+- fp16 cast via `cast_fp16.py` (streams initializers one at a time vs. `onnxconverter_common` which OOMs by inlining everything into a single protobuf).
 - q4f16 quant via `MatMulNBitsQuantizer` (block_size=32). Decoder shrinks from 17 GB → 1.2 GB.
-- PLE Gather tables packed to `com.microsoft.GatherBlockQuantized` via [`quantize_gather.py`](../../models/quantize_gather.py) — asymmetric uint4 + zp (symmetric int4 produces fluent gibberish; ORT's contrib op uses `(q - zp) * scale`).
+- PLE Gather tables packed to `com.microsoft.GatherBlockQuantized` via [`quantize_gather.py`](../../models/onnx/quantize_gather.py) — asymmetric uint4 + zp (symmetric int4 produces fluent gibberish; ORT's contrib op uses `(q - zp) * scale`).
 - Total: 2.7 GB at `Maelstrome/lora-wave-session-r32-onnx`.
 - Browser WebGPU: `len=0` for every WAVE prompt.
 
@@ -64,7 +64,7 @@ The upstream `onnx-community/gemma-4-E2B-it-ONNX` base model on the same browser
 
 ### v6 — fuse 227/242 RMSNorms into `SimplifiedLayerNormalization`
 - The standard `SimplifiedLayerNormalization` op (opset 18, domain `""`) has `stash_type=1` meaning **fp32 internal accumulation** regardless of fp16 IO. This is what upstream uses and what avoids fp16 overflow when summing 1536 squared activations.
-- [`fuse_rmsnorm.py`](../../models/fuse_rmsnorm.py) pattern-matches the 6-node decomposed chain (`Mul(x,x) → ReduceMean → Add(eps) → Pow(-0.5) → Mul(x, _) → Mul(_, weight)`) and replaces with one `SimplifiedLayerNormalization(x, weight, axis=-1, epsilon=eps, stash_type=1)`.
+- [`fuse_rmsnorm.py`](../../models/onnx/fuse_rmsnorm.py) pattern-matches the 6-node decomposed chain (`Mul(x,x) → ReduceMean → Add(eps) → Pow(-0.5) → Mul(x, _) → Mul(_, weight)`) and replaces with one `SimplifiedLayerNormalization(x, weight, axis=-1, epsilon=eps, stash_type=1)`.
 - 227 of 242 chains matched.
 - Total nodes: 3007 → 1872 (was 3497 in v3).
 - CPU: same output, marginally faster.
@@ -72,7 +72,7 @@ The upstream `onnx-community/gemma-4-E2B-it-ONNX` base model on the same browser
 
 ### v7 — Cast(fp32) wrapping the remaining 15 RMSNorms
 - 15 chains didn't match v6's pattern because they're **post-projection V/K norms with no learned weight** (the chain ends with `Mul(x, rsqrt)` directly, no final `Mul(_, weight)`). Replacing with `SimplifiedLayerNormalization` would need a synthesized 1D ones weight whose shape varies per layer (head_dim 256 for sliding, 512 for full). Brittle.
-- [`cast_rmsnorm_fp32.py`](../../models/cast_rmsnorm_fp32.py) inserts `Cast(fp32)` around the variance computation:
+- [`cast_rmsnorm_fp32.py`](../../models/onnx/cast_rmsnorm_fp32.py) inserts `Cast(fp32)` around the variance computation:
   - `Mul(x, x)` consumes a fresh fp32 cast of `x`
   - `Add(eps)` uses a fresh fp32 eps initializer
   - `Pow(_, -0.5)` uses a fresh fp32 exponent
@@ -99,17 +99,17 @@ We didn't iterate to v8/v9/v10 patching these because:
 
 | File | Purpose |
 |---|---|
-| [`models/merge_lora_peft.py`](../../models/merge_lora_peft.py) | PEFT-based LoRA merge that produces coherent fp16 base (Unsloth's `save_pretrained_merged` is broken for our fine-tune; produces all-pad output). |
-| [`models/diagnose_merged_base.py`](../../models/diagnose_merged_base.py) | 2-prompt smoke test on a merged checkpoint before downstream conversion. Catches the all-pad case early. |
-| [`models/cast_fp16_streaming.py`](../../models/cast_fp16_streaming.py) | Memory-safe fp32 → fp16 cast for 17 GB ONNX models. `onnxconverter_common` OOMs at this size. |
-| [`models/quantize_gather.py`](../../models/quantize_gather.py) | Asymmetric uint4 + zp packing for PLE Gather tables. Byte-identical to upstream's packing. |
-| [`models/inspect_gbq.py`](../../models/inspect_gbq.py) | Byte-diff two `GatherBlockQuantized` initializers. Proved our embed_tokens matches upstream. |
-| [`models/inspect_decoder.py`](../../models/inspect_decoder.py) | Op-count + IO-signature diff between two decoder ONNX files. Made the decomposed-vs-fused divergence visible. |
-| [`models/try_fuse_decoder.py`](../../models/try_fuse_decoder.py) | Tries `optimize_model` with multiple `model_type` settings. `gpt2 + opt_level=0` is the only combo that produces useful fusion. |
-| [`models/rewrite_pow_to_mul.py`](../../models/rewrite_pow_to_mul.py) | Walks every `Pow` node with constant exponent `2.0` and rewrites to `Mul(x, x)`. |
-| [`models/fuse_rmsnorm.py`](../../models/fuse_rmsnorm.py) | Pattern-matches the 6-node RMSNorm decomposition and fuses to `SimplifiedLayerNormalization(stash_type=1)`. |
-| [`models/cast_rmsnorm_fp32.py`](../../models/cast_rmsnorm_fp32.py) | Inserts `Cast(fp32)` around variance computation for the unweighted RMSNorm variants the fuser can't match. |
-| [`models/restage_decoder.py`](../../models/restage_decoder.py) | Renames ORT's `.onnx.data` external-data sidecar to transformers.js's `.onnx_data` convention. |
+| [`models/finetune/merge_lora_peft.py`](../../models/finetune/merge_lora_peft.py) | PEFT-based LoRA merge that produces coherent fp16 base (Unsloth's `save_pretrained_merged` is broken for our fine-tune; produces all-pad output). |
+| [`models/finetune/diagnose_merged_base.py`](../../models/finetune/diagnose_merged_base.py) | 2-prompt smoke test on a merged checkpoint before downstream conversion. Catches the all-pad case early. |
+| [`models/onnx/cast_fp16.py`](../../models/onnx/cast_fp16.py) | Memory-safe fp32 → fp16 cast for 17 GB ONNX models. `onnxconverter_common` OOMs at this size. |
+| [`models/onnx/quantize_gather.py`](../../models/onnx/quantize_gather.py) | Asymmetric uint4 + zp packing for PLE Gather tables. Byte-identical to upstream's packing. |
+| [`models/onnx/inspect_gbq.py`](../../models/onnx/inspect_gbq.py) | Byte-diff two `GatherBlockQuantized` initializers. Proved our embed_tokens matches upstream. |
+| [`models/onnx/inspect_decoder.py`](../../models/onnx/inspect_decoder.py) | Op-count + IO-signature diff between two decoder ONNX files. Made the decomposed-vs-fused divergence visible. |
+| [`models/onnx/try_fuse_decoder.py`](../../models/onnx/try_fuse_decoder.py) | Tries `optimize_model` with multiple `model_type` settings. `gpt2 + opt_level=0` is the only combo that produces useful fusion. |
+| [`models/onnx/rewrite_pow_to_mul.py`](../../models/onnx/rewrite_pow_to_mul.py) | Walks every `Pow` node with constant exponent `2.0` and rewrites to `Mul(x, x)`. |
+| [`models/onnx/fuse_rmsnorm.py`](../../models/onnx/fuse_rmsnorm.py) | Pattern-matches the 6-node RMSNorm decomposition and fuses to `SimplifiedLayerNormalization(stash_type=1)`. |
+| [`models/onnx/cast_rmsnorm_fp32.py`](../../models/onnx/cast_rmsnorm_fp32.py) | Inserts `Cast(fp32)` around variance computation for the unweighted RMSNorm variants the fuser can't match. |
+| [`models/onnx/restage_decoder.py`](../../models/onnx/restage_decoder.py) | Renames ORT's `.onnx.data` external-data sidecar to transformers.js's `.onnx_data` convention. |
 | [`client/scripts/bench-onnx-wave-prompts.ts`](../../client/scripts/bench-onnx-wave-prompts.ts) | Runs the three production WAVE prompts through `transformers.js` in Node CPU. **This is what proved CPU-vs-WebGPU divergence cleanly.** Earlier bench scripts only used simple chat prompts and missed the bug. |
 | [`client/scripts/serve-local-hf.ts`](../../client/scripts/serve-local-hf.ts) | Static-file server that mirrors HF Hub's URL pattern (`{repo}/resolve/main/...`). Lets the browser fetch a locally-staged variant for WebGPU testing without uploading 2.7 GB to HF each iteration. Supports range requests + CORS. |
 | `client/app/models/onnx-test/compare/page.tsx` + `compare-client.tsx` | Side-by-side WebGPU runtime A/B with upstream. `?local=1` query param swaps `env.remoteHost` to the local server. Has a `?local-host=...` override and a smoke-test (user-only) button. |
@@ -129,7 +129,7 @@ Every one of these has been verified non-viable. Don't re-litigate.
 
 These are speculative; none of them are quick.
 
-- **Rewrite `MergedDecoderWrapper` in `export_text_onnx.py`** to construct the forward path out of `torch.nn` modules whose ONNX export pattern matches what `onnxruntime.transformers.fusion_*` recognizes as `SimplifiedLayerNormalization` / `RotaryEmbedding` / `GroupQueryAttention`. We don't know exactly which PyTorch idioms map to which contrib ops — this would be reverse-engineering the optimizer's pattern matchers. Days of work, no guarantee.
+- **Rewrite `MergedDecoderWrapper` in `export.py`** to construct the forward path out of `torch.nn` modules whose ONNX export pattern matches what `onnxruntime.transformers.fusion_*` recognizes as `SimplifiedLayerNormalization` / `RotaryEmbedding` / `GroupQueryAttention`. We don't know exactly which PyTorch idioms map to which contrib ops — this would be reverse-engineering the optimizer's pattern matchers. Days of work, no guarantee.
 - **Microsoft Olive**: targets ONNX deployment optimization for LLMs. Doesn't officially list Gemma 4. Same `transformers` version risk as optimum.
 - **`onnxruntime-genai`**: has its own LLM export tools but [issue #2062](https://github.com/microsoft/onnxruntime-genai/issues/2062) flags Gemma 4 PLE + variable-head-dim + KV-cache-sharing as known blockers. No maintainer reply.
 - **Wait for `onnxruntime-web` to ship a fix for [microsoft/onnxruntime#26732](https://github.com/microsoft/onnxruntime/issues/26732)** (the Gemma 3 q4f16 WebGPU overflow). Open since Dec 2025. No maintainer reply. No fix shipped.

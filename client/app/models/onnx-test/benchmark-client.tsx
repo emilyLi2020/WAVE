@@ -7,61 +7,48 @@ import {
   TextStreamer,
   type TextGenerationPipeline,
 } from "@huggingface/transformers";
+
 import {
-  CreateMLCEngine,
-  type MLCEngineInterface,
-  type AppConfig,
-  type InitProgressReport,
-} from "@mlc-ai/web-llm";
+  loadWaveWllama,
+  WAVE_GGUF_FILE,
+  WAVE_GGUF_REPO,
+  type WllamaInstance,
+} from "@/lib/wllama";
 
-// Runtime benchmark: same upstream Gemma 4 E2B IT, two browser runtimes.
+// Runtime benchmark: ONNX upstream base vs wllama WAVE fine-tune.
 // - ONNX: onnx-community/gemma-4-E2B-it-ONNX via @huggingface/transformers
-// - MLC:  google/gemma-4-E2B-it via @mlc-ai/web-llm (mlc-google-it-export)
-// Apples-to-apples runtime comparison — same model, same q4f16 quant.
+//         (onnxruntime-web, q4f16, WebGPU)
+// - wllama: Maelstrome/lora-wave-session-r32/gguf/...-Q4_K_M-00001-of-00005.gguf
+//         via @wllama/wllama (llama.cpp WASM/WebGPU)
+//
+// Not an apples-to-apples model comparison — these are different fine-tunes.
+// It IS an apples-to-apples runtime comparison on browser inference: TTFT,
+// decode throughput, total wall-clock — answering "is the shipping path
+// (wllama GGUF) faster, slower, or comparable to the previously-shipping
+// path (ONNX base)?".
 
-type RuntimeKey = "onnx" | "mlc";
+type RuntimeKey = "onnx" | "wllama";
 
 const RUNTIMES: Record<
   RuntimeKey,
   { label: string; subtitle: string; color: string; backend: string }
 > = {
   onnx: {
-    label: "ONNX · @huggingface/transformers",
+    label: "ONNX · @huggingface/transformers (base)",
     subtitle:
       "onnx-community/gemma-4-E2B-it-ONNX · onnxruntime-web · q4f16 · WebGPU",
     color: "#3b82f6",
     backend: "transformers.js v4 + onnxruntime-web",
   },
-  mlc: {
-    label: "MLC · @mlc-ai/web-llm",
-    subtitle: "/mlc-google-it-export/ · google/gemma-4-E2B-it · q4f16_1 · WebGPU",
+  wllama: {
+    label: "wllama · @wllama/wllama (WAVE fine-tune)",
+    subtitle: `${WAVE_GGUF_REPO}/${WAVE_GGUF_FILE} · llama.cpp WASM/WebGPU · Q4_K_M`,
     color: "#10b981",
-    backend: "web-llm (PR #3485 conv_template)",
+    backend: "wllama v3.1 + llama.cpp WebGPU",
   },
 };
 
 const ONNX_MODEL_ID = "onnx-community/gemma-4-E2B-it-ONNX";
-const MLC_MODEL_ID = "google-gemma-4-E2B-it-q4f16_1";
-
-const MLC_APP_CONFIG: AppConfig = {
-  model_list: [
-    {
-      model:
-        typeof window === "undefined"
-          ? "/mlc-google-it-export/"
-          : new URL("/mlc-google-it-export/", window.location.origin).toString(),
-      model_id: MLC_MODEL_ID,
-      model_lib:
-        typeof window === "undefined"
-          ? "/mlc-google-it-export/gemma-4-E2B-it-q4f16_1-webgpu.wasm"
-          : new URL(
-              "/mlc-google-it-export/gemma-4-E2B-it-q4f16_1-webgpu.wasm",
-              window.location.origin,
-            ).toString(),
-      overrides: { context_window_size: 4096, sliding_window_size: -1 },
-    },
-  ],
-};
 
 // Three WAVE inference scenarios. Each is a sequence of user turns played in
 // order; for multi-turn scenarios the conversation history accumulates between
@@ -69,11 +56,13 @@ const MLC_APP_CONFIG: AppConfig = {
 type ScenarioKey = "phase" | "checkin" | "reflection";
 
 // Prompts are kept simple and conversational. Earlier versions tried to stuff
-// a persona / system instruction into the user role; Google E2B IT can't follow
-// long instruction-style user turns and falls into "please clarify" loops, and
-// splitting into a separate system role made it worse (Gemma 4's chat template
-// doesn't support a distinct system role cleanly). For pure runtime/throughput
-// numbers, simple prompts that we know elicit coherent output are sufficient.
+// a persona / system instruction into the user role; the upstream Gemma 4
+// E2B IT base can't follow long instruction-style user turns and falls into
+// "please clarify" loops, and splitting into a separate system role made it
+// worse (Gemma 4's chat template doesn't support a distinct system role
+// cleanly across all loaders). For pure runtime/throughput numbers, simple
+// prompts that we know elicit coherent output from both models are
+// sufficient — this is a runtime benchmark, not a quality benchmark.
 const SCENARIOS: Record<
   ScenarioKey,
   {
@@ -147,19 +136,26 @@ const INITIAL_LOAD: LoadState = {
 
 export function OnnxBenchmarkClient() {
   // Single-active runtime: only one engine in VRAM. Loading one disposes the
-  // other. Results accumulate across switches so ONNX and MLC runs end up in
-  // the same comparison table.
+  // other. Results accumulate across switches so ONNX and wllama runs end up
+  // in the same comparison table.
   const onnxRef = useRef<TextGenerationPipeline | null>(null);
-  const mlcRef = useRef<MLCEngineInterface | null>(null);
+  const wllamaRef = useRef<WllamaInstance | null>(null);
   const activeRef = useRef<RuntimeKey | null>(null);
 
   const [onnxState, setOnnxState] = useState<LoadState>(INITIAL_LOAD);
-  const [mlcState, setMlcState] = useState<LoadState>(INITIAL_LOAD);
+  const [wllamaState, setWllamaState] = useState<LoadState>(INITIAL_LOAD);
   const [runCount, setRunCount] = useState<number>(3);
   const [includeWarmup, setIncludeWarmup] = useState<boolean>(true);
   const [running, setRunning] = useState<boolean>(false);
   const [statusText, setStatusText] = useState<string>("");
   const [results, setResults] = useState<RunResult[]>([]);
+  // Live preview of whatever turn is currently generating. Populated by the
+  // per-runtime turn callbacks via setStreamingText(prev => prev + delta).
+  // Title is set when a turn starts and cleared between scenarios + at the
+  // end of the run. Lets you watch the model generate in real time —
+  // particularly useful for the multi-turn check-in scenario.
+  const [streamingText, setStreamingText] = useState<string>("");
+  const [streamingTitle, setStreamingTitle] = useState<string>("");
 
   useEffect(() => {
     env.allowLocalModels = true;
@@ -181,13 +177,16 @@ export function OnnxBenchmarkClient() {
       }
       onnxRef.current = null;
     }
-    if (mlcRef.current) {
+    if (wllamaRef.current) {
       try {
-        await mlcRef.current.unload();
+        // wllama's exit() releases the WASM heap + GPU buffers.
+        await (
+          wllamaRef.current as unknown as { exit?: () => Promise<void> }
+        ).exit?.();
       } catch {
         /* ignore */
       }
-      mlcRef.current = null;
+      wllamaRef.current = null;
     }
     activeRef.current = null;
   }, []);
@@ -195,9 +194,40 @@ export function OnnxBenchmarkClient() {
   const loadOnnx = useCallback(async () => {
     if (running) return;
     await disposeAll();
-    setMlcState(INITIAL_LOAD);
+    setWllamaState(INITIAL_LOAD);
+    // Reassert env each time — other model-test routes may have toggled
+    // these flags in this SPA session.
+    env.allowLocalModels = false;
+    env.allowRemoteModels = true;
+    // Crank onnxruntime-web's log level to verbose so init prints which
+    // execution providers (webgpu vs wasm) ORT actually selects. Without
+    // this we get silent fallback to wasm and no visible signal.
+    try {
+      // ORT Env types: logLevel is "verbose" | "info" | "warning" | "error" | "fatal"
+      (env.backends.onnx as { logLevel?: string }).logLevel = "verbose";
+      (env.backends.onnx as { logLevelInternal?: string }).logLevelInternal =
+        "verbose";
+    } catch {
+      /* ignore — older transformers.js builds may not expose this */
+    }
     setOnnxState({ phase: "loading", message: "Initializing on WEBGPU…", percent: 0 });
     try {
+      // Probe WebGPU adapter directly first so we know whether the browser
+      // is the bottleneck or ORT is.
+      if (typeof navigator !== "undefined" && "gpu" in navigator) {
+        try {
+          const adapter = await (
+            navigator as { gpu: { requestAdapter: () => Promise<unknown> } }
+          ).gpu.requestAdapter();
+          console.log("[onnx-probe] navigator.gpu.requestAdapter →", adapter);
+        } catch (err) {
+          console.warn("[onnx-probe] navigator.gpu.requestAdapter threw:", err);
+        }
+      } else {
+        console.warn(
+          "[onnx-probe] navigator.gpu is missing — WebGPU not available in this browser",
+        );
+      }
       const pipe = (await pipeline("text-generation", ONNX_MODEL_ID, {
         dtype: "q4f16",
         device: "webgpu",
@@ -214,6 +244,33 @@ export function OnnxBenchmarkClient() {
       })) as TextGenerationPipeline;
       onnxRef.current = pipe;
       activeRef.current = "onnx";
+      // Introspect which execution provider ORT actually picked. transformers.js
+      // hides the InferenceSession behind pipe.model.sessions; the session's
+      // handler holds the provider used. Surfaces silent wasm fallbacks where
+      // we asked for webgpu but ORT couldn't honor it for this model.
+      try {
+        const sessions = (
+          pipe.model as unknown as { sessions?: Record<string, unknown> }
+        ).sessions;
+        if (sessions) {
+          for (const [name, session] of Object.entries(sessions)) {
+            const handler = (session as { handler?: unknown }).handler as
+              | { _executionProviderInstances?: unknown[] }
+              | undefined;
+            const providers =
+              handler && Array.isArray(handler._executionProviderInstances)
+                ? handler._executionProviderInstances.map((p) =>
+                    (p as { constructor?: { name?: string } }).constructor?.name ?? typeof p,
+                  )
+                : "unknown (no _executionProviderInstances)";
+            console.log(`[onnx-probe] session "${name}" providers:`, providers);
+          }
+        } else {
+          console.log("[onnx-probe] pipe.model.sessions not present:", pipe.model);
+        }
+      } catch (err) {
+        console.warn("[onnx-probe] introspection failed:", err);
+      }
       setOnnxState({ phase: "ready", message: "Loaded and ready.", percent: 100 });
     } catch (err) {
       setOnnxState({
@@ -224,27 +281,30 @@ export function OnnxBenchmarkClient() {
     }
   }, [disposeAll, running]);
 
-  const loadMlc = useCallback(async () => {
+  const loadWllama = useCallback(async () => {
     if (running) return;
     await disposeAll();
     setOnnxState(INITIAL_LOAD);
-    setMlcState({ phase: "loading", message: "Initializing MLC engine…", percent: 0 });
+    setWllamaState({
+      phase: "loading",
+      message: "Initializing wllama (WebGPU)…",
+      percent: 0,
+    });
     try {
-      const engine = await CreateMLCEngine(MLC_MODEL_ID, {
-        appConfig: MLC_APP_CONFIG,
-        initProgressCallback: (r: InitProgressReport) => {
-          setMlcState({
+      const wllama = await loadWaveWllama({
+        onProgress: ({ percent }) => {
+          setWllamaState({
             phase: "loading",
-            message: r.text,
-            percent: Math.round(r.progress * 100),
+            message: `Downloading ${WAVE_GGUF_FILE} ${percent}%`,
+            percent,
           });
         },
       });
-      mlcRef.current = engine;
-      activeRef.current = "mlc";
-      setMlcState({ phase: "ready", message: "Engine ready.", percent: 100 });
+      wllamaRef.current = wllama;
+      activeRef.current = "wllama";
+      setWllamaState({ phase: "ready", message: "Loaded and ready.", percent: 100 });
     } catch (err) {
-      setMlcState({
+      setWllamaState({
         phase: "error",
         message: err instanceof Error ? err.message : String(err),
         percent: 0,
@@ -252,9 +312,15 @@ export function OnnxBenchmarkClient() {
     }
   }, [disposeAll, running]);
 
-  // --- One assistant turn through ONNX. Multi-turn = pass full `history` ---
+  // --- One assistant turn through ONNX. Multi-turn = pass full `history`.
+  //     `onPartial` is invoked with each text delta the streamer emits, so
+  //     the page can render generation live. ---
   const runOnnxTurn = useCallback(
-    async (history: ChatMessage[], maxTokens: number): Promise<RawTurnTiming> => {
+    async (
+      history: ChatMessage[],
+      maxTokens: number,
+      onPartial?: (delta: string) => void,
+    ): Promise<RawTurnTiming> => {
       const pipe = onnxRef.current;
       if (!pipe) return rawError("pipeline not loaded");
       let firstTokenTime = 0;
@@ -274,6 +340,7 @@ export function OnnxBenchmarkClient() {
           // undefined under Next/turbopack's partial `process` shim).
           callback_function: (text: string) => {
             output += text;
+            onPartial?.(text);
           },
           token_callback_function: (tokens: bigint[]) => {
             const now = performance.now();
@@ -307,33 +374,51 @@ export function OnnxBenchmarkClient() {
     [],
   );
 
-  // --- One assistant turn through MLC. Pass full `history` each call;
-  //     we deliberately do NOT call engine.resetChat() — it's unreliable
-  //     and could trigger an internal reload that pollutes timing. ---
-  const runMlcTurn = useCallback(
-    async (history: ChatMessage[], maxTokens: number): Promise<RawTurnTiming> => {
-      const engine = mlcRef.current;
-      if (!engine) return rawError("engine not loaded");
+  // --- One assistant turn through wllama. Pass full `history` each call.
+  //     wllama's createChatCompletion is stateless wrt conversational state —
+  //     we pass the full message array each call. No engine reload needed
+  //     between scenarios (unlike MLC); llama.cpp's KV cache handles cross-
+  //     call reuse via its prompt-cache checkpoint system.
+  //
+  //     With `stream: true`, createChatCompletion returns an AsyncIterable
+  //     immediately (after wiring the worker), NOT when generation finishes.
+  //     The onData callback fires asynchronously in the background. To
+  //     actually block until generation completes (and to collect tokens),
+  //     we have to drain the iterator with for-await — otherwise the function
+  //     returns with tokenCount=0 / output="" before any token arrives. ---
+  const runWllamaTurn = useCallback(
+    async (
+      history: ChatMessage[],
+      maxTokens: number,
+      onPartial?: (delta: string) => void,
+    ): Promise<RawTurnTiming> => {
+      const wllama = wllamaRef.current;
+      if (!wllama) return rawError("wllama not loaded");
       let firstTokenTime = 0;
       let lastTokenTime = 0;
       let tokenCount = 0;
       let output = "";
       const startedAt = performance.now();
       try {
-        const stream = await engine.chat.completions.create({
+        const stream = await wllama.createChatCompletion({
           messages: history,
           temperature: 0,
+          top_k: 1,
           max_tokens: maxTokens,
           stream: true,
+          onData: () => {
+            /* consumed via for-await below; required by StreamParams type */
+          },
         });
         for await (const chunk of stream) {
-          const delta = chunk.choices[0]?.delta?.content ?? "";
+          const delta = chunk.choices?.[0]?.delta?.content ?? "";
           if (delta.length === 0) continue;
           const now = performance.now();
           if (firstTokenTime === 0) firstTokenTime = now;
           lastTokenTime = now;
           tokenCount += 1;
           output += delta;
+          onPartial?.(delta);
         }
         const endedAt = performance.now();
         return {
@@ -351,47 +436,66 @@ export function OnnxBenchmarkClient() {
     [],
   );
 
-  // MLC-only: reload the engine to dodge web-llm's state leak across distinct
-  // tasks (see docs/postmortems/mlc-finetune.md). Called between scenario runs;
-  // reload time is intentionally NOT measured. Within a multi-turn scenario we
-  // keep the same engine and pass full history — that path is leak-free.
-  const reloadMlcEngine = useCallback(async () => {
-    const prior = mlcRef.current;
-    if (!prior) return;
-    try {
-      await prior.unload();
-    } catch {
-      /* ignore */
+  // Reload the wllama instance fresh. Workaround for a known llama.cpp WASM
+  // server-slot bug: after enough multi-turn `createChatCompletion` calls
+  // against a growing history, the prompt-cache update path aborts with
+  // "RuntimeError: table index is out of bounds" and
+  // `server-context.cpp:2848 fatal error` (see llama.cpp PR #20277).
+  // We reload between scenarios so each scenario starts with clean server
+  // state. Reload time is NOT included in timing — only inference is.
+  const reloadWllama = useCallback(async () => {
+    const prior = wllamaRef.current;
+    if (prior) {
+      try {
+        await (prior as unknown as { exit?: () => Promise<void> }).exit?.();
+      } catch {
+        /* ignore */
+      }
+      wllamaRef.current = null;
     }
-    mlcRef.current = null;
-    const fresh = await CreateMLCEngine(MLC_MODEL_ID, {
-      appConfig: MLC_APP_CONFIG,
-      initProgressCallback: (r: InitProgressReport) => {
-        setMlcState({
+    const fresh = await loadWaveWllama({
+      onProgress: ({ percent }) => {
+        setWllamaState({
           phase: "loading",
-          message: `reload: ${r.text}`,
-          percent: Math.round(r.progress * 100),
+          message: `reload: ${WAVE_GGUF_FILE} ${percent}%`,
+          percent,
         });
       },
     });
-    mlcRef.current = fresh;
-    setMlcState({ phase: "ready", message: "Engine ready.", percent: 100 });
+    wllamaRef.current = fresh;
+    setWllamaState({ phase: "ready", message: "Reloaded and ready.", percent: 100 });
   }, []);
 
   // Play one scenario end-to-end on the active runtime. Each user turn
   // produces a RunResult; conversation history accumulates between turns.
+  //
+  // wllama exception: due to the llama.cpp WASM multi-turn crash (see
+  // reloadWllama above), wllama runs each user turn as a fresh single-turn
+  // call instead of accumulating history. Loses the prefill-on-growing-
+  // context property of the check-in scenario but keeps the runtime stable.
   const runScenarioOnce = useCallback(
     async (runIndex: number, scenario: ScenarioKey): Promise<RunResult[]> => {
       const active = activeRef.current;
       if (!active) return [];
       const spec = SCENARIOS[scenario];
-      const runOne = active === "onnx" ? runOnnxTurn : runMlcTurn;
+      const runOne = active === "onnx" ? runOnnxTurn : runWllamaTurn;
+      const accumulateHistory = active !== "wllama";
       const history: ChatMessage[] = [];
       const out: RunResult[] = [];
 
       for (let t = 0; t < spec.userTurns.length; t++) {
-        history.push({ role: "user", content: spec.userTurns[t] });
-        const raw = await runOne(history, spec.suggestedMaxTokens);
+        const messages: ChatMessage[] = accumulateHistory
+          ? [...history, { role: "user", content: spec.userTurns[t] }]
+          : [{ role: "user", content: spec.userTurns[t] }];
+        const turnLabel =
+          runIndex === 0
+            ? `${active.toUpperCase()} · ${spec.label} · warmup · turn ${t + 1}/${spec.userTurns.length}`
+            : `${active.toUpperCase()} · ${spec.label} · run #${runIndex} · turn ${t + 1}/${spec.userTurns.length}`;
+        setStreamingTitle(turnLabel);
+        setStreamingText("");
+        const raw = await runOne(messages, spec.suggestedMaxTokens, (delta) => {
+          setStreamingText((prev) => prev + delta);
+        });
         if (raw.error) {
           out.push({
             runtime: active,
@@ -409,12 +513,15 @@ export function OnnxBenchmarkClient() {
           });
           break; // stop the scenario on first error
         }
-        history.push({ role: "assistant", content: raw.output });
+        if (accumulateHistory) {
+          history.push({ role: "user", content: spec.userTurns[t] });
+          history.push({ role: "assistant", content: raw.output });
+        }
         out.push(finalize(active, scenario, runIndex, t + 1, spec.userTurns.length, raw));
       }
       return out;
     },
-    [runMlcTurn, runOnnxTurn],
+    [runOnnxTurn, runWllamaTurn],
   );
 
   const runBenchmark = useCallback(async () => {
@@ -426,12 +533,12 @@ export function OnnxBenchmarkClient() {
 
     if (includeWarmup) {
       // One warmup, on the shortest scenario (phase narration, single turn).
-      if (active === "mlc") {
-        setStatusText("Reloading MLC engine for warmup…");
+      if (active === "wllama") {
+        setStatusText("Reloading wllama for warmup…");
         try {
-          await reloadMlcEngine();
+          await reloadWllama();
         } catch (err) {
-          console.error("MLC reload before warmup failed:", err);
+          console.error("wllama reload before warmup failed:", err);
         }
       }
       setStatusText(`Warmup on ${active.toUpperCase()}…`);
@@ -444,14 +551,14 @@ export function OnnxBenchmarkClient() {
     for (let i = 0; i < runCount; i++) {
       for (const sk of allScenarios) {
         stepIndex += 1;
-        if (active === "mlc") {
+        if (active === "wllama") {
           setStatusText(
-            `MLC · reloading engine before ${SCENARIOS[sk].label} (step ${stepIndex}/${totalSteps})…`,
+            `wllama · reloading before ${SCENARIOS[sk].label} (step ${stepIndex}/${totalSteps})…`,
           );
           try {
-            await reloadMlcEngine();
+            await reloadWllama();
           } catch (err) {
-            console.error("MLC reload between scenarios failed:", err);
+            console.error("wllama reload between scenarios failed:", err);
           }
         }
         setStatusText(
@@ -464,13 +571,19 @@ export function OnnxBenchmarkClient() {
     }
 
     setStatusText("");
+    setStreamingTitle("");
+    setStreamingText("");
     setRunning(false);
-  }, [includeWarmup, reloadMlcEngine, results, runCount, runScenarioOnce, running]);
+  }, [includeWarmup, reloadWllama, results, runCount, runScenarioOnce, running]);
 
   const onnxOk = results.filter((r) => r.runtime === "onnx" && !r.error);
-  const mlcOk = results.filter((r) => r.runtime === "mlc" && !r.error);
+  const wllamaOk = results.filter((r) => r.runtime === "wllama" && !r.error);
   const activeKey: RuntimeKey | null =
-    onnxState.phase === "ready" ? "onnx" : mlcState.phase === "ready" ? "mlc" : null;
+    onnxState.phase === "ready"
+      ? "onnx"
+      : wllamaState.phase === "ready"
+        ? "wllama"
+        : null;
   const canRun = activeKey !== null && !running;
 
   return (
@@ -486,15 +599,17 @@ export function OnnxBenchmarkClient() {
     >
       <header style={{ marginBottom: 24 }}>
         <h1 style={{ margin: 0, fontSize: 26, letterSpacing: -0.3 }}>
-          Runtime benchmark · ONNX vs MLC
+          Runtime benchmark · ONNX base vs wllama fine-tune
         </h1>
         <p style={{ color: "#6b7280", marginTop: 8, lineHeight: 1.5, fontSize: 14 }}>
-          Upstream Gemma 4 E2B IT on both sides (our fine-tune is broken in both
-          pipelines for now), same q4f16 quantization, greedy decoding (temperature
-          0). Three scenarios — phase narration (single-turn long-form), check-in
-          (multi-turn with growing context), reflection (single-turn summary).{" "}
-          <strong>TTFT</strong> = prefill (start → first token);{" "}
-          <strong>decode tok/s</strong> excludes prefill.
+          Two different fine-tunes through two different browser runtimes — but
+          both are Gemma 4 E2B at q4 quantization, so this measures runtime
+          throughput on equivalent-size models. <strong>ONNX</strong> = upstream
+          base via <code>onnxruntime-web</code> WebGPU. <strong>wllama</strong> =
+          WAVE fine-tune via llama.cpp WebGPU. Same three scenarios — phase
+          narration, multi-turn check-in, reflection — with the same prompts and
+          greedy decoding (temperature 0). <strong>TTFT</strong> = prefill
+          (start → first token); <strong>decode tok/s</strong> excludes prefill.
         </p>
         <div
           style={{
@@ -508,14 +623,23 @@ export function OnnxBenchmarkClient() {
             lineHeight: 1.5,
           }}
         >
-          ⚠️ <strong>MLC reset caveat.</strong> web-llm <code>resetChat()</code> is
-          unreliable (KV state leaks across distinct tasks), so between scenarios
-          and between runs of the same scenario we fully reload the MLC engine.
-          Reload time is <em>not</em> included in timing — only the actual
-          <code>chat.completions.create</code> stream is measured. Within a
-          multi-turn scenario we keep the same engine and pass full history,
-          which is the leak-free path. See{" "}
-          <code>docs/postmortems/mlc-finetune.md</code>.
+          ⚠️ <strong>wllama reset caveat.</strong> Known llama.cpp WASM bug
+          ({" "}
+          <a
+            href="https://github.com/ggml-org/llama.cpp/pull/20277"
+            target="_blank"
+            rel="noreferrer"
+            style={{ color: "#78350f", textDecoration: "underline" }}
+          >
+            llama.cpp PR #20277
+          </a>
+          ): repeated <code>createChatCompletion</code> calls against growing
+          multi-turn history abort the server slot with{" "}
+          <code>table index out of bounds</code>. Workaround: reload wllama
+          between scenarios (reload time is <em>not</em> measured), and
+          collapse the multi-turn check-in to <em>three independent
+          single-turn calls</em> instead of one accumulating conversation. ONNX
+          keeps the original multi-turn behavior.
         </div>
       </header>
 
@@ -533,18 +657,22 @@ export function OnnxBenchmarkClient() {
           state={onnxState}
           isActive={activeKey === "onnx"}
           busy={
-            running || onnxState.phase === "loading" || mlcState.phase === "loading"
+            running ||
+            onnxState.phase === "loading" ||
+            wllamaState.phase === "loading"
           }
           onLoad={loadOnnx}
         />
         <RuntimeCard
-          runtime="mlc"
-          state={mlcState}
-          isActive={activeKey === "mlc"}
+          runtime="wllama"
+          state={wllamaState}
+          isActive={activeKey === "wllama"}
           busy={
-            running || onnxState.phase === "loading" || mlcState.phase === "loading"
+            running ||
+            onnxState.phase === "loading" ||
+            wllamaState.phase === "loading"
           }
-          onLoad={loadMlc}
+          onLoad={loadWllama}
         />
       </div>
 
@@ -699,10 +827,54 @@ export function OnnxBenchmarkClient() {
         </button>
         <div style={{ marginLeft: "auto", color: "#6b7280", fontSize: 13 }}>
           {results.length > 0
-            ? `ONNX: ${onnxOk.length} ok · MLC: ${mlcOk.length} ok`
+            ? `ONNX: ${onnxOk.length} ok · wllama: ${wllamaOk.length} ok`
             : "No runs yet."}
         </div>
       </div>
+
+      {streamingTitle ? (
+        <div
+          style={{
+            marginBottom: 20,
+            padding: 16,
+            background: "#fff",
+            border: "1px solid #e5e7eb",
+            borderLeft: "4px solid #10b981",
+            borderRadius: 8,
+          }}
+        >
+          <div
+            style={{
+              fontSize: 11,
+              fontWeight: 600,
+              color: "#10b981",
+              letterSpacing: 0.4,
+              textTransform: "uppercase",
+              marginBottom: 8,
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <span>{streamingTitle}</span>
+            <span style={{ color: "#9ca3af" }}>streaming…</span>
+          </div>
+          <div
+            style={{
+              fontSize: 14,
+              whiteSpace: "pre-wrap",
+              lineHeight: 1.5,
+              maxHeight: 260,
+              overflowY: "auto",
+              color: "#1f2937",
+            }}
+          >
+            {streamingText || (
+              <span style={{ color: "#9ca3af" }}>Prefill in progress…</span>
+            )}
+          </div>
+        </div>
+      ) : null}
 
       {results.length > 0 ? (
         <ResultsView results={results} />
@@ -718,8 +890,8 @@ export function OnnxBenchmarkClient() {
             fontSize: 14,
           }}
         >
-          No runs yet. Load a runtime, pick a scenario, click Benchmark. Then load
-          the other runtime and re-run to compare side-by-side.
+          No runs yet. Load a runtime, click Benchmark. Then load the other
+          runtime and re-run to compare side-by-side.
         </div>
       )}
     </div>
@@ -941,7 +1113,7 @@ function Pill({
 }
 
 function ResultsView({ results }: { results: RunResult[] }) {
-  // Summary grid: rows = scenarios, columns = ONNX | MLC.
+  // Summary grid: rows = scenarios, columns = ONNX | wllama.
   const scenarios = Object.keys(SCENARIOS) as ScenarioKey[];
 
   return (
@@ -966,19 +1138,19 @@ function ResultsView({ results }: { results: RunResult[] }) {
             padding: "4px 8px",
           }}
         >
-          ONNX
+          ONNX (base)
         </div>
         <div
           style={{
             fontSize: 12,
             fontWeight: 600,
-            color: RUNTIMES.mlc.color,
+            color: RUNTIMES.wllama.color,
             textTransform: "uppercase",
             letterSpacing: 0.4,
             padding: "4px 8px",
           }}
         >
-          MLC
+          wllama (fine-tune)
         </div>
         {scenarios.map((s) => (
           <ScenarioRow
@@ -987,8 +1159,8 @@ function ResultsView({ results }: { results: RunResult[] }) {
             onnxRows={results.filter(
               (r) => r.scenario === s && r.runtime === "onnx" && !r.error,
             )}
-            mlcRows={results.filter(
-              (r) => r.scenario === s && r.runtime === "mlc" && !r.error,
+            wllamaRows={results.filter(
+              (r) => r.scenario === s && r.runtime === "wllama" && !r.error,
             )}
           />
         ))}
@@ -1114,11 +1286,11 @@ function ResultsView({ results }: { results: RunResult[] }) {
 function ScenarioRow({
   scenario,
   onnxRows,
-  mlcRows,
+  wllamaRows,
 }: {
   scenario: ScenarioKey;
   onnxRows: RunResult[];
-  mlcRows: RunResult[];
+  wllamaRows: RunResult[];
 }) {
   return (
     <>
@@ -1138,7 +1310,7 @@ function ScenarioRow({
         {SCENARIOS[scenario].label}
       </div>
       <SummaryBox runtime="onnx" rows={onnxRows} />
-      <SummaryBox runtime="mlc" rows={mlcRows} />
+      <SummaryBox runtime="wllama" rows={wllamaRows} />
     </>
   );
 }

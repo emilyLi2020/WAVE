@@ -10,23 +10,23 @@ Three things had to be diagnosed before anything else worked. None of them were 
 
 ### 1.1 The merged fine-tune on HF was corrupt
 
-`Maelstrome/lora-wave-session-r32-merged` (built with `unsloth.save_pretrained_merged(save_method="merged_16bit")` on a Linux training box) generates 100% `<pad>` tokens in plain PyTorch — independent of MLC, ONNX, or anything else. See memory note [`wave-merge-broken-unsloth`](../../.claude/projects/-Users-bill-zhang-Github-Wave/memory/wave-merge-broken-unsloth.md). We discovered this by running a tiny PyTorch generation script ([models/diagnose_merged_base.py](../../models/diagnose_merged_base.py)) before sinking more time into conversion.
+`Maelstrome/lora-wave-session-r32-merged` (built with `unsloth.save_pretrained_merged(save_method="merged_16bit")` on a Linux training box) generates 100% `<pad>` tokens in plain PyTorch — independent of MLC, ONNX, or anything else. See memory note [`wave-merge-broken-unsloth`](../../.claude/projects/-Users-bill-zhang-Github-Wave/memory/wave-merge-broken-unsloth.md). We discovered this by running a tiny PyTorch generation script ([models/finetune/diagnose_merged_base.py](../../models/finetune/diagnose_merged_base.py)) before sinking more time into conversion.
 
 **Fix**: re-merge the LoRA adapter via PEFT (Mac-compatible, no unsloth dep):
 
 ```bash
-uv run --project models python models/merge_lora_peft.py \
+uv run --project models python finetune/merge_lora_peft.py \
   --base unsloth/gemma-4-E2B-it \
   --adapter Maelstrome/lora-wave-session-r32 \
-  --out-dir models/runs/merge-peft \
+  --out-dir runs/merge-peft \
   --device cpu --dtype bfloat16
 ```
 
 Then verify before continuing — if 0/2 prompts pass, conversion can't save you:
 
 ```bash
-uv run --project models python models/diagnose_merged_base.py \
-  --source-repo models/runs/merge-peft \
+uv run --project models python finetune/diagnose_merged_base.py \
+  --source-repo runs/merge-peft \
   --prompts "What is the capital of France? Answer in one sentence." \
             "I'm feeling anxious right now. What's one small thing I can do?" \
   --max-new-tokens 48 --device cpu --dtype bfloat16
@@ -177,7 +177,7 @@ Loads one engine at a time, terminating the prior to free WebGPU memory. Designe
 
 ## 5. What we verified
 
-- Plain PyTorch on the re-merged fine-tune: coherent fine-tune-voice output ([models/diagnose_merged_base.py](../../models/diagnose_merged_base.py) result preserved in commit message of 339a007).
+- Plain PyTorch on the re-merged fine-tune: coherent fine-tune-voice output ([models/finetune/diagnose_merged_base.py](../../models/finetune/diagnose_merged_base.py) result preserved in commit message of 339a007).
 - MLC on Mac with patched conv_template: "Count from 1 to 5" → `1, 2, 3, 4, 5` for both our fine-tune and unsloth base. Google works too once its config is patched.
 - All three models load in ~30 s into the browser via web-llm, decode at ~45 tok/s on Apple M-series WebGPU.
 

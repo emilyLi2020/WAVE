@@ -73,7 +73,7 @@ Browser verification (pending HF upload):
 
 ## How v4-fused was produced
 
-[`models/try_fuse_decoder.py`](../models/try_fuse_decoder.py) → [`models/restage_decoder.py`](../models/restage_decoder.py):
+[`models/onnx/try_fuse_decoder.py`](../models/onnx/try_fuse_decoder.py) → [`models/onnx/restage_decoder.py`](../models/onnx/restage_decoder.py):
 
 ```python
 from onnxruntime.transformers.optimizer import optimize_model
@@ -102,11 +102,11 @@ If the FastGelu fusion isn't enough and v4-fused still produces `len=0` on WebGP
 ## File references
 
 - Test script (Node CPU): [`client/scripts/bench-onnx-wave-prompts.ts`](../client/scripts/bench-onnx-wave-prompts.ts)
-- Decoder diff inspector: [`models/inspect_decoder.py`](../models/inspect_decoder.py)
-- GBQ packing diff: [`models/inspect_gbq.py`](../models/inspect_gbq.py)
-- Fusion attempt script: [`models/try_fuse_decoder.py`](../models/try_fuse_decoder.py)
-- v4 staging script: [`models/restage_decoder.py`](../models/restage_decoder.py)
+- Decoder diff inspector: [`models/onnx/inspect_decoder.py`](../models/onnx/inspect_decoder.py)
+- GBQ packing diff: [`models/onnx/inspect_gbq.py`](../models/onnx/inspect_gbq.py)
+- Fusion attempt script: [`models/onnx/try_fuse_decoder.py`](../models/onnx/try_fuse_decoder.py)
+- v4 staging script: [`models/onnx/restage_decoder.py`](../models/onnx/restage_decoder.py)
 - Browser surface: [`client/app/models/onnx-test/compare-client.tsx`](../client/app/models/onnx-test/compare-client.tsx)
-- v3 export pipeline (decomposed): [`models/export_text_onnx.py`](../models/export_text_onnx.py)
+- v3 export pipeline (decomposed): [`models/onnx/export.py`](../models/onnx/export.py)
 - Logs: [`logs/bench-onnx-v4-fused.log`](../logs/bench-onnx-v4-fused.log), [`logs/gbq-diff.log`](../logs/gbq-diff.log), [`logs/decoder-diff.log`](../logs/decoder-diff.log), [`logs/fuse-attempt.log`](../logs/fuse-attempt.log)
 - Related docs: [`docs/postmortems/onnx-export.md`](postmortems/onnx-export.md), [`docs/transformers-js-gemma4-perf.md`](transformers-js-gemma4-perf.md)
