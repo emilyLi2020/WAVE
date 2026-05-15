@@ -19,7 +19,7 @@ const WLLAMA_PAGES: TestPage[] = [
     blurb:
       "Loads Maelstrome/lora-wave-session-r32/gguf/gemma-4-e2b-it-peft.Q4_K_M (5-shard split, ~3.2 GB) via @wllama/wllama and runs the production WAVE prompts on WebGPU. Bypasses onnxruntime-web's fp16 overflow bug entirely.",
     details:
-      "WebGPU enabled by default (V3.1+), WASM SIMD fallback. Smoke / Phase / Check-in / Reflection buttons. Defaults to HF Hub; append ?local=1 to fetch from a local-hf mirror at localhost:8765/gguf/ for fast iteration. See docs/wllama.md.",
+      "WebGPU enabled by default (V3.1+), WASM SIMD fallback. Smoke / Phase / Check-in / Reflection buttons. Defaults to HF Hub; append ?local=1 to fetch from a local-hf mirror at localhost:8765/gguf/ for fast iteration. See client/docs/wllama.md.",
     badge: "primary",
   },
   {

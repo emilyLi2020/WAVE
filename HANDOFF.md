@@ -2,7 +2,7 @@
 
 > **Current state** (2026-05-14 PM): the **wllama + GGUF path is the shipping path**. The ONNX iteration documented below (v3→v7) was abandoned after v7 still failed on browser WebGPU — same `onnxruntime-web` fp16 bug class, not fixable from our side. wllama bypasses it entirely by running llama.cpp's own WebGPU kernels.
 >
-> Read [`docs/wllama.md`](docs/wllama.md) for the current architecture. The rest of this file is preserved as the historical record of what was tried in the ONNX iteration.
+> Read [`client/docs/wllama.md`](client/docs/wllama.md) for the current architecture. The rest of this file is preserved as the historical record of what was tried in the ONNX iteration.
 
 ## Current shipping path (2026-05-14 PM)
 
@@ -12,11 +12,11 @@
 | Browser surface | [`client/app/models/wllama-test/`](client/app/models/wllama-test/) — Smoke / Phase / Check-in / Reflection buttons, defaults to HF, `?local=1` for the local mirror. Verified working on WebGPU. |
 | Client lib | [`client/lib/wllama/`](client/lib/wllama/) — `loadWaveWllama()` wrapper used by the test page and (eventually) the production runtime. |
 | Python pipeline | [`models/gguf/README.md`](models/gguf/README.md) — PEFT merge → f16 → Q4_K_M → split → upload. |
-| Design doc | [`docs/wllama.md`](docs/wllama.md) — end-to-end architecture, why-wllama-over-ONNX, browser support matrix, production-wiring plan. |
+| Design doc | [`client/docs/wllama.md`](client/docs/wllama.md) — end-to-end architecture, why-wllama-over-ONNX, browser support matrix, production-wiring plan. |
 
 To delete (HF web UI, your action): `lora-wave-session-r32-{merged,gguf,onnx,onnx-fused}` — all obsolete.
 
-Next step (not yet done): swap [`client/lib/gemma/local-runtime.ts`](client/lib/gemma/local-runtime.ts) from transformers.js+ONNX to `@/lib/wllama`. See `docs/wllama.md#production-wiring-next-step-not-yet-done`.
+Next step (not yet done): swap [`client/lib/gemma/local-runtime.ts`](client/lib/gemma/local-runtime.ts) from transformers.js+ONNX to `@/lib/wllama`. See `client/docs/wllama.md#production-wiring-next-step-not-yet-done`.
 
 ---
 
@@ -92,7 +92,7 @@ If that also fails, the failure is genuinely an `onnxruntime-web` WebGPU kernel 
 | `models/onnx/try_fuse_decoder.py` | New: tries `optimize_model` with different `model_type` settings. `gpt2` mode wins. |
 | `models/onnx/try_fuse_decoder_v2.py` | New: tried higher `opt_level` settings; conclusion is `opt_level=0` works best. Keep for reference. |
 | `models/onnx/restage_decoder.py` | New: re-saves a fused decoder with transformers.js-compatible `.onnx_data` (underscore) filename. |
-| `docs/onnx-webgpu-divergence.md` | Rewrote with the corrected diagnosis. Old version blamed packing; new version explains decomposed-ops + FastGelu fusion. |
+| `client/docs/onnx-webgpu-divergence.md` | Rewrote with the corrected diagnosis. Old version blamed packing; new version explains decomposed-ops + FastGelu fusion. |
 | `client/app/models/onnx-test/compare-client.tsx` | `FINETUNE_LOCAL_ID` switched to `Maelstrome/lora-wave-session-r32-onnx-fused`. Slot subtitle says "(v4 fused)". Also still has the smoke-test button from earlier. |
 | `client/scripts/bench-onnx-wave-prompts.ts` | `MODEL_ID` now reads `process.env.MODEL_ID` so you can A/B v3 and v4 without editing. |
 | `client/scripts/serve-local-hf.ts` | New: static-file server that mirrors HF's URL layout (`{model}/resolve/main/...`) for the v4 export. Lets you test under WebGPU without uploading. Range requests + CORS supported. |
@@ -126,6 +126,6 @@ Remove-Item -Recurse -Force models/runs/upstream-embed-ref
 - `models/runs/onnx-export-v3/generation_config.json`: added (also pushed to v3 HF repo).
 - `models/onnx/export.py`: added `generation_config.json` to `RUNTIME_CONFIG_FILES`.
 - `client/scripts/bench-onnx-wave-prompts.ts`: created to run WAVE prompts in Node CPU (this is what proved the model is fine and isolated the bug to the browser).
-- `docs/onnx-webgpu-divergence.md`: created (now rewritten with v4 finding).
+- `client/docs/onnx-webgpu-divergence.md`: created (now rewritten with v4 finding).
 
 Sleep well. The interesting part is "did `FastGelu` alone fix WebGPU, or do we also need to handle RMSNorm" — you'll know within 5 minutes of running steps 1–3 above.

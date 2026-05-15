@@ -1,6 +1,6 @@
 # Browser fine-tune via wllama + GGUF
 
-**Status**: shipping path for the WAVE fine-tune in the browser. Verified end-to-end on WebGPU with all three production prompts (phase / check_in / reflection). Replaces the seven-iteration ONNX export attempt documented in [`docs/onnx-webgpu-divergence.md`](onnx-webgpu-divergence.md) and [`models/onnx/README.md`](../models/onnx/README.md).
+**Status**: shipping path for the WAVE fine-tune in the browser. Verified end-to-end on WebGPU with all three production prompts (phase / check_in / reflection). Replaces the seven-iteration ONNX export attempt documented in [`client/docs/onnx-webgpu-divergence.md`](onnx-webgpu-divergence.md) and [`models/onnx/README.md`](../../models/onnx/README.md).
 
 ## TL;DR
 
@@ -13,19 +13,19 @@ This path was chosen after seven iterations on a hand-rolled ONNX export all pro
 | Location | Purpose |
 |---|---|
 | **Python side** (build the GGUF) | |
-| [`models/finetune/merge_lora_peft.py`](../models/finetune/merge_lora_peft.py) | PEFT-merge the LoRA into a coherent base. Required because `unsloth.save_pretrained_merged` produces an all-`<pad>` corruption. |
-| [`models/finetune/diagnose_merged_base.py`](../models/finetune/diagnose_merged_base.py) | 2-prompt smoke test for the merge. Stop here if it fails. |
-| [`models/gguf/README.md`](../models/gguf/README.md) | End-to-end conversion pipeline (PEFT merge → f16 GGUF → Q4_K_M → split → upload). |
-| [`models/gguf/bench_wave_prompts.py`](../models/gguf/bench_wave_prompts.py) | Drives `llama-cli` with the three production WAVE prompts to verify coherence locally. |
+| [`models/finetune/merge_lora_peft.py`](../../models/finetune/merge_lora_peft.py) | PEFT-merge the LoRA into a coherent base. Required because `unsloth.save_pretrained_merged` produces an all-`<pad>` corruption. |
+| [`models/finetune/diagnose_merged_base.py`](../../models/finetune/diagnose_merged_base.py) | 2-prompt smoke test for the merge. Stop here if it fails. |
+| [`models/gguf/README.md`](../../models/gguf/README.md) | End-to-end conversion pipeline (PEFT merge → f16 GGUF → Q4_K_M → split → upload). |
+| [`models/gguf/bench_wave_prompts.py`](../../models/gguf/bench_wave_prompts.py) | Drives `llama-cli` with the three production WAVE prompts to verify coherence locally. |
 | **Client side** (load and run in browser) | |
-| [`client/lib/wllama/config.ts`](../client/lib/wllama/config.ts) | Single source of truth: HF repo + filename, default `n_ctx`, WASM path. |
-| [`client/lib/wllama/client.ts`](../client/lib/wllama/client.ts) | `loadWaveWllama()` + `describeWaveWllamaSource()`. Lazy-imports wllama, branches on local-mirror vs. HF. |
-| [`client/lib/wllama/index.ts`](../client/lib/wllama/index.ts) | Public surface. Import from `@/lib/wllama`. |
-| [`client/lib/wllama/README.md`](../client/lib/wllama/README.md) | Per-module usage doc. |
-| [`client/public/wllama/wllama.wasm`](../client/public/wllama/) | The 7.1 MB WASM binary served at `/wllama/wllama.wasm`. Copied from `node_modules` after `pnpm install`. |
-| [`client/app/models/wllama-test/`](../client/app/models/wllama-test/) | Browser test surface. Loads the GGUF, exposes Smoke / Phase / Check-in / Reflection buttons. |
-| [`client/scripts/serve-local-hf.ts`](../client/scripts/serve-local-hf.ts) | Static-file server. Now exposes `/gguf/` (in addition to HF-style and MediaPipe mounts) reading from `models/runs/merge-peft-gguf/split/`. Used by `?local=1` mode. |
-| [`client/scripts/dump-wave-prompts.ts`](../client/scripts/dump-wave-prompts.ts) | Renders the three WAVE prompts and writes them as JSON for `bench_wave_prompts.py` to consume. |
+| [`client/lib/wllama/config.ts`](../lib/wllama/config.ts) | Single source of truth: HF repo + filename, default `n_ctx`, WASM path. |
+| [`client/lib/wllama/client.ts`](../lib/wllama/client.ts) | `loadWaveWllama()` + `describeWaveWllamaSource()`. Lazy-imports wllama, branches on local-mirror vs. HF. |
+| [`client/lib/wllama/index.ts`](../lib/wllama/index.ts) | Public surface. Import from `@/lib/wllama`. |
+| [`client/lib/wllama/README.md`](../lib/wllama/README.md) | Per-module usage doc. |
+| [`client/public/wllama/wllama.wasm`](../public/wllama/) | The 7.1 MB WASM binary served at `/wllama/wllama.wasm`. Copied from `node_modules` after `pnpm install`. |
+| [`client/app/models/wllama-test/`](../app/models/wllama-test/) | Browser test surface. Loads the GGUF, exposes Smoke / Phase / Check-in / Reflection buttons. |
+| [`client/scripts/serve-local-hf.ts`](../scripts/serve-local-hf.ts) | Static-file server. Now exposes `/gguf/` (in addition to HF-style and MediaPipe mounts) reading from `models/runs/merge-peft-gguf/split/`. Used by `?local=1` mode. |
+| [`client/scripts/dump-wave-prompts.ts`](../scripts/dump-wave-prompts.ts) | Renders the three WAVE prompts and writes them as JSON for `bench_wave_prompts.py` to consume. |
 | **HF artifacts** | |
 | [`Maelstrome/lora-wave-session-r32`](https://huggingface.co/Maelstrome/lora-wave-session-r32) | Single consolidated repo. Adapter at root; GGUFs under `gguf/`. |
 | [`Maelstrome/lora-wave-session-r32/gguf/README.md`](https://huggingface.co/Maelstrome/lora-wave-session-r32/blob/main/gguf/README.md) | GGUF-subdir-specific doc: file layout, wllama/Ollama/llama.cpp usage. |
@@ -83,7 +83,7 @@ wllama doesn't use `onnxruntime-web` at all. It compiles llama.cpp's WebGPU kern
 
 ## Runtime performance — measured
 
-Both runtimes are measured via [`/models/onnx-test/benchmark`](../client/app/models/onnx-test/benchmark-client.tsx) with temperature 0, greedy decode. Both confirmed on WebGPU — `navigator.gpu.requestAdapter` returns a real adapter for both, and ORT logs the same adapter-init warning that wllama does. So these are apples-to-apples WebGPU comparisons, not "ONNX on CPU vs wllama on GPU" comparisons.
+Both runtimes are measured via [`/models/onnx-test/benchmark`](../app/models/onnx-test/benchmark-client.tsx) with temperature 0, greedy decode. Both confirmed on WebGPU — `navigator.gpu.requestAdapter` returns a real adapter for both, and ORT logs the same adapter-init warning that wllama does. So these are apples-to-apples WebGPU comparisons, not "ONNX on CPU vs wllama on GPU" comparisons.
 
 iPhone (Safari 26 / WebGPU) is the next platform to benchmark — see [iOS slot below](#ios-iphone-tbd).
 
@@ -111,7 +111,7 @@ iPhone (Safari 26 / WebGPU) is the next platform to benchmark — see [iOS slot 
 
 Why: onnxruntime-web uses **JSEP** (JavaScript Execution Provider) to deliver WebGPU. JSEP dispatches each ONNX op from WASM to WebGPU individually with a sync barrier between them. Gemma 4 decode is hundreds of small ops per token (RMSNorm, MatMulNBits, RoPE, attention, gates), so the GPU spends most of its time idle waiting for the next op from the WASM module. llama.cpp's WebGPU backend (in wllama) fuses these into bigger compute shaders that do more work per dispatch and keep the GPU fed continuously.
 
-This is a structural ORT-web limitation, not something we can fix from the application side without rewriting the runtime. Even if the fp16 correctness bug ([`docs/onnx-webgpu-divergence.md`](onnx-webgpu-divergence.md)) were resolved, this ~9× throughput gap would remain on this platform.
+This is a structural ORT-web limitation, not something we can fix from the application side without rewriting the runtime. Even if the fp16 correctness bug ([`client/docs/onnx-webgpu-divergence.md`](onnx-webgpu-divergence.md)) were resolved, this ~9× throughput gap would remain on this platform.
 
 ### macOS / Chrome / Apple Silicon (Metal-backed WebGPU)
 
@@ -132,7 +132,7 @@ This is a structural ORT-web limitation, not something we can fix from the appli
 | Reflection | Total | 5.12 s (5.09 med) | 3.96 s (3.95 med) | wllama **−1.16 s** |
 | Reflection | Tokens/turn | 200 | 156 | — |
 
-**The Windows story does not transfer to Mac.** ONNX decode here is 40–44 tok/s, not the ~6 tok/s seen on Windows — Metal's bandwidth and the way Apple's WebGPU implementation batches dispatches hides the JSEP per-op overhead that pins NVIDIA. (Foreshadowed in [`docs/transformers-js-gemma4-perf.md`](transformers-js-gemma4-perf.md): the `num_logits_to_keep=0` bug is also still present here but masked by Metal throughput.) So on Mac the two runtimes are in the same league.
+**The Windows story does not transfer to Mac.** ONNX decode here is 40–44 tok/s, not the ~6 tok/s seen on Windows — Metal's bandwidth and the way Apple's WebGPU implementation batches dispatches hides the JSEP per-op overhead that pins NVIDIA. (Foreshadowed in [`client/docs/transformers-js-gemma4-perf.md`](transformers-js-gemma4-perf.md): the `num_logits_to_keep=0` bug is also still present here but masked by Metal throughput.) So on Mac the two runtimes are in the same league.
 
 **The Mac tradeoff:**
 - **TTFT — ONNX wins by 90–270 ms in every phase.** wllama's prefill is consistently slower (~280–350 ms regardless of scenario).
@@ -150,7 +150,7 @@ Not yet measured. Safari 26 enables WebGPU by default on iOS; expected to behave
 
 Back-to-back `createChatCompletion` calls with prompts that share little prefix (exactly the WAVE case — phase, check-in, and reflection have different system contexts) used to abort the wllama WASM worker with `RuntimeError: table index out of bounds` followed by `server-context.cpp:2848 fatal error` ([llama.cpp PR #20277](https://github.com/ggml-org/llama.cpp/pull/20277)). The slot/server harness rebuilds its prompt-cache checkpoint between unrelated prompts, and on Gemma 4 the sliding-window-attention (SWA) cache reset in that rebuild trips the bug.
 
-Setting `swa_full: true` in `loadModelParams` neutralizes it: the SWA cache covers the full context instead of just the 512-token window, so the buggy windowed-rebuild path is skipped entirely. Cost is ~250 MiB extra KV cache memory at `n_ctx=8192`. Set in [`client/lib/wllama/client.ts`](../client/lib/wllama/client.ts).
+Setting `swa_full: true` in `loadModelParams` neutralizes it: the SWA cache covers the full context instead of just the 512-token window, so the buggy windowed-rebuild path is skipped entirely. Cost is ~250 MiB extra KV cache memory at `n_ctx=8192`. Set in [`client/lib/wllama/client.ts`](../lib/wllama/client.ts).
 
 Without `swa_full`, the alternative is to dispose+reload the wllama instance between unrelated prompts (~5–10 s per reload from CacheStorage → GPU). We did this temporarily; it works but adds ~90 s to a 3-run benchmark and forfeits the warm-shader TTFT advantage on Windows (which dropped wllama TTFT from 276–309 ms with reloads to 42–185 ms warm).
 
@@ -188,9 +188,9 @@ wllama V3.1+ defaults to WebGPU with all layers offloaded. Pass `n_gpu_layers: 0
 
 To replace transformers.js+ONNX in the production runtime:
 
-1. Edit [`client/lib/gemma/local-runtime.ts`](../client/lib/gemma/local-runtime.ts). The current implementation uses `transformers.js` `pipeline()` to load `onnx-community/gemma-4-E2B-it-ONNX`. Replace with `loadWaveWllama()` from `@/lib/wllama`.
-2. Adapt the `generateGemmaChunk` / `generateGemmaCheckIn` / `generateGemmaReflection` functions in [`client/lib/gemma/*.ts`](../client/lib/gemma/) to call `wllama.createChatCompletion()` instead of the transformers.js pipeline. The message shape (`[{ role, content }]`) is identical, so this is mostly s/`pipe(messages, ...)`/`wllama.createChatCompletion({ messages, ... })`/.
-3. Remove the transformers.js patch ([`client/patches/@huggingface__transformers@4.2.0.patch`](../client/patches/)) and the `@huggingface/transformers` dependency once nothing references them.
+1. Edit [`client/lib/gemma/local-runtime.ts`](../lib/gemma/local-runtime.ts). The current implementation uses `transformers.js` `pipeline()` to load `onnx-community/gemma-4-E2B-it-ONNX`. Replace with `loadWaveWllama()` from `@/lib/wllama`.
+2. Adapt the `generateGemmaChunk` / `generateGemmaCheckIn` / `generateGemmaReflection` functions in [`client/lib/gemma/*.ts`](../lib/gemma/) to call `wllama.createChatCompletion()` instead of the transformers.js pipeline. The message shape (`[{ role, content }]`) is identical, so this is mostly s/`pipe(messages, ...)`/`wllama.createChatCompletion({ messages, ... })`/.
+3. Remove the transformers.js patch ([`client/patches/@huggingface__transformers@4.2.0.patch`](../patches/)) and the `@huggingface/transformers` dependency once nothing references them.
 4. Remove the `onnx-test/compare` page (and the ONNX `assertModelsEnabled` gate if it's now redundant).
 
 A separate followup: extend the wllama wrapper to expose `createChatCompletion` with a streaming flag, so the production check-in surface can stream tokens to the UI as they arrive rather than waiting for the full completion. wllama supports this via its `Wllama.createChatCompletion({ stream: true })` API; we just don't expose it in `loadWaveWllama` yet.

@@ -1,7 +1,7 @@
 # WAVE - Voice Test Stack
 
 > Developer-only reference for the on-device voice loop test at
-> [`/models/voice-test`](../client/app/models/voice-test/). This page validates
+> [`/models/voice-test`](../app/models/voice-test/). This page validates
 > the on-device STT → LLM → TTS pipeline, hands-free VAD, and TTS interruption
 > stack before any of it gets wired into the patient-facing session flow.
 
@@ -13,7 +13,7 @@ browser-runtime model probes) and starts with a mocked WAVE check-in scenario
 so the team can test realistic voice behavior without changing `/session`.
 
 The mocked check-in context lives in
-[`client/lib/gemma/voice-test.ts`](../client/lib/gemma/voice-test.ts) and is
+[`client/lib/gemma/voice-test.ts`](../lib/gemma/voice-test.ts) and is
 injected into the wllama Gemma runtime through `generateVoiceTestReply()`. The
 mock includes intake intensity, current score, medication status, trigger,
 prior chunk context, and the next phase. It is for developer validation only.
@@ -22,12 +22,12 @@ prior chunk context, and the next phase. It is for developer validation only.
 
 | Stage | Module | Backend |
 |-------|--------|---------|
-| STT   | [`client/lib/voice/stt-whisper.ts`](../client/lib/voice/stt-whisper.ts) | `@huggingface/transformers`, default `onnx-community/whisper-base.en` (tiny.en also selectable) |
-| LLM   | [`client/lib/gemma/voice-test.ts`](../client/lib/gemma/voice-test.ts) → [`client/lib/wllama/`](../client/lib/wllama/) | `@wllama/wllama` 3.1.1, WAVE fine-tune GGUF (`Maelstrome/lora-wave-session-r32`), streaming `createChatCompletion` |
-| TTS primary | [`client/lib/voice/tts-kokoro.ts`](../client/lib/voice/tts-kokoro.ts) | `kokoro-js` running `onnx-community/Kokoro-82M-v1.0-ONNX`, default `fp32 + WebGPU` |
-| TTS fallback | [`client/lib/voice/tts-browser.ts`](../client/lib/voice/tts-browser.ts) | Browser `speechSynthesis`, local voices only |
-| VAD   | [`client/lib/voice/vad-listener.ts`](../client/lib/voice/vad-listener.ts) | `@ricky0123/vad-web` Silero v5 via ONNX Runtime Web |
-| Orchestrator | [`client/app/models/voice-test/voice-test-client.tsx`](../client/app/models/voice-test/voice-test-client.tsx) | Wires mic → Whisper → wllama → Kokoro/browser, hands-free, interruptions, transcript, debug |
+| STT   | [`client/lib/voice/stt-whisper.ts`](../lib/voice/stt-whisper.ts) | `@huggingface/transformers`, default `onnx-community/whisper-base.en` (tiny.en also selectable) |
+| LLM   | [`client/lib/gemma/voice-test.ts`](../lib/gemma/voice-test.ts) → [`client/lib/wllama/`](../lib/wllama/) | `@wllama/wllama` 3.1.1, WAVE fine-tune GGUF (`Maelstrome/lora-wave-session-r32`), streaming `createChatCompletion` |
+| TTS primary | [`client/lib/voice/tts-kokoro.ts`](../lib/voice/tts-kokoro.ts) | `kokoro-js` running `onnx-community/Kokoro-82M-v1.0-ONNX`, default `fp32 + WebGPU` |
+| TTS fallback | [`client/lib/voice/tts-browser.ts`](../lib/voice/tts-browser.ts) | Browser `speechSynthesis`, local voices only |
+| VAD   | [`client/lib/voice/vad-listener.ts`](../lib/voice/vad-listener.ts) | `@ricky0123/vad-web` Silero v5 via ONNX Runtime Web |
+| Orchestrator | [`client/app/models/voice-test/voice-test-client.tsx`](../app/models/voice-test/voice-test-client.tsx) | Wires mic → Whisper → wllama → Kokoro/browser, hands-free, interruptions, transcript, debug |
 
 Silero VAD assets are self-hosted from `client/public/vendor/vad/`, not pulled
 from a CDN. After dependency installs/upgrades, run `pnpm prepare:vad-assets`
@@ -42,11 +42,11 @@ from `client/` to refresh:
 
 The voice-test page runs the WAVE fine-tune through `@wllama/wllama` rather
 than `transformers.js` + onnxruntime-web. The clinical session flow still uses
-ONNX Gemma via [`client/lib/gemma/local-runtime.ts`](../client/lib/gemma/local-runtime.ts);
+ONNX Gemma via [`client/lib/gemma/local-runtime.ts`](../lib/gemma/local-runtime.ts);
 they are intentionally on different engines so the test page can validate the
 wllama path independently.
 
-Load + generate surface in [`client/lib/gemma/voice-test.ts`](../client/lib/gemma/voice-test.ts):
+Load + generate surface in [`client/lib/gemma/voice-test.ts`](../lib/gemma/voice-test.ts):
 
 - `preloadVoiceTestLlm()` — singleton loader, calls `loadWaveWllama()` once and
   tracks state through `subscribeVoiceTestLlmLoad()`/`getVoiceTestLlmLoadState()`.
@@ -74,7 +74,7 @@ Jinja Exception: Conversation roles must alternate user/assistant/user/assistant
 mobile + WebGPU it keeps `n_ctx=4096` with f16 KV. On mobile without WebGPU
 it forces WASM, drops KV to `q8_0`, and turns on `flash_attn` so the 3.2 GB
 Q4_K_M weights fit alongside the KV cache in iOS Safari's ~2 GiB WASM heap.
-See [`client/lib/wllama/client.ts`](../client/lib/wllama/client.ts) for
+See [`client/lib/wllama/client.ts`](../lib/wllama/client.ts) for
 details.
 
 `swa_full: true` is set globally to dodge the llama.cpp SWA-cache crash
@@ -83,7 +83,7 @@ Costs ~250 MiB extra KV memory.
 
 ## Kokoro Runtime Options
 
-Defined in [`client/lib/voice/types.ts`](../client/lib/voice/types.ts).
+Defined in [`client/lib/voice/types.ts`](../lib/voice/types.ts).
 
 | Runtime | Notes |
 |---------|-------|
@@ -166,7 +166,7 @@ speech start. It only runs when all of these are true:
 
 When those conditions are met, the VAD listener resumes in `interruption`
 mode, which uses stricter criteria than normal speech (all in
-[`client/lib/voice/vad-listener.ts`](../client/lib/voice/vad-listener.ts)):
+[`client/lib/voice/vad-listener.ts`](../lib/voice/vad-listener.ts)):
 
 - Higher Silero positive speech threshold (`0.45` vs `0.30`).
 - Longer `minSpeechMs` gate before firing (`380` vs `240`).

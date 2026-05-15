@@ -294,7 +294,7 @@ All ignored via the repo [`.gitignore`](../../.gitignore).
 | [`../datasets/human/`](../datasets/human/) | Clinician seed JSONL (check-in 1–5, reflection, phase). Source of truth for `prepare_wave_session_dataset.py` defaults. |
 | [`../datasets/HF_README.md`](../datasets/HF_README.md) | Hugging Face dataset card for publishing the unified JSONL. |
 | [`../gguf/`](../gguf/) | Production export path — turns the PEFT-merged base into a Q4_K_M GGUF for wllama / Ollama / llama-cli. |
-| [`../onnx/`](../onnx/) | Parked ONNX export path (fp16 WebGPU divergence). See [`../../docs/onnx-webgpu-divergence.md`](../../docs/onnx-webgpu-divergence.md). |
+| [`../onnx/`](../onnx/) | Parked ONNX export path (fp16 WebGPU divergence). See [`../../client/docs/onnx-webgpu-divergence.md`](../../client/docs/onnx-webgpu-divergence.md). |
 | [`../contest-results/`](../contest-results/) | Frozen artifacts from the phase-narration contest run. |
 | [`../../docs/model-training.md`](../../docs/model-training.md) | Product ship gates and adapter manifest rules. |
 | [`../../docs/models.md`](../../docs/models.md) | Per-surface model contract (which adapter is used where, base-only crisis behavior). |

@@ -389,7 +389,7 @@ def run_track_b(source_path: Path, out_dir: Path) -> None:
     # NOTE: graph-optimization in `bert` mode was a no-op in the original
     # pipeline. `gpt2` mode (set in `_optimize_graph`) fuses 70 Tanh-based
     # gelu_pytorch_tanh chains into 70 FastGelu contrib ops, which is what
-    # unblocks browser WebGPU generation (see docs/onnx-webgpu-divergence.md).
+    # unblocks browser WebGPU generation (see client/docs/onnx-webgpu-divergence.md).
     # The fusion runs AFTER fp16 cast + q4 quantization on the decoder so it
     # operates on the smallest possible graph.
 
@@ -531,7 +531,7 @@ def _optimize_graph(src: Path, dst: Path) -> None:
     Without this, the decoder ships with the Tanh-based `gelu_pytorch_tanh`
     decomposition (70 `Tanh` + many `Pow(x, 3)` ops). On `onnxruntime-web`
     WebGPU this NaN-cascades for long prompts and the model emits a stop
-    token at step 0 — see docs/onnx-webgpu-divergence.md.
+    token at step 0 — see client/docs/onnx-webgpu-divergence.md.
 
     `model_type="gpt2"` with `opt_level=0` is the combination that fuses
     the gelu-tanh chain into a single `FastGelu` contrib op which Dawn

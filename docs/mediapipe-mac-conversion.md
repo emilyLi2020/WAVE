@@ -312,6 +312,6 @@ also runs into trouble:
 - Local-hf server (with `/mediapipe/<file>` mount): [`client/scripts/serve-local-hf.ts`](../client/scripts/serve-local-hf.ts)
 - The merged checkpoint to convert: `models/runs/merge-peft/`
 - The base Gemma 4 `.task` for comparison: `models/mediapipe/gemma-4-E2B-it-web.task` (1.86 GB)
-- Background on why ONNX failed: [`docs/onnx-webgpu-divergence.md`](onnx-webgpu-divergence.md)
+- Background on why ONNX failed: [`client/docs/onnx-webgpu-divergence.md`](../client/docs/onnx-webgpu-divergence.md)
 - Original training/merge pipeline: [`docs/onnx-windows-handoff.md`](onnx-windows-handoff.md)
 - Issue #6: <https://github.com/emilyLi2020/Wave/issues/6>

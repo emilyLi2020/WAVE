@@ -344,7 +344,7 @@ The EU's Digital Markets Act technically allows alternative engines in the EU si
 - Before committing to a runtime, `caniuse` every WASM proposal in its build flags. Memory64 status on Safari was a two-minute lookup. We didn't do it.
 - The iOS browser surface for a 4B-Q4 model in 2026 is fragile across three independent dimensions: Safari hasn't shipped Memory64, the runtimes that need it don't ship 32-bit fallbacks, and even a fallback wouldn't fit under the 4 GiB ceiling on a model this size. Browser-first iOS LLMs at this scale are a 2027+ bet, contingent on all three closing.
 
-→ Full detail: [`docs/wllama.md`](../wllama.md), [`ios-safari-browser.md`](./ios-safari-browser.md)
+→ Full detail: [`client/docs/wllama.md`](../../client/docs/wllama.md), [`ios-safari-browser.md`](./ios-safari-browser.md)
 
 ---
 

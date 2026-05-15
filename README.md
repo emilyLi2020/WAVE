@@ -24,5 +24,5 @@ The active demo is in `client/`. The session flow uses local Gemma-backed medita
 - **`PRD.md`** — source of truth for what to build. Every scaffold, route, and prompt is derived from it.
 - **`docs/models.md`** — per-model reference: the Gemma 4 base, every LoRA adapter, what each one is fine-tuned for, where it is used in the product, and its input/output contract.
 - **`docs/model-training.md`** — how we produce every LoRA: data collection, Synthetix synthetic-data pipeline, clinician spot-check, train/test split, QLoRA training recipe, eval harness, and ship gates.
-- **`docs/voice-test.md`** — developer-only voice stack reference for `/training/voice-test`: Whisper STT, Gemma streaming, Kokoro TTS, hands-free VAD, and interruption detection.
+- **`client/docs/voice-test.md`** — developer-only voice stack reference for `/training/voice-test`: Whisper STT, Gemma streaming, Kokoro TTS, hands-free VAD, and interruption detection.
 - **`client/.cursor/rules/frontend-guardrails.mdc`** — frontend guardrails scoped to `client/`.

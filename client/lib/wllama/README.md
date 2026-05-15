@@ -53,6 +53,6 @@ That script exposes three mounts on `localhost:8765`: HF-style at `/<repo>/resol
 
 ## See also
 
-- [`docs/wllama.md`](../../../docs/wllama.md) — end-to-end design doc: why wllama over ONNX, how the file structure fits together, how to extend to production.
+- [`client/docs/wllama.md`](../../docs/wllama.md) — end-to-end design doc: why wllama over ONNX, how the file structure fits together, how to extend to production.
 - [`models/gguf/README.md`](../../../models/gguf/README.md) — Python-side conversion pipeline that produces the GGUF this lib loads.
 - [`client/public/wllama/wllama.wasm`](../../public/wllama/wllama.wasm) — the WASM binary served at `/wllama/wllama.wasm`. Copied from `node_modules/@wllama/wllama/esm/wasm/wllama.wasm` after `pnpm install`.

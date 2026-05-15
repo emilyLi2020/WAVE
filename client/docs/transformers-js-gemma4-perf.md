@@ -23,7 +23,7 @@ manually patch.
 ## Root cause
 
 `decoder_forward()` in transformers.js 4.2.0 (installed at
-[client/node_modules/.pnpm/@huggingface+transformers@4.2.0/node_modules/@huggingface/transformers/dist/transformers.node.cjs:25901-25903](../client/node_modules/.pnpm/@huggingface+transformers@4.2.0/node_modules/@huggingface/transformers/dist/transformers.node.cjs)):
+[client/node_modules/.pnpm/@huggingface+transformers@4.2.0/node_modules/@huggingface/transformers/dist/transformers.node.cjs:25901-25903](../node_modules/.pnpm/@huggingface+transformers@4.2.0/node_modules/@huggingface/transformers/dist/transformers.node.cjs)):
 
 ```js
 if (session.inputNames.includes("num_logits_to_keep") && !new_model_inputs.num_logits_to_keep) {
@@ -83,20 +83,20 @@ the lm_head step every token. Roughly matches the observed 6 tok/s vs the
 
 ## How to A/B confirm on a given machine
 
-Load the [/models/onnx-test/compare](../client/app/models/onnx-test/compare/page.tsx)
+Load the [/models/onnx-test/compare](../app/models/onnx-test/compare/page.tsx)
 page, run all three tasks, note tok/s. Apply workaround 3, reload, re-run.
 Expect roughly a 5–10× jump on NVIDIA Windows.
 
 ## Related repo work this affects
 
 - The
-  [/models/onnx-test/compare](../client/app/models/onnx-test/compare/page.tsx)
+  [/models/onnx-test/compare](../app/models/onnx-test/compare/page.tsx)
   page surfaces this bug because both upstream and our fine-tune share the
   same `Gemma4ForConditionalGeneration` forward path in transformers.js.
 - The "we shipped a slower ONNX than upstream" suspicion was wrong: this is
   a runtime-side issue, not an export-side regression.
 - The production runtime in
-  [client/lib/gemma/local-runtime.ts](../client/lib/gemma/local-runtime.ts)
+  [client/lib/gemma/local-runtime.ts](../lib/gemma/local-runtime.ts)
   hits the same code path and is equally affected — including the
   multi-turn check-in, chunk narration, and reflection flows.
 

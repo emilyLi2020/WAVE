@@ -181,5 +181,5 @@ See the [postmortem §"What we tried that doesn't work"](../../docs/postmortems/
 
 - [`docs/postmortems/onnx-finetune.md`](../../docs/postmortems/onnx-finetune.md) — the canonical write-up of why v3 through v7 all fail on browser WebGPU.
 - [`docs/postmortems/onnx-export.md`](../../docs/postmortems/onnx-export.md) — the original Mac export postmortem (predates the Windows handoff and the WebGPU divergence finding; export-time details only).
-- [`docs/onnx-webgpu-divergence.md`](../../docs/onnx-webgpu-divergence.md) — earlier write-up of the divergence finding; superseded by the postmortem.
-- [`docs/transformers-js-gemma4-perf.md`](../../docs/transformers-js-gemma4-perf.md) — orthogonal `num_logits_to_keep` patch for transformers.js v4.2.0. Still applies; nothing in this directory changes it.
+- [`client/docs/onnx-webgpu-divergence.md`](../../client/docs/onnx-webgpu-divergence.md) — earlier write-up of the divergence finding; superseded by the postmortem.
+- [`client/docs/transformers-js-gemma4-perf.md`](../../client/docs/transformers-js-gemma4-perf.md) — orthogonal `num_logits_to_keep` patch for transformers.js v4.2.0. Still applies; nothing in this directory changes it.

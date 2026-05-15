@@ -1,6 +1,6 @@
 ## TL;DR
 
-The browser fine-tune path documented in [`docs/wllama.md`](../blob/main/docs/wllama.md) doesn't run on iOS. wllama 3.x's bundled llama.cpp WASM build requires the [Memory64 proposal](https://github.com/WebAssembly/memory64), which Safari (and therefore every iOS browser — Apple's App Store rules force Chrome/Firefox/etc. on iOS to use WebKit) does not implement. Model load aborts with `TypeError: Conversion from BigInt to number is not allowed`. Full evidence and the cross-runtime "we tried everything" table is in [`docs/postmortems/ios-safari-browser.md`](../blob/main/docs/postmortems/ios-safari-browser.md).
+The browser fine-tune path documented in [`client/docs/wllama.md`](../blob/main/client/docs/wllama.md) doesn't run on iOS. wllama 3.x's bundled llama.cpp WASM build requires the [Memory64 proposal](https://github.com/WebAssembly/memory64), which Safari (and therefore every iOS browser — Apple's App Store rules force Chrome/Firefox/etc. on iOS to use WebKit) does not implement. Model load aborts with `TypeError: Conversion from BigInt to number is not allowed`. Full evidence and the cross-runtime "we tried everything" table is in [`docs/postmortems/ios-safari-browser.md`](../blob/main/docs/postmortems/ios-safari-browser.md).
 
 For a medical hackathon where third-party cloud inference is disallowed, we need an on-device path on iOS. The plan: **port the WAVE app to React Native (Expo)** with two LLM runtimes selectable side-by-side — `llama.rn` (loads our existing Q4_K_M GGUF, native Metal) and `react-native-litert-lm` (loads our existing 4.7 GB LITERTLM bundle, native LiteRT-LM). Same model fine-tune, two runtimes, one app. Whisper STT via `whisper.rn`, Kokoro TTS via `react-native-sherpa-onnx`. All on-device, no cloud, hits hackathon constraint.
 
@@ -121,7 +121,7 @@ Shared:
 ## References
 
 - iOS Safari postmortem: [`docs/postmortems/ios-safari-browser.md`](../blob/main/docs/postmortems/ios-safari-browser.md)
-- Existing wllama desktop doc: [`docs/wllama.md`](../blob/main/docs/wllama.md)
+- Existing wllama desktop doc: [`client/docs/wllama.md`](../blob/main/client/docs/wllama.md)
 - Sibling browser-runtime postmortems: [`docs/postmortems/`](../blob/main/docs/postmortems/)
 - Upstream blocker for browser path: [ngxson/wllama#210](https://github.com/ngxson/wllama/issues/210)
 - LiteRT-LM iOS Swift SDK status: ["coming soon" per Google AI Edge docs](https://ai.google.dev/edge/litert-lm)

@@ -182,6 +182,6 @@ The current [`client/lib/gemma/local-runtime.ts:27`](../../client/lib/gemma/loca
 - Related Wave docs:
   - [`docs/postmortems/onnx-export.md`](./onnx-export.md) — the original Mac export postmortem (predates the Windows handoff and the WebGPU divergence finding)
   - [`docs/postmortems/mlc-finetune.md`](./mlc-finetune.md) — the parallel MLC investigation
-  - [`docs/onnx-webgpu-divergence.md`](../onnx-webgpu-divergence.md) — pre-postmortem write-up of v3 → v4 finding; superseded by this doc
+  - [`client/docs/onnx-webgpu-divergence.md`](../../client/docs/onnx-webgpu-divergence.md) — pre-postmortem write-up of v3 → v4 finding; superseded by this doc
   - [`docs/onnx-windows-handoff.md`](../onnx-windows-handoff.md) — the original Windows handoff that became this postmortem
-  - [`docs/transformers-js-gemma4-perf.md`](../transformers-js-gemma4-perf.md) — the orthogonal `num_logits_to_keep` patch (still applies; nothing in this postmortem changes it)
+  - [`client/docs/transformers-js-gemma4-perf.md`](../../client/docs/transformers-js-gemma4-perf.md) — the orthogonal `num_logits_to_keep` patch (still applies; nothing in this postmortem changes it)

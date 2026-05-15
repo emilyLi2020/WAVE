@@ -4,7 +4,7 @@ after Pow. This puts `mean(x²)` accumulation in fp32 internally — same effect
 as SimplifiedLayerNormalization's stash_type=1.
 
 The unmatched chains are V-projection norms (no learned weight), per
-docs/onnx-webgpu-divergence.md. Their normalized last-dim varies per layer
+client/docs/onnx-webgpu-divergence.md. Their normalized last-dim varies per layer
 (256 vs 512 head_dim) so a single ones-weight tensor can't replace all of
 them. Casting around the variance avoids needing to know the shape.
 

@@ -2,7 +2,7 @@
 
 > Sibling to [`onnx-finetune.md`](./onnx-finetune.md) (7 ONNX iterations, `len=0` on browser WebGPU), [`mlc-finetune.md`](./mlc-finetune.md) (MLC web-llm, KV cache leaks between calls), and [`mediapipe-finetune.md`](./mediapipe-finetune.md) (LITERTLM container with no public browser consumer). Each of those documented a *specific* runtime failing on our specific fine-tune. This document covers the cross-cutting problem: every browser runtime we've evaluated fails on iOS, and not for runtime-specific reasons. The blocker is the WebKit JavaScript/WASM engine that every iOS browser is forced to use, regardless of vendor.
 >
-> Resulting state on 2026-05-15: wllama, the runtime that ships to desktop (per [`docs/wllama.md`](../wllama.md)), aborts during model load on iOS Safari 26 with `Conversion from BigInt to number is not allowed`. The cause is upstream: wllama 3.x's bundled llama.cpp WASM build requires the `Memory64` proposal, which Safari does not implement. No other runtime in our evaluation works for Gemma 4 either ([`mlc-finetune.md`](./mlc-finetune.md), [`mediapipe-finetune.md`](./mediapipe-finetune.md), [`onnx-finetune.md`](./onnx-finetune.md) — same model, three separate dead ends). **No browser-shipped on-device path to Gemma 4 E2B exists on iOS today.**
+> Resulting state on 2026-05-15: wllama, the runtime that ships to desktop (per [`client/docs/wllama.md`](../../client/docs/wllama.md)), aborts during model load on iOS Safari 26 with `Conversion from BigInt to number is not allowed`. The cause is upstream: wllama 3.x's bundled llama.cpp WASM build requires the `Memory64` proposal, which Safari does not implement. No other runtime in our evaluation works for Gemma 4 either ([`mlc-finetune.md`](./mlc-finetune.md), [`mediapipe-finetune.md`](./mediapipe-finetune.md), [`onnx-finetune.md`](./onnx-finetune.md) — same model, three separate dead ends). **No browser-shipped on-device path to Gemma 4 E2B exists on iOS today.**
 
 ## TL;DR
 
@@ -104,7 +104,7 @@ Operationally: the iOS browser surface for any model in the 1-4B Q4 size range i
 
 **For the hackathon submission**, two parallel surfaces:
 
-1. **Desktop browser** — Chrome / Edge on Windows, macOS, Linux. Already working via wllama at the perf numbers documented in [`docs/wllama.md`](../wllama.md). This is the primary submission surface.
+1. **Desktop browser** — Chrome / Edge on Windows, macOS, Linux. Already working via wllama at the perf numbers documented in [`client/docs/wllama.md`](../../client/docs/wllama.md). This is the primary submission surface.
 2. **Native iOS app via `llama.cpp/examples/llama.swiftui`** — same `gemma-4-e2b-it-peft.Q4_K_M.gguf` shards (after `llama-gguf-split --merge` to combine into a single file), loaded natively, decode via Metal. STT via WhisperKit. TTS via `AVSpeechSynthesizer` for the demo (Kokoro via ONNX Runtime Swift is the post-hackathon upgrade). No model-side rework — our existing GGUF, prompts, and chat template work unchanged.
 
 The cloud-fallback option that would be standard for non-medical applications (iOS user → server-side inference) is explicitly disallowed by the hackathon's medical use case constraint. On-device or nothing.
@@ -117,7 +117,7 @@ The cloud-fallback option that would be standard for non-medical applications (i
 - The wllama wrapper (where `nGpuLayers` and the WebGPU probe live): [`client/lib/wllama/client.ts`](../../client/lib/wllama/client.ts)
 - Production COOP/COEP gating (dev-mode tap-event fix that surfaced this): [`client/next.config.ts`](../../client/next.config.ts)
 - Sibling browser-runtime postmortems: [`onnx-finetune.md`](./onnx-finetune.md), [`mlc-finetune.md`](./mlc-finetune.md), [`mediapipe-finetune.md`](./mediapipe-finetune.md), [`mlc-build.md`](./mlc-build.md)
-- The currently-shipping desktop browser runtime: [`docs/wllama.md`](../wllama.md)
+- The currently-shipping desktop browser runtime: [`client/docs/wllama.md`](../../client/docs/wllama.md)
 - Canonical upstream issue: [ngxson/wllama#210](https://github.com/ngxson/wllama/issues/210)
 - Memory64 proposal status: [WebAssembly/memory64](https://github.com/WebAssembly/memory64), [caniuse](https://caniuse.com/?search=memory64)
 - Apple WebKit-only browser policy: [App Store Review Guidelines §2.5.6](https://developer.apple.com/app-store/review/guidelines/#2.5.6)

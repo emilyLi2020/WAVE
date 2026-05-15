@@ -420,7 +420,7 @@ export function useCheckInVoiceLoop(
             }
           },
           onSpeechEnd: (audio: Float32Array, _level: VadListenerLevel) => {
-            // VAD returns 16 kHz mono PCM (per docs/voice-test.md).
+            // VAD returns 16 kHz mono PCM (per client/docs/voice-test.md).
             void processPatientTurn(audio, 16_000);
           },
           onSpeechMisfire: () => {

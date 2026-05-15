@@ -117,7 +117,7 @@ Operationally: when a vendor's docs say "we publish artifacts but no recipe," th
 
 ## What ships instead
 
-The fine-tune runs in the browser via wllama (`Maelstrome/lora-wave-session-r32` GGUF Q4_K_M split shards, served as `/gguf/*` from the local-hf mirror). See [`docs/wllama.md`](../wllama.md). Production runtime in [`client/lib/gemma/local-runtime.ts`](../../client/lib/gemma/local-runtime.ts) was not switched to MediaPipe — the test page at [`/models/mediapipe-finetune-test`](../../client/app/models/mediapipe-finetune-test/) is parked, not load-bearing. If `@mediapipe/tasks-genai` ever registers a `LITERTLM` matcher (or `litert-torch` ever grows a `--web-task` flag), the page will be ready and we'll just need to flip a URL.
+The fine-tune runs in the browser via wllama (`Maelstrome/lora-wave-session-r32` GGUF Q4_K_M split shards, served as `/gguf/*` from the local-hf mirror). See [`client/docs/wllama.md`](../../client/docs/wllama.md). Production runtime in [`client/lib/gemma/local-runtime.ts`](../../client/lib/gemma/local-runtime.ts) was not switched to MediaPipe — the test page at [`/models/mediapipe-finetune-test`](../../client/app/models/mediapipe-finetune-test/) is parked, not load-bearing. If `@mediapipe/tasks-genai` ever registers a `LITERTLM` matcher (or `litert-torch` ever grows a `--web-task` flag), the page will be ready and we'll just need to flip a URL.
 
 ## File references
 
@@ -125,7 +125,7 @@ The fine-tune runs in the browser via wllama (`Maelstrome/lora-wave-session-r32`
 - Browser test page (parked, scaffolding intact): [`client/app/models/mediapipe-finetune-test/`](../../client/app/models/mediapipe-finetune-test/)
 - Sibling pivots: [`mlc-finetune.md`](./mlc-finetune.md), [`onnx-finetune.md`](./onnx-finetune.md)
 - The HF bundle (for anyone repeating this dead-end): `Maelstrome/lora-wave-session-r32` under `mediapipe/`
-- The currently-shipping browser runtime: [`docs/wllama.md`](../wllama.md)
+- The currently-shipping browser runtime: [`client/docs/wllama.md`](../../client/docs/wllama.md)
 - Issue tracking this with reproduction: [Wave#8](https://github.com/emilyLi2020/Wave/issues/8)
 - Google staff statement: [HF litert-community/TranslateGemma-4B-IT discussion #1](https://huggingface.co/litert-community/TranslateGemma-4B-IT/discussions/1)
 - Canonical upstream issue: [google-ai-edge/LiteRT-LM#2150](https://github.com/google-ai-edge/LiteRT-LM/issues/2150)

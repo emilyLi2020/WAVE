@@ -156,4 +156,4 @@ Pick the subdir that matches what you want to do:
 
 - **Train a new LoRA** or re-run eval against the existing one → [`finetune/README.md`](finetune/README.md).
 - **Rebuild the shipping GGUF** from a merged base → [`gguf/README.md`](gguf/README.md).
-- **Read the ONNX postmortem** → [`onnx/README.md`](onnx/README.md) and [`../docs/onnx-webgpu-divergence.md`](../docs/onnx-webgpu-divergence.md).
+- **Read the ONNX postmortem** → [`onnx/README.md`](onnx/README.md) and [`../client/docs/onnx-webgpu-divergence.md`](../client/docs/onnx-webgpu-divergence.md).

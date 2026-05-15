@@ -129,4 +129,4 @@ The GGUF path goes through `llama.cpp`'s own WebGPU/WASM kernels (via wllama), w
 | [`../../client/scripts/dump-wave-prompts.ts`](../../client/scripts/dump-wave-prompts.ts) | Renders the three production WAVE prompts and writes them as JSON for `bench_wave_prompts.py` to read. |
 | [`../../client/lib/wllama/`](../../client/lib/wllama/) | Client-side wllama wrapper used by the browser test page and (eventually) the production runtime. |
 | [`../../client/app/models/wllama-test/`](../../client/app/models/wllama-test/) | Browser-side test surface for the GGUF. Loads from HF by default; `?local=1` routes to the local-hf mirror. |
-| [`../../docs/wllama.md`](../../docs/wllama.md) | End-to-end design doc: why we ship via wllama, how the pieces fit together, how to extend to production. |
+| [`../../client/docs/wllama.md`](../../client/docs/wllama.md) | End-to-end design doc: why we ship via wllama, how the pieces fit together, how to extend to production. |
