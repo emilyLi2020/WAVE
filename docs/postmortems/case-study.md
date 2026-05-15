@@ -20,10 +20,10 @@ Almost. Four different ways.
 
 | Runtime | Conversion | Browser load | Coherent output | Multi-turn safe | iOS Safari | Verdict |
 |---|---|---|---|---|---|---|
-| ONNX + transformers.js | hand-rolled, 10 iterations | yes | yes on Node CPU; `len=0` on WebGPU | n/a | no | fp16 overflow inside `onnxruntime-web` |
-| MLC + web-llm | PR #3485 source build | yes | yes on first prompt | KV-cache state leaks | no | workaround is 3–5 s engine reload per call |
-| MediaPipe + tasks-genai | litert-torch `LITERTLM` | `No model format matched` | n/a | n/a | no | no browser SDK reads what the converter writes |
-| wllama + GGUF | llama.cpp `convert_hf_to_gguf` | yes on Chromium/Firefox | 60 tok/s on Blackwell | yes | Memory64 unsupported | ships on desktop; dies on iOS at the WebKit layer |
+| ONNX + transformers.js | ✅ hand-rolled, 10 iterations | ✅ | ⚠️ Node CPU only; `len=0` on WebGPU | n/a | ❌ | **dead** — fp16 overflow in `onnxruntime-web` |
+| MLC + web-llm | ✅ PR #3485 source build | ✅ | ⚠️ first prompt only | ❌ KV-cache state leaks | ❌ | **dead** — 3–5 s engine reload per call to work around |
+| MediaPipe + tasks-genai | ✅ litert-torch `LITERTLM` | ❌ `No model format matched` | n/a | n/a | ❌ | **dead** — no browser SDK reads the converter's output |
+| wllama + GGUF | ✅ llama.cpp `convert_hf_to_gguf` | ✅ Chromium/Firefox | ✅ **60 tok/s on Blackwell** | ✅ | ❌ Memory64 unsupported | **ships** on desktop; dies on iOS at the WebKit layer |
 
 We shipped wllama on desktop. We pivoted to React Native for iOS. Everything else is parked.
 
@@ -79,11 +79,11 @@ Five rewriter variants chased the gap:
 
 | Variant | Patch | Browser WebGPU |
 |---|---|---|
-| v3 | Original export | `len=0` |
-| v4 | ORT `optimize_model(model_type="gpt2")` fused 70 `Tanh` chains into `FastGelu` | `len=0` |
-| v5 | Rewrote 242 `Pow(x, 2.0)` to `Mul(x, x)` because WebGPU implements `Pow(y, x)` as `exp(x · ln(y))` and that's NaN for y ≤ 0 | `len=0` |
-| v6 | Pattern-fused 227 of 242 RMSNorms into `SimplifiedLayerNormalization(stash_type=1)` | `len=0` |
-| v7 | Wrapped the remaining 15 variance chains with explicit `Cast(fp32)` pairs | `len=0` |
+| v3 | Original export | ❌ `len=0` |
+| v4 | ORT `optimize_model(model_type="gpt2")` fused 70 `Tanh` chains into `FastGelu` | ❌ `len=0` |
+| v5 | Rewrote 242 `Pow(x, 2.0)` to `Mul(x, x)` because WebGPU implements `Pow(y, x)` as `exp(x · ln(y))` and that's NaN for y ≤ 0 | ❌ `len=0` |
+| v6 | Pattern-fused 227 of 242 RMSNorms into `SimplifiedLayerNormalization(stash_type=1)` | ❌ `len=0` |
+| v7 | Wrapped the remaining 15 variance chains with explicit `Cast(fp32)` pairs | ❌ `len=0` |
 
 Every variant closed one overflow site. CPU output stayed coherent on every one. Browser WebGPU stayed at `len=0` on every one. Whatever overflow we hadn't patched yet was sufficient on its own to kill long-context generation.
 
@@ -147,10 +147,10 @@ We hand-patched each model's `mlc-chat-config.json` to use Gemma 4's real tokens
 
 | Order | Our fine-tune | Unsloth base |
 |---|---|---|
-| #1 "Count to 5" | `1, 2, 3, 4, 5` ✓ | `1, 2, 3, 4, 5` ✓ |
-| #2 "I'm feeling anxious..." | `(0 tokens)` ✗ | `(0 tokens)` ✗ |
-| #3 "Capital of France?" | "Please provide the sentence or question..." ✗ | "Please provide a clear question..." ✗ |
-| #4 "Haiku about waves" | `wave deep wave deep` ✗ | `**ocean** **ocean** **ocean**` ✗ |
+| #1 "Count to 5" | ✅ `1, 2, 3, 4, 5` | ✅ `1, 2, 3, 4, 5` |
+| #2 "I'm feeling anxious..." | ❌ `(0 tokens)` | ❌ `(0 tokens)` |
+| #3 "Capital of France?" | ❌ *"Please provide the sentence or question..."* | ❌ *"Please provide a clear question..."* |
+| #4 "Haiku about waves" | ❌ `wave deep wave deep` | ❌ `**ocean** **ocean** **ocean**` |
 
 Reorder the prompts and whichever runs first comes out clean. The KV cache is leaking between calls.
 
@@ -297,11 +297,11 @@ Three runs per scenario, temperature 0, greedy decode. Both ONNX and wllama runn
 
 | Scenario | Metric | ONNX base (q4f16) | wllama fine-tune (Q4_K_M) | wllama advantage |
 |---|---|---|---|---|
-| Phase narration | Decode | 6.8 tok/s | 60.1 tok/s | 8.8× |
-| Phase narration | TTFT | 203 ms | 42 ms | 4.8× |
-| Phase narration | Total (~65 tok) | 9.45 s | 1.16 s | 8.1× |
-| Check-in turn | Decode | 6.6 tok/s | 59.0 tok/s | 8.9× |
-| Check-in turn | TTFT | 295 ms | 152 ms | 1.9× |
+| Phase narration | Decode | 6.8 tok/s | **60.1 tok/s** | 🚀 **8.8×** |
+| Phase narration | TTFT | 203 ms | **42 ms** | **4.8×** |
+| Phase narration | Total (~65 tok) | 9.45 s | **1.16 s** | 🚀 **8.1×** |
+| Check-in turn | Decode | 6.6 tok/s | **59.0 tok/s** | 🚀 **8.9×** |
+| Check-in turn | TTFT | 295 ms | **152 ms** | **1.9×** |
 
 For a guided-breathwork app, 1.16 seconds to deliver a 65-token phase narration is the difference between an app that feels alive and a user staring at a spinner during a panic attack.
 
@@ -387,9 +387,9 @@ When evaluating a runtime, the real benchmark is "multi-turn correctness with co
 
 | Layer | Velocity | Examples |
 |---|---|---|
-| Model architecture (PyTorch) | days | Gemma 4 released, training works the same day via Unsloth |
-| Runtime kernels | months | ONNX contrib ops, MLC PR #3485, wllama llama.cpp updates |
-| Browser engine (Chromium, WebKit) | years | WebGPU, Memory64, fp16 stability in shader compilers |
+| Model architecture (PyTorch) | ⚡ days | Gemma 4 released, training works the same day via Unsloth |
+| Runtime kernels | ⏳ months | ONNX contrib ops, MLC PR #3485, wllama llama.cpp updates |
+| Browser engine (Chromium, WebKit) | 🐢 **years** | WebGPU, Memory64, fp16 stability in shader compilers |
 
 A new model architecture flows down this stack at the speed of its slowest layer. For iOS, the slowest layer is Apple's WebKit team's roadmap, on Apple's timelines. We aren't unblocking that from the application layer.
 
