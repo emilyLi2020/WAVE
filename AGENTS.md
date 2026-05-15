@@ -35,7 +35,7 @@ The checked-in web demo now routes model-backed surfaces through `client/lib/gem
 - Chunk narration: [client/lib/gemma/chunk.ts](client/lib/gemma/chunk.ts) calls local Gemma for each of the five meditation chunks and falls back to clinician-reviewed local copy after two invalid attempts.
 - Reflection: [client/lib/gemma/session.ts](client/lib/gemma/session.ts) calls local Gemma for the final structured reflection while preserving validation + fallback semantics.
 - Insights regeneration: [client/app/insights/page.tsx](client/app/insights/page.tsx) calls local Gemma directly and validates the returned insight cards.
-- Voice test: [client/app/training/voice-test](client/app/training/voice-test) is a developer-only isolated test page for on-device conversational voice. It uses Whisper STT, the local Gemma voice-test boundary, Kokoro TTS, hands-free VAD, and explicit interruption detection. Details live in `client/docs/voice-test.md`.
+- Voice test: [client/app/models/voice-test](client/app/models/voice-test) is a developer-only isolated test page for on-device conversational voice. It uses Whisper STT, the local Gemma voice-test boundary (wllama), Kokoro TTS, hands-free VAD, and explicit interruption detection. Details live in `client/docs/voice-test.md`.
 - Fallback bank: `client/lib/prompts/fallback-bank.ts` holds local fallbacks for chunks, check-ins, and reflection.
 
 The intake safety screen, fallback bank, and crisis-routing rules remain rule-based and never trust a model decision.
@@ -54,7 +54,7 @@ The intake safety screen, fallback bank, and crisis-routing rules remain rule-ba
 - **Crisis triage runs on base Gemma with no LoRA** — the safety boundary that must never be fine-tuned. Routing to 988 / SAMHSA / local emergency is rule-based and never trusted to the model.
 - Mock data / local UI state for the web demo's dashboard, history, and insights defaults
 - CSS/Tailwind wave animation and an ambient audio bed during the session
-- Developer-only `/training/voice-test` surface for validating the future voice stack: Whisper STT, Gemma streamed replies, Kokoro TTS with WebGPU default and WASM fallback, native Kokoro text/audio streaming, hands-free VAD, and interruption detection that suppresses self-triggering from TTS audio.
+- Developer-only `/models/voice-test` surface for validating the voice stack: Whisper STT, wllama Gemma streamed replies, Kokoro TTS with WebGPU default and WASM fallback, native Kokoro text/audio streaming, hands-free VAD, and interruption detection that suppresses self-triggering from TTS audio. This stack now also drives the production `/session` voice check-in.
 - Scripted local fallback bank as the single fallback when local Gemma fails to load or output fails validation twice
 
 **Production mobile (roadmap):**
@@ -186,6 +186,6 @@ Same global discipline as check-ins 2–3 (no check-in-1 med + surf paragraph on
 - Prompt templates in `client/lib/prompts/` use XML-style tagged sections (`<role>`, `<voice>`, `<never>`, `<output>` in system prompts; `<situation>` / `<clinical_source>` / `<citation_required>` in user turns) so the same prompts run portably on Gemma 4 E2B-it and any future runtime wrapper.
 - The insights regenerate flow lives in `client/app/insights/page.tsx` and calls `generateGemmaInsights()` from the local runtime.
 - The `sessions` array on insights/regen requests is capped at 200 in `client/lib/prompts/schemas.ts`; expanding the mock dataset past that cap requires bumping the schema first.
-- The developer-only voice test stack is documented in `client/docs/voice-test.md`. Keep voice experiments isolated under `/training/voice-test` until they are intentionally promoted into `/session`; do not wire voice changes into the patient-facing flow as part of test-page work.
+- The developer-only voice test stack is documented in `client/docs/voice-test.md`. Keep voice experiments isolated under `/models/voice-test` until they are intentionally promoted into `/session`; do not wire voice changes into the patient-facing flow as part of test-page work.
 - `pnpm test:gemma:tools:live` is a Node smoke test that uses the filesystem cache at `client/.cache/transformers`; it does not benchmark browser WebGPU acceleration. Browser Gemma uses `GEMMA_CACHE_KEY = "wave-gemma4-cache"` with browser cache/IndexedDB and still reloads the model into memory after a full refresh.
 - For Gemma 4 E2B training/eval, installing FlashAttention 2 may not speed this repo's path because Unsloth can still fall back to SDPA when Gemma 4's attention head dimension exceeds FA2 kernel limits; do not treat FA2 presence alone as proof the run is accelerated.
