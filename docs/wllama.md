@@ -83,7 +83,13 @@ wllama doesn't use `onnxruntime-web` at all. It compiles llama.cpp's WebGPU kern
 
 ## Runtime performance — measured
 
-Captured on Windows 11 / Chrome / NVIDIA Blackwell discrete GPU via [`/models/onnx-test/benchmark`](../client/app/models/onnx-test/benchmark-client.tsx) (3 runs per scenario, temperature 0, greedy decode). Both runtimes confirmed on WebGPU — `navigator.gpu.requestAdapter` returns a real adapter for both, and ORT logs the same adapter-init warning that wllama does. So this is an apples-to-apples WebGPU comparison, not a "ONNX on CPU vs wllama on GPU" comparison.
+Both runtimes are measured via [`/models/onnx-test/benchmark`](../client/app/models/onnx-test/benchmark-client.tsx) with temperature 0, greedy decode. Both confirmed on WebGPU — `navigator.gpu.requestAdapter` returns a real adapter for both, and ORT logs the same adapter-init warning that wllama does. So these are apples-to-apples WebGPU comparisons, not "ONNX on CPU vs wllama on GPU" comparisons.
+
+iPhone (Safari 26 / WebGPU) is the next platform to benchmark — see [iOS slot below](#ios-iphone-tbd).
+
+### Windows 11 / Chrome / NVIDIA Blackwell discrete GPU
+
+3 runs per scenario.
 
 | Scenario | Metric | ONNX base (q4f16) | wllama fine-tune (Q4_K_M) | wllama advantage |
 |---|---|---|---|---|
@@ -97,13 +103,46 @@ Captured on Windows 11 / Chrome / NVIDIA Blackwell discrete GPU via [`/models/on
 | Reflection | TTFT | 237 ms | 299 ms | ONNX +62 ms |
 | Reflection | Total (200 tok cap) | 30.71 s | 4.55 s | **6.7×** |
 
-**Decode is the bottleneck for ONNX.** Prefill (TTFT) is roughly tied — within ~70ms either way. But ONNX decode is pinned at ~6.6 tok/s across every scenario, regardless of context length, which is the giveaway that the limit is per-token dispatch overhead, not prefill or model size.
+**Decode is the bottleneck for ONNX on Windows/NVIDIA.** Prefill (TTFT) is roughly tied — within ~70ms either way. But ONNX decode is pinned at ~6.6 tok/s across every scenario, regardless of context length, which is the giveaway that the limit is per-token dispatch overhead, not prefill or model size.
 
 **GPU utilization tells the story:** at 6.6 tok/s, ORT pegs the GPU at ~10% utilization while CPU works hard. wllama at 38 tok/s saturates the GPU. Same hardware, same Gemma 4 E2B at q4 quantization — totally different dispatch pattern.
 
 Why: onnxruntime-web uses **JSEP** (JavaScript Execution Provider) to deliver WebGPU. JSEP dispatches each ONNX op from WASM to WebGPU individually with a sync barrier between them. Gemma 4 decode is hundreds of small ops per token (RMSNorm, MatMulNBits, RoPE, attention, gates), so the GPU spends most of its time idle waiting for the next op from the WASM module. llama.cpp's WebGPU backend (in wllama) fuses these into bigger compute shaders that do more work per dispatch and keep the GPU fed continuously.
 
-This is a structural ORT-web limitation, not something we can fix from the application side without rewriting the runtime. Even if the fp16 correctness bug ([`docs/onnx-webgpu-divergence.md`](onnx-webgpu-divergence.md)) were resolved, this 6× throughput gap would remain.
+This is a structural ORT-web limitation, not something we can fix from the application side without rewriting the runtime. Even if the fp16 correctness bug ([`docs/onnx-webgpu-divergence.md`](onnx-webgpu-divergence.md)) were resolved, this 6× throughput gap would remain on this platform.
+
+### macOS / Chrome / Apple Silicon (Metal-backed WebGPU)
+
+3 turns for narration and reflection, 9 turns for check-in (multi-turn).
+
+| Scenario | Metric | ONNX base (q4f16) | wllama fine-tune (Q4_K_M) | Winner |
+|---|---|---|---|---|
+| Phase narration | TTFT | 70 ms (71 med) | 296 ms (296 med) | ONNX **−226 ms** |
+| Phase narration | Decode | 43.8 tok/s | 45.1 tok/s (45.2 med) | wllama +1.3 tok/s |
+| Phase narration | Total | 1.51 s (1.48 med) | 1.78 s (1.78 med) | ONNX **−0.27 s** |
+| Phase narration | Tokens/turn | 64 | 67 | — |
+| Check-in (multi-turn) | TTFT | 189 ms (182 med) | 277 ms (275 med) | ONNX **−88 ms** |
+| Check-in | Decode | 39.8 tok/s (38.4 med) | 45.0 tok/s (45.1 med) | wllama **+5.2 tok/s** |
+| Check-in | Total | 2.59 s (2.66 med) | 2.01 s (2.37 med) | wllama **−0.58 s** |
+| Check-in | Tokens/turn | 96 | 79 | — |
+| Reflection | TTFT | 82 ms (83 med) | 348 ms (349 med) | ONNX **−266 ms** |
+| Reflection | Decode | 39.5 tok/s (39.8 med) | 43.2 tok/s (43.4 med) | wllama +3.7 tok/s |
+| Reflection | Total | 5.12 s (5.09 med) | 3.96 s (3.95 med) | wllama **−1.16 s** |
+| Reflection | Tokens/turn | 200 | 156 | — |
+
+**The Windows story does not transfer to Mac.** ONNX decode here is 40–44 tok/s, not the ~6 tok/s seen on Windows — Metal's bandwidth and the way Apple's WebGPU implementation batches dispatches hides the JSEP per-op overhead that pins NVIDIA. (Foreshadowed in [`docs/transformers-js-gemma4-perf.md`](transformers-js-gemma4-perf.md): the `num_logits_to_keep=0` bug is also still present here but masked by Metal throughput.) So on Mac the two runtimes are in the same league.
+
+**The Mac tradeoff:**
+- **TTFT — ONNX wins by 90–270 ms in every phase.** wllama's prefill is consistently slower (~280–350 ms regardless of scenario).
+- **Decode — wllama wins by 1–5 tok/s in every phase**, with a bigger edge on the multi-turn check-in (45 vs 40 tok/s).
+- **Total — depends on output length.** ONNX wins on short outputs (narration, ~65 tok) because TTFT dominates. wllama wins once outputs cross ~80–100 tokens (check-in, reflection) because faster decode amortizes the TTFT cost — and the fine-tune also emits fewer tokens (96→79 on check-in, 200→156 on reflection), compounding the win.
+- Crossover is roughly **~80–100 output tokens**.
+
+The fine-tune emitting shorter outputs is doing real work in the totals column — not a runtime advantage per se, but a product win for the same prompts.
+
+### iOS / Safari 26 / iPhone (TBD)
+
+Not yet measured. Safari 26 enables WebGPU by default on iOS; expected to behave more like Mac (Apple Silicon, Metal) than Windows, but thermals and memory pressure on a phone are unknowns. Update this section after running the same benchmark page on-device.
 
 ## How `?local=1` works
 
