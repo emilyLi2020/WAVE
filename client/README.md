@@ -1,72 +1,59 @@
 # WAVE Client
 
-Next.js 16 web demo for WAVE, an offline-first, medication-aware urge surfing companion.
+Next.js 16 web demo for WAVE, an offline-first, medication-aware urge surfing companion. All LLM, STT, and TTS inference is on-device.
 
 ## Getting Started
-
-Install dependencies and run the development server:
 
 ```bash
 pnpm install
 pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
+
+Copy `.env.local.example` to `.env.local` and set `NEXT_PUBLIC_TRAINING_ENABLED=true` only when you want the developer training UI visible.
 
 ## Current Runtime Shape
 
-- The session generates five meditation chunks locally with Gemma and falls back to `lib/prompts/fallback-bank.ts` if model output fails validation twice.
-- The adaptive check-in chat streams Gemma text through `ai` + `@browser-ai/transformers-js` and ends the conversation with a Zod-validated `endConversation` tool.
-- Reflection and `/insights` regeneration still call Gemma 4 E2B-it locally through the direct `@huggingface/transformers` boundary.
-- Model weights are cached by the browser after first load; WebGPU is used when available.
-- The final target adds LoRA adapters on top of this local Gemma boundary, with no LLM network calls during inference.
+The clinical `/session` flow runs three models on-device, all via `@wllama/wllama` (LLM), `@huggingface/transformers` (STT), and `kokoro-js` (TTS):
 
-Copy `.env.local.example` to `.env.local` and set `NEXT_PUBLIC_TRAINING_ENABLED=true` only when you want the developer training UI visible.
+- **LLM** — fine-tuned Gemma 4 E2B as a 5-shard Q4_K_M GGUF (`Maelstrome/lora-wave-session-r32/gguf/`, ~3.2 GB total). Loaded once via the shared singleton in [`lib/wllama/wave-instance.ts`](lib/wllama/wave-instance.ts); reused for chunk narration, check-in turns, and reflection. Phase-chunk and reflection use strict `response_format: { type: "json_schema" }`; check-in uses the same with an `endConversation` signal. See [`docs/wllama.md`](docs/wllama.md) and [`docs/tool-calling-investigation.md`](docs/tool-calling-investigation.md) for why json_schema rather than native tool calls.
+- **STT** — Whisper `base.en` via `@huggingface/transformers`, fed 16 kHz mono PCM from Silero VAD.
+- **TTS** — Kokoro 82M on WebGPU, default runtime `fp32-webgpu` (fp16 is silent on some NVIDIA WebGPU drivers, see [`docs/voice-test.md`](docs/voice-test.md)). The chunk player streams narration sentence-by-sentence; audio-length drives advance to the next line.
+- **VAD** — Silero v5 via `@ricky0123/vad-web` for hands-free check-in turn-taking and barge-in detection.
+
+Each chunk's loading phase preloads Whisper + Kokoro in parallel with chunk generation so the voice check-in opens warm. Fallback to clinician-reviewed local copy after two failed LLM attempts ([`lib/prompts/fallback-bank.ts`](lib/prompts/fallback-bank.ts)).
+
+The patient-facing check-in surface is voice-only ([`app/session/_components/voice-check-in.tsx`](app/session/_components/voice-check-in.tsx)); the developer voice-loop test page at `/models/voice-test` is documented in [`docs/voice-test.md`](docs/voice-test.md).
 
 ## Useful Commands
 
 ```bash
-pnpm dev
-pnpm build
+pnpm dev              # start dev server
+pnpm build            # production build
 pnpm lint
 pnpm exec tsc --noEmit
-pnpm test:gemma:tools:live
+pnpm test             # JSON-schema parsing + score-extraction unit tests
+pnpm prepare:vad-assets  # refresh Silero VAD WASM after dependency bumps
 ```
 
-`pnpm test:gemma:tools:live` downloads the Gemma ONNX weights on first run and
-caches them under `client/.cache/transformers/` for reuse. The cache folder is
-gitignored.
+`pnpm test` runs `tsx scripts/test-extract-craving-score.ts` and `tsx scripts/test-wllama-generators.ts` — they cover the parsing layer in isolation and never touch a real model.
 
-## Performance — Gemma 4 E2B on the Web
+## Performance principles
 
-Three models run in the browser alongside each other: Whisper (STT), Gemma 4 E2B (LLM), Kokoro (TTS). The web runtime is `@huggingface/transformers` v3 (transformers.js) on WebGPU. Optimizations are ranked by impact.
+Measured browser perf numbers (Windows NVIDIA, Mac Apple Silicon) live in [`docs/wllama.md`](docs/wllama.md). On Windows wllama is ~9× faster than `onnxruntime-web` at decode; on Mac the two runtimes are in the same league and the win depends on output length. The principles that still apply on every platform:
 
-### High impact
-- **Encoder stripping happens at export time, not runtime.** The client loads from `Maelstrome/lora-wave-session-r32-onnx`, a text-only q4f16 export of our fine-tuned Gemma 4 E2B. Produced by `models/export_text_onnx.py` from the merged-16bit safetensors. The repo contains only `decoder_model_merged_q4f16.onnx` + `embed_tokens_q4f16.onnx` — no vision or audio encoder weights to download (~270 MB saved vs the upstream multimodal ONNX repo).
-- **Use the `q4f16` ONNX variant** with the WebGPU `shader-f16` feature enabled. INT4 weights + f16 math is the WebGPU sweet spot. Feature-detect `shader-f16` and fall back to `q4` only if unavailable.
-- **Pre-warm at app load** with a dummy 1-token generate behind a loading splash. First call pays shader compile + weight upload (2–8s on iPhone Safari); after warmup TTFT drops to a few hundred ms. Never unload mid-session.
-- **Stream tokens into Kokoro at the first sentence boundary** (`.`/`?`/`!`, or ~15 tokens, whichever first). Perceived latency is gated by TTS start, not full LLM completion.
-- **Prefix-cache the system prompt.** Reuse the cached prefix across turns. Every 100 prompt tokens is ~200–500ms of mobile prefill.
-- **Kokoro runs at fp16 + WebGPU by default** (~165 MB vs ~330 MB at fp32, no perceptible quality loss). See `KOKORO_RUNTIME_OPTIONS` in `lib/voice/types.ts` for q8/q4f16/q4 experimental options. q4 has audible artifacts on prosody — don't ship it as default for the meditation voice.
-- **Defensive `<|think|>` filter** runs on every Gemma generation (`stripThinking` in `lib/gemma/local-runtime.ts`). The fine-tune's chat template defaults `enable_thinking=false`, but training data may have contained reasoning traces, so the client strips any stray `<|think|>...</|think|>` blocks before they reach the UI or TTS.
+- **Pre-warm at app load.** First call pays shader compile + weight upload. wllama compiles WebGPU shaders once and stays warm for the whole session; never call `wllama.exit()` mid-session.
+- **Stream into Kokoro at the first sentence boundary.** Perceived latency is gated by TTS start, not full LLM completion. [`lib/voice/sentence-buffer.ts`](lib/voice/sentence-buffer.ts) drives this.
+- **Keep prompt context tight.** Gemma 4's sliding-window path is fastest under ~512 tokens; long histories cost KV memory for no quality gain.
+- **Different compute paths per model.** Whisper on WASM-SIMD CPU, Gemma on WebGPU via wllama, Kokoro on WebGPU. Putting two models on WebGPU simultaneously context-switches and tanks both.
+- **`swa_full: true` is load-bearing.** Set in [`lib/wllama/client.ts`](lib/wllama/client.ts) to dodge a llama.cpp SWA-cache crash on long prompts ([ggml-org/llama.cpp#20277](https://github.com/ggml-org/llama.cpp/pull/20277)). Costs ~250 MiB extra KV memory.
+- **Strict `json_schema`, not loose `json_object`.** llama.cpp compiles a strict schema into a GBNF grammar that constrains decoding; loose `json_object` produces malformed JSON on our fine-tune. See [`docs/tool-calling-investigation.md`](docs/tool-calling-investigation.md).
 
-### Medium impact
-- **Keep context tight (<512 tokens) to stay in Gemma 4's local sliding-window path.** The 128K context is irrelevant for voice turns and costs KV cache memory. Don't ship long histories.
-- **INT8 KV cache** when the runtime exposes it.
-- **Disable thinking mode** (`<|think|>`) — it burns tokens before producing user-facing output and kills TTFT.
-- **Run each model on a different compute path** to avoid contention: Whisper on WASM-SIMD CPU (Web Worker), Gemma on WebGPU, Kokoro on WASM. Never put two models on WebGPU simultaneously — context switches tank throughput.
-- **OffscreenCanvas + Web Worker** for Gemma so STT/TTS don't jank the main thread.
-- **OPFS** (Origin Private File System) for the weight cache — faster than IndexedDB and avoids Safari quota prompts.
-- **COOP/COEP headers** for `SharedArrayBuffer` so Whisper can use multi-threaded WASM.
+## See also
 
-### Runtime watch-list
-- `litert-community/gemma-4-E2B-it-litert-lm` — once MediaPipe ships a `.task` wrapper, switching runtimes is typically 20–40% faster than transformers.js.
-
-### Don't bother
-- WebGL fallback for LLM — show an unsupported message instead.
-- Q4_K_M / k-quants — WebGPU runtimes don't accelerate them; stick to plain INT4 group-quant.
-- Manual PLE offload — no web runtime exposes Per-Layer Embedding offload in 2026.
-- Speculative decoding — not shipping in any browser runtime yet.
-- llama.cpp WASM as the primary runtime — CPU-only, ~2–4 tok/s.
-
-See the root `README.md`, `AGENTS.md`, `PRD.md`, and `docs/models.md` for the product and model contracts.
+- [`docs/wllama.md`](docs/wllama.md) — browser GGUF runtime: design doc + measured perf on Windows/Mac/iOS.
+- [`docs/voice-test.md`](docs/voice-test.md) — developer voice-stack reference (Whisper + wllama + Kokoro + VAD + interruption detection).
+- [`docs/tool-calling-investigation.md`](docs/tool-calling-investigation.md) — why the current LoRA can't emit native Gemma 4 tool tokens, and the path to fix.
+- [`docs/onnx-webgpu-divergence.md`](docs/onnx-webgpu-divergence.md), [`docs/transformers-js-gemma4-perf.md`](docs/transformers-js-gemma4-perf.md) — historical browser-runtime debugging records.
+- Root [`README.md`](../README.md), [`AGENTS.md`](../AGENTS.md), [`PRD.md`](../PRD.md), [`docs/models.md`](../docs/models.md), [`docs/model-training.md`](../docs/model-training.md) — product spec and model contracts.
