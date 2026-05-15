@@ -436,43 +436,17 @@ export function OnnxBenchmarkClient() {
     [],
   );
 
-  // Reload the wllama instance fresh. Workaround for a known llama.cpp WASM
-  // server-slot bug: after enough multi-turn `createChatCompletion` calls
-  // against a growing history, the prompt-cache update path aborts with
-  // "RuntimeError: table index is out of bounds" and
-  // `server-context.cpp:2848 fatal error` (see llama.cpp PR #20277).
-  // We reload between scenarios so each scenario starts with clean server
-  // state. Reload time is NOT included in timing — only inference is.
-  const reloadWllama = useCallback(async () => {
-    const prior = wllamaRef.current;
-    if (prior) {
-      try {
-        await (prior as unknown as { exit?: () => Promise<void> }).exit?.();
-      } catch {
-        /* ignore */
-      }
-      wllamaRef.current = null;
-    }
-    const fresh = await loadWaveWllama({
-      onProgress: ({ percent }) => {
-        setWllamaState({
-          phase: "loading",
-          message: `reload: ${WAVE_GGUF_FILE} ${percent}%`,
-          percent,
-        });
-      },
-    });
-    wllamaRef.current = fresh;
-    setWllamaState({ phase: "ready", message: "Reloaded and ready.", percent: 100 });
-  }, []);
-
   // Play one scenario end-to-end on the active runtime. Each user turn
   // produces a RunResult; conversation history accumulates between turns.
   //
-  // wllama exception: due to the llama.cpp WASM multi-turn crash (see
-  // reloadWllama above), wllama runs each user turn as a fresh single-turn
-  // call instead of accumulating history. Loses the prefill-on-growing-
-  // context property of the check-in scenario but keeps the runtime stable.
+  // wllama exception: kept as a fresh single-turn call instead of
+  // accumulating history. The original reason was the llama.cpp slot-manager
+  // crash (PR #20277) on back-to-back calls with diverging prefixes — that
+  // crash is now neutralized by `swa_full: true` in client/lib/wllama/client.ts.
+  // The no-history behavior was kept on this pass to isolate the reload-vs-
+  // swa_full change; if the benchmark runs clean without reloads we can
+  // re-enable history accumulation in a follow-up to make check-in measure
+  // prefill-on-growing-context, matching the ONNX path.
   const runScenarioOnce = useCallback(
     async (runIndex: number, scenario: ScenarioKey): Promise<RunResult[]> => {
       const active = activeRef.current;
@@ -532,15 +506,6 @@ export function OnnxBenchmarkClient() {
     const allScenarios = Object.keys(SCENARIOS) as ScenarioKey[];
 
     if (includeWarmup) {
-      // One warmup, on the shortest scenario (phase narration, single turn).
-      if (active === "wllama") {
-        setStatusText("Reloading wllama for warmup…");
-        try {
-          await reloadWllama();
-        } catch (err) {
-          console.error("wllama reload before warmup failed:", err);
-        }
-      }
       setStatusText(`Warmup on ${active.toUpperCase()}…`);
       await runScenarioOnce(0, "phase");
     }
@@ -551,16 +516,6 @@ export function OnnxBenchmarkClient() {
     for (let i = 0; i < runCount; i++) {
       for (const sk of allScenarios) {
         stepIndex += 1;
-        if (active === "wllama") {
-          setStatusText(
-            `wllama · reloading before ${SCENARIOS[sk].label} (step ${stepIndex}/${totalSteps})…`,
-          );
-          try {
-            await reloadWllama();
-          } catch (err) {
-            console.error("wllama reload between scenarios failed:", err);
-          }
-        }
         setStatusText(
           `${active.toUpperCase()} · ${SCENARIOS[sk].label} · step ${stepIndex}/${totalSteps}…`,
         );
@@ -574,7 +529,7 @@ export function OnnxBenchmarkClient() {
     setStreamingTitle("");
     setStreamingText("");
     setRunning(false);
-  }, [includeWarmup, reloadWllama, results, runCount, runScenarioOnce, running]);
+  }, [includeWarmup, results, runCount, runScenarioOnce, running]);
 
   const onnxOk = results.filter((r) => r.runtime === "onnx" && !r.error);
   const wllamaOk = results.filter((r) => r.runtime === "wllama" && !r.error);
@@ -623,8 +578,7 @@ export function OnnxBenchmarkClient() {
             lineHeight: 1.5,
           }}
         >
-          ⚠️ <strong>wllama reset caveat.</strong> Known llama.cpp WASM bug
-          ({" "}
+          ⚠️ <strong>wllama caveat.</strong> Known llama.cpp WASM bug ({" "}
           <a
             href="https://github.com/ggml-org/llama.cpp/pull/20277"
             target="_blank"
@@ -633,13 +587,15 @@ export function OnnxBenchmarkClient() {
           >
             llama.cpp PR #20277
           </a>
-          ): repeated <code>createChatCompletion</code> calls against growing
-          multi-turn history abort the server slot with{" "}
-          <code>table index out of bounds</code>. Workaround: reload wllama
-          between scenarios (reload time is <em>not</em> measured), and
-          collapse the multi-turn check-in to <em>three independent
-          single-turn calls</em> instead of one accumulating conversation. ONNX
-          keeps the original multi-turn behavior.
+          ): back-to-back <code>createChatCompletion</code> calls with diverging
+          prefixes used to abort the server slot with{" "}
+          <code>table index out of bounds</code>. Neutralized by setting{" "}
+          <code>swa_full: true</code> at load time (covers the full SWA cache
+          window instead of the buggy 512-token windowed rebuild). The check-in
+          scenario still runs as three independent single-turn calls on wllama
+          rather than one accumulating conversation, so wllama TTFT does not
+          reflect prefill-on-growing-context the way ONNX TTFT does. ONNX keeps
+          the original multi-turn behavior.
         </div>
       </header>
 

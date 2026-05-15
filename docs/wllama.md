@@ -93,23 +93,25 @@ iPhone (Safari 26 / WebGPU) is the next platform to benchmark — see [iOS slot 
 
 | Scenario | Metric | ONNX base (q4f16) | wllama fine-tune (Q4_K_M) | wllama advantage |
 |---|---|---|---|---|
-| Phase narration | Decode | 6.8 tok/s | 38.5 tok/s | **5.7×** |
-| Phase narration | TTFT | 203 ms | 276 ms | ONNX +73 ms |
-| Phase narration | Total (~65 tok) | 9.45 s | 2.02 s | **4.7×** |
-| Check-in (multi-turn) | Decode | 6.6 tok/s | 40.3 tok/s | **6.1×** |
-| Check-in | TTFT | 295 ms | 276 ms | wllama +19 ms |
-| Check-in | Total per turn (~85 tok) | 14.67 s | 2.21 s | **6.6×** |
-| Reflection | Decode | 6.5 tok/s | 36.8 tok/s | **5.7×** |
-| Reflection | TTFT | 237 ms | 299 ms | ONNX +62 ms |
-| Reflection | Total (200 tok cap) | 30.71 s | 4.55 s | **6.7×** |
+| Phase narration | Decode | 6.8 tok/s | 60.1 tok/s | **8.8×** |
+| Phase narration | TTFT | 203 ms | 42 ms | wllama **4.8×** faster |
+| Phase narration | Total (~65 tok) | 9.45 s | 1.16 s | **8.1×** |
+| Check-in (multi-turn) | Decode | 6.6 tok/s | 59.0 tok/s | **8.9×** |
+| Check-in | TTFT | 295 ms | 152 ms | wllama **1.9×** faster |
+| Check-in | Total per turn (~80 tok) | 14.67 s | 1.48 s | **9.9×** |
+| Reflection | Decode | 6.5 tok/s | 56.9 tok/s | **8.8×** |
+| Reflection | TTFT | 237 ms | 185 ms | wllama **1.3×** faster |
+| Reflection | Total (200 tok cap) | 30.71 s | 2.93 s | **10.5×** |
 
-**Decode is the bottleneck for ONNX on Windows/NVIDIA.** Prefill (TTFT) is roughly tied — within ~70ms either way. But ONNX decode is pinned at ~6.6 tok/s across every scenario, regardless of context length, which is the giveaway that the limit is per-token dispatch overhead, not prefill or model size.
+**Decode is the bottleneck for ONNX on Windows/NVIDIA.** ORT decode is pinned at ~6.5 tok/s across every scenario, regardless of context length, which is the giveaway that the limit is per-token dispatch overhead, not prefill or model size. wllama holds ~58 tok/s with the same kind of stability — both runtimes are decoder-throughput-limited, just with very different ceilings.
 
-**GPU utilization tells the story:** at 6.6 tok/s, ORT pegs the GPU at ~10% utilization while CPU works hard. wllama at 38 tok/s saturates the GPU. Same hardware, same Gemma 4 E2B at q4 quantization — totally different dispatch pattern.
+**TTFT also favors wllama**, by a smaller margin (1.3–4.8× depending on scenario). This is in part because wllama's compute shaders compile once on first inference and stay warm across calls — we measured this directly by adding then removing a between-scenario `wllama.exit()`+reload (a workaround for an unrelated llama.cpp slot-manager bug, see below). With reloads in place, wllama TTFT was 276–309 ms; with one warm instance across all scenarios, TTFT drops to 42–185 ms. Production should mirror the warm-instance numbers since the runtime loads once per session.
+
+**GPU utilization tells the story for ONNX:** at 6.6 tok/s, ORT pegs the GPU at ~10% utilization while CPU works hard. wllama at ~58 tok/s saturates the GPU. Same hardware, same Gemma 4 E2B at q4 quantization — totally different dispatch pattern.
 
 Why: onnxruntime-web uses **JSEP** (JavaScript Execution Provider) to deliver WebGPU. JSEP dispatches each ONNX op from WASM to WebGPU individually with a sync barrier between them. Gemma 4 decode is hundreds of small ops per token (RMSNorm, MatMulNBits, RoPE, attention, gates), so the GPU spends most of its time idle waiting for the next op from the WASM module. llama.cpp's WebGPU backend (in wllama) fuses these into bigger compute shaders that do more work per dispatch and keep the GPU fed continuously.
 
-This is a structural ORT-web limitation, not something we can fix from the application side without rewriting the runtime. Even if the fp16 correctness bug ([`docs/onnx-webgpu-divergence.md`](onnx-webgpu-divergence.md)) were resolved, this 6× throughput gap would remain on this platform.
+This is a structural ORT-web limitation, not something we can fix from the application side without rewriting the runtime. Even if the fp16 correctness bug ([`docs/onnx-webgpu-divergence.md`](onnx-webgpu-divergence.md)) were resolved, this ~9× throughput gap would remain on this platform.
 
 ### macOS / Chrome / Apple Silicon (Metal-backed WebGPU)
 
@@ -143,6 +145,14 @@ The fine-tune emitting shorter outputs is doing real work in the totals column �
 ### iOS / Safari 26 / iPhone (TBD)
 
 Not yet measured. Safari 26 enables WebGPU by default on iOS; expected to behave more like Mac (Apple Silicon, Metal) than Windows, but thermals and memory pressure on a phone are unknowns. Update this section after running the same benchmark page on-device.
+
+### Operational gotcha: `swa_full: true` is load-bearing (all platforms)
+
+Back-to-back `createChatCompletion` calls with prompts that share little prefix (exactly the WAVE case — phase, check-in, and reflection have different system contexts) used to abort the wllama WASM worker with `RuntimeError: table index out of bounds` followed by `server-context.cpp:2848 fatal error` ([llama.cpp PR #20277](https://github.com/ggml-org/llama.cpp/pull/20277)). The slot/server harness rebuilds its prompt-cache checkpoint between unrelated prompts, and on Gemma 4 the sliding-window-attention (SWA) cache reset in that rebuild trips the bug.
+
+Setting `swa_full: true` in `loadModelParams` neutralizes it: the SWA cache covers the full context instead of just the 512-token window, so the buggy windowed-rebuild path is skipped entirely. Cost is ~250 MiB extra KV cache memory at `n_ctx=8192`. Set in [`client/lib/wllama/client.ts`](../client/lib/wllama/client.ts).
+
+Without `swa_full`, the alternative is to dispose+reload the wllama instance between unrelated prompts (~5–10 s per reload from CacheStorage → GPU). We did this temporarily; it works but adds ~90 s to a 3-run benchmark and forfeits the warm-shader TTFT advantage on Windows (which dropped wllama TTFT from 276–309 ms with reloads to 42–185 ms warm).
 
 ## How `?local=1` works
 

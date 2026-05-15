@@ -252,55 +252,17 @@ export function WllamaTestClient() {
     ]);
   }, [runTask]);
 
-  // Dispose the current wllama session and load a fresh one. Used between
-  // tasks in runAll because llama.cpp's slot/server harness has a known bug
-  // (see https://github.com/ggml-org/llama.cpp/pull/20277) that aborts the
-  // WASM worker on the second back-to-back createChatCompletion when the
-  // two prompts share little prefix — exactly the WAVE prompts' situation.
-  // The reload only re-uploads from browser CacheStorage to GPU; no network.
-  const reloadWllama = useCallback(async (label: string) => {
-    const prior = wllamaRef.current;
-    if (prior) {
-      try {
-        await prior.exit();
-      } catch {
-        /* worker may already be dead from a prior abort; ignore */
-      }
-      wllamaRef.current = null;
-    }
-    setLoad({
-      phase: "loading",
-      message: `Reloading wllama before ${label}…`,
-      percent: 0,
-    });
-    const wllama = await loadWaveWllama({
-      nCtx,
-      useLocalMirror: useLocal,
-      localHost,
-      onProgress: ({ percent }) => {
-        setLoad({
-          phase: "loading",
-          message: `Reloading wllama before ${label} (${percent}%)…`,
-          percent,
-        });
-      },
-    });
-    wllamaRef.current = wllama;
-    setLoad({
-      phase: "ready",
-      message: `Reloaded for ${label}.`,
-      percent: 100,
-    });
-  }, [localHost, nCtx, useLocal]);
-
+  // Run phase → check-in → reflection back-to-back on one wllama session.
+  // We used to reload wllama between tasks to dodge the llama.cpp slot/server
+  // crash (PR #20277) on back-to-back createChatCompletion calls with
+  // diverging prefixes. That crash is now neutralized by `swa_full: true` in
+  // client/lib/wllama/client.ts (full-size SWA cache, ~250 MiB extra KV).
   const runAll = useCallback(async () => {
     if (load.phase !== "ready" || running) return;
     await runPhase();
-    await reloadWllama("check-in");
     await runCheckIn();
-    await reloadWllama("reflection");
     await runReflection();
-  }, [load.phase, running, runPhase, runCheckIn, runReflection, reloadWllama]);
+  }, [load.phase, running, runPhase, runCheckIn, runReflection]);
 
   const canRun = load.phase === "ready" && running === null;
 
@@ -329,9 +291,11 @@ export function WllamaTestClient() {
       </div>
 
       <div className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-900">
-        <strong>Heads up:</strong> &quot;Run all 3 tasks&quot; reloads the
-        wllama instance between each task to dodge a llama.cpp slot-manager
-        bug (
+        <strong>Heads up:</strong> &quot;Run all 3 tasks&quot; runs back-to-back
+        on one wllama session. Without the{" "}
+        <code>swa_full: true</code> load param (set in{" "}
+        <code>client/lib/wllama/client.ts</code>) this would hit a llama.cpp
+        slot-manager bug (
         <a
           href="https://github.com/ggml-org/llama.cpp/pull/20277"
           target="_blank"
@@ -340,12 +304,10 @@ export function WllamaTestClient() {
         >
           ggml-org/llama.cpp#20277
         </a>
-        ) that aborts the WASM worker on back-to-back{" "}
-        <code>createChatCompletion</code> calls when the prompts share little
-        prefix — which is exactly the WAVE prompts. The reload only
-        re-uploads from the browser cache to GPU (no network), so it adds a
-        few seconds per task but keeps the run from crashing. Single-task
-        buttons (or the smoke test) don&apos;t need this.
+        ) and abort the WASM worker on the second{" "}
+        <code>createChatCompletion</code> because the WAVE prompts share little
+        prefix. <code>swa_full</code> sidesteps the buggy windowed SWA-cache
+        rebuild at a cost of ~250 MiB extra KV memory.
       </div>
 
       <div className="rounded-2xl border border-border bg-surface p-5">
