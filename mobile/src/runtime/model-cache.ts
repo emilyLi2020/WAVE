@@ -38,9 +38,9 @@ export const MODELS: Record<ModelId, ModelManifest> = {
     id: "litert-wave",
     label: "Gemma 4 LITERTLM (WAVE fine-tune)",
     filename: "model.litertlm",
-    url: "https://huggingface.co/Maelstrome/lora-wave-session-r32/resolve/main/mediapipe/model.litertlm",
-    expectedBytes: 5_071_689_680,
-    minBytes: 5_000_000_000,
+    url: "https://huggingface.co/Maelstrome/lora-wave-session-r32/resolve/main/litert-lm/model.litertlm",
+    expectedBytes: 2_560_966_656,
+    minBytes: 2_500_000_000,
   },
   "whisper-tiny-en": {
     id: "whisper-tiny-en",
