@@ -119,7 +119,12 @@ export function preloadWaveLiteRT(
       await llm.loadModel(nativePath, {
         // No systemPrompt; per-flow composed prompts go in the user msg
         // after resetConversation(). See file header.
-        backend: opts?.backend ?? "gpu",
+        // TEMP: defaulting to CPU while we debug whether the rebuilt
+        // xcframework from issue #13 includes proper Metal/GPU support.
+        // The agent's macOS verification only proved CPU loading; their
+        // own note flagged GPU dylibs not registering. Revert to "gpu"
+        // once Metal init is confirmed working on iPhone.
+        backend: opts?.backend ?? "cpu",
         maxTokens: 512,
         temperature: 0,
         topK: 1,
