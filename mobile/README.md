@@ -2,7 +2,11 @@
 
 Native iOS port of the Wave fine-tune. The web app at `../client/` is closed on iOS Safari by the WASM Memory64 requirement (see `../docs/postmortems/ios-safari-browser.md`); this app runs the same Gemma 4 fine-tune natively via LiteRT-LM and ships a full VAD-driven voice loop.
 
-See the Claude plan at `~/.claude/plans/take-a-look-at-fizzy-melody.md` for the full pivot plan.
+## Docs
+
+- **[`docs/handoff.md`](./docs/handoff.md)** — read this if you just cloned the repo. Step-by-step first-launch checklist, gotchas, where to look when things break.
+- **[`docs/architecture.md`](./docs/architecture.md)** — deep dive on the stack, port boundary, runtime contract, model cache, routing, and known TODOs.
+- **[Claude plan](`~/.claude/plans/take-a-look-at-fizzy-melody.md`)** — the pivot plan this work is executing against.
 
 ## Stack
 
