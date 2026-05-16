@@ -3,7 +3,7 @@
 // build flag.
 
 import { Link } from "expo-router";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import CachePanel from "@/screens/CachePanel";
 
@@ -65,13 +65,15 @@ function StatusBadge({ status }: { status: Entry["status"] }) {
 function Row({ entry }: { entry: Entry }) {
   return (
     <Link href={entry.href as any} asChild>
-      <View style={styles.row}>
+      <Pressable
+        style={({ pressed }) => [styles.row, pressed && styles.rowPressed]}
+      >
         <View style={styles.rowHead}>
           <Text style={styles.rowTitle}>{entry.title}</Text>
           <StatusBadge status={entry.status} />
         </View>
         <Text style={styles.rowBlurb}>{entry.blurb}</Text>
-      </View>
+      </Pressable>
     </Link>
   );
 }
@@ -111,6 +113,7 @@ const styles = StyleSheet.create({
     borderColor: "#23232F",
     marginBottom: 6,
   },
+  rowPressed: { backgroundColor: "#1C1C28", borderColor: "#3F3F50" },
   rowHead: {
     flexDirection: "row",
     alignItems: "center",
