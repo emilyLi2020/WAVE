@@ -85,17 +85,18 @@ mobile/
 │   └── types/                    Verbatim port of client/types/
 │
 ├── assets/
-│   ├── images/                   From scaffold
-│   ├── silero/                   Silero VAD ONNX — bundled, ~2 MB (step 5a)
-│   └── kokoro/                   Gitignored; populated by
-│                                 scripts/download-kokoro.sh (~330 MB)
+│   └── images/                   From scaffold
+│   (Kokoro is downloaded at runtime — see docs/kokoro-tts.md)
+│   (Silero VAD is downloaded at runtime — see docs/silero-vad.md)
 │
 ├── scripts/
-│   ├── download-kokoro.sh        One-shot fetch+extract of Kokoro bundle
 │   ├── install-litert-ios-framework.js
 │   │                            Downloads the rebuilt LiteRT-LM iOS
 │   │                            XCFramework from HF after npm install
-│   └── reset-project.js          From scaffold
+│   ├── reset-project.js          From scaffold
+│   └── test_silero_local.py      Local Python smoke for the VAD wrapper —
+│                                 use before EAS rebuilding any silero-vad.ts
+│                                 change. See docs/silero-vad.md.
 │
 ├── docs/
 │   ├── architecture.md           ← this file
@@ -239,7 +240,8 @@ Storage layout:
 documentDirectory/
   wave-models/
     litert-wave/model.litertlm     (~2.4 GB)
-    whisper-tiny-en/ggml-tiny.en.bin  (~78 MB)
+    whisper-tiny-en/ggml-tiny.en.bin  (~78 MB; used by CombinedVoiceTestScreen)
+    whisper-base-en/ggml-base.en.bin  (~148 MB; used by WhisperTestScreen)
 ```
 
 `documentDirectory` was chosen so iOS doesn't reclaim the LiteRT bundle
@@ -252,19 +254,25 @@ the flag.
 
 ### Models that don't go through the cache
 
-- **Kokoro** is shipped as an Expo asset bundle at `mobile/assets/kokoro/`,
-  populated by `scripts/download-kokoro.sh` once per dev machine. EAS Build
-  packages the directory into the IPA. sherpa-onnx loads it via
-  `{ modelPath: { type: 'asset', path: 'kokoro' } }`. Bundling is the
-  right call because Kokoro is small enough (~330 MB) that the install
-  size is acceptable for a TestFlight dev build and the runtime download +
-  unzip pipeline isn't worth the complexity.
+- **Kokoro** is fetched at runtime by sherpa-onnx's own download manager
+  (`ensureModelByCategory`) into
+  `Documents/sherpa-onnx/models/tts/kokoro-en-v0_19/`. Pinned to
+  `kokoro-en-v0_19` (fp32, 304 MB) — the empirical winner across
+  TTFB, RTF, and audio quality on iPhone. Playback uses sherpa's
+  built-in native PCM queue (`startPcmPlayer` / `writePcmChunk` /
+  `stopPcmPlayer`) for true sentence-streaming with no temp WAV files.
+  See `docs/kokoro-tts.md` for the full decision record and why the
+  earlier "bundle it in the IPA" plan didn't survive contact with Expo's
+  asset bundler.
 
-- **Silero VAD** ships bundled at `mobile/assets/silero/silero_vad.onnx`
-  (~2 MB). Step 5a populates the file.
+### Silero VAD goes through the unified cache too
 
-The unified cache is just for the things big enough to need on-demand
-fetching (LiteRT) or things with no good bundle path (Whisper ggml).
+`silero-vad` (2.3 MB ONNX from the snakers4 repo) is registered in
+`model-cache.ts`, downloaded on first use, and surfaces in the cache panel
+like Whisper/LiteRT. Inference uses `onnxruntime-react-native`; live mic
+capture comes from sherpa-onnx's `createPcmLiveStream`. The model has a
+non-obvious input contract — 64 samples of carried-over context prepended
+to each 512-sample frame — see `docs/silero-vad.md` for the full record.
 
 ### Cache panel UI
 

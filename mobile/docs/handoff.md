@@ -29,6 +29,40 @@ current WAVE bundle at
 for the CLI environment, so the remaining acceptance check is the physical
 iPhone `/tests/litert` smoke using Metal.
 
+## ✅ Whisper STT confirmed working on-device (2026-05-16)
+
+`/tests/whisper` end-to-end pass on the physical iPhone:
+mic → 16 kHz mono 16-bit LPCM WAV → `ggml-base.en` on Metal → transcript.
+
+Two gotchas worth remembering — both surfaced during the first device run:
+
+1. **whisper.rn rejects M4A/AAC with "invalid wav file".** It only accepts
+   real WAV/RIFF (16 kHz mono 16-bit linear PCM). `RecordingPresets.HIGH_QUALITY`
+   from expo-audio gives you 44.1 kHz stereo AAC in an M4A container — the
+   first byte of the header fails the RIFF check immediately, no useful error.
+   Fix: a custom `WHISPER_RECORDING_OPTIONS` in `WhisperTestScreen.tsx` with
+   `.wav` extension + `IOSOutputFormat.LINEARPCM` + `linearPCMBitDepth: 16`
+   + `sampleRate: 16000` + `numberOfChannels: 1`. AVAudioRecorder writes a
+   proper RIFF/WAVE header when given that combo. Side benefit: recording
+   already at whisper's native rate, no in-engine resample tax on RTF.
+
+2. **Native-module throws are plain objects, not Error instances.**
+   `String(plainObj)` yields the legendary `"[object Object]"`. The screen
+   now has a `stringifyErr()` helper that walks `message` / `code` / `userInfo`
+   before falling back to `JSON.stringify`. Reuse the pattern in other test
+   screens that catch errors from whisper.rn / expo-audio / sherpa-onnx —
+   they all share this throw shape.
+
+Android note: `MediaRecorder` cannot emit raw PCM WAV; this preset is iOS-only.
+When the Android path matters, the usual route is `react-native-audio-record`
+(emits raw PCM that you wrap in a WAV header yourself) or whisper.rn's
+`realtimeTranscribe` which takes raw PCM frames directly.
+
+Model upgrade: cache layer now ships `whisper-base-en` (148 MB) alongside
+`whisper-tiny-en` (78 MB, still used by `CombinedVoiceTestScreen.tsx`).
+Loose end: combined screen should follow once base.en is validated for
+the full loop's latency budget.
+
 ## Previous bundle blocker recap (2026-05-16)
 
 Issue #11 is closed. The fine-tune was re-exported via `litert-torch 0.9.0`
@@ -101,8 +135,8 @@ voice loop just gates the LLM step on LiteRT.
 | Route | What it does | State |
 |---|---|---|
 | `/tests/litert` | Download `model.litertlm` from HF → load via `react-native-litert-lm` → generate chunk 1 → Zod-validate. Memory + tok/s + TTFT panel. | Ready to test on device (#11 resolved) |
-| `/tests/whisper` | Push-to-talk: record via `expo-audio` → `whisper.rn` (ggml-tiny.en on Metal GPU) → transcript + RTF. | Ready to test on device |
-| `/tests/kokoro` | Text input → `react-native-sherpa-onnx` Kokoro TTS (CoreML EP, ANE) → playback. Needs `./scripts/download-kokoro.sh` to populate `assets/kokoro/`. | Ready once the bundle is downloaded |
+| `/tests/whisper` | Push-to-talk: record 16 kHz mono LPCM WAV via `expo-audio` → `whisper.rn` (ggml-base.en on Metal GPU) → transcript + RTF. | ✅ Working on iPhone (2026-05-16) |
+| `/tests/kokoro` | Text input → `react-native-sherpa-onnx` Kokoro TTS (CoreML EP, ANE) → sentence-streaming playback via native PCM queue. Model fetched at runtime on first use. See `docs/kokoro-tts.md`. | ✅ Production-ready |
 | `/tests/combined` | Push-to-talk MVP: record → Whisper → LiteRT → Kokoro → play. State machine for the four subsystems. | Wired; depends on `/tests/litert` working |
 
 ### Production session screens
@@ -126,21 +160,19 @@ eas login
 cd mobile
 eas device:create
 
-# 4. Populate the Kokoro asset bundle (one-shot, ~330 MB).
-./scripts/download-kokoro.sh
-
-# 5. Cloud-build the iOS dev client and auto-upload to TestFlight in one go.
+# 4. Cloud-build the iOS dev client and auto-upload to TestFlight in one go.
 eas build -p ios --profile development --submit
 
-# 6. When the TestFlight email lands, install on the iPhone.
+# 5. When the TestFlight email lands, install on the iPhone.
 
-# 7. Start the JS dev server.
+# 6. Start the JS dev server.
 npx expo start --dev-client
 ```
 
-After step 7 the app should open on the dev menu home. Cache panel at the
+After step 6 the app should open on the dev menu home. Cache panel at the
 bottom shows what's already downloaded; tap the rows to navigate to each
-test page.
+test page. Kokoro fetches its model on first use of `/tests/kokoro` or
+`/tests/combined` (~304 MB, runtime download with resume).
 
 ## Critical gotchas
 
@@ -162,10 +194,6 @@ test page.
   `react-native-litert-lm` declares `peerOptional expo@>=55.0.0` and
   we're on Expo 54. Keep until the wrapper drops the constraint.
 
-- **`Don't commit `mobile/assets/kokoro/`.** Gitignored. Anyone cloning
-  the repo runs `scripts/download-kokoro.sh` once to populate it (or EAS
-  Build does on its first run for that build profile).
-
 - **Memory ceiling is real.** Demo on iPhone 15/16 Pro. iPhone 14 Pro and
   earlier (6 GB RAM) likely won't fit the full stack.
 
@@ -174,6 +202,12 @@ test page.
 
 - **Whisper test page uses Metal GPU**, not the ANE CoreML encoder.
   Moving encoder to ANE is a follow-up that frees Metal for Gemma decode.
+
+- **whisper.rn requires real WAV/RIFF, 16 kHz mono 16-bit LPCM.** Do not
+  feed it `RecordingPresets.HIGH_QUALITY` from expo-audio — that's M4A/AAC
+  and trips an "invalid wav file" error with no other diagnostics. See
+  the `WHISPER_RECORDING_OPTIONS` const in `src/screens/WhisperTestScreen.tsx`
+  for the exact iOS preset, and the writeup at the top of this doc.
 
 - **expo-file-system v19 deprecated the legacy procedural API**
   (`getInfoAsync`, `makeDirectoryAsync`, `documentDirectory`,
@@ -253,7 +287,10 @@ the full list.
 - [x] Routing restructure
 - [x] LiteRT smoke screen
 - [x] Whisper test page
-- [x] Kokoro test page (asset path wired; script provided)
+- [x] Kokoro test page — **production-ready**. Runtime download of
+      kokoro-en-v0_19 (fp32) via sherpa's download manager, sentence-
+      streaming playback via native PCM queue. Full decision record at
+      `docs/kokoro-tts.md`.
 - [x] Production screen skeletons (5)
 - [x] Unified model cache + cache panel
 - [x] Combined voice loop test page (push-to-talk MVP)
@@ -262,8 +299,10 @@ the full list.
 - [x] **Unblock the LiteRT path — issue #11** (LiteRT-LM-flavored bundle re-exported via litert-torch 0.9.0)
 - [x] Add a "Try stock Gemma" button to the smoke screen to verify the
       bundle-format hypothesis if #11 takes time
-- [ ] VAD listener port (`vad-listener.ts`) — Silero via
-      `onnxruntime-react-native` + bundled `assets/silero/silero_vad.onnx`
+- [x] **Silero VAD live detection** — runtime-downloaded ONNX via
+      `onnxruntime-react-native`, live mic via sherpa-onnx
+      `createPcmLiveStream`. Full record at `docs/silero-vad.md`. Local
+      smoke at `scripts/test_silero_local.py`.
 - [ ] CoreML Whisper encoder (move encoder to ANE)
 - [ ] Production screen full UIs (port from `client/app/session/_components/`)
 - [ ] Wire production screens to the session-machine reducer
