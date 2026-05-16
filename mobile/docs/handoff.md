@@ -3,10 +3,23 @@
 Skim this if you just cloned the repo or are starting a fresh session. For
 the deeper architecture, read `docs/architecture.md` next.
 
-## 🚨 Current blocker (read first)
+## ✅ Blocker resolved (2026-05-16)
 
-**The LITERTLM bundle on HF is in the wrong flavor for our wrapper.** Filed
-upstream as [Maelstrome/Wave#11](https://github.com/emilyLi2020/Wave/issues/11).
+Issue #11 is closed. The fine-tune was re-exported via `litert-torch 0.9.0`
+on a rented Threadripper box (PEFT merge → `litert_torch.generative.export_hf`
+with `dynamic_wi4_afp32` quant + `externalize_embedder=True`). New bundle is
+at `Maelstrome/lora-wave-session-r32/litert-lm/model.litertlm` (2.56 GB);
+the old `mediapipe/model.litertlm` is preserved as-is. Magic header bytes
+match the stock `litert-community/gemma-4-E2B-it.litertlm` exactly.
+
+`mobile/src/runtime/model-cache.ts` already points at the new URL. **If your
+device had the old 5 GB bundle cached**, the cache-hit check now requires
+exact size match against `expectedBytes`, so the stale file will be discarded
+and the new one downloaded on next `ensureModel('litert-wave')`.
+
+### Original blocker writeup (kept for context)
+
+**The LITERTLM bundle on HF was in the wrong flavor for our wrapper.**
 
 Quick recap of how we found this:
 
@@ -26,6 +39,10 @@ Quick recap of how we found this:
 4. Size check confirms: stock `litert-community/gemma-4-E2B-it.litertlm` is
    2.59 GB; ours is 5.07 GB. The LiteRT-LM build mmaps embedding params
    separately and runs ~half the on-disk footprint.
+5. **Confirmation (2026-05-16):** stock-Gemma diagnostic button (added in
+   `5288b28`) was tapped on the physical iPhone — the unmodified
+   `litert-community/gemma-4-E2B-it.litertlm` loads through the same
+   wrapper. Same device, same wrapper, only the bundle differs.
 
 ### Paths forward
 
@@ -56,7 +73,7 @@ voice loop just gates the LLM step on LiteRT.
 
 | Route | What it does | State |
 |---|---|---|
-| `/tests/litert` | Download `model.litertlm` from HF → load via `react-native-litert-lm` → generate chunk 1 → Zod-validate. Memory + tok/s + TTFT panel. | **BLOCKED by #11** |
+| `/tests/litert` | Download `model.litertlm` from HF → load via `react-native-litert-lm` → generate chunk 1 → Zod-validate. Memory + tok/s + TTFT panel. | Ready to test on device (#11 resolved) |
 | `/tests/whisper` | Push-to-talk: record via `expo-audio` → `whisper.rn` (ggml-tiny.en on Metal GPU) → transcript + RTF. | Ready to test on device |
 | `/tests/kokoro` | Text input → `react-native-sherpa-onnx` Kokoro TTS (CoreML EP, ANE) → playback. Needs `./scripts/download-kokoro.sh` to populate `assets/kokoro/`. | Ready once the bundle is downloaded |
 | `/tests/combined` | Push-to-talk MVP: record → Whisper → LiteRT → Kokoro → play. State machine for the four subsystems. | Wired; depends on `/tests/litert` working |
@@ -213,8 +230,8 @@ the full list.
 - [x] Combined voice loop test page (push-to-talk MVP)
 - [x] Documentation (this doc + `architecture.md`)
 - [x] Expo skill audit pass (UI guidelines, eas.json, file-system migration)
-- [ ] **Unblock the LiteRT path — issue #11** (LiteRT-LM-flavored bundle)
-- [ ] Add a "Try stock Gemma" button to the smoke screen to verify the
+- [x] **Unblock the LiteRT path — issue #11** (LiteRT-LM-flavored bundle re-exported via litert-torch 0.9.0)
+- [x] Add a "Try stock Gemma" button to the smoke screen to verify the
       bundle-format hypothesis if #11 takes time
 - [ ] VAD listener port (`vad-listener.ts`) — Silero via
       `onnxruntime-react-native` + bundled `assets/silero/silero_vad.onnx`

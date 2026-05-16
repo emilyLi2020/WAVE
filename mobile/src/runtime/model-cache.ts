@@ -140,11 +140,14 @@ export async function ensureModel(
 
   if (opts?.force) {
     deleteFileIfExists(file);
-  } else if (file.exists && (file.size ?? 0) >= manifest.minBytes) {
+  } else if (file.exists && file.size === manifest.expectedBytes) {
     opts?.onProgress?.(1);
     return file.uri;
   } else if (file.exists) {
-    // Partial download from a previous attempt — treat as miss, start fresh.
+    // Size mismatch — either a partial download from a prior attempt OR a
+    // stale bundle from a previous manifest version (e.g. the old 5 GB
+    // MediaPipe-flavored litert-wave bundle, now replaced by the 2.5 GB
+    // litert-torch re-export). Treat as miss either way.
     deleteFileIfExists(file);
   }
 

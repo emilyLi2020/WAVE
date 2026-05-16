@@ -192,8 +192,8 @@ artifacts. Each model has a manifest entry:
   label: 'Gemma 4 LITERTLM (WAVE fine-tune)',
   filename: 'model.litertlm',
   url: 'https://huggingface.co/.../model.litertlm',
-  expectedBytes: 5_071_689_680,
-  minBytes:      5_000_000_000,  // lower bound that counts as a valid cache hit
+  expectedBytes: 2_560_966_656,  // exact byte-size of the on-HF blob
+  minBytes:      2_500_000_000,  // lower bound for the post-download truncation guard
 }
 ```
 
@@ -212,13 +212,13 @@ Storage layout:
 ```
 documentDirectory/
   wave-models/
-    litert-wave/model.litertlm     (~4.7 GB)
+    litert-wave/model.litertlm     (~2.4 GB)
     whisper-tiny-en/ggml-tiny.en.bin  (~78 MB)
 ```
 
 `documentDirectory` was chosen so iOS doesn't reclaim the LiteRT bundle
-under storage pressure (a 4.7 GB redownload is painful on cellular).
-**Trade-off:** Documents/ is iCloud-backed by default. For a 4.7 GB model
+under storage pressure (a 2.4 GB redownload is painful on cellular).
+**Trade-off:** Documents/ is iCloud-backed by default. For a 2.4 GB model
 that's wasteful for users. Polish item flagged in the source: either move
 to `Library/Application Support/` (durable + not backed up) or set
 `NSURLIsExcludedFromBackupKey` on the file once expo-file-system exposes
@@ -347,7 +347,7 @@ Update if you need a non-placeholder for your Apple team.
   Kokoro on CPU, or fall back to the llama.rn contingency (Q4_K_M GGUF is
   ~1.5 GB smaller than LITERTLM).
 
-- **`documentDirectory` is iCloud-backed.** The 4.7 GB LiteRT bundle will
+- **`documentDirectory` is iCloud-backed.** The 2.4 GB LiteRT bundle will
   back up by default. Fix: `NSURLIsExcludedFromBackupKey` or
   `Library/Application Support/`. Polish item.
 

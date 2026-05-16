@@ -1,7 +1,7 @@
 // Step 2 smoke test screen — first deliverable of the LiteRT pivot.
 //
 // Goals:
-//   1. Download model.litertlm from HF (~4.7 GB, first-launch only).
+//   1. Download model.litertlm from HF (~2.4 GB, first-launch only).
 //   2. Load it on the GPU backend with the increased-memory entitlement.
 //   3. Generate a chunk-1 prompt and stream the response.
 //   4. Validate output against chunkLinesSchema (Zod).
