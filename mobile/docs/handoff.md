@@ -35,16 +35,22 @@ eas device:create
 # 4. Populate the Kokoro asset bundle (one-shot, ~330 MB).
 ./scripts/download-kokoro.sh
 
-# 5. Cloud-build the iOS development client. ~10-15 min.
-eas build --profile development --platform ios
+# 5. Cloud-build the iOS dev client AND auto-upload to TestFlight in one go
+#    (~10-15 min build + a few minutes for App Store Connect processing).
+eas build -p ios --profile development --submit
 
-# 6. Install the IPA on your iPhone (TestFlight link or ad-hoc URL from
-#    the build output). Open the app once so iOS registers it.
+# 6. When the TestFlight email lands, install on your iPhone, open the
+#    app once so iOS registers the dev-client UI.
 
 # 7. Start the JS dev server.
 npx expo start --dev-client
-# Scan the QR with the installed app.
+# Scan the QR with the installed app, or paste your Metro URL.
 ```
+
+The `--submit` flag chains the build + App Store Connect upload using
+`submit.development` in `eas.json`. If you'd rather grab an ad-hoc URL
+from the build output instead of using TestFlight, drop `--submit` and
+install via the QR/IPA link EAS prints when the build completes.
 
 After step 7 the app should open on the dev menu home. From there:
 
