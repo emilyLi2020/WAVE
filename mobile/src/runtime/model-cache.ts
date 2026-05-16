@@ -20,7 +20,11 @@
 import { Directory, File, Paths } from "expo-file-system";
 import { createDownloadResumable } from "expo-file-system/legacy";
 
-export type ModelId = "litert-wave" | "whisper-tiny-en" | "whisper-base-en";
+export type ModelId =
+  | "litert-wave"
+  | "mediapipe-wave"
+  | "whisper-tiny-en"
+  | "whisper-base-en";
 
 export interface ModelManifest {
   id: ModelId;
@@ -41,6 +45,14 @@ export const MODELS: Record<ModelId, ModelManifest> = {
     url: "https://huggingface.co/Maelstrome/lora-wave-session-r32/resolve/main/litert-lm-v2/model.litertlm",
     expectedBytes: 2_560_956_368,
     minBytes: 2_500_000_000,
+  },
+  "mediapipe-wave": {
+    id: "mediapipe-wave",
+    label: "Gemma 4 MediaPipe (WAVE fine-tune)",
+    filename: "model.litertlm",
+    url: "https://huggingface.co/Maelstrome/lora-wave-session-r32/resolve/main/mediapipe/model.litertlm",
+    expectedBytes: 5_071_689_680,
+    minBytes: 5_000_000_000,
   },
   "whisper-tiny-en": {
     id: "whisper-tiny-en",

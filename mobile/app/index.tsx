@@ -22,6 +22,12 @@ const TEST_ENTRIES: Entry[] = [
     status: "ready",
   },
   {
+    href: "/tests/mediapipe",
+    title: "MediaPipe smoke",
+    blurb: "MediaPipeTasksGenAI iOS (LiteRT under the hood) — loads the MediaPipe-flavored bundle and validates chunk 1.",
+    status: "ready",
+  },
+  {
     href: "/tests/whisper",
     title: "Whisper STT",
     blurb: "Record audio with mic → whisper.rn (CoreML encoder) → transcript.",

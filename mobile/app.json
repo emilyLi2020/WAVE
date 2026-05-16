@@ -54,7 +54,9 @@
         }
       ],
       "expo-audio",
-      "expo-asset"
+      "expo-asset",
+      "@kesha-antonov/react-native-background-downloader",
+      "expo-llm-mediapipe"
     ],
     "experiments": {
       "typedRoutes": true,
