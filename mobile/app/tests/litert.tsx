@@ -1,5 +1,5 @@
 import LiteRTSmokeScreen from "@/screens/LiteRTSmokeScreen";
 
-export default function HomeScreen() {
+export default function LiteRTRoute() {
   return <LiteRTSmokeScreen />;
 }
