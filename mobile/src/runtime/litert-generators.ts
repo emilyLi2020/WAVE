@@ -105,11 +105,18 @@ export function preloadWaveLiteRT(
     llmPromise = (async () => {
       // Download via the unified cache; ensureModel is idempotent so
       // returning the local path is cheap when cached.
-      const localPath = await ensureModel("litert-wave", {
+      const fileUri = await ensureModel("litert-wave", {
         onProgress: opts?.onProgress,
       });
+      // The LiteRT-LM C++ engine uses POSIX stat()/fopen() directly on
+      // the path string (see HybridLiteRTLM.cpp line ~348/392) — it does
+      // NOT understand file:// URIs. expo-file-system returns paths with
+      // the file:// scheme, so strip it before handing to the native
+      // wrapper or stat() returns ENOENT and load fails with
+      // "Failed to create LiteRT-LM engine: failed to stat file (errno 2)".
+      const nativePath = fileUri.replace(/^file:\/\//, "");
       const llm = createLLM({ enableMemoryTracking: true });
-      await llm.loadModel(localPath, {
+      await llm.loadModel(nativePath, {
         // No systemPrompt; per-flow composed prompts go in the user msg
         // after resetConversation(). See file header.
         backend: opts?.backend ?? "gpu",
