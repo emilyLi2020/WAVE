@@ -125,15 +125,15 @@ export default function LiteRTStockScreen() {
       const llm = createLLM({ enableMemoryTracking: true });
       await llm.loadModel(nativePath, {
         backend: "gpu",
-        // The stock litert-community bundle was compiled with cache_length
-        // 2048 (per its HF README benchmark settings: "1024 prefill +
-        // 256 decode with a context length of 2048"). Asking the wrapper
-        // for more than what the bundle was compiled with passes loadModel
-        // but fails at inference with "failed to invoke the compiled model".
-        // 2048 is the hard ceiling for THIS bundle; if the WAVE chunk-1
-        // prompt still overflows we'll need to trim the system prompt for
-        // stock-only demo runs.
-        maxTokens: 2048,
+        // maxTokens is the OUTPUT/decode cap per the wrapper TS types
+        // ("Maximum number of tokens to generate", @default 1024), NOT the
+        // total context window. The stock litert-community bundle was
+        // compiled for **256 decode tokens** (per its HF README benchmark
+        // table). Asking for more than 256 passes loadModel but the
+        // compiled graph rejects it at inference ("failed to invoke the
+        // compiled model"). 256 matches what the existing "Try Stock
+        // Gemma" diagnostic in LiteRTSmokeScreen uses successfully.
+        maxTokens: 256,
         temperature: 0,
         topK: 1,
       });
