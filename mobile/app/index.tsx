@@ -5,6 +5,8 @@
 import { Link } from "expo-router";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 
+import CachePanel from "@/screens/CachePanel";
+
 interface Entry {
   href: string;
   title: string;
@@ -88,6 +90,10 @@ export default function DevMenu() {
       {SESSION_ENTRIES.map((e) => (
         <Row key={e.href} entry={e} />
       ))}
+
+      <View style={{ marginTop: 24 }}>
+        <CachePanel />
+      </View>
     </ScrollView>
   );
 }

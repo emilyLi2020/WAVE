@@ -30,14 +30,9 @@ import {
   useAudioRecorder,
   useAudioRecorderState,
 } from "expo-audio";
-import * as FileSystem from "expo-file-system";
 import { initWhisper, type WhisperContext } from "whisper.rn";
 
-// Standard ggerganov hosted whisper model. Tiny + English-only fits the
-// memory budget (Whisper goes alongside Gemma + Kokoro + VAD per plan).
-const WHISPER_MODEL_URL =
-  "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-tiny.en.bin";
-const WHISPER_MODEL_FILENAME = "ggml-tiny.en.bin";
+import { ensureModel } from "@/runtime/model-cache";
 
 type Phase =
   | "idle"
@@ -90,50 +85,18 @@ export default function WhisperTestScreen() {
     setPhase("downloading");
     setDownloadPct(0);
 
-    const dir =
-      (FileSystem as any).documentDirectory ??
-      ((FileSystem as any).Paths?.document?.uri as string | undefined);
-    if (!dir) {
-      setError("expo-file-system documentDirectory unavailable");
+    let localPath: string;
+    try {
+      localPath = await ensureModel("whisper-tiny-en", {
+        onProgress: (p) => {
+          setDownloadPct(p);
+          if (p >= 1) setPhase("loading");
+        },
+      });
+    } catch (e) {
+      setError(e instanceof Error ? e.message : String(e));
       setPhase("error");
       return;
-    }
-    const targetDir = `${dir}wave-models/whisper/`;
-    const targetPath = `${targetDir}${WHISPER_MODEL_FILENAME}`;
-
-    try {
-      await FileSystem.makeDirectoryAsync(targetDir, { intermediates: true });
-    } catch {
-      // already exists
-    }
-
-    let localPath: string;
-    const existing = await FileSystem.getInfoAsync(targetPath);
-    if (existing.exists && existing.size && existing.size > 1024 * 1024) {
-      localPath = targetPath;
-      setDownloadPct(1);
-    } else {
-      const dl = FileSystem.createDownloadResumable(
-        WHISPER_MODEL_URL,
-        targetPath,
-        {},
-        (progress) => {
-          if (progress.totalBytesExpectedToWrite > 0) {
-            setDownloadPct(
-              progress.totalBytesWritten / progress.totalBytesExpectedToWrite,
-            );
-          }
-        },
-      );
-      try {
-        const result = await dl.downloadAsync();
-        if (!result?.uri) throw new Error("download returned no uri");
-        localPath = result.uri;
-      } catch (e) {
-        setError(e instanceof Error ? e.message : String(e));
-        setPhase("error");
-        return;
-      }
     }
 
     setPhase("loading");

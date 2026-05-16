@@ -41,3 +41,7 @@ app-example
 # generated native folders
 /ios
 /android
+
+# Locally-downloaded model bundles (fetched via scripts/download-*.sh)
+/assets/kokoro/
+/assets/whisper-coreml/

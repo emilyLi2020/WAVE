@@ -30,6 +30,7 @@
 import { createLLM } from "react-native-litert-lm";
 import type { LiteRTLMInstance } from "react-native-litert-lm";
 
+import { ensureModel } from "@/runtime/model-cache";
 import { buildCheckInPrompt } from "@/lib/prompts/check-in";
 import { buildChunkPrompt } from "@/lib/prompts/chunk-generator";
 import { buildInsightsPrompt } from "@/lib/prompts/insights";
@@ -46,11 +47,11 @@ import type {
 import type { ObstacleCategory } from "@/types/session";
 import type { Session } from "@/types/models";
 
-// HF Hub path for the fine-tuned LITERTLM bundle. Verified on HF at this exact
-// URL (5,071,689,680 bytes); the wrapper auto-caches into iOS sandbox
-// Library/Caches/litert_models/ after first download.
-export const WAVE_LITERT_URL =
-  "https://huggingface.co/Maelstrome/lora-wave-session-r32/resolve/main/mediapipe/model.litertlm";
+// Model URL + manifest entry live in src/runtime/model-cache.ts (id:
+// 'litert-wave'). We download via ensureModel + pass the local path to
+// loadModel; that way the cache panel in the dev menu can inspect/clear
+// LiteRT alongside the other models, instead of being hidden inside the
+// wrapper's Library/Caches/litert_models/ directory.
 
 interface GenerateOptions {
   maxNewTokens: number;
@@ -102,19 +103,20 @@ export function preloadWaveLiteRT(
 ): Promise<LiteRTLMInstance> {
   if (!llmPromise) {
     llmPromise = (async () => {
+      // Download via the unified cache; ensureModel is idempotent so
+      // returning the local path is cheap when cached.
+      const localPath = await ensureModel("litert-wave", {
+        onProgress: opts?.onProgress,
+      });
       const llm = createLLM({ enableMemoryTracking: true });
-      await llm.loadModel(
-        WAVE_LITERT_URL,
-        {
-          // No systemPrompt; per-flow composed prompts go in the user msg
-          // after resetConversation(). See file header.
-          backend: opts?.backend ?? "gpu",
-          maxTokens: 512,
-          temperature: 0,
-          topK: 1,
-        },
-        opts?.onProgress,
-      );
+      await llm.loadModel(localPath, {
+        // No systemPrompt; per-flow composed prompts go in the user msg
+        // after resetConversation(). See file header.
+        backend: opts?.backend ?? "gpu",
+        maxTokens: 512,
+        temperature: 0,
+        topK: 1,
+      });
       return llm;
     })();
   }
