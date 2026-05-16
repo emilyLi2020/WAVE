@@ -55,8 +55,7 @@
       ],
       "expo-audio",
       "expo-asset",
-      "@kesha-antonov/react-native-background-downloader",
-      "expo-llm-mediapipe"
+      "onnxruntime-react-native"
     ],
     "experiments": {
       "typedRoutes": true,

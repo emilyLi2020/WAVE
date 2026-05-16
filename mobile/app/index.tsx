@@ -19,24 +19,24 @@ const TEST_ENTRIES: Entry[] = [
     href: "/tests/litert",
     title: "LiteRT smoke",
     blurb: "Download model.litertlm, generate chunk 1, validate JSON, measure RSS/TTFT/tok/s.",
-    status: "ready",
-  },
-  {
-    href: "/tests/mediapipe",
-    title: "MediaPipe smoke",
-    blurb: "MediaPipeTasksGenAI iOS (LiteRT under the hood) — loads the MediaPipe-flavored bundle and validates chunk 1.",
-    status: "ready",
+    status: "wip",
   },
   {
     href: "/tests/whisper",
     title: "Whisper STT",
     blurb: "Record audio with mic → whisper.rn (CoreML encoder) → transcript.",
-    status: "wip",
+    status: "ready",
   },
   {
     href: "/tests/kokoro",
     title: "Kokoro TTS",
     blurb: "Type/select text → react-native-sherpa-onnx Kokoro → audio playback.",
+    status: "ready",
+  },
+  {
+    href: "/tests/vad",
+    title: "Silero VAD",
+    blurb: "Live mic via sherpa-onnx + onnxruntime-react-native Silero v5. Indicator turns green when speech is detected.",
     status: "wip",
   },
   {
