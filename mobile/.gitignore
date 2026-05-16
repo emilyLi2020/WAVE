@@ -45,3 +45,9 @@ app-example
 # Locally-downloaded model bundles (fetched via scripts/download-*.sh)
 /assets/kokoro/
 /assets/whisper-coreml/
+
+# EAS local build result files (created by `eas build` in the working dir
+# when --local or when EAS writes the build summary).
+_build.json
+_logs.txt
+_build/
