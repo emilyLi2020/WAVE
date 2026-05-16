@@ -20,7 +20,7 @@
 import { Directory, File, Paths } from "expo-file-system";
 import { createDownloadResumable } from "expo-file-system/legacy";
 
-export type ModelId = "litert-wave" | "whisper-tiny-en";
+export type ModelId = "litert-wave" | "whisper-tiny-en" | "whisper-base-en";
 
 export interface ModelManifest {
   id: ModelId;
@@ -38,8 +38,8 @@ export const MODELS: Record<ModelId, ModelManifest> = {
     id: "litert-wave",
     label: "Gemma 4 LITERTLM (WAVE fine-tune)",
     filename: "model.litertlm",
-    url: "https://huggingface.co/Maelstrome/lora-wave-session-r32/resolve/main/litert-lm/model.litertlm",
-    expectedBytes: 2_560_966_656,
+    url: "https://huggingface.co/Maelstrome/lora-wave-session-r32/resolve/main/litert-lm-v2/model.litertlm",
+    expectedBytes: 2_560_956_368,
     minBytes: 2_500_000_000,
   },
   "whisper-tiny-en": {
@@ -49,6 +49,14 @@ export const MODELS: Record<ModelId, ModelManifest> = {
     url: "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-tiny.en.bin",
     expectedBytes: 77_704_716,
     minBytes: 70_000_000,
+  },
+  "whisper-base-en": {
+    id: "whisper-base-en",
+    label: "Whisper base.en (GGML)",
+    filename: "ggml-base.en.bin",
+    url: "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-base.en.bin",
+    expectedBytes: 147_964_211,
+    minBytes: 140_000_000,
   },
 };
 
