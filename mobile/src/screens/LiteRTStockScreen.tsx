@@ -12,11 +12,9 @@
 //   1. Download gemma-4-E2B-it.litertlm from litert-community (~2.59 GB,
 //      first-launch only) via the unified cache layer.
 //   2. Load it on the GPU backend with the increased-memory entitlement.
-//   3. Run a chunk-1 prompt and stream the response.
-//   4. Validate output against chunkLinesSchema (Zod) — stock won't follow
-//      the schema as cleanly as the fine-tune, so failure here is expected
-//      and informative.
-//   5. Report RSS, tok/s, TTFT live.
+//   3. Run a short WAVE-flavored prompt that fits the bundle's 1024-token
+//      total budget (the full chunk-1 prompt is ~1.8 K tokens, too big).
+//   4. Report RSS, tok/s, TTFT live.
 
 import React, { useEffect, useRef, useState } from "react";
 import {
@@ -27,28 +25,9 @@ import {
   Text,
   View,
 } from "react-native";
-import { z } from "zod";
 
-import {
-  chunkLinesSchema,
-  type ChunkGenerationContextPayload,
-} from "@/prompts/schemas";
-import { buildChunkPrompt } from "@/lib/prompts/chunk-generator";
 import { ensureModel } from "@/runtime/model-cache";
 import { createLLM, type LiteRTLMInstance } from "react-native-litert-lm";
-
-const SAMPLE_CONTEXT: ChunkGenerationContextPayload = {
-  chunkNumber: 1,
-  intakeIntensity: 7,
-  profile: {
-    matType: "buprenorphine",
-    medicationStatus: "on_time",
-    trigger: "stress",
-    triggerOther: null,
-    usedSubstanceToday: false,
-  },
-  sessionHistory: [],
-};
 
 type Phase =
   | "idle"
@@ -125,15 +104,17 @@ export default function LiteRTStockScreen() {
       const llm = createLLM({ enableMemoryTracking: true });
       await llm.loadModel(nativePath, {
         backend: "gpu",
-        // maxTokens is the OUTPUT/decode cap per the wrapper TS types
-        // ("Maximum number of tokens to generate", @default 1024), NOT the
-        // total context window. The stock litert-community bundle was
-        // compiled for **256 decode tokens** (per its HF README benchmark
-        // table). Asking for more than 256 passes loadModel but the
-        // compiled graph rejects it at inference ("failed to invoke the
-        // compiled model"). 256 matches what the existing "Try Stock
-        // Gemma" diagnostic in LiteRTSmokeScreen uses successfully.
-        maxTokens: 256,
+        // maxTokens is effectively the **total token budget** (input +
+        // output) in this wrapper despite the TS comment saying "to
+        // generate". With maxTokens=256 we got "input too long, 1846 > 256"
+        // when sending the full WAVE chunk-1 prompt; with maxTokens=2048
+        // we got "failed to invoke compiled model" (bundle prefill shapes
+        // don't accept arbitrary lengths). 1024 matches the maintainer's
+        // example app and is the sweet spot that the bundle's compiled
+        // graph accepts. Input prompts must stay short enough to leave
+        // room for output within 1024.
+        systemPrompt: "You are WAVE, a calm voice guiding someone through urge surfing. Reply in 1-2 short sentences.",
+        maxTokens: 1024,
         temperature: 0,
         topK: 1,
       });
@@ -159,14 +140,21 @@ export default function LiteRTStockScreen() {
     setOutput("");
     setStats(null);
     try {
-      const prompt = buildChunkPrompt(SAMPLE_CONTEXT);
-      const combined = `${prompt.systemPrompt}\n\n${prompt.userPrompt}`;
+      // Short demo prompt — the full WAVE chunk-1 prompt (~1800 tokens) is
+      // too long for the stock bundle's 1024 total-token budget. The
+      // system prompt at load time is the WAVE persona; here we just ask
+      // for a single urge-surfing cue. Demonstrates Gemma 4 running on
+      // LiteRT-LM end-to-end without overflowing the bundle's compiled
+      // context. Fine-tune would replace this with the full chunk
+      // contract; stock can't follow that schema.
+      const prompt =
+        "I'm feeling a 7-out-of-10 craving for buprenorphine right now. Give me one short urge-surfing cue to ride this out.";
 
       llm.resetConversation();
       let accumulated = "";
       await new Promise<void>((resolve, reject) => {
         try {
-          llm.sendMessageAsync(combined, (token, done) => {
+          llm.sendMessageAsync(prompt, (token, done) => {
             accumulated += token;
             setOutput(accumulated);
             if (done) resolve();
@@ -186,23 +174,13 @@ export default function LiteRTStockScreen() {
       });
       setMemory(llm.getMemoryUsage());
 
-      // Try to validate; stock won't always follow schema as cleanly as the
-      // fine-tune but the JSON-ish output is enough to demo the path.
-      try {
-        const text = extractFirstJsonObject(accumulated);
-        const parsed = JSON.parse(text);
-        chunkLinesSchema.parse(parsed);
+      // No JSON validation — stock Gemma 4 generates prose for this prompt.
+      // The fine-tune is what shapes output into the chunk schema. For the
+      // prize demo, coherent prose is the win condition.
+      if (accumulated.trim().length > 0) {
         setPhase("valid");
-      } catch (validationErr) {
-        if (validationErr instanceof z.ZodError) {
-          setError(
-            `Zod: ${validationErr.issues.map((i) => `${i.path.join(".")}: ${i.message}`).join("; ")}`,
-          );
-        } else {
-          setError(
-            `JSON parse: ${validationErr instanceof Error ? validationErr.message : String(validationErr)}`,
-          );
-        }
+      } else {
+        setError("Model returned empty output.");
         setPhase("invalid");
       }
     } catch (e) {
@@ -330,13 +308,6 @@ export default function LiteRTStockScreen() {
       )}
     </ScrollView>
   );
-}
-
-function extractFirstJsonObject(text: string): string {
-  const start = text.indexOf("{");
-  const end = text.lastIndexOf("}");
-  if (start === -1 || end === -1 || end < start) return text.trim();
-  return text.slice(start, end + 1);
 }
 
 function phaseStyle(p: Phase) {
