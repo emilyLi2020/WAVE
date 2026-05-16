@@ -1,21 +1,72 @@
 # mobile/ handoff
 
-Skim this if you just cloned the repo and want to ship the iOS app. For
+Skim this if you just cloned the repo or are starting a fresh session. For
 the deeper architecture, read `docs/architecture.md` next.
 
-## TL;DR — where the pivot is
+## 🚨 Current blocker (read first)
 
-- `pivot/react-native-litert` branch holds the work.
+**The LITERTLM bundle on HF is in the wrong flavor for our wrapper.** Filed
+upstream as [Maelstrome/Wave#11](https://github.com/emilyLi2020/Wave/issues/11).
+
+Quick recap of how we found this:
+
+1. Smoke screen on a physical iPhone hit `errno 2` from the LiteRT-LM C++
+   engine — turned out to be a `file://` URI vs raw POSIX path mismatch
+   (commit `2b6fdc6` strips the prefix before passing to `loadModel`).
+2. Next iteration: file found, readable, but engine creation still fails
+   ("Failed to create LiteRT-LM engine. Tried backend 'gpu' and CPU fallback").
+3. Diagnosis: our `Maelstrome/lora-wave-session-r32/mediapipe/model.litertlm`
+   was produced by **Google's MediaPipe Model Maker** (per its own
+   [HF README](https://huggingface.co/Maelstrome/lora-wave-session-r32/blob/main/mediapipe/README.md)).
+   The wrapper `react-native-litert-lm` calls `litert_lm_engine_create()` —
+   a different Google runtime that won't load MediaPipe-flavored bundles
+   even though they share the `.litertlm` extension and `LITERTLM` magic
+   bytes. Same trap as the MediaPipe-web postmortem
+   (`docs/postmortems/mediapipe-finetune.md`), one layer deeper.
+4. Size check confirms: stock `litert-community/gemma-4-E2B-it.litertlm` is
+   2.59 GB; ours is 5.07 GB. The LiteRT-LM build mmaps embedding params
+   separately and runs ~half the on-disk footprint.
+
+### Paths forward
+
+| Path | Status | Cost | Owner |
+|---|---|---|---|
+| Re-export via `litert-torch` Generative API | Filed as issue #11 | Needs a **Linux x86_64** box (not Mac — `litert-torch` is Linux-only) | Delegated |
+| Verify the diagnosis with stock Gemma 4 | Optional sanity check | Add a "Try stock Gemma" button to the smoke screen pointing at `https://huggingface.co/litert-community/gemma-4-E2B-it-litert-lm/resolve/main/gemma-4-E2B-it.litertlm` | Next session |
+| Contingency: pivot to llama.rn + GGUF | Documented in plan, not wired | ~3-4h to wire `llamarn-generators.ts` against `Maelstrome/lora-wave-session-r32/gguf/` | If #11 stalls |
+
+Until #11 lands, the LiteRT smoke screen is the **only** blocked test page.
+Whisper STT and Kokoro TTS are independent and should run; the combined
+voice loop just gates the LLM step on LiteRT.
+
+## TL;DR — overall state
+
+- Branch: `pivot/react-native-litert` (~14 commits, all on a clean main+1).
 - Type-check is green; `npx expo-doctor` is 17/17 green.
-- Three test pages built. LiteRT smoke and Whisper STT are wired end-to-end
-  and should run on a device. Kokoro TTS is wired but needs you to run a
-  setup script that populates `assets/kokoro/`. The combined voice loop
-  page is a stub until the three individual smokes green.
-- Five production session screens exist as skeletons (not tested).
-- A unified model cache + cache panel is on the dev menu home.
+- The user is running `npx expo start --dev-client` and successfully
+  installed a dev build on a physical iPhone, after the EAS build
+  (`react-native-litert-lm@0.3.6` — `0.3.7` is broken upstream, filed as
+  [hung-yueh/react-native-litert-lm#9](https://github.com/hung-yueh/react-native-litert-lm/issues/9)).
+- Routes structure (`app/`): dev menu home → `/tests/{litert,whisper,kokoro,combined}`
+  and `/session/{intake,safety,chunk,checkin,reflection}`.
+- Unified model cache (`src/runtime/model-cache.ts`) + cache panel embedded
+  in the dev menu home.
 
-Nothing has run on a physical iPhone yet because that's gated on you
-finishing Apple Developer Program enrollment + EAS setup.
+### Test pages
+
+| Route | What it does | State |
+|---|---|---|
+| `/tests/litert` | Download `model.litertlm` from HF → load via `react-native-litert-lm` → generate chunk 1 → Zod-validate. Memory + tok/s + TTFT panel. | **BLOCKED by #11** |
+| `/tests/whisper` | Push-to-talk: record via `expo-audio` → `whisper.rn` (ggml-tiny.en on Metal GPU) → transcript + RTF. | Ready to test on device |
+| `/tests/kokoro` | Text input → `react-native-sherpa-onnx` Kokoro TTS (CoreML EP, ANE) → playback. Needs `./scripts/download-kokoro.sh` to populate `assets/kokoro/`. | Ready once the bundle is downloaded |
+| `/tests/combined` | Push-to-talk MVP: record → Whisper → LiteRT → Kokoro → play. State machine for the four subsystems. | Wired; depends on `/tests/litert` working |
+
+### Production session screens
+
+All five (`intake`, `safety`, `chunk`, `checkin`, `reflection`) exist as
+navigable skeletons under `app/session/`. They link forward in the flow
+but don't run the reducer yet — the reducer (`src/session/session-machine.ts`)
+is ported but not wired.
 
 ## First-launch checklist
 
@@ -30,73 +81,64 @@ eas login
 # 3. Register your physical iPhone 15 Pro / 16 Pro UDID.
 cd mobile
 eas device:create
-# Follow the on-screen QR/email flow.
 
 # 4. Populate the Kokoro asset bundle (one-shot, ~330 MB).
 ./scripts/download-kokoro.sh
 
-# 5. Cloud-build the iOS dev client AND auto-upload to TestFlight in one go
-#    (~10-15 min build + a few minutes for App Store Connect processing).
+# 5. Cloud-build the iOS dev client and auto-upload to TestFlight in one go.
 eas build -p ios --profile development --submit
 
-# 6. When the TestFlight email lands, install on your iPhone, open the
-#    app once so iOS registers the dev-client UI.
+# 6. When the TestFlight email lands, install on the iPhone.
 
 # 7. Start the JS dev server.
 npx expo start --dev-client
-# Scan the QR with the installed app, or paste your Metro URL.
 ```
 
-The `--submit` flag chains the build + App Store Connect upload using
-`submit.development` in `eas.json`. If you'd rather grab an ad-hoc URL
-from the build output instead of using TestFlight, drop `--submit` and
-install via the QR/IPA link EAS prints when the build completes.
-
-After step 7 the app should open on the dev menu home. From there:
-
-- **LiteRT smoke** — tap "Download + Load". First run pulls model.litertlm
-  (~4.7 GB) from HF. Tap "Generate Chunk 1" once loaded. Output should be a
-  6-line JSON narration validated by `chunkLinesSchema`.
-- **Whisper STT** — tap "Download + Load" (~78 MB). Tap "Record", say
-  something, tap "Stop + transcribe". Transcript appears, RTF reported.
-- **Kokoro TTS** — tap "Download + Load Kokoro". If you ran the script in
-  step 4, this should initialize from the bundled asset and the "Speak"
-  button enables.
-
-Once all three are green, the combined voice loop page is the next thing
-to wire.
+After step 7 the app should open on the dev menu home. Cache panel at the
+bottom shows what's already downloaded; tap the rows to navigate to each
+test page.
 
 ## Critical gotchas
 
+- **Branch is `pivot/react-native-litert`, not `main`.** Push approval
+  required.
+
+- **`react-native-litert-lm` pinned to `0.3.6`** (not the latest `0.3.7` —
+  that release is broken upstream; iOS frameworks asset was never attached
+  to the GitHub release. See [hung-yueh#9](https://github.com/hung-yueh/react-native-litert-lm/issues/9)).
+  If a `0.3.8` lands with the asset fix, we can move forward.
+
 - **`app.json` bundle identifier is a placeholder** (`com.wave.mobile`).
-  If your Apple team needs a specific one (it usually does — you have to
-  own the bundle ID), change it before the first EAS build. EAS will
-  prompt to create a new App Store Connect entry.
-
-- **Mic permission string** is in `app.json` under `ios.infoPlist`. The
-  text shows up in the system permission prompt on first mic use. Change
-  it if you want different copy.
-
-- **Don't commit `mobile/assets/kokoro/`.** It's gitignored. Anyone cloning
-  the repo runs `scripts/download-kokoro.sh` once to populate it.
+  If your Apple team needs a specific bundle ID, change it before the
+  first EAS build.
 
 - **`legacy-peer-deps=true` is in `mobile/.npmrc`** because
-  `react-native-litert-lm@0.3.7` declares `peerOptional expo@>=55.0.0`
-  and we're on Expo 54. Keep the flag until either Expo bumps to 55 or
-  the wrapper drops the constraint.
+  `react-native-litert-lm` declares `peerOptional expo@>=55.0.0` and
+  we're on Expo 54. Keep until the wrapper drops the constraint.
+
+- **`Don't commit `mobile/assets/kokoro/`.** Gitignored. Anyone cloning
+  the repo runs `scripts/download-kokoro.sh` once to populate it (or EAS
+  Build does on its first run for that build profile).
 
 - **Memory ceiling is real.** Demo on iPhone 15/16 Pro. iPhone 14 Pro and
-  earlier (6 GB RAM) likely won't fit the full stack. The LiteRT smoke
-  screen's memory panel reports live RSS so you can watch it.
+  earlier (6 GB RAM) likely won't fit the full stack.
 
 - **No barge-in cancel yet.** `sendMessageAsync` in the LiteRT wrapper
-  doesn't expose an AbortSignal. When step 5c wires the voice loop, we'll
-  either call `wrapper.close()` + reload (slow) or upstream a cancel PR.
-  Treat barge-in as a future polish item, not Day 1.
+  doesn't expose an AbortSignal. Future polish for the combined loop.
 
-- **Whisper test page uses Metal GPU, not the ANE CoreML encoder.** Adding
-  CoreML moves the encoder off Metal and frees the GPU for Gemma decode +
-  Whisper decoder. Follow-up item.
+- **Whisper test page uses Metal GPU**, not the ANE CoreML encoder.
+  Moving encoder to ANE is a follow-up that frees Metal for Gemma decode.
+
+- **expo-file-system v19 deprecated the legacy procedural API**
+  (`getInfoAsync`, `makeDirectoryAsync`, `documentDirectory`,
+  `createDownloadResumable`) — they now THROW at runtime. We migrated to
+  the `File`/`Directory`/`Paths` class API in `src/runtime/model-cache.ts`
+  but kept `createDownloadResumable` via the `expo-file-system/legacy`
+  subpath because the new `File.downloadFileAsync` has no progress
+  callback in its options.
+
+- **LiteRT-LM C++ wants raw POSIX paths**, not `file://` URIs. Stripped
+  in `litert-generators.ts` `preloadWaveLiteRT()`. Don't reintroduce.
 
 ## File-by-file pointers
 
@@ -107,8 +149,8 @@ For "where do I add a new model?":
 For "where do I change the LLM behavior?":
 - Prompt builders: `src/prompts/`. They port verbatim from `client/lib/prompts/`,
   so make any change in *both* places until the web app is sunset.
-- Generation logic: `src/runtime/litert-generators.ts`. Each flow has its own
-  function (chunk / reflection / insights / checkin).
+- Generation logic: `src/runtime/litert-generators.ts`. Each flow has its
+  own function (chunk / reflection / insights / checkin).
 
 For "where do I add a new screen?":
 - File-based route: `app/<route>.tsx` (or `app/<group>/<route>.tsx` for a
@@ -130,18 +172,34 @@ For "what's already ported and what isn't":
 - **`npx expo-doctor` flags a version mismatch:** run
   `npx expo install <package>` to pull the SDK-compatible version
   (instead of plain `npm install`).
-- **EAS build fails on native module compilation:** usually a peer-dep or
-  Expo SDK mismatch. Check the build log; common fixes are bumping Expo,
-  reinstalling with `legacy-peer-deps`, or adding the package's config
-  plugin to `app.json > plugins`.
+- **EAS build fails on native module compilation:** check the build log
+  for the actual error. Past failures: `react-native-litert-lm@0.3.7`
+  missing iOS frameworks asset (filed upstream); `_build.json` / `_logs.txt`
+  artifacts EAS dumps in `mobile/` after a failed build (gitignored).
 - **App opens but a test page errors on load:** check the cache panel on
   the home screen. Models may be partially downloaded (size below
   `minBytes`); clear them and retry.
+- **LiteRT smoke fails with "failed to create engine":** that's the issue
+  #11 blocker. Don't spend time debugging — the bundle format is wrong.
+
+## Branch commit history (newest → oldest)
+
+```
+2b6fdc6  Strip file:// prefix before loadModel for LiteRT-LM
+efa4862  Tune eas.json + handoff per the expo-dev-client skill
+4b858a4  Apply Expo building-native-ui guidelines to existing screens
+223c320  Migrate cache layer to new expo-file-system API (File/Directory/Paths)
+17ec065  Fix dev menu navigation — Pressable child for Link asChild
+(file:// strip and dev-menu fix above this point are the most recent fixes)
+fff76d0  Pin expo-audio + expo-file-system to SDK 54-compatible versions
+…earlier commits: combined voice loop, kokoro path, cache + panel, docs,
+session reducer, gemma wrappers, runtime, scaffolding
+```
+
+`git log --oneline pivot/react-native-litert ^main` from the repo root has
+the full list.
 
 ## Outstanding work
-
-Tracked in the project's task list (run `TaskList` from inside Claude
-Code). Current state:
 
 - [x] Scaffold + entitlement + EAS config
 - [x] Runtime layer (LiteRT primary, contingency on hold)
@@ -152,9 +210,15 @@ Code). Current state:
 - [x] Kokoro test page (asset path wired; script provided)
 - [x] Production screen skeletons (5)
 - [x] Unified model cache + cache panel
-- [x] Documentation (this doc + architecture.md)
-- [ ] Combined voice loop test page (wires the three subsystems + push-to-talk MVP)
-- [ ] VAD listener port (step 5a, after combined smoke greens)
+- [x] Combined voice loop test page (push-to-talk MVP)
+- [x] Documentation (this doc + `architecture.md`)
+- [x] Expo skill audit pass (UI guidelines, eas.json, file-system migration)
+- [ ] **Unblock the LiteRT path — issue #11** (LiteRT-LM-flavored bundle)
+- [ ] Add a "Try stock Gemma" button to the smoke screen to verify the
+      bundle-format hypothesis if #11 takes time
+- [ ] VAD listener port (`vad-listener.ts`) — Silero via
+      `onnxruntime-react-native` + bundled `assets/silero/silero_vad.onnx`
 - [ ] CoreML Whisper encoder (move encoder to ANE)
-- [ ] Production screen full UIs (port from client/app/session/_components/)
+- [ ] Production screen full UIs (port from `client/app/session/_components/`)
+- [ ] Wire production screens to the session-machine reducer
 - [ ] Demo video + postmortem write-up
