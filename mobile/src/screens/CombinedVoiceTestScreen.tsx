@@ -34,7 +34,7 @@ import {
   useAudioPlayer,
   useAudioRecorder,
 } from "expo-audio";
-import * as FileSystem from "expo-file-system";
+import { Paths } from "expo-file-system";
 import { initWhisper, type WhisperContext } from "whisper.rn";
 
 import { preloadWaveLiteRT } from "@/runtime/litert-generators";
@@ -259,10 +259,7 @@ export default function CombinedVoiceTestScreen() {
 
       // saveAudioToFile writes a WAV the audio player can read.
       const sherpa: any = await import("react-native-sherpa-onnx/tts");
-      const docDir: string =
-        (FileSystem as any).documentDirectory ??
-        ((FileSystem as any).Paths?.document?.uri as string);
-      const wavPath = `${docDir}wave-models/kokoro/last-${Date.now()}.wav`;
+      const wavPath = `${Paths.document.uri}wave-models/kokoro/last-${Date.now()}.wav`;
       const savedPath = await sherpa.saveAudioToFile(audio, wavPath);
       setAudioUri(savedPath ?? wavPath);
       const ttsMs = Date.now() - ttsT0;

@@ -3,20 +3,22 @@
 // is idempotent — returns the cached path on cache hit, downloads on miss.
 //
 // Storage:
-//   documentDirectory/wave-models/<id>/<filename>
+//   <documentDirectory>/wave-models/<id>/<filename>
 //
-// We pick documentDirectory (not cacheDirectory) for the LiteRT bundle so
-// iOS doesn't reclaim a 4.7 GB download under storage pressure. Downside:
-// Documents/ is backed up to iCloud by default. Polish item: set
-// NSURLIsExcludedFromBackupKey on the file once expo-file-system exposes
-// that flag, or move to Library/Application Support/.
+// We pick the document directory (not cache) for the LiteRT bundle so iOS
+// doesn't reclaim a 4.7 GB download under storage pressure. Downside: the
+// document directory is iCloud-backed by default. Polish item: set
+// NSURLIsExcludedFromBackupKey or move to Library/Application Support/.
 //
 // Cache validity = (file exists) AND (size >= manifest.minBytes). A partial
 // download from a previous interrupted session is treated as a miss and
-// re-fetched (no resume yet — manifest.expectedBytes lets us add that
-// later via the resumeData field on FileSystem.DownloadResumable).
+// re-fetched. We currently use the legacy createDownloadResumable for the
+// progress callback (the new File.downloadFileAsync has no progress hook
+// in DownloadOptions); the legacy subpath import is the supported workaround
+// per expo-file-system's deprecation notes.
 
-import * as FileSystem from "expo-file-system";
+import { Directory, File, Paths } from "expo-file-system";
+import { createDownloadResumable } from "expo-file-system/legacy";
 
 export type ModelId = "litert-wave" | "whisper-tiny-en";
 
@@ -54,24 +56,12 @@ export const MODELS: Record<ModelId, ModelManifest> = {
 // Path helpers
 // ────────────────────────────────────────────────────────────────────────
 
-function getDocDir(): string {
-  // expo-file-system 19.x exposes `documentDirectory`. Older/newer variants
-  // moved to `Paths.document.uri`. Try both.
-  const dir =
-    (FileSystem as any).documentDirectory ??
-    ((FileSystem as any).Paths?.document?.uri as string | undefined);
-  if (!dir) {
-    throw new Error("expo-file-system documentDirectory is unavailable");
-  }
-  return dir;
+function getModelDir(id: ModelId): Directory {
+  return new Directory(Paths.document, "wave-models", id);
 }
 
-function getModelDir(id: ModelId): string {
-  return `${getDocDir()}wave-models/${id}/`;
-}
-
-function getModelPath(id: ModelId): string {
-  return `${getModelDir(id)}${MODELS[id].filename}`;
+function getModelFile(id: ModelId): File {
+  return new File(getModelDir(id), MODELS[id].filename);
 }
 
 // ────────────────────────────────────────────────────────────────────────
@@ -91,16 +81,16 @@ export interface CacheEntry {
 
 export async function inspectModel(id: ModelId): Promise<CacheEntry> {
   const manifest = MODELS[id];
-  const path = getModelPath(id);
-  const info = await FileSystem.getInfoAsync(path);
-  const bytes = info.exists ? (info.size ?? 0) : 0;
+  const file = getModelFile(id);
+  const exists = file.exists;
+  const bytes = exists ? file.size ?? 0 : 0;
   return {
     id,
     label: manifest.label,
     filename: manifest.filename,
-    path,
+    path: file.uri,
     url: manifest.url,
-    cached: info.exists && bytes >= manifest.minBytes,
+    cached: exists && bytes >= manifest.minBytes,
     bytes,
     expectedBytes: manifest.expectedBytes,
   };
@@ -131,42 +121,43 @@ export interface EnsureOptions {
   force?: boolean;
 }
 
+function deleteFileIfExists(file: File): void {
+  if (!file.exists) return;
+  try {
+    file.delete();
+  } catch {
+    // best-effort
+  }
+}
+
 export async function ensureModel(
   id: ModelId,
   opts?: EnsureOptions,
 ): Promise<string> {
   const manifest = MODELS[id];
   const dir = getModelDir(id);
-  const path = getModelPath(id);
+  const file = getModelFile(id);
 
   if (opts?.force) {
-    await FileSystem.deleteAsync(path, { idempotent: true });
-  } else {
-    const info = await FileSystem.getInfoAsync(path);
-    if (info.exists && (info.size ?? 0) >= manifest.minBytes) {
-      opts?.onProgress?.(1);
-      return path;
-    }
-    // Partial download from a previous attempt? Treat as a miss and
-    // start fresh. Resume support can be added by persisting the
-    // DownloadResumable's resumeData in a future revision.
-    if (info.exists) {
-      await FileSystem.deleteAsync(path, { idempotent: true });
-    }
+    deleteFileIfExists(file);
+  } else if (file.exists && (file.size ?? 0) >= manifest.minBytes) {
+    opts?.onProgress?.(1);
+    return file.uri;
+  } else if (file.exists) {
+    // Partial download from a previous attempt — treat as miss, start fresh.
+    deleteFileIfExists(file);
   }
 
-  try {
-    await FileSystem.makeDirectoryAsync(dir, { intermediates: true });
-  } catch {
-    // already exists — fine
-  }
+  // Make sure the parent directory exists. `idempotent: true` keeps create()
+  // from throwing when the directory was created by a previous run.
+  dir.create({ intermediates: true, idempotent: true });
 
   let aborted = false;
-  const dl = FileSystem.createDownloadResumable(
+  const dl = createDownloadResumable(
     manifest.url,
-    path,
+    file.uri,
     {},
-    (progress) => {
+    (progress: { totalBytesWritten: number; totalBytesExpectedToWrite: number }) => {
       if (opts?.signal?.aborted) {
         aborted = true;
         return;
@@ -181,7 +172,7 @@ export async function ensureModel(
 
   const result = await dl.downloadAsync();
   if (aborted || opts?.signal?.aborted) {
-    await FileSystem.deleteAsync(path, { idempotent: true });
+    deleteFileIfExists(file);
     throw new DOMException("Aborted", "AbortError");
   }
   if (!result?.uri) {
@@ -189,10 +180,10 @@ export async function ensureModel(
   }
 
   // Sanity: did we actually get the expected file?
-  const after = await FileSystem.getInfoAsync(result.uri);
-  const afterSize = after.exists ? (after.size ?? 0) : 0;
+  const after = new File(result.uri);
+  const afterSize = after.exists ? after.size ?? 0 : 0;
   if (!after.exists || afterSize < manifest.minBytes) {
-    await FileSystem.deleteAsync(result.uri, { idempotent: true });
+    deleteFileIfExists(after);
     throw new Error(
       `cached ${id} is smaller than expected (got ${afterSize}b, expected at least ${manifest.minBytes}b)`,
     );
@@ -206,7 +197,7 @@ export async function ensureModel(
 // ────────────────────────────────────────────────────────────────────────
 
 export async function clearModel(id: ModelId): Promise<void> {
-  await FileSystem.deleteAsync(getModelPath(id), { idempotent: true });
+  deleteFileIfExists(getModelFile(id));
 }
 
 export async function clearAllModels(): Promise<void> {
