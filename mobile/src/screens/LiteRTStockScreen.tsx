@@ -125,7 +125,12 @@ export default function LiteRTStockScreen() {
       const llm = createLLM({ enableMemoryTracking: true });
       await llm.loadModel(nativePath, {
         backend: "gpu",
-        maxTokens: 512,
+        // maxTokens is the TOTAL context window (input + output), not just
+        // generation length — react-native-litert-lm wrapper convention.
+        // WAVE chunk-1 prompt is ~2-4 K input tokens; 8192 gives generous
+        // headroom for chunk + reflection without bumping KV-cache RAM
+        // beyond what Gemma 4 E2B sliding-window attention handles.
+        maxTokens: 8192,
         temperature: 0,
         topK: 1,
       });
