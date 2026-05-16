@@ -22,6 +22,7 @@ import { createDownloadResumable } from "expo-file-system/legacy";
 
 export type ModelId =
   | "litert-wave"
+  | "litert-stock-gemma4"
   | "whisper-tiny-en"
   | "whisper-base-en"
   | "silero-vad";
@@ -44,6 +45,14 @@ export const MODELS: Record<ModelId, ModelManifest> = {
     filename: "model.litertlm",
     url: "https://huggingface.co/Maelstrome/lora-wave-session-r32/resolve/main/litert-lm-v3/model.litertlm",
     expectedBytes: 2_560_956_368,
+    minBytes: 2_500_000_000,
+  },
+  "litert-stock-gemma4": {
+    id: "litert-stock-gemma4",
+    label: "Gemma 4 LITERTLM (stock litert-community)",
+    filename: "gemma-4-E2B-it.litertlm",
+    url: "https://huggingface.co/litert-community/gemma-4-E2B-it-litert-lm/resolve/main/gemma-4-E2B-it.litertlm",
+    expectedBytes: 2_588_147_712,
     minBytes: 2_500_000_000,
   },
   "whisper-tiny-en": {

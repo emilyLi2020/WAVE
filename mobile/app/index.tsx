@@ -17,9 +17,15 @@ interface Entry {
 const TEST_ENTRIES: Entry[] = [
   {
     href: "/tests/litert",
-    title: "LiteRT smoke",
-    blurb: "Download model.litertlm, generate chunk 1, validate JSON, measure RSS/TTFT/tok/s.",
+    title: "LiteRT smoke (fine-tune)",
+    blurb: "Loads our WAVE fine-tune bundle. Blocked on the wrapper-rebuild path (issue #13). Has the stock-Gemma sanity-check button.",
     status: "wip",
+  },
+  {
+    href: "/tests/litert-stock",
+    title: "LiteRT (stock Gemma 4)",
+    blurb: "Prize demo: loads litert-community/gemma-4-E2B-it.litertlm on the bundled wrapper and runs a WAVE chunk-1 prompt.",
+    status: "ready",
   },
   {
     href: "/tests/whisper",
@@ -53,6 +59,33 @@ const SESSION_ENTRIES: Entry[] = [
   { href: "/session/chunk", title: "Chunk", blurb: "Generated meditation chunk playback.", status: "stub" },
   { href: "/session/checkin", title: "Check-in", blurb: "Multi-turn voice check-in.", status: "stub" },
   { href: "/session/reflection", title: "Reflection", blurb: "Post-session card + next-step chips.", status: "stub" },
+];
+
+const NON_SESSION_ENTRIES: Entry[] = [
+  {
+    href: "/onboarding",
+    title: "Onboarding",
+    blurb: "Name, MAT type, dose time, consent. Hands off to /session/intake.",
+    status: "ready",
+  },
+  {
+    href: "/dashboard",
+    title: "Dashboard",
+    blurb: "Stats, 7×6 risk heatmap, this-week summary. Backed by mock-sessions.",
+    status: "ready",
+  },
+  {
+    href: "/history",
+    title: "History",
+    blurb: "Recent sessions with outcome chips. Export-PDF button is a stub.",
+    status: "ready",
+  },
+  {
+    href: "/insights",
+    title: "Insights",
+    blurb: "Static cards + regenerate via on-device Gemma (LiteRT-backed).",
+    status: "wip",
+  },
 ];
 
 function StatusBadge({ status }: { status: Entry["status"] }) {
@@ -100,6 +133,12 @@ export default function DevMenu() {
       <Text style={[styles.section, { marginTop: 24 }]}>Session flow</Text>
       <Text style={styles.sectionSub}>Production screen skeletons — not yet wired to LiteRT.</Text>
       {SESSION_ENTRIES.map((e) => (
+        <Row key={e.href} entry={e} />
+      ))}
+
+      <Text style={[styles.section, { marginTop: 24 }]}>Non-session pages</Text>
+      <Text style={styles.sectionSub}>Ports of the web surfaces around the session loop.</Text>
+      {NON_SESSION_ENTRIES.map((e) => (
         <Row key={e.href} entry={e} />
       ))}
 
