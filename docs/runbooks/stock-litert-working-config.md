@@ -27,7 +27,15 @@ prompt streamed coherent JSON on device.
 | Verified device | iPhone 17 Pro, hardware UDID `00008150-001079E40182401C` |
 | Branch | `wave/litert-maxtokens-pathA` |
 
-## Per-surface fit on this config (hard caps: 2048 total, 256 decode)
+> **⚠️ CORRECTION:** the "2048 total / 256 decode" framing below is
+> over-stated (old-wrapper conflation artifact). Context is
+> runtime-settable; real iOS ceiling ≈ 4096 ([LiteRT #6765]), and the
+> 256-decode cap is unverified post-fork. The table is the *conservative
+> verified-safe* envelope; the true envelope is being measured per
+> `docs/plans/litert-cache-reexport-plan.md` Phase 0. Don't treat the ❌
+> rows as proven.
+
+## Per-surface fit on this config (conservative verified-safe envelope)
 
 Usable output = `min(outputMaxTokens, 256, 2048 − inputTokens)`.
 

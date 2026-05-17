@@ -10,6 +10,19 @@
 > "input token ids are too long" errors on this stack with prompts >~200
 > tokens. Stack-trace pattern recognition for the next person who hits this.
 
+> **⚠️ CORRECTION (2026-05-16, added after Path A verified).** This
+> document repeatedly states the stock bundle is hard-capped at **2048
+> total / 256 decode**. That is **wrong / over-stated** — it was an
+> artifact of the old wrapper's `maxTokens` conflation (failures above 256
+> were always the *decode* side, never the engine cache). Context is in
+> fact **runtime-settable, not bundle-fixed**: the HF card says "up to
+> 32k"; [LiteRT #6765] shows the official bundle's `LlmMetadata` doesn't
+> set `max_num_tokens` and 4096 works on iOS (>4096 SIGSEGV); [LiteRT-LM
+> #2202] ran E2B at 8192 on Android. The genuine ceiling is
+> **platform-runtime ≈ 4096 on iOS arm64**, and the 256-decode cap is
+> likewise unverified post-fork. Treat the "2048/256 hard limit" claims
+> below as historical. Live plan: `docs/plans/litert-cache-reexport-plan.md`.
+
 ## TL;DR
 
 | Use case | Stock bundle + `react-native-litert-lm@0.3.6` |
