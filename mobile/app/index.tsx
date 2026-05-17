@@ -24,7 +24,7 @@ const TEST_ENTRIES: Entry[] = [
   {
     href: "/tests/litert-stock",
     title: "LiteRT (stock Gemma 4)",
-    blurb: "Prize demo: loads litert-community/gemma-4-E2B-it.litertlm on the bundled wrapper and runs a WAVE chunk-1 prompt.",
+    blurb: "Prize demo: stock Gemma 4 E2B on the vendored GPU LiteRT-LM wrapper (~50 tok/s on device) running three real WAVE surfaces — phase narration, a 3-turn check-in that fires the endConversation tool call, and reflection.",
     status: "ready",
   },
   {
