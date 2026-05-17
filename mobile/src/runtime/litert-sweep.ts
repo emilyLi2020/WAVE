@@ -357,7 +357,7 @@ export const ASCENDING_PROBES: Probe[] = [
 
 const SAFE_CFG = {
   engineMaxTokens: 2048,
-  outputMaxTokens: 256,
+  outputMaxTokens: 512,
   backend: "gpu" as Backend,
 };
 
@@ -375,20 +375,20 @@ export async function runAdaptiveSafe(
     all.push(r);
     onResult(r);
     if (r.outcome === "hang")
-      return { eStar: 2048, oStar: 256, results: all };
+      return { eStar: 2048, oStar: 512, results: all };
   }
 
   // Nothing hung — one CPU sanity (backend behaviour differs; #6765).
   const cpu = await runProbe(
     modelPath,
-    { engineMaxTokens: 2048, outputMaxTokens: 256, backend: "cpu" },
+    { engineMaxTokens: 2048, outputMaxTokens: 512, backend: "cpu" },
     { surface: "chunk1", variant: "compact" },
     timeoutMs,
   );
   all.push(cpu);
   onResult(cpu);
 
-  return { eStar: 2048, oStar: 256, results: all };
+  return { eStar: 2048, oStar: 512, results: all };
 }
 
 /** Suggested upward outlier ladder for the manual >4096 probe control. */
