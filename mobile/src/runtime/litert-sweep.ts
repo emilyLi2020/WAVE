@@ -339,20 +339,27 @@ export async function runProbe(
  * The >4096 ceiling question is handled separately by the one-shot
  * outlier probes in the screen.
  */
+// LiteRT is mandatory; the production fallback is stock Gemma 4 base +
+// outputMaxTokens=256. All on-device crashes were at eng4096 cold-start;
+// eng2048 was stable in the v1 grid. So we probe ONLY the in-constraint,
+// stable config — eng2048 / out256 — and the question collapses to: does
+// the COMPACT system prompt shrink chunk3/chunk5 enough to fit and emit
+// valid output here? chunk1/compact is the control (v1: ok at 2048).
 export const ASCENDING_PROBES: Probe[] = [
-  // chunk1/canonical is the CONTROL: the v1 grid proved it ok at
-  // 4096/512 (94 tok, ~30 s). If it's ok here too, the harness is sound
-  // and any later "hang" is real (slow-to-cap or wedge), not a bug. With
-  // the 300 s timeout below, a slow-but-completing gen now reports its
-  // true completionTokens + tok/s instead of a false "hang".
-  { surface: "chunk1", variant: "canonical" }, // CONTROL (known-good)
+  { surface: "chunk1", variant: "compact" }, // CONTROL (v1: ok @2048)
   { surface: "reflection", variant: "canonical" }, // ~700 tok in
-  { surface: "chunk1", variant: "compact" },
-  { surface: "chunk3", variant: "compact" },
-  { surface: "chunk3", variant: "canonical" },
-  { surface: "chunk5", variant: "compact" },
-  { surface: "chunk5", variant: "canonical" }, // heaviest input
+  { surface: "chunk1", variant: "canonical" },
+  { surface: "chunk3", variant: "compact" }, // does compact fit @2048?
+  { surface: "chunk3", variant: "canonical" }, // expected: too big
+  { surface: "chunk5", variant: "compact" }, // heaviest, compact
+  { surface: "chunk5", variant: "canonical" }, // heaviest, canonical
 ];
+
+const SAFE_CFG = {
+  engineMaxTokens: 2048,
+  outputMaxTokens: 256,
+  backend: "gpu" as Backend,
+};
 
 export async function runAdaptiveSafe(
   modelPath: string,
@@ -360,34 +367,28 @@ export async function runAdaptiveSafe(
   onResult: (r: ProbeResult) => void,
 ): Promise<{ eStar: number; oStar: number; results: ProbeResult[] }> {
   const all: ProbeResult[] = [];
-  const cfg = {
-    engineMaxTokens: 4096,
-    outputMaxTokens: 512,
-    backend: "gpu" as Backend,
-  };
-  // One load per probe (system in LLMConfig). Ascending input order, so a
-  // hang/crash on the heavy end never costs the lighter results. Stop the
-  // moment one hangs — the process is wedged; relaunch resumes from a
-  // trimmed ASCENDING_PROBES if needed.
+  // One load per probe (system in LLMConfig), all at the stable
+  // in-constraint config (eng2048/out256). Ascending input order so a
+  // hang/crash on the heavy end never costs the lighter results.
   for (const p of ASCENDING_PROBES) {
-    const r = await runProbe(modelPath, cfg, p, timeoutMs);
+    const r = await runProbe(modelPath, SAFE_CFG, p, timeoutMs);
     all.push(r);
     onResult(r);
-    if (r.outcome === "hang") return { eStar: 4096, oStar: 512, results: all };
+    if (r.outcome === "hang")
+      return { eStar: 2048, oStar: 256, results: all };
   }
 
-  // Nothing hung — engine path is healthy. One CPU sanity (backend
-  // behaviour differs sharply; #6765 was CPU-only).
+  // Nothing hung — one CPU sanity (backend behaviour differs; #6765).
   const cpu = await runProbe(
     modelPath,
-    { engineMaxTokens: 4096, outputMaxTokens: 512, backend: "cpu" },
-    { surface: "chunk3", variant: "canonical" },
+    { engineMaxTokens: 2048, outputMaxTokens: 256, backend: "cpu" },
+    { surface: "chunk1", variant: "compact" },
     timeoutMs,
   );
   all.push(cpu);
   onResult(cpu);
 
-  return { eStar: 4096, oStar: 512, results: all };
+  return { eStar: 2048, oStar: 256, results: all };
 }
 
 /** Suggested upward outlier ladder for the manual >4096 probe control. */
