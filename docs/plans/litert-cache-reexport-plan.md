@@ -80,6 +80,16 @@ turn the knobs up on the bundle we already verified.
    - `engineMaxTokens` ∈ {2048, 3072, 4096} (never >4096 on iOS)
    - `outputMaxTokens` ∈ {256, 384, 512} (re-test the "256 decode" wall —
      it may also have been a conflation artifact)
+   - **`backend` recorded per row:** primary sweep on `gpu` (WAVE's real
+     path); add a small `cpu` sanity row at one mid cell — upstream
+     behaviour differs sharply by backend (#6765 was CPU-only), so a
+     gpu-only result must not be generalised.
+   - **Timeout / recovery rule (decide BEFORE running, per #2202 silent
+     hangs):** per-cell hard timeout (e.g. 90 s wall with zero tokens, or
+     >2× the expected decode time); on trip → log the cell as `HANG`,
+     destroy + recreate the conversation/engine, and DO NOT keep sending
+     on the wedged conversation. Treat a hang as a distinct outcome from
+     truncation or error, not a pass.
    - **Real WAVE surfaces, not just synthetic sizes:** actual chunk 1–5
      prompts built with real session history, plus reflection and a
      multi-turn check-in flow — AND synthetic boundary sizes

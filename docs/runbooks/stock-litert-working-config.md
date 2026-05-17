@@ -52,10 +52,12 @@ prompt streamed coherent JSON on device.
 | Chunks 2–5 | ~2500–2900 w/ history | ~150–210 | ❓ unverified — the core Phase 0 question |
 | >256-tok output | — | >256 | ❓ unverified (256-decode cap not re-tested post-fork) |
 
-The compact system prompt is what moves chunk-1 from "fragile, ~202-token
-output bound" to "comfortably decode-cap bound." It does **not** fully
-rescue chunks 4–5 (history accumulation) or any surface needing >256
-output tokens — those need llama.rn/GGUF or a re-exported bundle (Wave#14).
+The compact system prompt reduces every chunk's input by ~400–500 tokens,
+which *should* materially help chunk-1 and push chunks 2–5 lower — but by
+how much, and whether chunks 4–5 / >256-token outputs then fit, is exactly
+what **Wave#15 Phase 0 measures**. Do not treat "needs GGUF/re-export" as
+settled; that conclusion was from the disproven 2048/256 model and is now
+an open question pending the on-device sweep.
 
 ## Reproduce the on-device build (no EAS credits)
 
