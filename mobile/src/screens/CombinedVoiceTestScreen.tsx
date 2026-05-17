@@ -1,81 +1,190 @@
-// Combined voice loop test page — wires VAD-eventually + STT + LLM + TTS
-// in a single screen so we can verify the integration before pulling the
-// loop into the production CheckInScreen.
+// Full hands-free voice loop (issue #21).
 //
-// Scope of this first pass:
-//   - PUSH-TO-TALK only. No VAD-driven auto-listen, no barge-in.
-//     VAD comes in step 5a after this screen confirms the three subsystems
-//     pipe into each other cleanly.
-//   - Single-turn round-trip: record → STT → LLM → TTS → play.
-//     Multi-turn history threading is a follow-up.
-//   - Generic chat system prompt — NOT the WAVE check-in prompt. We're
-//     proving the wiring; clinical correctness happens when this gets
-//     pulled into CheckInScreen with buildCheckInPrompt() in step 5c.
+//   Silero VAD endpointing → Whisper base STT → Gemma 4 (stock, GPU
+//   LiteRT) → Kokoro streaming TTS → playback, with stop-playback barge-in.
 //
-// Pipeline state machine:
-//   idle → recording → transcribing → generating → speaking → idle
-//                                                    ^
-//   Errors at any step return to idle with the error surfaced.
+// Architecture decisions (locked in #21):
+//   - ALL-RESIDENT: VAD + Whisper base + stock-Gemma-GPU + Kokoro stay
+//     loaded for the whole session. No per-turn load/unload.
+//   - Barge-in = STOP PLAYBACK ONLY: speech during TTS cancels Kokoro and
+//     re-listens; the (already-finished) LLM turn is never re-run, no
+//     2.5 GB reload.
+//   - Stock Gemma on GPU is the GPU-validated bundle; the loop talks to it
+//     through the (modelId,backend,systemPrompt)-keyed preloadLiteRT —
+//     NOT preloadWaveLiteRT (which is litert-wave/CPU and would no-op the
+//     backend, per review #1).
+//
+// Concurrency (review #3): one resident LLM can't take a new turn until the
+// prior sendMessage resolves. `llmBusyRef` serializes turns; a barge/utter
+// that lands mid-turn is stashed in `pendingPcmRef` (latest wins) and run
+// when the current turn finishes. `epochRef` invalidates a stale reply so a
+// barged-over turn is never spoken.
+//
+// State machine:
+//   idle → loading → listening
+//   listening →(speechEnd) transcribing → generating → speaking → listening
+//   speaking →(speechStart, past grace) listening   [barge-in]
+//
+// Mic policy: the endpointer is muted during transcribing/generating (the
+// loop must not recurse on itself) and live during listening/speaking
+// (speaking stays live for barge-in). Self-trigger from the device speaker
+// during TTS is a known limitation — a short grace window after playback
+// start absorbs the worst of it; earbuds for the demo. Tracked in #21.
 
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
-  Alert,
   Pressable,
   ScrollView,
   StyleSheet,
   Text,
   View,
 } from "react-native";
-import {
-  AudioModule,
-  RecordingPresets,
-  setAudioModeAsync,
-  useAudioPlayer,
-  useAudioRecorder,
-} from "expo-audio";
-import { Directory, Paths } from "expo-file-system";
+import { setAudioModeAsync } from "expo-audio";
 import { initWhisper, type WhisperContext } from "whisper.rn";
 
-import { preloadWaveLiteRT } from "@/runtime/litert-generators";
-import { ensureModel } from "@/runtime/model-cache";
+import {
+  preloadLiteRT,
+  unloadLiteRT,
+  type LiteRTLoadConfig,
+} from "@/runtime/litert-generators";
+import { ensureModel, MODELS } from "@/runtime/model-cache";
+import {
+  createSileroVad,
+  VAD_SAMPLE_RATE,
+  type SileroVad,
+} from "@/voice/silero-vad";
+import { useVadEndpointer } from "@/voice/use-vad-endpointer";
+import { writePcmToWavFile } from "@/voice/pcm-wav";
+import { WAVE_SYSTEM_PROMPT_STOCK_COMPACT } from "@/prompts/wave-system";
+import type { LiteRTLMInstance } from "react-native-litert-lm";
 
-// Empirical winner on iPhone: fp32 has lower TTFB than int8 (CoreML EP
-// has no general int8 fast-path on Apple Silicon) and the cleanest
-// audio output of the four Kokoro variants. See KokoroTestScreen for
-// the A/B harness this conclusion came from.
+// ── Stock-Gemma-GPU config = the Wave#15-verified envelope (matches
+// LiteRTStockScreen): eng2048 / out512 / gpu, deterministic decode.
+const TOOL_OBSTACLES =
+  "none, cannot_visualize, mind_wandering, urge_overwhelming, breath_tight, breath_anxiety, gave_in, guilt_failure, physical_discomfort, sleepiness";
+
+const CI_SYSTEM = `${WAVE_SYSTEM_PROMPT_STOCK_COMPACT}
+
+You are running a hands-free post-chunk voice check-in. The patient speaks; you reply out loud. Reply naturally in 1-3 short plain sentences each turn — validate, then ask one question — no markdown, no lists, no emoji.
+
+Once the patient has clearly said they are ready to continue, give a brief warm closing line with NO question, then on its OWN final line emit exactly:
+endConversation{cravingScore:N,obstacleCategory:CAT}
+where N is their latest craving score (1-10) and CAT is one of: ${TOOL_OBSTACLES} (use none if no clear obstacle). Do NOT emit endConversation before the patient is ready, and emit it at most once.`;
+
+const STOCK_GPU_CONFIG: LiteRTLoadConfig = {
+  modelId: "litert-stock-gemma4",
+  backend: "gpu",
+  engineMaxTokens: 2048,
+  outputMaxTokens: 512,
+  systemPrompt: CI_SYSTEM,
+  temperature: 0,
+  topK: 1,
+};
+
 const KOKORO_MODEL_ID = "kokoro-en-v0_19";
 
-// A short, friendly system prompt — keeps responses tight so the round-trip
-// finishes fast enough to feel conversational. Real WAVE prompts plug in
-// when this loop gets wired into the production CheckInScreen.
-const SYSTEM_PROMPT =
-  "You are a friendly assistant. Reply in one or two short sentences. Plain prose only — no markdown, no lists, no emoji.";
+// Ignore VAD onset for this long after playback starts so the device
+// speaker doesn't barge-in on itself the instant Kokoro begins.
+const BARGE_GRACE_MS = 600;
+
+// Best-effort memory guard. There's no first-party device-free-RAM API
+// without a new native module, so the "gate" is: surface the projected
+// footprint before load, then read the LLM's own getMemoryUsage() after
+// load and warn (non-fatal) if resident blows past a safe ceiling.
+const KOKORO_DISK_BYTES = 304 * 1024 * 1024;
+const PROJECTED_DISK_BYTES =
+  MODELS["litert-stock-gemma4"].expectedBytes +
+  MODELS["whisper-base-en"].expectedBytes +
+  MODELS["silero-vad"].expectedBytes +
+  KOKORO_DISK_BYTES;
+const SAFE_RESIDENT_CEILING_BYTES = 6 * 1024 * 1024 * 1024;
 
 type Phase =
   | "idle"
   | "loading"
-  | "ready"
-  | "recording"
+  | "listening"
   | "transcribing"
   | "generating"
   | "speaking"
   | "error";
 
 interface SubsystemState {
+  vad: "missing" | "loading" | "ready" | "error";
   litert: "missing" | "loading" | "ready" | "error";
   whisper: "missing" | "loading" | "ready" | "error";
   kokoro: "missing" | "loading" | "ready" | "error";
 }
 
+type StreamingTtsEngine = {
+  generateSpeechStream: (
+    text: string,
+    opts: unknown,
+    handlers: {
+      onChunk?: (c: {
+        samples: number[];
+        sampleRate: number;
+        isFinal: boolean;
+      }) => void;
+      onEnd?: (e: { cancelled: boolean }) => void;
+      onError?: (e: { message: string }) => void;
+    },
+  ) => Promise<{ cancel: () => Promise<void> }>;
+  cancelSpeechStream: () => Promise<void>;
+  startPcmPlayer: (sampleRate: number, channels: number) => Promise<void>;
+  writePcmChunk: (samples: number[]) => Promise<void>;
+  stopPcmPlayer: () => Promise<void>;
+  destroy: () => Promise<void>;
+};
+
 function fmtMs(ms: number): string {
-  if (!Number.isFinite(ms)) return "—";
+  if (!Number.isFinite(ms) || ms <= 0) return "—";
   return ms >= 1000 ? `${(ms / 1000).toFixed(2)}s` : `${ms.toFixed(0)}ms`;
 }
 
+function fmtBytes(b: number): string {
+  if (!b || !Number.isFinite(b)) return "—";
+  const u = ["B", "KB", "MB", "GB"];
+  const i = Math.min(u.length - 1, Math.floor(Math.log(b) / Math.log(1024)));
+  return `${(b / Math.pow(1024, i)).toFixed(i > 1 ? 2 : 0)} ${u[i]}`;
+}
+
+// whisper.cpp emits non-speech markers like [BLANK_AUDIO] / (wind blowing).
+// Strip bracketed/parenthesized tokens; empty after that = no speech.
+function cleanWhisper(raw: string): string {
+  return raw
+    .replace(/\[[^\]]*\]/g, " ")
+    .replace(/\([^)]*\)/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+// Native Gemma-4 tool-call shape (the base-reliable one): a plain reply
+// then a literal endConversation{...}. Spoken text = reply with that
+// stripped. Mirrors LiteRTStockScreen.extractToolCall.
+function extractToolCall(raw: string): { reply: string; tool: string | null } {
+  const m = raw.match(/endConversation\s*\{([^}]*)\}/i);
+  if (!m) return { reply: raw.trim(), tool: null };
+  const args = m[1] ?? "";
+  const score = args.match(/cravingScore\s*[:=]\s*(\d+)/i)?.[1] ?? "?";
+  const obst =
+    args.match(/obstacleCategory\s*[:=]\s*"?([a-zA-Z_]+)"?/i)?.[1] ?? "none";
+  return {
+    reply: raw.replace(m[0], "").trim(),
+    tool: `endConversation{cravingScore:${score},obstacleCategory:${obst}}`,
+  };
+}
+
 export default function CombinedVoiceTestScreen() {
-  const [phase, setPhase] = useState<Phase>("idle");
+  const [phase, setPhaseState] = useState<Phase>("idle");
+  const phaseRef = useRef<Phase>("idle");
+  const setPhase = useCallback((p: Phase) => {
+    phaseRef.current = p;
+    setPhaseState(p);
+  }, []);
+
   const [subsystems, setSubsystems] = useState<SubsystemState>({
+    vad: "missing",
     litert: "missing",
     whisper: "missing",
     kokoro: "missing",
@@ -83,89 +192,258 @@ export default function CombinedVoiceTestScreen() {
   const [error, setError] = useState<string | null>(null);
   const [transcript, setTranscript] = useState("");
   const [llmReply, setLlmReply] = useState("");
-  const [audioUri, setAudioUri] = useState<string | null>(null);
-  const [stats, setStats] = useState({
-    sttMs: 0,
-    llmMs: 0,
-    ttsMs: 0,
-  });
-  const [kokoroDownload, setKokoroDownload] = useState<{
+  const [toolCall, setToolCall] = useState<string | null>(null);
+  const [residentBytes, setResidentBytes] = useState(0);
+  const [stats, setStats] = useState({ sttMs: 0, llmMs: 0, tps: 0 });
+  const [kokoroDl, setKokoroDl] = useState<{
     percent: number;
     phase: "downloading" | "extracting" | null;
   }>({ percent: 0, phase: null });
 
+  const vadRef = useRef<SileroVad | null>(null);
+  const llmRef = useRef<LiteRTLMInstance | null>(null);
+  const ttsRef = useRef<StreamingTtsEngine | null>(null);
   const whisperRef = useRef<WhisperContext | null>(null);
-  const ttsRef = useRef<any>(null);
-  const llmReadyRef = useRef(false);
 
-  const recorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY);
-  const player = useAudioPlayer(audioUri);
+  const llmBusyRef = useRef(false);
+  const pendingPcmRef = useRef<Float32Array | null>(null);
+  const epochRef = useRef(0);
+  const convStartedRef = useRef(false);
+  const pcmPlayerActiveRef = useRef(false);
+  const speakingStartedAtRef = useRef(0);
+  const mountedRef = useRef(true);
 
-  // Configure audio session for record + playback once the screen mounts.
   useEffect(() => {
     setAudioModeAsync({
       playsInSilentMode: true,
       allowsRecording: true,
     }).catch(() => {});
     return () => {
-      whisperRef.current?.release().catch(() => {});
-      ttsRef.current?.destroy?.().catch(() => {});
+      mountedRef.current = false;
     };
   }, []);
 
-  // Auto-play when a new audio uri lands.
+  // Live resident-MB readout (plan: memory-budget gate + visibility).
   useEffect(() => {
-    if (!audioUri) return;
+    if (subsystems.litert !== "ready") return;
+    const tick = () => {
+      try {
+        const mem = llmRef.current?.getMemoryUsage();
+        if (mem && mountedRef.current) setResidentBytes(mem.residentBytes);
+      } catch {
+        /* engine may be mid-call */
+      }
+    };
+    tick();
+    const id = setInterval(tick, 3000);
+    return () => clearInterval(id);
+  }, [subsystems.litert]);
+
+  const cancelTtsAndPlayer = useCallback(async () => {
+    const eng = ttsRef.current;
+    if (!eng) return;
     try {
-      player.seekTo(0);
-      player.play();
+      await eng.cancelSpeechStream();
     } catch {
-      // ignore — happens if the player isn't initialized yet
+      /* best-effort */
     }
-  }, [audioUri, player]);
-
-  const allReady =
-    subsystems.litert === "ready" &&
-    subsystems.whisper === "ready" &&
-    subsystems.kokoro === "ready";
-
-  const ensurePermission = async (): Promise<boolean> => {
-    const status = await AudioModule.requestRecordingPermissionsAsync();
-    if (!status.granted) {
-      Alert.alert(
-        "Microphone permission required",
-        "The combined voice loop needs the mic. Grant access in Settings.",
-      );
-      return false;
+    if (pcmPlayerActiveRef.current) {
+      try {
+        await eng.stopPcmPlayer();
+      } catch {
+        /* best-effort */
+      }
+      pcmPlayerActiveRef.current = false;
     }
-    return true;
-  };
+  }, []);
+
+  // Parse-then-speak (review #2): the reply is fully formed before we
+  // synthesize — no token-streamed TTS. Returns when playback is done or
+  // the turn was superseded by a barge-in.
+  const speak = useCallback(
+    (text: string, myEpoch: number): Promise<void> => {
+      const eng = ttsRef.current;
+      if (!eng || !text) return Promise.resolve();
+      setPhase("speaking");
+      let totalSamples = 0;
+      let firstChunkAt = 0;
+      let playerSr = 24_000;
+
+      return new Promise<void>((resolve) => {
+        let settled = false;
+        const done = () => {
+          if (settled) return;
+          settled = true;
+          resolve();
+        };
+        eng
+          .generateSpeechStream(text, undefined, {
+            onChunk: (c) => {
+              // A barge-in (or next turn) bumped the epoch — stop feeding
+              // the player; cancelTtsAndPlayer() already tore it down.
+              if (epochRef.current !== myEpoch) return;
+              if (!pcmPlayerActiveRef.current && firstChunkAt === 0) {
+                firstChunkAt = Date.now();
+                speakingStartedAtRef.current = firstChunkAt;
+                playerSr = c.sampleRate;
+                eng
+                  .startPcmPlayer(c.sampleRate, 1)
+                  .then(() => {
+                    pcmPlayerActiveRef.current = true;
+                    return eng.writePcmChunk(c.samples);
+                  })
+                  .catch(() => {});
+              } else {
+                eng.writePcmChunk(c.samples).catch(() => {});
+              }
+              totalSamples += c.samples.length;
+            },
+            onEnd: () => {
+              // Let the queued audio drain before stopping the player —
+              // [player stop] discards unplayed buffers otherwise.
+              const audioMs = (totalSamples / (playerSr || 24_000)) * 1000;
+              const since = firstChunkAt ? Date.now() - firstChunkAt : 0;
+              const drainMs = Math.max(0, audioMs - since) + 200;
+              setTimeout(() => {
+                if (
+                  epochRef.current === myEpoch &&
+                  pcmPlayerActiveRef.current
+                ) {
+                  ttsRef.current?.stopPcmPlayer().catch(() => {});
+                  pcmPlayerActiveRef.current = false;
+                }
+                done();
+              }, drainMs);
+            },
+            onError: () => done(),
+          })
+          .catch(() => done());
+      });
+    },
+    [setPhase],
+  );
+
+  // One serialized turn: STT → LLM → (speak). Concurrency-guarded.
+  const runTurn = useCallback(
+    async (pcm: Float32Array) => {
+      if (llmBusyRef.current) {
+        pendingPcmRef.current = pcm; // latest wins
+        return;
+      }
+      llmBusyRef.current = true;
+      const myEpoch = ++epochRef.current;
+      endpointerRef.current?.setMuted(true);
+      try {
+        // ── STT ──────────────────────────────────────────────────────
+        setPhase("transcribing");
+        const ctx = whisperRef.current;
+        if (!ctx) throw new Error("Whisper not initialized");
+        const wavUri = await writePcmToWavFile(pcm, VAD_SAMPLE_RATE);
+        const sttT0 = Date.now();
+        const { promise } = ctx.transcribe(wavUri, { language: "en" });
+        const { result } = await promise;
+        const text = cleanWhisper(result);
+        setStats((s) => ({ ...s, sttMs: Date.now() - sttT0 }));
+        setTranscript(text || "(no speech)");
+        if (!text) return; // finally → unmute + drain pending
+
+        // ── LLM ──────────────────────────────────────────────────────
+        setPhase("generating");
+        const llm = llmRef.current;
+        if (!llm) throw new Error("LiteRT not initialized");
+        if (!convStartedRef.current) {
+          llm.resetConversation();
+          convStartedRef.current = true;
+        }
+        const llmT0 = Date.now();
+        const raw = await llm.sendMessage(text);
+        const { reply, tool } = extractToolCall(raw);
+        try {
+          setStats((s) => ({
+            ...s,
+            llmMs: Date.now() - llmT0,
+            tps: llm.getStats().tokensPerSecond,
+          }));
+        } catch {
+          setStats((s) => ({ ...s, llmMs: Date.now() - llmT0 }));
+        }
+        setLlmReply(reply);
+        setToolCall(tool);
+
+        // Barged over while generating? Don't speak the stale reply.
+        if (epochRef.current !== myEpoch) return;
+
+        // ── TTS ──────────────────────────────────────────────────────
+        endpointerRef.current?.setMuted(false); // live for barge-in
+        await speak(reply, myEpoch);
+      } catch (e) {
+        setError(e instanceof Error ? e.message : String(e));
+        setPhase("error");
+      } finally {
+        llmBusyRef.current = false;
+        endpointerRef.current?.setMuted(false);
+        if (phaseRef.current !== "error") setPhase("listening");
+        const pend = pendingPcmRef.current;
+        if (pend) {
+          pendingPcmRef.current = null;
+          void runTurn(pend);
+        }
+      }
+    },
+    [setPhase, speak],
+  );
+
+  const onSpeechStart = useCallback(() => {
+    if (phaseRef.current !== "speaking") return;
+    if (Date.now() - speakingStartedAtRef.current < BARGE_GRACE_MS) return;
+    // Barge-in: invalidate the current spoken turn, kill audio, re-listen.
+    // The utterance that triggered this is already being captured by the
+    // endpointer; its speechEnd will drive the next turn.
+    epochRef.current += 1;
+    void cancelTtsAndPlayer();
+    setPhase("listening");
+  }, [cancelTtsAndPlayer, setPhase]);
+
+  const onSpeechEnd = useCallback(
+    (utterance: Float32Array) => {
+      void runTurn(utterance);
+    },
+    [runTurn],
+  );
+
+  const endpointer = useVadEndpointer({
+    vadRef,
+    onSpeechStart,
+    onSpeechEnd,
+    onError: (msg) => setError(msg),
+  });
+  // runTurn/onSpeechStart need setMuted without depending on the hook
+  // object identity in their useCallback deps.
+  const endpointerRef = useRef(endpointer);
+  endpointerRef.current = endpointer;
 
   const initAll = useCallback(async () => {
     setError(null);
     setPhase("loading");
 
-    // LiteRT
-    setSubsystems((s) => ({ ...s, litert: "loading" }));
+    // VAD
+    setSubsystems((s) => ({ ...s, vad: "loading" }));
     try {
-      await preloadWaveLiteRT();
-      llmReadyRef.current = true;
-      setSubsystems((s) => ({ ...s, litert: "ready" }));
+      const p = await ensureModel("silero-vad");
+      vadRef.current = await createSileroVad(p);
+      setSubsystems((s) => ({ ...s, vad: "ready" }));
     } catch (e) {
-      setSubsystems((s) => ({ ...s, litert: "error" }));
-      setError(`LiteRT: ${e instanceof Error ? e.message : String(e)}`);
+      setSubsystems((s) => ({ ...s, vad: "error" }));
+      setError(`VAD: ${e instanceof Error ? e.message : String(e)}`);
       setPhase("error");
       return;
     }
 
-    // Whisper
+    // Whisper base
     setSubsystems((s) => ({ ...s, whisper: "loading" }));
     try {
-      const whisperPath = await ensureModel("whisper-tiny-en");
-      whisperRef.current = await initWhisper({
-        filePath: whisperPath,
-        useGpu: true,
-      });
+      const wp = await ensureModel("whisper-base-en");
+      whisperRef.current = await initWhisper({ filePath: wp, useGpu: true });
       setSubsystems((s) => ({ ...s, whisper: "ready" }));
     } catch (e) {
       setSubsystems((s) => ({ ...s, whisper: "error" }));
@@ -174,44 +452,44 @@ export default function CombinedVoiceTestScreen() {
       return;
     }
 
-    // Kokoro — runtime download via sherpa's model manager. Saves to
-    // Documents/sherpa-onnx/models/tts/<id>/, resumes if interrupted.
+    // Stock Gemma 4 on GPU — via the keyed preload (NOT preloadWaveLiteRT).
+    setSubsystems((s) => ({ ...s, litert: "loading" }));
+    try {
+      llmRef.current = await preloadLiteRT(STOCK_GPU_CONFIG);
+      setSubsystems((s) => ({ ...s, litert: "ready" }));
+    } catch (e) {
+      setSubsystems((s) => ({ ...s, litert: "error" }));
+      setError(`LiteRT: ${e instanceof Error ? e.message : String(e)}`);
+      setPhase("error");
+      return;
+    }
+
+    // Kokoro streaming TTS (sherpa-managed download).
     setSubsystems((s) => ({ ...s, kokoro: "loading" }));
-    setKokoroDownload({ percent: 0, phase: null });
     try {
       const sherpaTts: any = await import("react-native-sherpa-onnx/tts");
-      const sherpaDownload: any = await import(
-        "react-native-sherpa-onnx/download"
-      );
-
-      // refreshModelsByCategory primes the on-disk registry cache that
-      // ensureModelByCategory reads from. Without this, fresh installs
-      // throw "Unknown model id".
-      await sherpaDownload.refreshModelsByCategory(
-        sherpaDownload.ModelCategory.Tts,
-      );
-      const result = await sherpaDownload.ensureModelByCategory(
-        sherpaDownload.ModelCategory.Tts,
+      const sherpaDl: any = await import("react-native-sherpa-onnx/download");
+      await sherpaDl.refreshModelsByCategory(sherpaDl.ModelCategory.Tts);
+      const result = await sherpaDl.ensureModelByCategory(
+        sherpaDl.ModelCategory.Tts,
         KOKORO_MODEL_ID,
         {
-          onProgress: (p: {
+          onProgress: (pr: {
             percent: number;
             phase?: "downloading" | "extracting";
-          }) => {
-            setKokoroDownload({
-              percent: p.percent,
-              phase: p.phase ?? "downloading",
-            });
-          },
+          }) =>
+            setKokoroDl({
+              percent: pr.percent,
+              phase: pr.phase ?? "downloading",
+            }),
         },
       );
-      setKokoroDownload({ percent: 100, phase: null });
-
-      ttsRef.current = await sherpaTts.createTTS({
+      setKokoroDl({ percent: 100, phase: null });
+      ttsRef.current = (await sherpaTts.createStreamingTTS({
         modelPath: { type: "file", path: result.localPath },
         modelType: "kokoro",
         providers: ["CoreMLExecutionProvider"],
-      });
+      })) as StreamingTtsEngine;
       setSubsystems((s) => ({ ...s, kokoro: "ready" }));
     } catch (e) {
       setSubsystems((s) => ({ ...s, kokoro: "error" }));
@@ -220,104 +498,56 @@ export default function CombinedVoiceTestScreen() {
       return;
     }
 
-    setPhase("ready");
-  }, []);
-
-  const startRecording = useCallback(async () => {
-    if (!allReady) return;
-    if (!(await ensurePermission())) return;
-    setError(null);
-    setTranscript("");
-    setLlmReply("");
-    setAudioUri(null);
+    // All resident — go hands-free.
     try {
-      await recorder.prepareToRecordAsync();
-      recorder.record();
-      setPhase("recording");
-    } catch (e) {
-      setError(`Record: ${e instanceof Error ? e.message : String(e)}`);
-      setPhase("error");
-    }
-  }, [allReady, recorder]);
-
-  const stopAndRun = useCallback(async () => {
-    if (phase !== "recording") return;
-    setPhase("transcribing");
-    try {
-      await recorder.stop();
-      const uri = recorder.uri;
-      if (!uri) throw new Error("recorder produced no uri");
-
-      // ── STT ────────────────────────────────────────────────────────
-      const sttT0 = Date.now();
-      const ctx = whisperRef.current;
-      if (!ctx) throw new Error("Whisper not initialized");
-      const { promise } = ctx.transcribe(uri, { language: "en" });
-      const { result: rawTranscript } = await promise;
-      const sttMs = Date.now() - sttT0;
-      const cleanTranscript = rawTranscript.trim();
-      setTranscript(cleanTranscript);
-      setStats((s) => ({ ...s, sttMs }));
-
-      if (!cleanTranscript) {
-        setPhase("ready");
-        return;
-      }
-
-      // ── LLM ────────────────────────────────────────────────────────
-      setPhase("generating");
-      const llmT0 = Date.now();
-      const llm = await preloadWaveLiteRT();
-      llm.resetConversation();
-      const reply = await new Promise<string>((resolve, reject) => {
-        let acc = "";
-        try {
-          llm.sendMessageAsync(
-            `${SYSTEM_PROMPT}\n\nUser: ${cleanTranscript}\n\nAssistant:`,
-            (token, done) => {
-              acc += token;
-              setLlmReply(acc);
-              if (done) resolve(acc);
-            },
-          );
-        } catch (err) {
-          reject(err as Error);
-        }
-      });
-      const llmMs = Date.now() - llmT0;
-      setStats((s) => ({ ...s, llmMs }));
-
-      // ── TTS ────────────────────────────────────────────────────────
-      setPhase("speaking");
-      const ttsT0 = Date.now();
-      const tts: any = ttsRef.current;
-      if (!tts) throw new Error("Kokoro not initialized");
-      const audio = await tts.generateSpeech(reply.trim());
-
-      // saveAudioToFile writes a WAV the audio player can read. Make
-      // sure the output directory exists — the native side won't mkdir.
-      const sherpa: any = await import("react-native-sherpa-onnx/tts");
-      const outDir = new Directory(Paths.document, "wave-models", "kokoro");
-      outDir.create({ intermediates: true, idempotent: true });
-      const wavPath = `${outDir.uri}last-${Date.now()}.wav`;
-      const savedPath = await sherpa.saveAudioToFile(audio, wavPath);
-      const ttsUri = savedPath ?? wavPath;
-      setAudioUri(ttsUri.startsWith("file://") ? ttsUri : `file://${ttsUri}`);
-      const ttsMs = Date.now() - ttsT0;
-      setStats((s) => ({ ...s, ttsMs }));
-
-      setPhase("ready");
+      await endpointerRef.current?.startListening();
+      setPhase("listening");
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
       setPhase("error");
     }
-  }, [phase, recorder]);
+  }, [setPhase]);
 
+  // Deterministic teardown (plan mgmt #3): player → stream → vad →
+  // whisper → kokoro → llm.
+  useEffect(() => {
+    return () => {
+      (async () => {
+        try {
+          await endpointerRef.current?.stopListening();
+        } catch {}
+        try {
+          if (pcmPlayerActiveRef.current)
+            await ttsRef.current?.stopPcmPlayer();
+        } catch {}
+        try {
+          await vadRef.current?.release();
+        } catch {}
+        try {
+          await whisperRef.current?.release();
+        } catch {}
+        try {
+          await ttsRef.current?.destroy();
+        } catch {}
+        try {
+          await unloadLiteRT(STOCK_GPU_CONFIG);
+        } catch {}
+      })();
+    };
+  }, []);
+
+  const allReady =
+    subsystems.vad === "ready" &&
+    subsystems.litert === "ready" &&
+    subsystems.whisper === "ready" &&
+    subsystems.kokoro === "ready";
+  const isLoading = phase === "loading";
   const isBusy =
-    phase === "loading" ||
     phase === "transcribing" ||
     phase === "generating" ||
     phase === "speaking";
+  const overBudget =
+    residentBytes > 0 && residentBytes > SAFE_RESIDENT_CEILING_BYTES;
 
   return (
     <ScrollView
@@ -326,17 +556,19 @@ export default function CombinedVoiceTestScreen() {
       contentInsetAdjustmentBehavior="automatic"
     >
       <Text style={styles.sub} selectable>
-        VAD-less push-to-talk MVP. Record → Whisper → LiteRT → Kokoro → play.
+        Hands-free loop: Silero VAD endpoints speech → Whisper base → stock
+        Gemma 4 on GPU → Kokoro → playback. Talk over the reply to barge in.
       </Text>
 
-      <SubsystemRow label="LiteRT" status={subsystems.litert} />
-      <SubsystemRow label="Whisper" status={subsystems.whisper} />
+      <SubsystemRow label="Silero VAD" status={subsystems.vad} />
+      <SubsystemRow label="Whisper base" status={subsystems.whisper} />
+      <SubsystemRow label="Gemma 4 (stock, GPU)" status={subsystems.litert} />
       <SubsystemRow
         label="Kokoro"
         status={subsystems.kokoro}
         detail={
-          kokoroDownload.phase
-            ? `${kokoroDownload.phase} ${kokoroDownload.percent.toFixed(0)}%`
+          kokoroDl.phase
+            ? `${kokoroDl.phase} ${kokoroDl.percent.toFixed(0)}%`
             : undefined
         }
       />
@@ -344,70 +576,114 @@ export default function CombinedVoiceTestScreen() {
       <View style={styles.statusRow}>
         <Text style={styles.statusLabel}>Phase:</Text>
         <Text style={[styles.statusValue, phaseStyle(phase)]}>{phase}</Text>
-        {isBusy && <ActivityIndicator size="small" style={{ marginLeft: 8 }} />}
+        {(isLoading || isBusy) && (
+          <ActivityIndicator size="small" style={{ marginLeft: 8 }} />
+        )}
+      </View>
+
+      <View style={styles.panel}>
+        <Text style={styles.panelHead}>Memory budget</Text>
+        <Text selectable style={styles.kv}>
+          Projected on-disk: {fmtBytes(PROJECTED_DISK_BYTES)} · ceiling{" "}
+          {fmtBytes(SAFE_RESIDENT_CEILING_BYTES)}
+        </Text>
+        <Text
+          selectable
+          style={[styles.kv, overBudget && { color: "#F87171" }]}
+        >
+          LLM resident: {fmtBytes(residentBytes)}
+          {overBudget ? "  ⚠ over ceiling" : ""}
+        </Text>
       </View>
 
       {!allReady && (
         <Pressable
-          style={[styles.button, isBusy && styles.buttonDisabled]}
-          disabled={isBusy}
+          style={[styles.button, isLoading && styles.buttonDisabled]}
+          disabled={isLoading}
           onPress={initAll}
         >
-          <Text style={styles.buttonText}>1. Initialize all subsystems</Text>
+          <Text style={styles.buttonText}>
+            {isLoading
+              ? "Loading all four models…"
+              : "Initialize & go hands-free"}
+          </Text>
         </Pressable>
       )}
 
       {allReady && (
-        <View style={styles.talkButtonWrap}>
-          <Pressable
-            style={[
-              styles.talkButton,
-              phase === "recording" && styles.talkButtonHot,
-              isBusy && styles.buttonDisabled,
-            ]}
-            onPressIn={startRecording}
-            onPressOut={stopAndRun}
-            disabled={isBusy}
-          >
-            <Text style={styles.talkButtonText}>
-              {phase === "recording" ? "Listening…" : "Hold to talk"}
-            </Text>
-          </Pressable>
+        <View style={styles.panel}>
+          <Text style={styles.panelHead}>Loop</Text>
+          <Text style={styles.kv}>
+            {endpointer.listening
+              ? phase === "speaking"
+                ? "Speaking — talk to interrupt"
+                : phase === "listening"
+                  ? "Listening — just talk"
+                  : phase
+              : "Stopped"}
+          </Text>
+          <View style={styles.buttonRow}>
+            {endpointer.listening ? (
+              <Pressable
+                style={[styles.smallButton, styles.stopBtn]}
+                onPress={() => {
+                  void endpointer.stopListening();
+                  void cancelTtsAndPlayer();
+                  setPhase("idle");
+                }}
+              >
+                <Text style={styles.smallButtonText}>Stop loop</Text>
+              </Pressable>
+            ) : (
+              <Pressable
+                style={styles.smallButton}
+                onPress={() => {
+                  void endpointer.startListening();
+                  setPhase("listening");
+                }}
+              >
+                <Text style={styles.smallButtonText}>Resume loop</Text>
+              </Pressable>
+            )}
+          </View>
         </View>
       )}
 
       {error && (
         <View style={[styles.panel, styles.errorPanel]}>
           <Text style={styles.panelHead}>Error</Text>
-          <Text selectable style={styles.errorText}>{error}</Text>
+          <Text selectable style={styles.errorText}>
+            {error}
+          </Text>
         </View>
       )}
 
-      {transcript && (
-        <View style={styles.panel}>
-          <Text style={styles.panelHead}>You said ({fmtMs(stats.sttMs)})</Text>
-          <Text selectable style={styles.outputText}>{transcript}</Text>
-        </View>
-      )}
-
-      {llmReply && (
+      {transcript ? (
         <View style={styles.panel}>
           <Text style={styles.panelHead}>
-            LiteRT reply ({fmtMs(stats.llmMs)})
+            You said ({fmtMs(stats.sttMs)})
           </Text>
-          <Text selectable style={styles.outputText}>{llmReply}</Text>
+          <Text selectable style={styles.outputText}>
+            {transcript}
+          </Text>
         </View>
-      )}
+      ) : null}
 
-      {audioUri && (
+      {llmReply ? (
         <View style={styles.panel}>
-          <Text style={styles.panelHead}>Kokoro audio ({fmtMs(stats.ttsMs)})</Text>
-          <Text selectable style={styles.kv}>{audioUri}</Text>
-          <Pressable style={styles.smallButton} onPress={() => player.play()}>
-            <Text style={styles.smallButtonText}>Replay</Text>
-          </Pressable>
+          <Text style={styles.panelHead}>
+            Gemma ({fmtMs(stats.llmMs)} · {stats.tps.toFixed(1)} tok/s)
+          </Text>
+          {toolCall && (
+            <Text selectable style={styles.toolCall}>
+              🛠 {toolCall}
+            </Text>
+          )}
+          <Text selectable style={styles.outputText}>
+            {llmReply}
+          </Text>
         </View>
-      )}
+      ) : null}
     </ScrollView>
   );
 }
@@ -425,10 +701,10 @@ function SubsystemRow({
     status === "ready"
       ? "#34D399"
       : status === "loading"
-      ? "#FBBF24"
-      : status === "error"
-      ? "#F87171"
-      : "#6B7280";
+        ? "#FBBF24"
+        : status === "error"
+          ? "#F87171"
+          : "#6B7280";
   return (
     <View style={styles.subRow}>
       <View style={[styles.dot, { backgroundColor: color }]} />
@@ -441,13 +717,12 @@ function SubsystemRow({
 
 function phaseStyle(p: Phase) {
   switch (p) {
-    case "ready":
+    case "listening":
+      return { color: "#34D399" };
+    case "speaking":
       return { color: "#22D3EE" };
-    case "recording":
-      return { color: "#F87171" };
     case "transcribing":
     case "generating":
-    case "speaking":
     case "loading":
       return { color: "#FBBF24" };
     case "error":
@@ -460,7 +735,7 @@ function phaseStyle(p: Phase) {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#08080C" },
   content: { padding: 16, gap: 12 },
-  sub: { color: "#9CA3AF", fontSize: 13 },
+  sub: { color: "#9CA3AF", fontSize: 13, lineHeight: 18 },
   subRow: { flexDirection: "row", alignItems: "center", gap: 8 },
   dot: { width: 8, height: 8, borderRadius: 4 },
   subLabel: { color: "#F1F1F4", fontSize: 13, flex: 1 },
@@ -476,7 +751,12 @@ const styles = StyleSheet.create({
     textTransform: "uppercase",
     letterSpacing: 1,
   },
-  statusRow: { flexDirection: "row", alignItems: "center", gap: 6, marginTop: 4 },
+  statusRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    marginTop: 4,
+  },
   statusLabel: { color: "#9CA3AF", fontSize: 14 },
   statusValue: { fontSize: 14, fontWeight: "600" },
   panel: {
@@ -498,7 +778,13 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   outputText: { color: "#F1F1F4", fontSize: 14, lineHeight: 20 },
-  kv: { color: "#F1F1F4", fontSize: 12, fontFamily: "Menlo" },
+  kv: { color: "#F1F1F4", fontSize: 13, fontFamily: "Menlo" },
+  toolCall: {
+    color: "#34D399",
+    fontSize: 13,
+    fontFamily: "Menlo",
+    fontWeight: "700",
+  },
   errorText: { color: "#F87171", fontSize: 13, fontFamily: "Menlo" },
   button: {
     backgroundColor: "#6366F1",
@@ -508,25 +794,14 @@ const styles = StyleSheet.create({
     borderCurve: "continuous",
   },
   buttonDisabled: { backgroundColor: "#3F3F50", opacity: 0.5 },
-  buttonText: { color: "#F1F1F4", fontWeight: "600", fontSize: 14, textAlign: "center" },
-  talkButtonWrap: { alignItems: "center", marginVertical: 12 },
-  talkButton: {
-    backgroundColor: "#6366F1",
-    paddingVertical: 24,
-    paddingHorizontal: 36,
-    borderRadius: 100,
-    minWidth: 220,
-    // capsule shape; borderCurve: 'continuous' is unnecessary here
-  },
-  talkButtonHot: { backgroundColor: "#F87171" },
-  talkButtonText: {
+  buttonText: {
     color: "#F1F1F4",
-    fontSize: 18,
-    fontWeight: "700",
+    fontWeight: "600",
+    fontSize: 14,
     textAlign: "center",
   },
+  buttonRow: { flexDirection: "row", gap: 8, marginTop: 6 },
   smallButton: {
-    marginTop: 6,
     alignSelf: "flex-start",
     backgroundColor: "#23232F",
     paddingHorizontal: 12,
@@ -534,5 +809,6 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     borderCurve: "continuous",
   },
+  stopBtn: { backgroundColor: "#7F1D1D" },
   smallButtonText: { color: "#F1F1F4", fontSize: 12, fontWeight: "600" },
 });
