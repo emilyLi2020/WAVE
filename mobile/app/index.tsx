@@ -49,12 +49,12 @@ const TEST_ENTRIES: Entry[] = [
     href: "/tests/vad",
     title: "Silero VAD",
     blurb: "Live mic via sherpa-onnx + onnxruntime-react-native Silero v5. Indicator turns green when speech is detected.",
-    status: "wip",
+    status: "ready",
   },
   {
     href: "/tests/combined",
     title: "Combined voice loop",
-    blurb: "Push-to-talk: record → Whisper → LiteRT → Kokoro → play. VAD + barge-in pending.",
+    blurb: "Full hands-free loop: Silero VAD endpoints speech → Whisper base STT → Gemma 4 GPU LiteRT → Kokoro TTS → playback, with barge-in. See issue for the staged model-memory plan.",
     status: "wip",
   },
 ];
