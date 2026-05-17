@@ -1,17 +1,25 @@
 /**
- * Wave#15 Phase 0 — on-device LiteRT context-envelope sweep.
+ * Wave#15 Phase 0 — adaptive, load-amortized LiteRT context-envelope probe.
  *
- * Measures the REAL usable (engineMaxTokens × outputMaxTokens × backend ×
- * system-prompt-variant × WAVE surface) envelope of the stock
- * `gemma-4-E2B-it.litertlm` bundle on device via the
- * react-native-litert-lm-wave fork — because the "hard 2048/256" framing
- * was disproven (see docs/plans/litert-cache-reexport-plan.md).
+ * Replaces the O(n²) grid. Two facts drive the design:
+ *  1. Model load (~2.6 GB) is the only expensive step. engineMaxTokens /
+ *     outputMaxTokens / backend are load-time, but the *prompt* sent is
+ *     free — so ONE loaded engine runs every surface × variant as cheap
+ *     inner sends. The whole surface dimension is an inner loop, not
+ *     reloads.
+ *  2. The constraints are monotonic with known-ish ceilings, so we
+ *     binary-search the ceiling instead of gridding it, seeded by what
+ *     already passed on device (4096 / 512 on E2B/GPU/iPhone17Pro).
  *
- * Honest scope: this is a measurement harness, not a guarantee. It records
- * real tokenizer counts (GenerationStats.promptTokens), JSON validity,
- * truncation, RAM, TTFT, tok/s, and — critically, per upstream
- * LiteRT-LM#2202 — silent-hang behaviour with a hard per-cell timeout and
- * conversation/engine teardown so one wedged cell can't poison the rest.
+ * Crash-resilience: every probe console.log's its result the instant it
+ * completes (captured live by idevicesyslog), BEFORE the next load — so a
+ * SIGSEGV on a risky >4096 outlier only loses the in-flight probe.
+ *
+ * To keep the system prompt out of the (load-time) LLMConfig so a single
+ * load can A/B canonical vs compact, the surface's system text is folded
+ * into the user message. Token counts stay truthful — we record the
+ * engine's GenerationStats.promptTokens. Chat-template channel shift is an
+ * accepted fidelity caveat for envelope mapping (see the plan doc).
  */
 
 import { createLLM, type LiteRTLMInstance } from "react-native-litert-lm";
@@ -30,39 +38,35 @@ import {
 
 export type Backend = "gpu" | "cpu";
 export type PromptVariant = "canonical" | "compact";
-export type SurfaceId =
-  | "chunk1"
-  | "chunk3"
-  | "chunk5"
-  | "reflection";
+export type SurfaceId = "chunk1" | "chunk3" | "chunk5" | "reflection";
 
-export interface SweepCell {
+export interface Probe {
   surface: SurfaceId;
   variant: PromptVariant;
-  backend: Backend;
-  engineMaxTokens: number;
-  outputMaxTokens: number;
 }
 
-export type SweepOutcome =
+export type ProbeOutcome =
   | "ok"
   | "truncated"
   | "invalid_json"
   | "hang"
+  | "empty"
   | "load_error"
   | "gen_error";
 
-export interface SweepResult {
-  cell: SweepCell;
-  outcome: SweepOutcome;
-  /** Real tokenizer prompt count from the engine (not chars/4). */
+export interface ProbeResult {
+  engineMaxTokens: number;
+  outputMaxTokens: number;
+  backend: Backend;
+  surface: SurfaceId;
+  variant: PromptVariant;
+  outcome: ProbeOutcome;
   promptTokens: number | null;
   completionTokens: number | null;
   ttftMs: number | null;
   tokensPerSecond: number | null;
   residentBytes: number | null;
   isLowMemory: boolean | null;
-  /** First ~200 chars of output, for eyeballing coherence. */
   sample: string;
   error: string | null;
   wallMs: number;
@@ -76,7 +80,6 @@ const PROFILE: ChunkGenerationContextPayload["profile"] = {
   usedSubstanceToday: false,
 };
 
-/** One realistic ~6-line prior chunk (~90–110 tokens) for history inflation. */
 function priorChunk(n: 1 | 2 | 3 | 4 | 5): SessionHistoryEntry {
   return {
     kind: "chunk",
@@ -110,23 +113,14 @@ const REFLECTION_CTX: ReflectionContext = {
   durationSeconds: 600,
 };
 
-/**
- * Build {systemPrompt,userPrompt} for a surface. For `compact`, swap the
- * canonical WAVE_SYSTEM_PROMPT embedded by the chunk builder for the
- * compact variant (string replace — the production builders are
- * untouched). Reflection has its own system prompt (no WAVE_SYSTEM_PROMPT
- * inside) so canonical === compact there; flagged by caller.
- */
-export function buildSurfacePrompt(
-  surface: SurfaceId,
-  variant: PromptVariant,
-): { systemPrompt: string; userPrompt: string; variantApplies: boolean } {
-  if (surface === "reflection") {
-    const p = buildReflectionPrompt(REFLECTION_CTX);
-    return { ...p, variantApplies: false };
+/** Returns one combined message (system text folded in) per surface×variant. */
+export function buildMessage(p: Probe): string {
+  if (p.surface === "reflection") {
+    const r = buildReflectionPrompt(REFLECTION_CTX);
+    return `${r.systemPrompt}\n\n${r.userPrompt}`;
   }
   const chunkNumber = (
-    surface === "chunk1" ? 1 : surface === "chunk3" ? 3 : 5
+    p.surface === "chunk1" ? 1 : p.surface === "chunk3" ? 3 : 5
   ) as 1 | 3 | 5;
   const ctx: ChunkGenerationContextPayload = {
     chunkNumber,
@@ -134,199 +128,286 @@ export function buildSurfacePrompt(
     profile: PROFILE,
     sessionHistory: historyUpTo(chunkNumber),
   };
-  const p = buildChunkPrompt(ctx);
-  if (variant === "canonical") return { ...p, variantApplies: true };
-  const swapped = p.systemPrompt.includes(WAVE_SYSTEM_PROMPT)
-    ? p.systemPrompt.replace(
-        WAVE_SYSTEM_PROMPT,
-        WAVE_SYSTEM_PROMPT_STOCK_COMPACT,
-      )
-    : p.systemPrompt;
-  return {
-    systemPrompt: swapped,
-    userPrompt: p.userPrompt,
-    variantApplies: swapped !== p.systemPrompt,
-  };
+  const c = buildChunkPrompt(ctx);
+  const sys =
+    p.variant === "compact" && c.systemPrompt.includes(WAVE_SYSTEM_PROMPT)
+      ? c.systemPrompt.replace(
+          WAVE_SYSTEM_PROMPT,
+          WAVE_SYSTEM_PROMPT_STOCK_COMPACT,
+        )
+      : c.systemPrompt;
+  return `${sys}\n\n${c.userPrompt}`;
 }
 
-function looksLikeValidJson(surface: SurfaceId, text: string): boolean {
+/** chunk5/canonical = the heaviest input; used to probe ceilings honestly. */
+export const HEAVY_PROBE: Probe = { surface: "chunk5", variant: "canonical" };
+/** A surface whose schema wants the most output, for the O-ceiling search. */
+export const LONG_OUTPUT_PROBE: Probe = {
+  surface: "chunk1",
+  variant: "compact",
+};
+
+function classify(
+  surface: SurfaceId,
+  text: string,
+  completion: number,
+  outputMaxTokens: number,
+): ProbeOutcome {
+  if (!text) return "empty";
   const m = text.match(/\{[\s\S]*\}/);
-  if (!m) return false;
-  try {
-    const obj = JSON.parse(m[0]);
-    if (surface === "reflection") {
-      return (
-        typeof obj.insight === "string" &&
-        obj.nextSteps &&
-        typeof obj.nextSteps === "object"
-      );
+  let valid = false;
+  if (m) {
+    try {
+      const o = JSON.parse(m[0]);
+      valid =
+        surface === "reflection"
+          ? typeof o.insight === "string" && !!o.nextSteps
+          : Array.isArray(o.lines) && o.lines.length > 0;
+    } catch {
+      valid = false;
     }
-    return Array.isArray(obj.lines) && obj.lines.length > 0;
-  } catch {
-    return false;
   }
+  if (valid) return completion >= outputMaxTokens ? "truncated" : "ok";
+  return completion >= outputMaxTokens ? "truncated" : "invalid_json";
+}
+
+const blank = (
+  cfg: { engineMaxTokens: number; outputMaxTokens: number; backend: Backend },
+  p: Probe,
+): Omit<ProbeResult, "outcome" | "wallMs"> => ({
+  ...cfg,
+  surface: p.surface,
+  variant: p.variant,
+  promptTokens: null,
+  completionTokens: null,
+  ttftMs: null,
+  tokensPerSecond: null,
+  residentBytes: null,
+  isLowMemory: null,
+  sample: "",
+  error: null,
+});
+
+function emit(r: ProbeResult) {
+  // Streamed live by idevicesyslog -m litert-sweep — crash-safe checkpoint.
+  // eslint-disable-next-line no-console
+  console.log("[litert-sweep]", JSON.stringify(r));
 }
 
 /**
- * Run one cell. Loads a fresh engine (config is load-time), sends the
- * user prompt with a hard timeout, classifies the outcome, and ALWAYS
- * tears the engine down — a hung cell never reuses its conversation.
+ * Load ONE engine at (engineMaxTokens, outputMaxTokens, backend), then run
+ * every probe as a cheap inner send (resetConversation between). One
+ * expensive load amortized over many measurements. Each result is emitted
+ * immediately. The engine is always torn down.
  */
-export async function runCell(
+export async function runConfig(
   modelPath: string,
-  cell: SweepCell,
+  cfg: { engineMaxTokens: number; outputMaxTokens: number; backend: Backend },
+  probes: Probe[],
   timeoutMs: number,
-): Promise<SweepResult> {
-  const t0 = Date.now();
-  const base: Omit<SweepResult, "outcome" | "wallMs"> = {
-    cell,
-    promptTokens: null,
-    completionTokens: null,
-    ttftMs: null,
-    tokensPerSecond: null,
-    residentBytes: null,
-    isLowMemory: null,
-    sample: "",
-    error: null,
-  };
+): Promise<ProbeResult[]> {
+  const out: ProbeResult[] = [];
   let llm: LiteRTLMInstance | null = null;
   try {
-    const { systemPrompt, userPrompt } = buildSurfacePrompt(
-      cell.surface,
-      cell.variant,
-    );
     llm = createLLM({ enableMemoryTracking: true });
     try {
       await llm.loadModel(modelPath, {
-        backend: cell.backend,
-        engineMaxTokens: cell.engineMaxTokens,
-        outputMaxTokens: cell.outputMaxTokens,
-        systemPrompt,
+        backend: cfg.backend,
+        engineMaxTokens: cfg.engineMaxTokens,
+        outputMaxTokens: cfg.outputMaxTokens,
+        systemPrompt: "",
         temperature: 0,
         topK: 1,
       });
     } catch (e) {
-      return {
-        ...base,
-        outcome: "load_error",
-        error: e instanceof Error ? e.message : String(e),
+      for (const p of probes) {
+        const r: ProbeResult = {
+          ...blank(cfg, p),
+          outcome: "load_error",
+          error: e instanceof Error ? e.message : String(e),
+          wallMs: 0,
+        };
+        emit(r);
+        out.push(r);
+      }
+      return out;
+    }
+
+    for (const p of probes) {
+      const t0 = Date.now();
+      try {
+        llm.resetConversation();
+      } catch {
+        /* fresh conversation best-effort */
+      }
+      const msg = buildMessage(p);
+      let timer: ReturnType<typeof setTimeout> | undefined;
+      const timeout = new Promise<{ hang: true }>((res) => {
+        timer = setTimeout(() => res({ hang: true }), timeoutMs);
+      });
+      const gen = llm
+        .sendMessage(msg)
+        .then((text) => ({ hang: false as const, text }));
+      let race: { hang: true } | { hang: false; text: string };
+      try {
+        race = await Promise.race([gen, timeout]);
+      } catch (e) {
+        if (timer) clearTimeout(timer);
+        const r: ProbeResult = {
+          ...blank(cfg, p),
+          outcome: "gen_error",
+          error: e instanceof Error ? e.message : String(e),
+          wallMs: Date.now() - t0,
+        };
+        emit(r);
+        out.push(r);
+        continue;
+      }
+      if (timer) clearTimeout(timer);
+
+      if ("hang" in race && race.hang) {
+        const r: ProbeResult = {
+          ...blank(cfg, p),
+          outcome: "hang",
+          wallMs: Date.now() - t0,
+        };
+        emit(r);
+        out.push(r);
+        // A wedged conversation can poison the engine — stop this config.
+        break;
+      }
+
+      const text = (race as { text: string }).text ?? "";
+      let st: Partial<{
+        promptTokens: number;
+        completionTokens: number;
+        timeToFirstToken: number;
+        tokensPerSecond: number;
+      }> = {};
+      let mem: Partial<{ residentBytes: number; isLowMemory: boolean }> = {};
+      try {
+        st = llm.getStats() as typeof st;
+      } catch {
+        /* best-effort */
+      }
+      try {
+        mem = llm.getMemoryUsage() as typeof mem;
+      } catch {
+        /* best-effort */
+      }
+      const completion = st.completionTokens ?? 0;
+      const r: ProbeResult = {
+        ...blank(cfg, p),
+        outcome: classify(p.surface, text, completion, cfg.outputMaxTokens),
+        promptTokens: st.promptTokens ?? null,
+        completionTokens: st.completionTokens ?? null,
+        ttftMs: st.timeToFirstToken ?? null,
+        tokensPerSecond: st.tokensPerSecond ?? null,
+        residentBytes: mem.residentBytes ?? null,
+        isLowMemory: mem.isLowMemory ?? null,
+        sample: text.slice(0, 160),
         wallMs: Date.now() - t0,
       };
+      emit(r);
+      out.push(r);
     }
-
-    let timer: ReturnType<typeof setTimeout> | undefined;
-    const timeout = new Promise<{ hang: true }>((resolve) => {
-      timer = setTimeout(() => resolve({ hang: true }), timeoutMs);
-    });
-    const gen = llm
-      .sendMessage(userPrompt)
-      .then((text) => ({ hang: false as const, text }));
-
-    const race = await Promise.race([gen, timeout]);
-    if (timer) clearTimeout(timer);
-
-    if ("hang" in race && race.hang) {
-      return { ...base, outcome: "hang", wallMs: Date.now() - t0 };
-    }
-
-    const text = (race as { text: string }).text ?? "";
-    let stats: Partial<{
-      promptTokens: number;
-      completionTokens: number;
-      timeToFirstToken: number;
-      tokensPerSecond: number;
-    }> = {};
-    try {
-      stats = llm.getStats() as typeof stats;
-    } catch {
-      /* stats best-effort */
-    }
-    let mem: Partial<{ residentBytes: number; isLowMemory: boolean }> = {};
-    try {
-      mem = llm.getMemoryUsage() as typeof mem;
-    } catch {
-      /* mem best-effort */
-    }
-
-    const completion = stats.completionTokens ?? 0;
-    const truncated =
-      completion >= cell.outputMaxTokens ||
-      !looksLikeValidJson(cell.surface, text);
-    const outcome: SweepOutcome = !text
-      ? "gen_error"
-      : !looksLikeValidJson(cell.surface, text)
-        ? completion >= cell.outputMaxTokens
-          ? "truncated"
-          : "invalid_json"
-        : truncated
-          ? "truncated"
-          : "ok";
-
-    return {
-      ...base,
-      outcome,
-      promptTokens: stats.promptTokens ?? null,
-      completionTokens: stats.completionTokens ?? null,
-      ttftMs: stats.timeToFirstToken ?? null,
-      tokensPerSecond: stats.tokensPerSecond ?? null,
-      residentBytes: mem.residentBytes ?? null,
-      isLowMemory: mem.isLowMemory ?? null,
-      sample: text.slice(0, 200),
-      wallMs: Date.now() - t0,
-    };
-  } catch (e) {
-    return {
-      ...base,
-      outcome: "gen_error",
-      error: e instanceof Error ? e.message : String(e),
-      wallMs: Date.now() - t0,
-    };
+    return out;
   } finally {
     try {
       llm?.close();
     } catch {
-      /* engine torn down regardless */
+      /* torn down regardless */
     }
   }
 }
 
+const PASS: ProbeOutcome[] = ["ok", "truncated"];
+
 /**
- * Curated matrix (NOT full cartesian — each cell reloads the 2.6 GB
- * bundle, so this is ~25 cells, sequential). GPU is WAVE's real path; one
- * CPU sanity row because upstream behaviour differs sharply by backend
- * (#6765 was CPU-only). Edit freely between runs.
+ * Adaptive driver for the SAFE band (engineMaxTokens ≤ 4096). Seeded by
+ * the on-device observation that 4096/512 passes. Binary-searches the E
+ * ceiling within [2048,4096] using the heavy prompt, then the O ceiling
+ * upward from 512, then does one rich pass over all surfaces×variants at
+ * the winner. Outliers (>4096) are driven manually one-shot via runConfig
+ * from the screen (crash risk — must not batch).
+ *
+ * `onResult` lets the screen render live; everything is also emit()'d.
  */
-export const DEFAULT_CELLS: SweepCell[] = (() => {
-  const cells: SweepCell[] = [];
-  const surfaces: SurfaceId[] = ["chunk1", "chunk3", "chunk5", "reflection"];
-  const engineVals = [2048, 3072, 4096];
-  const outVals = [256, 512];
-  for (const surface of surfaces) {
-    for (const variant of ["canonical", "compact"] as PromptVariant[]) {
-      // reflection: variant doesn't change its prompt — run once.
-      if (surface === "reflection" && variant === "compact") continue;
-      for (const engineMaxTokens of engineVals) {
-        for (const outputMaxTokens of outVals) {
-          cells.push({
-            surface,
-            variant,
-            backend: "gpu",
-            engineMaxTokens,
-            outputMaxTokens,
-          });
-        }
-      }
+export async function runAdaptiveSafe(
+  modelPath: string,
+  timeoutMs: number,
+  onResult: (r: ProbeResult) => void,
+): Promise<{ eStar: number; oStar: number; results: ProbeResult[] }> {
+  const all: ProbeResult[] = [];
+  const sink = (rs: ProbeResult[]) => {
+    for (const r of rs) {
+      all.push(r);
+      onResult(r);
+    }
+  };
+
+  // Step 1 — E ceiling in {4096,3072,2048}, heavy prompt, O=512.
+  let eStar = 2048;
+  for (const E of [4096, 3072, 2048]) {
+    const rs = await runConfig(
+      modelPath,
+      { engineMaxTokens: E, outputMaxTokens: 512, backend: "gpu" },
+      [HEAVY_PROBE],
+      timeoutMs,
+    );
+    sink(rs);
+    if (rs.length && PASS.includes(rs[0].outcome)) {
+      eStar = E;
+      break;
     }
   }
-  // CPU sanity: one mid cell.
-  cells.push({
-    surface: "chunk3",
-    variant: "canonical",
-    backend: "cpu",
-    engineMaxTokens: 4096,
-    outputMaxTokens: 256,
-  });
-  return cells;
-})();
 
+  // Step 2 — O ceiling upward from 512 at eStar, long-output prompt.
+  let oStar = 256;
+  for (const O of [1024, 768, 512, 256]) {
+    const rs = await runConfig(
+      modelPath,
+      { engineMaxTokens: eStar, outputMaxTokens: O, backend: "gpu" },
+      [LONG_OUTPUT_PROBE],
+      timeoutMs,
+    );
+    sink(rs);
+    if (rs.length && PASS.includes(rs[0].outcome)) {
+      oStar = O;
+      break;
+    }
+  }
+
+  // Step 3 — one rich pass at (eStar,oStar) over every surface×variant.
+  const richProbes: Probe[] = [];
+  for (const surface of ["chunk1", "chunk3", "chunk5", "reflection"] as const) {
+    for (const variant of ["canonical", "compact"] as const) {
+      if (surface === "reflection" && variant === "compact") continue;
+      richProbes.push({ surface, variant });
+    }
+  }
+  sink(
+    await runConfig(
+      modelPath,
+      { engineMaxTokens: eStar, outputMaxTokens: oStar, backend: "gpu" },
+      richProbes,
+      timeoutMs,
+    ),
+  );
+
+  // Step 4 — one CPU sanity at the winner (backend differs sharply, #6765).
+  sink(
+    await runConfig(
+      modelPath,
+      { engineMaxTokens: eStar, outputMaxTokens: oStar, backend: "cpu" },
+      [{ surface: "chunk3", variant: "canonical" }],
+      timeoutMs,
+    ),
+  );
+
+  return { eStar, oStar, results: all };
+}
+
+/** Suggested upward outlier ladder for the manual >4096 probe control. */
+export const OUTLIER_LADDER = [6144, 8192, 12288, 16384, 24576, 32768];
 export const SWEEP_TIMEOUT_MS = 90_000;
