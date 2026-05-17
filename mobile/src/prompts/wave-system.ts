@@ -89,15 +89,21 @@ Do not narrate "I'm now going to validate" — just speak.`;
 /**
  * Compact system prompt for the STOCK Gemma 4 LiteRT path ONLY.
  *
- * The stock litert-community Gemma 4 E2B `.litertlm` bundle has a hard
- * compiled 2048-token total budget (input + output) and a 256-token
- * decode cap. The canonical `WAVE_SYSTEM_PROMPT` above is ~850 tokens and,
- * with the chunk instruction block, leaves almost no room for history or
- * output on that bundle (see
- * `docs/postmortems/gemma4-litert-stock-limits-research.md` and Wave#14).
- * This variant compresses it to ~450-510 tokens (measured: 2035 chars
- * vs the canonical 4104; roughly half), preserving every safety-critical
- * rule, to reclaim ~400-500 tokens of input headroom.
+ * The stock litert-community Gemma 4 E2B `.litertlm` bundle's *benchmarked*
+ * context is 2048 (1024 prefill / 256 decode), but context is set at
+ * runtime via `engineMaxTokens` — NOT hard-compiled at 2048 (HF card:
+ * "up to 32k"; the real ceiling is platform-runtime, ~4096 on iOS but
+ * UNVERIFIED for E2B/GPU — see Wave#15 / the Phase 0 sweep). The earlier
+ * "hard 2048/256 cap" framing was an old-wrapper conflation artifact.
+ * Regardless of the ceiling, the canonical `WAVE_SYSTEM_PROMPT` (~900-1000
+ * tok) plus the chunk instruction block is a large fixed input cost; this
+ * variant compresses it to ~450-510 tokens (measured: 2035 chars vs the
+ * canonical 4104; roughly half), preserving every safety-critical rule,
+ * to reclaim ~400-500 tokens of headroom on any runtime.
+ *
+ * STATUS: defined but NOT yet wired — `check-in.ts` / `chunk-generator.ts`
+ * still use the canonical prompt. Wiring is Wave#15 Phase 0b (measure
+ * canonical vs compact on device before switching the stock path).
  *
  * IMPORTANT: this is NOT a substitute for `WAVE_SYSTEM_PROMPT`. The
  * fine-tune LoRA is trained against the canonical text — the GGUF /

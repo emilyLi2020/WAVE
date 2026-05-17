@@ -107,21 +107,14 @@ export default function LiteRTStockScreen() {
         // Path A fix (react-native-litert-lm-wave fork): upstream collapsed
         // the engine KV budget and the per-call decode cap into one
         // `maxTokens`, so no single value could run the ~1846-token WAVE
-        // chunk-1 prompt (256 → "input too long, 1846 > 256"; 2048 →
-        // "failed to invoke compiled model" because the decode batch
-        // exceeded the bundle's compiled 256-token chunk). The fork splits
-        // them. The stock litert-community Gemma 4 E2B bundle has TWO hard
-        // compiled ceilings; usable output = min(outputMaxTokens, 256,
-        // 2048 - inputTokens):
-        //  - engineMaxTokens 2048 = compiled cache_length (total in+out).
-        //  - outputMaxTokens 256  = compiled decode-chunk cap. This is the
-        //    TRUE max; an earlier 200 here silently truncated any surface
-        //    whose output ran 200-256 (e.g. a long reflection). Setting it
-        //    to the compiled max is correct: surfaces with small inputs
-        //    (reflection ~700, check-in) get the full 256; chunk-1 is still
-        //    bound by 2048 - 1846 ≈ 202 regardless of this knob (only a
-        //    smaller system prompt or a bigger-cache bundle helps there —
-        //    see Wave#14).
+        // chunk-1 prompt. The fork splits them into engineMaxTokens
+        // (input+output KV budget) and outputMaxTokens (decode cap).
+        // NOTE: 2048 / 256 below are the litert-community *benchmark*
+        // values and a known-safe starting point — NOT proven hard caps.
+        // Context is runtime-settable; the real iOS ceiling is unverified
+        // for E2B/GPU (upstream LiteRT#6765 saw ~4096 on E4B/CPU only).
+        // The true usable envelope is being measured in Wave#15 Phase 0;
+        // raise these per that sweep's findings.
         systemPrompt: "You are WAVE, a calm voice guiding someone through urge surfing. Reply in 1-2 short sentences.",
         engineMaxTokens: 2048,
         outputMaxTokens: 256,

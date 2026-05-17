@@ -24,10 +24,14 @@ bundle-fixed**:
   2048 ctx), not a ceiling.
 - **[LiteRT #6765](https://github.com/google-ai-edge/LiteRT/issues/6765)**
   (2026-04-07, open): the official Gemma 4 `.litertlm`'s `LlmMetadata`
-  **does not set `max_num_tokens`**; it is set at runtime via
-  `litert_lm_engine_settings_set_max_num_tokens`. On iOS arm64: **4096
-  works**, 8192 returns nil, 16384 SIGSEGVs in `reshape::Eval` during
-  prefill. (Reported on E4B; E2B unverified.)
+  **does not set `max_num_tokens`**; it is set at runtime. Results: 4096
+  "stable — but only prompts up to ~700 tokens worked reliably", 8192 →
+  nil, 16384 → SIGSEGV in `reshape::Eval`. **Caveats that matter:** this
+  was **E4B**, **CPU/XNNPACK** (GPU was blocked), **iPhone 16 Pro Max** —
+  i.e. a different model, backend, and device than WAVE's E2B/GPU/iPhone
+  17 Pro. It proves context is runtime-settable and justifies a sweep; it
+  does **not** predict our envelope (and even there, 4096 only worked for
+  ~700-tok prompts).
 - **[LiteRT-LM #2202](https://github.com/google-ai-edge/LiteRT-LM/issues/2202)**
   (field report): ran Gemma 4 **E2B** at `maxNumTokens=8192` on Android
   (Mali-G715) — it executed (hung only when a prompt actually approached
@@ -76,9 +80,17 @@ turn the knobs up on the bundle we already verified.
    - `engineMaxTokens` ∈ {2048, 3072, 4096} (never >4096 on iOS)
    - `outputMaxTokens` ∈ {256, 384, 512} (re-test the "256 decode" wall —
      it may also have been a conflation artifact)
-   - prompt sizes ∈ {700, 1400, 1846, 2400, 3200}
-2. Per cell record: loads? generates coherent (not `<pad>`/garbage)?
-   truncated? RAM (wrapper memory tracking), decode tok/s, TTFT, hang?
+   - **Real WAVE surfaces, not just synthetic sizes:** actual chunk 1–5
+     prompts built with real session history, plus reflection and a
+     multi-turn check-in flow — AND synthetic boundary sizes
+     {700, 1400, 1846, 2400, 3200} to map the cliff.
+   - Each surface run **both** with canonical `WAVE_SYSTEM_PROMPT` and
+     `WAVE_SYSTEM_PROMPT_STOCK_COMPACT` (explicit A/B).
+2. Per cell record: exact **tokenizer** input count (not chars/4); loads?
+   generates coherent (not `<pad>`/garbage)? **output truncated / JSON
+   schema-valid?** RAM (wrapper memory tracking) vs jetsam headroom;
+   decode tok/s; TTFT; and the #2202 **hang-near-cap** behavior (does it
+   silently latch?).
 - **Gate 0:** find the largest stable `(engineMaxTokens, outputMaxTokens,
   inputLen)` envelope. If it covers WAVE chunks 2–5 (~2500–2900 input
   with history) + reflection within memory → **done, no re-export, no
@@ -134,9 +146,15 @@ already exist at `Maelstrome/lora-wave-session-r32/gguf/`.
 
 ## Honest expectation
 
-The corrected evidence makes **Phase 0 likely sufficient** (engine accepts
-up to 4096 at runtime per #6765/#2202; our fork already exposes the knob).
-Re-export drops to a low-probability fallback that mostly re-treads the
+The corrected evidence makes Phase 0 **worth running first and plausibly
+sufficient** — but it is *not a guarantee*. #6765 (E4B/CPU/iPhone 16 Pro
+Max, ~700-tok cap at 4096) and #2202 (E2B/Android/GPU) establish that the
+engine accepts >2048 at runtime; they do **not** prove WAVE's
+E2B/iOS/GPU/long-history envelope works. Phase 0 is a measurement, not a
+foregone conclusion — its purpose is to find the real cliff, including the
+possibility that the iOS/GPU E2B ceiling is well under 4096 or that
+quality degrades (multi-turn KV rebuild, #2202 finding #5) before the
+token limit bites. Re-export remains a fallback that mostly re-treads the
 parked #12/#13 converter wall. Net effort if Phase 0 wins: ~1–2 h of
 on-device sweeping. Treat Phase 1 as a strictly time-boxed last resort.
 

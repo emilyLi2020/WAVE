@@ -22,8 +22,8 @@ prompt streamed coherent JSON on device.
 | Wrapper fork | `IdkwhatImD0ing/react-native-litert-lm-wave` @ **`f9dbf28`** — *pristine npm `0.3.6` + only the 5-file maxTokens patch* (NOT `d35ba92`, which bundled the `main` framework and broke the C++ bridge compile) |
 | `mobile/package.json` dep | `"react-native-litert-lm": "github:IdkwhatImD0ing/react-native-litert-lm-wave#f9dbf28b7cf8b0afeb390a525a155dc37db4002e"` |
 | Framework | upstream **v0.10.2** prebuilt (the fork's pristine postinstall downloads it; the 0.3.6 C++ bridge only compiles against the v0.10.2 C header) |
-| Engine config | `engineMaxTokens: 2048` (compiled cache_length), `outputMaxTokens: 256` (compiled decode cap — the true max; do not set lower) |
-| System prompt (stock path) | `WAVE_SYSTEM_PROMPT_STOCK_COMPACT` in `src/prompts/wave-system.ts` (~450–510 tok, ≈half the canonical ~900–1000). **Stock base only — never for the fine-tune/GGUF path, which must use the canonical `WAVE_SYSTEM_PROMPT` verbatim.**) |
+| Engine config | `engineMaxTokens: 2048`, `outputMaxTokens: 256` — the litert-community **benchmark** values; verified-safe, NOT proven hard caps. Runtime-settable; real envelope under measurement in Wave#15 Phase 0. |
+| System prompt (stock path) | Currently the canonical `WAVE_SYSTEM_PROMPT` (via `check-in.ts` / `chunk-generator.ts`), and a tiny inline prompt on the stock test screen. `WAVE_SYSTEM_PROMPT_STOCK_COMPACT` is **defined but not yet wired** — switching to it is Wave#15 Phase 0b. (When wired: stock base only — the fine-tune/GGUF path must keep canonical `WAVE_SYSTEM_PROMPT` verbatim.) |
 | Verified device | iPhone 17 Pro, hardware UDID `00008150-001079E40182401C` |
 | Branch | `wave/litert-maxtokens-pathA` |
 
@@ -35,17 +35,22 @@ prompt streamed coherent JSON on device.
 > `docs/plans/litert-cache-reexport-plan.md` Phase 0. Don't treat the ❌
 > rows as proven.
 
-## Per-surface fit on this config (conservative verified-safe envelope)
+## Per-surface fit — HISTORICAL estimate at the benchmark 2048/256 config
 
-Usable output = `min(outputMaxTokens, 256, 2048 − inputTokens)`.
+> This table is the conservative estimate **at the 2048/256 benchmark
+> config only**, under the now-disproven `min(outputMaxTokens, 256, 2048 −
+> input)` model. It is NOT the true envelope: context is runtime-settable
+> and the 256/2048 numbers are not proven caps. The ⚠️/❌ rows are
+> **unverified pending the Wave#15 Phase 0 sweep** (real WAVE prompts +
+> tokenizer counts on device). Kept only to show why the sweep matters.
 
-| Surface | Input (est) | Output need | On stock |
+| Surface | Input (est) | Output need | At 2048/256 (historical estimate) |
 |---|---|---|---|
-| Reflection | ~700 (less w/ compact) | ~150–180 | ✅ fits |
+| Reflection | ~700 | ~150–180 | ✅ fits |
 | Check-in turn | ~600–1000 | <100 | ✅ fits |
-| Chunk-1 / phase | ~1846 canonical → **~1400 with compact prompt** | ~150–210 | ✅ with compact prompt (canonical: ⚠️ ~202-tok bound) |
-| Chunks 2–5 | canonical ~2500–2900; compact lowers but history still grows | ~150–210 | ⚠️/❌ marginal even with compact — needs trim of history block or a larger bundle |
-| Any >256-tok output | — | >256 | ❌ impossible on stock (compiled decode cap) |
+| Chunk-1 / phase | ~1846 (→ ~1400 w/ compact) | ~150–210 | ✅ (tight at canonical) |
+| Chunks 2–5 | ~2500–2900 w/ history | ~150–210 | ❓ unverified — the core Phase 0 question |
+| >256-tok output | — | >256 | ❓ unverified (256-decode cap not re-tested post-fork) |
 
 The compact system prompt is what moves chunk-1 from "fragile, ~202-token
 output bound" to "comfortably decode-cap bound." It does **not** fully
