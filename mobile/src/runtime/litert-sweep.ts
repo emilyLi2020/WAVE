@@ -208,6 +208,11 @@ export async function runConfig(
 ): Promise<ProbeResult[]> {
   const out: ProbeResult[] = [];
   let llm: LiteRTLMInstance | null = null;
+  // A hung native sendMessage cannot be cancelled (the JS timeout fires
+  // but the native thread stays stuck); calling close() on it crashes the
+  // app. So once hung we leak the engine and bail — the process is dead
+  // anyway, and every prior probe was already streamed.
+  let hung = false;
   try {
     llm = createLLM({ enableMemoryTracking: true });
     try {
@@ -273,7 +278,8 @@ export async function runConfig(
         };
         emit(r);
         out.push(r);
-        // A wedged conversation can poison the engine — stop this config.
+        hung = true;
+        // A wedged conversation poisons the engine — stop, don't close.
         break;
       }
 
@@ -313,26 +319,42 @@ export async function runConfig(
     }
     return out;
   } finally {
-    try {
-      llm?.close();
-    } catch {
-      /* torn down regardless */
+    if (!hung) {
+      try {
+        llm?.close();
+      } catch {
+        /* torn down regardless */
+      }
     }
   }
 }
 
-const PASS: ProbeOutcome[] = ["ok", "truncated"];
-
 /**
- * Adaptive driver for the SAFE band (engineMaxTokens ≤ 4096). Seeded by
- * the on-device observation that 4096/512 passes. Binary-searches the E
- * ceiling within [2048,4096] using the heavy prompt, then the O ceiling
- * upward from 512, then does one rich pass over all surfaces×variants at
- * the winner. Outliers (>4096) are driven manually one-shot via runConfig
- * from the screen (crash risk — must not batch).
+ * Single-load, ASCENDING-input probe at the best known-safe config
+ * (E=4096, O=512 — already shown on device to load & run chunk1; the
+ * chunk1 data also showed output is naturally ~94 tok, so O is not the
+ * constraint — input length is). One expensive load; every surface×variant
+ * runs as a free inner send, ordered lightest→heaviest input so every
+ * passing case is streamed BEFORE the one that hangs/crashes. The boundary
+ * is wherever it flips ok→hang. A hang ends the pass (engine wedged) but
+ * all prior results are already captured.
  *
- * `onResult` lets the screen render live; everything is also emit()'d.
+ * This replaces the earlier ceiling-binary-search, which started with the
+ * heaviest prompt and crashed the app before learning anything (the
+ * observed `chunk5/canonical @4096 → hang` then SIGSEGV on close).
+ * The >4096 ceiling question is handled separately by the one-shot
+ * outlier probes in the screen.
  */
+export const ASCENDING_PROBES: Probe[] = [
+  { surface: "reflection", variant: "canonical" }, // smallest input (~700)
+  { surface: "chunk1", variant: "compact" },
+  { surface: "chunk1", variant: "canonical" },
+  { surface: "chunk3", variant: "compact" },
+  { surface: "chunk3", variant: "canonical" },
+  { surface: "chunk5", variant: "compact" },
+  { surface: "chunk5", variant: "canonical" }, // heaviest — the known hang
+];
+
 export async function runAdaptiveSafe(
   modelPath: string,
   timeoutMs: number,
@@ -346,66 +368,29 @@ export async function runAdaptiveSafe(
     }
   };
 
-  // Step 1 — E ceiling in {4096,3072,2048}, heavy prompt, O=512.
-  let eStar = 2048;
-  for (const E of [4096, 3072, 2048]) {
-    const rs = await runConfig(
-      modelPath,
-      { engineMaxTokens: E, outputMaxTokens: 512, backend: "gpu" },
-      [HEAVY_PROBE],
-      timeoutMs,
-    );
-    sink(rs);
-    if (rs.length && PASS.includes(rs[0].outcome)) {
-      eStar = E;
-      break;
-    }
-  }
-
-  // Step 2 — O ceiling upward from 512 at eStar, long-output prompt.
-  let oStar = 256;
-  for (const O of [1024, 768, 512, 256]) {
-    const rs = await runConfig(
-      modelPath,
-      { engineMaxTokens: eStar, outputMaxTokens: O, backend: "gpu" },
-      [LONG_OUTPUT_PROBE],
-      timeoutMs,
-    );
-    sink(rs);
-    if (rs.length && PASS.includes(rs[0].outcome)) {
-      oStar = O;
-      break;
-    }
-  }
-
-  // Step 3 — one rich pass at (eStar,oStar) over every surface×variant.
-  const richProbes: Probe[] = [];
-  for (const surface of ["chunk1", "chunk3", "chunk5", "reflection"] as const) {
-    for (const variant of ["canonical", "compact"] as const) {
-      if (surface === "reflection" && variant === "compact") continue;
-      richProbes.push({ surface, variant });
-    }
-  }
   sink(
     await runConfig(
       modelPath,
-      { engineMaxTokens: eStar, outputMaxTokens: oStar, backend: "gpu" },
-      richProbes,
+      { engineMaxTokens: 4096, outputMaxTokens: 512, backend: "gpu" },
+      ASCENDING_PROBES,
       timeoutMs,
     ),
   );
 
-  // Step 4 — one CPU sanity at the winner (backend differs sharply, #6765).
-  sink(
-    await runConfig(
-      modelPath,
-      { engineMaxTokens: eStar, outputMaxTokens: oStar, backend: "cpu" },
-      [{ surface: "chunk3", variant: "canonical" }],
-      timeoutMs,
-    ),
-  );
+  // Only if nothing hung (engine still healthy) add a CPU sanity — backend
+  // behaviour differs sharply (#6765 was CPU-only).
+  if (!all.some((r) => r.outcome === "hang")) {
+    sink(
+      await runConfig(
+        modelPath,
+        { engineMaxTokens: 4096, outputMaxTokens: 512, backend: "cpu" },
+        [{ surface: "chunk3", variant: "canonical" }],
+        timeoutMs,
+      ),
+    );
+  }
 
-  return { eStar, oStar, results: all };
+  return { eStar: 4096, oStar: 512, results: all };
 }
 
 /** Suggested upward outlier ladder for the manual >4096 probe control. */
