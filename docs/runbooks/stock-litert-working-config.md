@@ -85,6 +85,39 @@ npx expo start                                    # Metro; open Wave on device -
 `credentials.json` + `credentials/` are git-ignored (private key). EAS was
 abandoned for builds (out of credits); this local path is the supported one.
 
+## Demo corner-cuts (Wave#15 — to fit stock LiteRT's 2048 budget)
+
+Stock Gemma 4 on LiteRT can't hold the canonical system prompt + an
+accumulating session history within the 2048-token compiled budget (the
+phone demo hung/crashed on the heavy late chunks). For the **phone demo**
+two deliberate corner-cuts were made; both are localized and reversible:
+
+1. **Phase-narration history reduced to the last check-in only.**
+   `chunk-generator.ts` `renderHistoryBlock` previously included up to
+   `MAX_HISTORY_ENTRIES=10` recent entries (all prior chunk narrations +
+   check-ins). Now chunk N includes **only the single immediately-prior
+   check-in** (the one after chunk N−1); chunk 1 includes nothing (no
+   prior check-in). Drops all chunk-narration history and older check-ins,
+   capping the history block at ~one short check-in transcript instead of
+   growing unbounded. **Trade-off:** later chunks lose long-range
+   continuity (earlier obstacles, full score arc) and react only to the
+   most recent check-in. Acceptable for the demo; revisit if a
+   larger-context bundle ships.
+
+2. **Chunk system prompt trimmed ~half.** The chunk-generator's appended
+   "CHUNK NARRATION OUTPUT / formatting rules" block was condensed
+   (~280 → ~140 tok). The canonical `WAVE_SYSTEM_PROMPT` is **not**
+   touched (clinically gated: requires a clinician citation + LoRA
+   retrain). Only the redundant formatting verbosity was cut — every
+   safety line (never prescribe / dose / crisis) and the
+   one-beat-per-element / strict-JSON constraints are preserved, and the
+   user-prompt `<task>` block still restates the format rules.
+
+Combined effect: late-session phase-narration input drops from
+~2500–2900 tok toward the ~1300–1500 range, which (with the compact
+stock system prompt) is intended to fit eng2048. Verified envelope: see
+the Phase 0 sweep results in Wave#15.
+
 ## Known-good commits
 
 - `362a806` Path A fork wiring · `ea790aa` react-native-fs peer dep ·
