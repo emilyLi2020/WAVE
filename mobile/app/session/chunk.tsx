@@ -1,74 +1,107 @@
-import { Link } from "expo-router";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+// Chunk — guided narration player. Still a skeleton ahead of the
+// generateChunk() + Kokoro wiring; it shows the first narration beat
+// statically. Re-skinned to the dark oceanic chunk player. Navigation
+// (Next → /session/checkin) is unchanged.
 
-// Skeleton — will host the ChunkPlayer port from
-// client/app/session/_components/chunk-player.tsx (renders Segment[] as
-// narrated meditation, drives ambient audio bed, fades between lines).
+import { useRouter } from "expo-router";
+import { StyleSheet, Text, View } from "react-native";
+
+import {
+  Eyebrow,
+  TopBar,
+  WaveButton,
+  WaveCard,
+  WaveScreen,
+} from "@/components/wave-ui";
+import { WaveColors, WaveType } from "@/constants/wave-theme";
 
 export default function ChunkScreenRoute() {
-  return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={styles.content}
-      contentInsetAdjustmentBehavior="automatic"
-    >
-      <Text style={styles.sub}>
-        TODO: port chunk-player.tsx + narration-card.tsx. Drives the
-        generated 6-line narration with default pauses between beats. Per the
-        plan, Kokoro speaks each line (sentence buffer) instead of relying on
-        scripted pauses alone.
-      </Text>
+  const router = useRouter();
 
-      <View style={styles.panel}>
-        <Text style={styles.panelHead}>Wired with</Text>
-        <Text style={styles.bodyText}>
-          - generateChunk() from src/gemma/chunk.ts (already ported)
+  return (
+    <WaveScreen>
+      <TopBar crumb="Chunk 1 of 5 · Settle" />
+
+      <View style={styles.progress}>
+        <View style={styles.progressFill} />
+      </View>
+
+      <Text style={styles.meta}>CHUNK 1 OF 5 · SETTLE</Text>
+
+      <View style={styles.lineWrap}>
+        <Text style={styles.line}>
+          You&apos;re here. That&apos;s already the hardest part.
         </Text>
-        <Text style={styles.bodyText}>
-          - LiteRT runtime via src/runtime/litert-generators.ts
-        </Text>
-        <Text style={styles.bodyText}>
-          - Kokoro TTS via src/voice/tts-sherpa-kokoro.ts (after Kokoro smoke greens)
+        <Text style={styles.subline}>
+          Cravings rise. They peak. They fall. Like a wave.
         </Text>
       </View>
 
-      <Link href="/session/checkin" asChild>
-        <Pressable style={styles.button}>
-          <Text style={styles.buttonText}>Skip → check-in</Text>
-        </Pressable>
-      </Link>
-    </ScrollView>
+      <WaveCard accent style={styles.medAck}>
+        <Eyebrow accent>Medication-aware</Eyebrow>
+        <Text style={styles.medText}>
+          Your Suboxone is working right now. What you&apos;re feeling at a 7
+          would be a 9 or 10 without it.
+        </Text>
+      </WaveCard>
+
+      <WaveButton
+        label="Next →"
+        variant="ghost"
+        onPress={() => router.push("/session/checkin")}
+        style={styles.next}
+      />
+    </WaveScreen>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#08080C" },
-  content: { padding: 16, gap: 12 },
-  heading: { color: "#F1F1F4", fontSize: 22, fontWeight: "700" },
-  sub: { color: "#9CA3AF", fontSize: 13 },
-  panel: {
-    backgroundColor: "#16161F",
-    padding: 12,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: "#23232F",
-    gap: 4,
+  progress: {
+    height: 2,
+    borderRadius: 999,
+    backgroundColor: WaveColors.borderSoft,
+    overflow: "hidden",
+    marginTop: 6,
   },
-  panelHead: {
-    color: "#6B7280",
-    fontSize: 11,
-    fontWeight: "700",
-    textTransform: "uppercase",
-    letterSpacing: 1,
-    marginBottom: 4,
+  progressFill: {
+    height: "100%",
+    width: "20%",
+    borderRadius: 999,
+    backgroundColor: WaveColors.waveGlow,
   },
-  bodyText: { color: "#F1F1F4", fontSize: 13, lineHeight: 18 },
-  button: {
-    backgroundColor: "#6366F1",
-    paddingVertical: 12,
-    paddingHorizontal: 14,
-    borderRadius: 6,
-    marginTop: 8,
+  meta: {
+    textAlign: "center",
+    marginTop: 16,
+    fontFamily: WaveType.mono,
+    fontSize: 9.5,
+    letterSpacing: 2.6,
+    color: WaveColors.inkFaint,
   },
-  buttonText: { color: "#F1F1F4", fontWeight: "600", fontSize: 14, textAlign: "center" },
+  lineWrap: { flex: 1, justifyContent: "center", gap: 22, paddingVertical: 60 },
+  line: {
+    fontFamily: WaveType.serif,
+    fontStyle: "italic",
+    fontSize: 26,
+    lineHeight: 33,
+    textAlign: "center",
+    color: WaveColors.ink,
+    paddingHorizontal: 12,
+  },
+  subline: {
+    fontFamily: WaveType.serif,
+    fontStyle: "italic",
+    fontSize: 19,
+    lineHeight: 26,
+    textAlign: "center",
+    color: WaveColors.inkMute,
+    paddingHorizontal: 12,
+  },
+  medAck: { flexDirection: "column", gap: 6 },
+  medText: {
+    color: WaveColors.inkSoft,
+    fontSize: 12.5,
+    lineHeight: 19,
+    fontFamily: WaveType.sans,
+  },
+  next: { alignSelf: "flex-end", marginTop: 8 },
 });

@@ -1,72 +1,88 @@
-import { Link } from "expo-router";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+// Reflection — post-session card. Still a skeleton ahead of the
+// generateReflection() wiring (src/gemma/session.ts is ported; the bind
+// is not), so the summary copy is representative static text. Re-skinned
+// to the dark oceanic reflection. Navigation (done → dev menu, "/") is
+// unchanged.
 
-// Skeleton — will host the reflection card after check-in 5. Calls
-// generateReflection() from src/gemma/session.ts (already ported) and
-// renders the insight + journalPromptQuestion + 4 next-step chips.
+import { useRouter } from "expo-router";
+import { StyleSheet, Text, View } from "react-native";
+
+import {
+  Chip,
+  Display,
+  Eyebrow,
+  TopBar,
+  WaveButton,
+  WaveCard,
+  WaveScreen,
+} from "@/components/wave-ui";
+import { WaveColors, WaveType } from "@/constants/wave-theme";
+
+const NEXT_STEPS = [
+  "Glass of water · step outside for two minutes",
+  'Text the person you trust most: "today is a hard one"',
+  "Eat something small — a piece of fruit or toast",
+  "Lie down for 10 minutes with a podcast you trust",
+];
 
 export default function ReflectionScreenRoute() {
-  return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={styles.content}
-      contentInsetAdjustmentBehavior="automatic"
-    >
-      <Text style={styles.sub}>
-        TODO: render insight + journalPromptQuestion + NextStepChips. Use
-        reflectionPayloadSchema for validation.
-      </Text>
+  const router = useRouter();
+  const finish = () => router.replace("/");
 
-      <View style={styles.panel}>
-        <Text style={styles.panelHead}>Wired with</Text>
-        <Text style={styles.bodyText}>
-          - generateReflection() from src/gemma/session.ts (ported)
-        </Text>
-        <Text style={styles.bodyText}>
-          - reflectionPayloadSchema (already in src/prompts/schemas.ts)
-        </Text>
-        <Text style={styles.bodyText}>
-          - fallbackReflection() if the model fails twice
-        </Text>
+  return (
+    <WaveScreen intensity={4}>
+      <TopBar crumb="Closing · reflection" />
+
+      <View style={styles.summaryBlock}>
+        <Eyebrow accent>Your reflection</Eyebrow>
+        <Display size="lg">
+          Your craving fell{" "}
+          <Text style={styles.hl}>3 points</Text>
+          {"\n"}across the session.
+        </Display>
       </View>
 
-      <Link href="/" asChild>
-        <Pressable style={styles.button}>
-          <Text style={styles.buttonText}>Done → dev menu</Text>
-        </Pressable>
-      </Link>
-    </ScrollView>
+      <Text style={styles.insight}>
+        When you noticed it in your chest, you stopped fighting it — that&apos;s
+        when it started moving.
+      </Text>
+
+      <WaveCard style={styles.arcCard}>
+        <Eyebrow>Intake → end</Eyebrow>
+        <Text style={styles.arc}>7 · 7 · 6 · 5 · 4 · 4</Text>
+      </WaveCard>
+
+      <Eyebrow style={styles.stepsLabel}>Next 10 minutes · pick one</Eyebrow>
+      <View style={styles.steps}>
+        {NEXT_STEPS.map((s) => (
+          <Chip key={s} label={s} onPress={finish} />
+        ))}
+      </View>
+
+      <WaveButton label="done" variant="quiet" onPress={finish} style={styles.done} />
+    </WaveScreen>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#08080C" },
-  content: { padding: 16, gap: 12 },
-  heading: { color: "#F1F1F4", fontSize: 22, fontWeight: "700" },
-  sub: { color: "#9CA3AF", fontSize: 13 },
-  panel: {
-    backgroundColor: "#16161F",
-    padding: 12,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: "#23232F",
-    gap: 4,
+  summaryBlock: { gap: 10, marginTop: 8 },
+  hl: { color: WaveColors.waveCrest },
+  insight: {
+    fontFamily: WaveType.serif,
+    fontStyle: "italic",
+    fontSize: 14,
+    lineHeight: 22,
+    color: WaveColors.inkMute,
   },
-  panelHead: {
-    color: "#6B7280",
-    fontSize: 11,
-    fontWeight: "700",
-    textTransform: "uppercase",
+  arcCard: { gap: 8 },
+  arc: {
+    fontFamily: WaveType.serif,
+    fontStyle: "italic",
+    fontSize: 22,
     letterSpacing: 1,
-    marginBottom: 4,
+    color: WaveColors.waveCrest,
   },
-  bodyText: { color: "#F1F1F4", fontSize: 13, lineHeight: 18 },
-  button: {
-    backgroundColor: "#6366F1",
-    paddingVertical: 12,
-    paddingHorizontal: 14,
-    borderRadius: 6,
-    marginTop: 8,
-  },
-  buttonText: { color: "#F1F1F4", fontWeight: "600", fontSize: 14, textAlign: "center" },
+  stepsLabel: { marginTop: 6 },
+  steps: { gap: 6 },
+  done: { alignSelf: "center", marginTop: 18 },
 });
