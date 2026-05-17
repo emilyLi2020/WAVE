@@ -216,7 +216,7 @@ export function PrimaryButton({
         style,
       ]}
     >
-      <Text style={styles.btnPrimaryText}>
+      <Text style={styles.btnPrimaryText} numberOfLines={1}>
         {label}
         {trailing ? `  ${trailing}` : ""}
       </Text>
@@ -239,7 +239,7 @@ export function GhostButton({
       onPress={onPress}
       style={({ pressed }) => [styles.btnGhost, pressed && { opacity: 0.6 }, style]}
     >
-      <Text style={styles.btnGhostText}>{label}</Text>
+      <Text style={styles.btnGhostText} numberOfLines={1}>{label}</Text>
     </Pressable>
   );
 }

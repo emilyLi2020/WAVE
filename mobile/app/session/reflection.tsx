@@ -156,15 +156,14 @@ export default function ReflectionScreen() {
                 multiline
               />
               <View style={styles.planRow}>
-                <GhostButton
-                  label="No ideas — show options"
-                  onPress={() => setStage("suggestions")}
-                />
                 <PrimaryButton
                   label="Use my plan"
                   onPress={finish}
                   disabled={plan.trim().length < 2}
-                  style={{ flexShrink: 1 }}
+                />
+                <GhostButton
+                  label="No ideas — show options"
+                  onPress={() => setStage("suggestions")}
                 />
               </View>
             </Card>
@@ -224,10 +223,8 @@ const makeStyles = (theme: Theme) => StyleSheet.create({
     textAlignVertical: "top",
   },
   planRow: {
-    flexDirection: "row",
-    gap: 10,
     marginTop: 10,
-    justifyContent: "flex-end",
-    alignItems: "center",
+    gap: 8,
+    alignItems: "stretch",
   },
 });

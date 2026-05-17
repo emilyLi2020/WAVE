@@ -215,7 +215,12 @@ function buildOceanPath(
 }
 
 // ─── one drifting + bobbing layer ──────────────────────────────
-function OceanLayer({
+// Memoized: `spec` is a stable ref from Wave's useMemo and `clock` is a
+// stable shared value, so a parent re-render (e.g. the check-in screen
+// streaming transcript text word-by-word, or the JS thread busy with
+// Whisper/LLM/TTS in real use) never reconciles this subtree — the
+// per-frame `d` recompute stays entirely on the Reanimated UI thread.
+const OceanLayer = React.memo(function OceanLayer({
   spec,
   clock,
 }: {
@@ -284,7 +289,7 @@ function OceanLayer({
       </Svg>
     </Animated.View>
   );
-}
+});
 
 // ─── public Wave ───────────────────────────────────────────────
 export interface WaveProps {
@@ -299,7 +304,7 @@ export interface WaveProps {
   width?: DimensionValue;
 }
 
-export function Wave({
+function WaveBase({
   intensity = 5,
   motion = 0.7,
   height = 130,
@@ -357,6 +362,12 @@ export function Wave({
     </View>
   );
 }
+
+// Memoized so the screen re-rendering around it (transcript streaming,
+// status changes) doesn't reconcile the wave; props (intensity/motion/
+// height/bare) only change on a committed score, which is when a
+// re-render is actually wanted.
+export const Wave = React.memo(WaveBase);
 
 const styles = StyleSheet.create({
   bare: { backgroundColor: "transparent", overflow: "hidden" },
