@@ -22,6 +22,13 @@
 > **platform-runtime ≈ 4096 on iOS arm64**, and the 256-decode cap is
 > likewise unverified post-fork. Treat the "2048/256 hard limit" claims
 > below as historical. Live plan: `docs/plans/litert-cache-reexport-plan.md`.
+>
+> **✅ RESOLVED 2026-05-16:** the full WAVE session runs on stock Gemma 4
+> LiteRT at **eng2048/out256** after two demo corner-cuts (phase narration
+> → only the prior check-in; chunk system block trimmed ~half). 8/8
+> on-device probes valid, no hangs/crashes, ~3–4 tok/s. No re-export, no
+> bigger bundle. Canonical resolution + numbers:
+> `docs/runbooks/stock-litert-working-config.md`; ticket Wave#15.
 
 ## TL;DR
 

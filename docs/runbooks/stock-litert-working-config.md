@@ -114,9 +114,44 @@ two deliberate corner-cuts were made; both are localized and reversible:
    user-prompt `<task>` block still restates the format rules.
 
 Combined effect: late-session phase-narration input drops from
-~2500–2900 tok toward the ~1300–1500 range, which (with the compact
-stock system prompt) is intended to fit eng2048. Verified envelope: see
-the Phase 0 sweep results in Wave#15.
+~2500–2900 tok toward the ~1300–1500 range.
+
+## ✅ VERIFIED on device — full session fits stock LiteRT (2026-05-16)
+
+Phase 0 sweep, **physical iPhone 17 Pro**, stock `gemma-4-E2B-it.litertlm`,
+fork `f9dbf28`, **eng2048 / out512 / gpu**, with both corner-cuts above.
+**7/7 surface×variant probes passed — all valid JSON, zero hangs/crashes:**
+
+| Surface | Outcome | Out tok | tok/s | RAM |
+|---|---|---|---|---|
+| chunk1 / compact | ✅ ok | 123 | 4.0 | 2.10 GB |
+| reflection / canonical | ✅ ok | 131 | 3.9 | 2.09 GB |
+| chunk1 / canonical | ✅ ok | 123 | 4.0 | 2.12 GB |
+| chunk3 / compact | ✅ ok | 110 | 3.3 | 2.12 GB |
+| chunk3 / canonical | ✅ ok | 110 | 3.0 | 2.13 GB |
+| chunk5 / compact | ✅ ok | 101 | 3.1 | 2.13 GB |
+| chunk5 / canonical | ✅ ok | 101 | 3.1 | 2.13 GB |
+
+Findings:
+- **Fit:** entire session (5 phase narrations + reflection) fits eng2048
+  with the corner-cuts — **even the canonical prompt fits**; the compact
+  variant is optional margin, not required.
+- **Output size:** real outputs are **101–131 tok**, well under 256 —
+  `out256` is sufficient; `out512` is just headroom. (Settles the
+  "256 too small" question: no.)
+- **Memory/stability:** ~2.1 GB, never low-mem, **no hangs/crashes** at
+  eng2048. (Every earlier crash was eng4096 cold-start — do NOT use
+  eng4096 on this stack.)
+- **Latency (the only remaining constraint):** ~3–4 tok/s → ~30–40 s to
+  generate a surface (~100–130 tok), plus a one-time ~75 s model load.
+  Mitigations: load the engine **once per session** (not per call);
+  **pre-generate** the next chunk during the patient's check-in (model
+  idle then). Workable for pre-rendered narration; not chat-speed.
+
+**Shipping config:** stock Gemma 4 E2B + `engineMaxTokens: 2048` +
+`outputMaxTokens: 256` (or 512 for margin) + both corner-cuts + persistent
+per-session engine. This is the prize-eligible LiteRT demo running the
+real WAVE surfaces.
 
 ## Known-good commits
 

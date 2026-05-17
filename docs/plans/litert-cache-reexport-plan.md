@@ -1,5 +1,17 @@
 # Plan — raise the stock LiteRT context ceiling for WAVE
 
+> **✅ RESOLVED (2026-05-16) — re-export NOT needed.** Phase 0 ran on a
+> physical iPhone 17 Pro. The whole WAVE session (5 phase narrations +
+> reflection) runs on **stock Gemma 4 E2B LiteRT at eng2048/out256** once
+> two demo corner-cuts shrink the input (phase narration → only the
+> immediately-prior check-in; chunk system block trimmed ~half). 7/7
+> probes passed, all valid JSON, no hangs/crashes, ~2.1 GB, ~3–4 tok/s.
+> Raising the context ceiling / re-exporting is unnecessary — the binding
+> issue was input size (fixed by the corner-cuts) and latency, not the
+> compiled budget. Full results + shipping config:
+> `docs/runbooks/stock-litert-working-config.md`; resolution in Wave#15.
+> The phased re-export plan below is retained for the record only.
+
 > Investigation plan for running WAVE's longer surfaces (chunks 2–5,
 > >256-token outputs) on stock Gemma 4 LiteRT. Companion to
 > `docs/postmortems/gemma4-litert-stock-limits-research.md`, the runbook
