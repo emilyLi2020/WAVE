@@ -194,13 +194,13 @@ export default function LiteRTSmokeScreen() {
       await llm.loadModel(
         STOCK_GEMMA4_URL,
         // Fork (react-native-litert-lm-wave): split knobs — engine KV
-        // budget vs per-call decode cap. 2048 matches the stock Gemma 4
-        // E2B bundle's compiled cache_length; 200 stays within its
-        // compiled 256-token decode chunk.
+        // budget vs per-call decode cap. 2048 = stock Gemma 4 E2B
+        // compiled cache_length; 256 = compiled decode-chunk cap (the
+        // TRUE max — don't set below it or long outputs truncate).
         {
           backend: "gpu",
           engineMaxTokens: 2048,
-          outputMaxTokens: 200,
+          outputMaxTokens: 256,
           temperature: 0,
           topK: 1,
         },

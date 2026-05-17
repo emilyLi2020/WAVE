@@ -205,9 +205,12 @@ What changed in the fork vs upstream `0.3.6`:
 WAVE call sites updated to the split knobs:
 
 - `src/screens/LiteRTStockScreen.tsx` (the prize-eligible stock demo):
-  `engineMaxTokens: 2048, outputMaxTokens: 200` — the 1846-token chunk-1
-  prompt now fits without slimming.
-- `src/screens/LiteRTSmokeScreen.tsx`: same 2048 / 200.
+  `engineMaxTokens: 2048, outputMaxTokens: 256` — the 1846-token chunk-1
+  prompt runs. (Initially set to `200`; corrected to `256` = the bundle's
+  *true* compiled decode-chunk cap. `200` silently truncated any surface
+  whose output ran 200–256, e.g. a long reflection. Note: for chunk-1 the
+  binding limit is still `2048 − 1846 ≈ 202`, not this knob.)
+- `src/screens/LiteRTSmokeScreen.tsx`: same 2048 / 256.
 - `src/runtime/litert-generators.ts` (parked fine-tune path): `4096 / 256`
   to match that bundle's `--cache_length=4096` export.
 
@@ -258,9 +261,11 @@ Sequence that worked:
 This is the decisive proof: a prompt that returned
 `input token ids are too long, 1846 > 256` (or `failed to invoke the
 compiled model`) on the un-forked wrapper now generates, because
-`engineMaxTokens: 2048` and `outputMaxTokens: 200` are finally independent
+`engineMaxTokens: 2048` and `outputMaxTokens: 256` are finally independent
 knobs. **Path A is complete and the prize-eligible stock LiteRT demo runs
-the real WAVE prompt.**
+the real WAVE prompt.** (Caveat carried forward: stock's compiled
+2048-total / 256-decode ceilings mean reflection + check-in + chunk-1 fit,
+but chunks 2–5 and any >256-token output do not — see Wave#14.)
 
 ### Path B: Use a different bundle with a larger compiled cache
 
@@ -337,7 +342,7 @@ non-trivial native development.
 - **Stock Gemma 4 LiteRT page** (`/tests/litert-stock`) — ✅ **SHIPPING,
   VERIFIED ON A PHYSICAL iPhone 17 Pro on 2026-05-16** (see the Path A
   Outcome section above — *do not delete it*). The fork's split
-  `engineMaxTokens: 2048` / `outputMaxTokens: 200` removed the conflation;
+  `engineMaxTokens: 2048` / `outputMaxTokens: 256` removed the conflation;
   the full ~1846-token chunk-1 prompt generated streamed JSON on device.
   Fork pinned at `f9dbf28` (pristine `0.3.6` + maxTokens patch). This is
   the prize-eligible "uses LiteRT" demo and it runs the real WAVE prompt.
