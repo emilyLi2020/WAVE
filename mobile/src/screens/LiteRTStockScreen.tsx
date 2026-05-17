@@ -26,8 +26,17 @@ import {
   View,
 } from "react-native";
 
-import { ensureModel } from "@/runtime/model-cache";
+import { File } from "expo-file-system";
+
+import { ensureModel, getModelDir } from "@/runtime/model-cache";
 import { createLLM, type LiteRTLMInstance } from "react-native-litert-lm";
+
+// Wave#17 Phase 0: we request GPU but the wrapper silently falls back to CPU
+// with no JS-visible signal, and ~1.9 tok/s looks the same whether it's a
+// CPU fallback or a cold MLDrift GPU kernel JIT. The native engine writes its
+// MLDrift program cache next to the model file; presence + growth of those
+// files across runs is the no-native-rebuild tell that GPU actually ran.
+const REQUESTED_BACKEND = "gpu" as const;
 
 type Phase =
   | "idle"
@@ -54,6 +63,12 @@ interface Memory {
   isLowMemory: boolean;
 }
 
+interface MlDriftFile {
+  name: string;
+  size: number;
+  mtimeMs: number | null;
+}
+
 function fmtBytes(b: number): string {
   if (!b || !Number.isFinite(b)) return "—";
   const units = ["B", "KB", "MB", "GB"];
@@ -68,6 +83,7 @@ export default function LiteRTStockScreen() {
   const [error, setError] = useState<string | null>(null);
   const [stats, setStats] = useState<Stats | null>(null);
   const [memory, setMemory] = useState<Memory | null>(null);
+  const [mldrift, setMldrift] = useState<MlDriftFile[] | null>(null);
   const memTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const llmRef = useRef<LiteRTLMInstance | null>(null);
 
@@ -86,6 +102,29 @@ export default function LiteRTStockScreen() {
         // ignore — wrapper may be torn down
       }
     }, 1000);
+  };
+
+  // Probe the model directory for MLDrift GPU program-cache files. Empty
+  // after a generate run ⇒ GPU never compiled kernels (likely CPU fallback).
+  // Present and growing across runs ⇒ GPU ran; run-1 slowness was cold JIT.
+  const probeMlDrift = () => {
+    try {
+      const entries = getModelDir("litert-stock-gemma4").list();
+      const hits = entries
+        .filter(
+          (e): e is File =>
+            e instanceof File && e.name.toLowerCase().includes("mldrift"),
+        )
+        .map((f) => ({
+          name: f.name,
+          size: f.exists ? (f.size ?? 0) : 0,
+          mtimeMs: f.modificationTime,
+        }));
+      setMldrift(hits);
+    } catch {
+      // Dir may not exist before first download — treat as no cache yet.
+      setMldrift([]);
+    }
   };
 
   const onLoad = async () => {
@@ -124,6 +163,7 @@ export default function LiteRTStockScreen() {
       llmRef.current = llm;
       setMemory(llm.getMemoryUsage());
       startMemoryPoll(llm);
+      probeMlDrift();
       setPhase("ready");
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
@@ -176,6 +216,7 @@ export default function LiteRTStockScreen() {
         tokensPerSecond: s.tokensPerSecond,
       });
       setMemory(llm.getMemoryUsage());
+      probeMlDrift();
 
       // No JSON validation — stock Gemma 4 generates prose for this prompt.
       // The fine-tune is what shapes output into the chunk schema. For the
@@ -205,6 +246,7 @@ export default function LiteRTStockScreen() {
     llmRef.current = null;
     setMemory(null);
     setStats(null);
+    setMldrift(null);
     setOutput("");
     setPhase("idle");
   };
@@ -220,7 +262,8 @@ export default function LiteRTStockScreen() {
     >
       <Text style={styles.sub} selectable>
         Loads the unmodified `litert-community/gemma-4-E2B-it.litertlm` bundle
-        on react-native-litert-lm@0.3.6 and runs a WAVE chunk-1 prompt. Prize
+        on react-native-litert-lm@0.3.6 and runs a short WAVE urge-surfing
+        prompt (not the full chunk-1 contract — see note in onGenerate). Prize
         demo: stock Gemma 4 running fully on-device via LiteRT-LM.
       </Text>
 
@@ -247,6 +290,34 @@ export default function LiteRTStockScreen() {
               ⚠ System reports low memory
             </Text>
           )}
+        </View>
+      )}
+
+      {mldrift !== null && (
+        <View style={styles.panel}>
+          <Text style={styles.panelHead}>Backend (Wave#17 Phase 0)</Text>
+          <Text selectable style={styles.kv}>
+            Requested: {REQUESTED_BACKEND} — active backend NOT verifiable
+            from JS (wrapper falls back to CPU silently)
+          </Text>
+          <Text selectable style={styles.kv}>
+            MLDrift GPU program cache:{" "}
+            {mldrift.length === 0
+              ? "none — GPU kernels never compiled (likely CPU fallback)"
+              : `${mldrift.length} file(s)`}
+          </Text>
+          {mldrift.map((f) => (
+            <Text key={f.name} selectable style={styles.kv}>
+              • {f.name} — {fmtBytes(f.size)}
+              {f.mtimeMs
+                ? ` @ ${new Date(f.mtimeMs).toLocaleTimeString()}`
+                : ""}
+            </Text>
+          ))}
+          <Text selectable style={[styles.kv, { color: "#6B7280" }]}>
+            growing across runs ⇒ GPU ran (run-1 = cold JIT); stays empty ⇒
+            CPU fallback
+          </Text>
         </View>
       )}
 
@@ -293,7 +364,7 @@ export default function LiteRTStockScreen() {
           }
           onPress={onGenerate}
         >
-          <Text style={styles.buttonText}>2. Generate Chunk 1</Text>
+          <Text style={styles.buttonText}>2. Generate</Text>
         </Pressable>
 
         <Pressable style={styles.buttonSecondary} onPress={onUnload}>
