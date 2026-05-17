@@ -30,7 +30,7 @@ import {
   HEAVY_PROBE,
   OUTLIER_LADDER,
   runAdaptiveSafe,
-  runConfig,
+  runProbe,
   SWEEP_TIMEOUT_MS,
   type ProbeResult,
 } from "@/runtime/litert-sweep";
@@ -106,15 +106,14 @@ export default function LiteRTSweepScreen() {
     try {
       const path = await ensurePath();
       setPhase("running");
-      const rs = await runConfig(
+      const r = await runProbe(
         path,
         { engineMaxTokens: E, outputMaxTokens: 512, backend: "gpu" },
-        [HEAVY_PROBE],
+        HEAVY_PROBE,
         SWEEP_TIMEOUT_MS,
       );
-      setResults((prev) => [...prev, ...rs]);
-      const o = rs[0]?.outcome ?? "no-result (app may have crashed — relaunch)";
-      setNote(`Outlier E=${E} → ${o}`);
+      setResults((prev) => [...prev, r]);
+      setNote(`Outlier E=${E} → ${r.outcome}`);
       setPhase("done");
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));

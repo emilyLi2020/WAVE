@@ -113,11 +113,22 @@ const REFLECTION_CTX: ReflectionContext = {
   durationSeconds: 600,
 };
 
-/** Returns one combined message (system text folded in) per surface×variant. */
-export function buildMessage(p: Probe): string {
+/**
+ * Production-faithful: returns {systemPrompt,userPrompt} separately so the
+ * system prompt goes into loadModel's LLMConfig (exactly how the WAVE
+ * generators call it) and only the user turn is sent via sendMessage.
+ *
+ * The earlier "fold system into the message + empty systemPrompt" trick
+ * (to amortize one load over many surfaces) hit a pathological wrapper
+ * path that hung even on the ~700-token reflection prompt — so it's gone.
+ * One load per probe; correctness over cleverness.
+ */
+export function buildSurfacePrompt(p: Probe): {
+  systemPrompt: string;
+  userPrompt: string;
+} {
   if (p.surface === "reflection") {
-    const r = buildReflectionPrompt(REFLECTION_CTX);
-    return `${r.systemPrompt}\n\n${r.userPrompt}`;
+    return buildReflectionPrompt(REFLECTION_CTX);
   }
   const chunkNumber = (
     p.surface === "chunk1" ? 1 : p.surface === "chunk3" ? 3 : 5
@@ -129,14 +140,14 @@ export function buildMessage(p: Probe): string {
     sessionHistory: historyUpTo(chunkNumber),
   };
   const c = buildChunkPrompt(ctx);
-  const sys =
+  const systemPrompt =
     p.variant === "compact" && c.systemPrompt.includes(WAVE_SYSTEM_PROMPT)
       ? c.systemPrompt.replace(
           WAVE_SYSTEM_PROMPT,
           WAVE_SYSTEM_PROMPT_STOCK_COMPACT,
         )
       : c.systemPrompt;
-  return `${sys}\n\n${c.userPrompt}`;
+  return { systemPrompt, userPrompt: c.userPrompt };
 }
 
 /** chunk5/canonical = the heaviest input; used to probe ceilings honestly. */
@@ -195,129 +206,112 @@ function emit(r: ProbeResult) {
 }
 
 /**
- * Load ONE engine at (engineMaxTokens, outputMaxTokens, backend), then run
- * every probe as a cheap inner send (resetConversation between). One
- * expensive load amortized over many measurements. Each result is emitted
- * immediately. The engine is always torn down.
+ * One probe = one model load (systemPrompt in LLMConfig, exactly like the
+ * WAVE generators) + one sendMessage(userPrompt). Production-faithful.
+ * Result is emit()'d immediately (idevicesyslog crash-safe checkpoint).
+ * On hang the wedged native call cannot be cancelled and close() on it
+ * crashes the app — so we DON'T close; the caller must stop (process is
+ * effectively dead) and prior probes are already streamed.
  */
-export async function runConfig(
+export async function runProbe(
   modelPath: string,
   cfg: { engineMaxTokens: number; outputMaxTokens: number; backend: Backend },
-  probes: Probe[],
+  p: Probe,
   timeoutMs: number,
-): Promise<ProbeResult[]> {
-  const out: ProbeResult[] = [];
+): Promise<ProbeResult> {
+  const t0 = Date.now();
   let llm: LiteRTLMInstance | null = null;
-  // A hung native sendMessage cannot be cancelled (the JS timeout fires
-  // but the native thread stays stuck); calling close() on it crashes the
-  // app. So once hung we leak the engine and bail — the process is dead
-  // anyway, and every prior probe was already streamed.
   let hung = false;
   try {
+    const { systemPrompt, userPrompt } = buildSurfacePrompt(p);
     llm = createLLM({ enableMemoryTracking: true });
     try {
       await llm.loadModel(modelPath, {
         backend: cfg.backend,
         engineMaxTokens: cfg.engineMaxTokens,
         outputMaxTokens: cfg.outputMaxTokens,
-        systemPrompt: "",
+        systemPrompt,
         temperature: 0,
         topK: 1,
       });
     } catch (e) {
-      for (const p of probes) {
-        const r: ProbeResult = {
-          ...blank(cfg, p),
-          outcome: "load_error",
-          error: e instanceof Error ? e.message : String(e),
-          wallMs: 0,
-        };
-        emit(r);
-        out.push(r);
-      }
-      return out;
-    }
-
-    for (const p of probes) {
-      const t0 = Date.now();
-      try {
-        llm.resetConversation();
-      } catch {
-        /* fresh conversation best-effort */
-      }
-      const msg = buildMessage(p);
-      let timer: ReturnType<typeof setTimeout> | undefined;
-      const timeout = new Promise<{ hang: true }>((res) => {
-        timer = setTimeout(() => res({ hang: true }), timeoutMs);
-      });
-      const gen = llm
-        .sendMessage(msg)
-        .then((text) => ({ hang: false as const, text }));
-      let race: { hang: true } | { hang: false; text: string };
-      try {
-        race = await Promise.race([gen, timeout]);
-      } catch (e) {
-        if (timer) clearTimeout(timer);
-        const r: ProbeResult = {
-          ...blank(cfg, p),
-          outcome: "gen_error",
-          error: e instanceof Error ? e.message : String(e),
-          wallMs: Date.now() - t0,
-        };
-        emit(r);
-        out.push(r);
-        continue;
-      }
-      if (timer) clearTimeout(timer);
-
-      if ("hang" in race && race.hang) {
-        const r: ProbeResult = {
-          ...blank(cfg, p),
-          outcome: "hang",
-          wallMs: Date.now() - t0,
-        };
-        emit(r);
-        out.push(r);
-        hung = true;
-        // A wedged conversation poisons the engine — stop, don't close.
-        break;
-      }
-
-      const text = (race as { text: string }).text ?? "";
-      let st: Partial<{
-        promptTokens: number;
-        completionTokens: number;
-        timeToFirstToken: number;
-        tokensPerSecond: number;
-      }> = {};
-      let mem: Partial<{ residentBytes: number; isLowMemory: boolean }> = {};
-      try {
-        st = llm.getStats() as typeof st;
-      } catch {
-        /* best-effort */
-      }
-      try {
-        mem = llm.getMemoryUsage() as typeof mem;
-      } catch {
-        /* best-effort */
-      }
-      const completion = st.completionTokens ?? 0;
       const r: ProbeResult = {
         ...blank(cfg, p),
-        outcome: classify(p.surface, text, completion, cfg.outputMaxTokens),
-        promptTokens: st.promptTokens ?? null,
-        completionTokens: st.completionTokens ?? null,
-        ttftMs: st.timeToFirstToken ?? null,
-        tokensPerSecond: st.tokensPerSecond ?? null,
-        residentBytes: mem.residentBytes ?? null,
-        isLowMemory: mem.isLowMemory ?? null,
-        sample: text.slice(0, 160),
+        outcome: "load_error",
+        error: e instanceof Error ? e.message : String(e),
         wallMs: Date.now() - t0,
       };
       emit(r);
-      out.push(r);
+      return r;
     }
-    return out;
+
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const timeout = new Promise<{ hang: true }>((res) => {
+      timer = setTimeout(() => res({ hang: true }), timeoutMs);
+    });
+    const gen = llm
+      .sendMessage(userPrompt)
+      .then((text) => ({ hang: false as const, text }));
+    let race: { hang: true } | { hang: false; text: string };
+    try {
+      race = await Promise.race([gen, timeout]);
+    } catch (e) {
+      if (timer) clearTimeout(timer);
+      const r: ProbeResult = {
+        ...blank(cfg, p),
+        outcome: "gen_error",
+        error: e instanceof Error ? e.message : String(e),
+        wallMs: Date.now() - t0,
+      };
+      emit(r);
+      return r;
+    }
+    if (timer) clearTimeout(timer);
+
+    if ("hang" in race && race.hang) {
+      hung = true;
+      const r: ProbeResult = {
+        ...blank(cfg, p),
+        outcome: "hang",
+        wallMs: Date.now() - t0,
+      };
+      emit(r);
+      return r;
+    }
+
+    const text = (race as { text: string }).text ?? "";
+    let st: Partial<{
+      promptTokens: number;
+      completionTokens: number;
+      timeToFirstToken: number;
+      tokensPerSecond: number;
+    }> = {};
+    let mem: Partial<{ residentBytes: number; isLowMemory: boolean }> = {};
+    try {
+      st = llm.getStats() as typeof st;
+    } catch {
+      /* best-effort */
+    }
+    try {
+      mem = llm.getMemoryUsage() as typeof mem;
+    } catch {
+      /* best-effort */
+    }
+    const completion = st.completionTokens ?? 0;
+    const r: ProbeResult = {
+      ...blank(cfg, p),
+      outcome: classify(p.surface, text, completion, cfg.outputMaxTokens),
+      promptTokens: st.promptTokens ?? null,
+      completionTokens: st.completionTokens ?? null,
+      ttftMs: st.timeToFirstToken ?? null,
+      tokensPerSecond: st.tokensPerSecond ?? null,
+      residentBytes: mem.residentBytes ?? null,
+      isLowMemory: mem.isLowMemory ?? null,
+      sample: text.slice(0, 160),
+      wallMs: Date.now() - t0,
+    };
+    emit(r);
+    return r;
   } finally {
     if (!hung) {
       try {
@@ -361,34 +355,32 @@ export async function runAdaptiveSafe(
   onResult: (r: ProbeResult) => void,
 ): Promise<{ eStar: number; oStar: number; results: ProbeResult[] }> {
   const all: ProbeResult[] = [];
-  const sink = (rs: ProbeResult[]) => {
-    for (const r of rs) {
-      all.push(r);
-      onResult(r);
-    }
+  const cfg = {
+    engineMaxTokens: 4096,
+    outputMaxTokens: 512,
+    backend: "gpu" as Backend,
   };
-
-  sink(
-    await runConfig(
-      modelPath,
-      { engineMaxTokens: 4096, outputMaxTokens: 512, backend: "gpu" },
-      ASCENDING_PROBES,
-      timeoutMs,
-    ),
-  );
-
-  // Only if nothing hung (engine still healthy) add a CPU sanity — backend
-  // behaviour differs sharply (#6765 was CPU-only).
-  if (!all.some((r) => r.outcome === "hang")) {
-    sink(
-      await runConfig(
-        modelPath,
-        { engineMaxTokens: 4096, outputMaxTokens: 512, backend: "cpu" },
-        [{ surface: "chunk3", variant: "canonical" }],
-        timeoutMs,
-      ),
-    );
+  // One load per probe (system in LLMConfig). Ascending input order, so a
+  // hang/crash on the heavy end never costs the lighter results. Stop the
+  // moment one hangs — the process is wedged; relaunch resumes from a
+  // trimmed ASCENDING_PROBES if needed.
+  for (const p of ASCENDING_PROBES) {
+    const r = await runProbe(modelPath, cfg, p, timeoutMs);
+    all.push(r);
+    onResult(r);
+    if (r.outcome === "hang") return { eStar: 4096, oStar: 512, results: all };
   }
+
+  // Nothing hung — engine path is healthy. One CPU sanity (backend
+  // behaviour differs sharply; #6765 was CPU-only).
+  const cpu = await runProbe(
+    modelPath,
+    { engineMaxTokens: 4096, outputMaxTokens: 512, backend: "cpu" },
+    { surface: "chunk3", variant: "canonical" },
+    timeoutMs,
+  );
+  all.push(cpu);
+  onResult(cpu);
 
   return { eStar: 4096, oStar: 512, results: all };
 }
