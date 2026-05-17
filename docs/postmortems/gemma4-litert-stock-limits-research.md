@@ -158,13 +158,26 @@ constrained by the bundle's compiled cache_length=2048, but usable.
 
 To open a PR upstream or fork, the wrapper is single-file: `cpp/HybridLiteRTLM.cpp`.
 
-#### Outcome — Path A implemented (2026-05-16)
+#### ✅ Outcome — Path A VERIFIED ON A PHYSICAL iPhone (2026-05-16)
 
-Path A was taken. Fork published at
+> **🏆 IMPORTANT — DO NOT DELETE THIS SECTION.** This documents the first
+> time a WAVE-relevant Gemma 4 LiteRT path was proven working end-to-end
+> on real hardware. It is the resolution of the central blocker tracked
+> across every runtime postmortem in this directory. Keep it.
+>
+> **Result:** stock Gemma 4 E2B, via the forked `react-native-litert-lm`,
+> running on a **physical iPhone 17 Pro**, **generated streamed JSON output
+> for the full ~1846-token WAVE chunk-1 prompt** — the exact prompt that
+> was structurally impossible on the un-forked wrapper. The maxTokens
+> conflation bug is dead. Path A works.
+
+Path A was taken, corrected, and **verified live on device**. Fork at
 [`IdkwhatImD0ing/react-native-litert-lm-wave`](https://github.com/IdkwhatImD0ing/react-native-litert-lm-wave)
-(branch `wave/maxtokens-decouple`, based on upstream `0.3.6`), consumed by
-`mobile/package.json` as a git dependency:
-`"react-native-litert-lm": "github:IdkwhatImD0ing/react-native-litert-lm-wave#wave/maxtokens-decouple"`.
+(branch `wave/maxtokens-decouple`, commit **`f9dbf28`** — *pristine npm
+`0.3.6` + only the maxTokens decouple patch*; the earlier `d35ba92` that
+bundled the rebuilt `main` framework was abandoned because its `main` C
+header broke the 0.3.6 C++ bridge compile — see "Correction" below),
+consumed by `mobile/package.json` as a pinned git dependency.
 
 What changed in the fork vs upstream `0.3.6`:
 
@@ -183,14 +196,11 @@ What changed in the fork vs upstream `0.3.6`:
 - **`src/specs/LiteRTLM.nitro.ts` + `lib/specs/LiteRTLM.nitro.d.ts`** —
   typed `engineMaxTokens?` / `outputMaxTokens?`; `maxTokens` marked
   `@deprecated` (kept as the back-compat fallback for both).
-- **`scripts/postinstall.js`** — extracts a committed
-  `LiteRTLM-ios-frameworks.zip` (the rebuilt `main-2f70ce8` framework from
-  Issue #13, 64 MB, tracked in the fork) instead of downloading the stale
-  upstream `v0.3.6` release asset — which is the v0.10.2 framework and has
-  404'd before ([upstream #9](https://github.com/hung-yueh/react-native-litert-lm/issues/9)).
-  This makes a clean `npm install` reproduce the known-good runtime;
-  previously the `main-2f70ce8` framework only existed as an
-  un-reproducible local mutation of `node_modules` on other branches.
+- **`scripts/postinstall.js`, `cpp/include/litert_lm_engine.h`, the
+  `litertLm` pin — all left PRISTINE.** The fork downloads upstream's
+  **v0.10.2** prebuilt framework exactly as stock `0.3.6` does. This is the
+  whole point of the correction below: the 0.3.6 C++ bridge only compiles
+  against the v0.10.2 C header.
 
 WAVE call sites updated to the split knobs:
 
@@ -201,15 +211,56 @@ WAVE call sites updated to the split knobs:
 - `src/runtime/litert-generators.ts` (parked fine-tune path): `4096 / 256`
   to match that bundle's `--cache_length=4096` export.
 
-Verified locally: git-dep install resolves the fork (`lib/` ships
-committed, no `prepare` build needed), `postinstall` extracts the
-`main-2f70ce8` xcframework into `ios/Frameworks/` (podspec vendors exactly
-that path), and `npx tsc --noEmit` on the mobile app is clean with the new
-knobs. **Not yet verified:** the native C++ compiles only at EAS/Xcode
-build time, and the decisive proof — the full 1846-token WAVE chunk-1
-prompt actually generating on a physical iPhone through stock Gemma 4 —
-still needs the `/tests/litert-stock` on-device smoke. That is the
-remaining open item for this path.
+**Correction (the `d35ba92` → `f9dbf28` pivot).** The first fork attempt
+bundled the rebuilt `main-2f70ce8` LiteRT-LM framework (to also serve the
+parked fine-tune path). That was wrong for Path A: the rebuilt framework
+ships LiteRT-LM `main`'s C header, where `litert_lm_conversation_config_create`
+takes **no args** and `kTopP` is gone, but the `0.3.6` `HybridLiteRTLM.cpp`
+bridge calls them the **v0.10.2** way. The EAS Xcode build failed with
+`no matching function for call to 'litert_lm_conversation_config_create'`
+and `use of undeclared identifier 'kTopP'` — exactly the "porting the
+bridge to the new C API is a separate multi-day project" gap flagged in
+[`litert-lm-mobile-finetune.md`](./litert-lm-mobile-finetune.md). Path A
+does **not** need the rebuilt framework (it is stock Gemma 4, which loads
+on vanilla `0.3.6` + v0.10.2). The fork was rebuilt from **pristine npm
+`0.3.6` + only the 5-file maxTokens patch** (`f9dbf28`); the bridge then
+compiled clean.
+
+**Verification — done, on a physical iPhone 17 Pro (not EAS):** EAS was
+abandoned mid-effort (out of credits) and the build was done **locally**.
+Sequence that worked:
+
+1. `expo prebuild` + `pod install` (the `react-native-litert-lm` config
+   plugin integrates the v0.10.2 `LiteRTLM.xcframework`). Also surfaced and
+   fixed a pre-existing, Path-A-unrelated bug: `react-native-sherpa-onnx`
+   requires the peer dep `@dr.pogodin/react-native-fs`, never installed —
+   it had been masked because every prior build was a dev-client build
+   that skips JS bundling. Added `@dr.pogodin/react-native-fs@^2.38.2`.
+2. `xcodebuild` (generic iOS, `CODE_SIGNING_ALLOWED=NO`) → **`** BUILD
+   SUCCEEDED **`**, zero errors. `HybridLiteRTLM.cpp` + extended
+   `LLMConfig.hpp` compiled & linked against the v0.10.2 framework — the
+   recurring native blocker is resolved.
+3. Signing: `expo run:ios`'s device layer is broken by an Xcode 26.5 ↔
+   expo 54 `devicectl` JSON mismatch; bypassed with direct `xcodebuild`.
+   xcodebuild CLI couldn't see the Xcode-GUI account, and the existing
+   AdHoc profile was bound to EAS's distribution cert. Resolved by
+   `eas credentials -p ios` → *Download credentials from EAS to
+   credentials.json* (free, no build credits), importing EAS's
+   distribution `.p12` + its matched AdHoc profile (UUID
+   `a7801d9d-…`, team `8TADX8KSDK`, device included), then manual-signing.
+   (`credentials.json` + `credentials/` are git-ignored — they hold the
+   private key.)
+4. `xcrun devicectl device install app` → installed on "Bills iphone 17
+   pro"; Metro started; app launched.
+5. **`/tests/litert-stock` with the full ~1846-token WAVE chunk-1 prompt
+   → stock Gemma 4 E2B streamed coherent JSON output.** ✅
+
+This is the decisive proof: a prompt that returned
+`input token ids are too long, 1846 > 256` (or `failed to invoke the
+compiled model`) on the un-forked wrapper now generates, because
+`engineMaxTokens: 2048` and `outputMaxTokens: 200` are finally independent
+knobs. **Path A is complete and the prize-eligible stock LiteRT demo runs
+the real WAVE prompt.**
 
 ### Path B: Use a different bundle with a larger compiled cache
 
@@ -283,11 +334,13 @@ non-trivial native development.
 
 ## What ships now
 
-- **Stock Gemma 4 LiteRT page** (`/tests/litert-stock`) — Path A shipped
-  (see "Outcome" above). The fork's split `engineMaxTokens: 2048` /
-  `outputMaxTokens: 200` removes the conflation, so the full 1846-token
-  chunk-1 prompt no longer needs slimming. Pending the on-device iPhone
-  smoke to confirm generation end-to-end.
+- **Stock Gemma 4 LiteRT page** (`/tests/litert-stock`) — ✅ **SHIPPING,
+  VERIFIED ON A PHYSICAL iPhone 17 Pro on 2026-05-16** (see the Path A
+  Outcome section above — *do not delete it*). The fork's split
+  `engineMaxTokens: 2048` / `outputMaxTokens: 200` removed the conflation;
+  the full ~1846-token chunk-1 prompt generated streamed JSON on device.
+  Fork pinned at `f9dbf28` (pristine `0.3.6` + maxTokens patch). This is
+  the prize-eligible "uses LiteRT" demo and it runs the real WAVE prompt.
 - **Existing `/tests/litert`** (fine-tune target) — stays parked behind issue #13 / #11.
 
 The deeper research run from parallel-cli is saved at
