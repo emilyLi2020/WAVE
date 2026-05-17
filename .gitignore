@@ -48,3 +48,6 @@ models-bundle.tar.gz
 # Local tool-calling probe outputs.
 test_tool_calling_*.log
 
+
+# vendored package dev install (EAS resolves runtime deps at mobile root; not needed in git)
+mobile/vendor/react-native-litert-lm/node_modules/
