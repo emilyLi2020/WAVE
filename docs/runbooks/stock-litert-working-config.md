@@ -1,0 +1,77 @@
+# Runbook — Verified working stock Gemma 4 LiteRT config (WAVE)
+
+> **🏆 Verified on a physical iPhone 17 Pro, 2026-05-16.** This is the
+> reproducible snapshot of the *working* on-device LiteRT path. If you
+> need "the thing that demonstrably runs," start here. Companion to
+> `docs/postmortems/gemma4-litert-stock-limits-research.md` (the why) and
+> [`Wave#14`](https://github.com/emilyLi2020/Wave/issues/14) (tracking).
+> Do not delete.
+
+## What this is
+
+Stock (un-fine-tuned) Gemma 4 E2B running on-device through LiteRT-LM on
+iPhone, via a one-line fork of `react-native-litert-lm` that splits the
+conflated `maxTokens` knob. Proven: the full ~1846-token WAVE chunk-1
+prompt streamed coherent JSON on device.
+
+## Pinned artifacts (the "saved model")
+
+| Piece | Exact value |
+|---|---|
+| Model bundle | `https://huggingface.co/litert-community/gemma-4-E2B-it-litert-lm/resolve/main/gemma-4-E2B-it.litertlm` (~2.59 GB, downloaded at runtime, cached) |
+| Wrapper fork | `IdkwhatImD0ing/react-native-litert-lm-wave` @ **`f9dbf28`** — *pristine npm `0.3.6` + only the 5-file maxTokens patch* (NOT `d35ba92`, which bundled the `main` framework and broke the C++ bridge compile) |
+| `mobile/package.json` dep | `"react-native-litert-lm": "github:IdkwhatImD0ing/react-native-litert-lm-wave#f9dbf28b7cf8b0afeb390a525a155dc37db4002e"` |
+| Framework | upstream **v0.10.2** prebuilt (the fork's pristine postinstall downloads it; the 0.3.6 C++ bridge only compiles against the v0.10.2 C header) |
+| Engine config | `engineMaxTokens: 2048` (compiled cache_length), `outputMaxTokens: 256` (compiled decode cap — the true max; do not set lower) |
+| System prompt (stock path) | `WAVE_SYSTEM_PROMPT_STOCK_COMPACT` in `src/prompts/wave-system.ts` (~450–510 tok, ≈half the canonical ~900–1000). **Stock base only — never for the fine-tune/GGUF path, which must use the canonical `WAVE_SYSTEM_PROMPT` verbatim.**) |
+| Verified device | iPhone 17 Pro, hardware UDID `00008150-001079E40182401C` |
+| Branch | `wave/litert-maxtokens-pathA` |
+
+## Per-surface fit on this config (hard caps: 2048 total, 256 decode)
+
+Usable output = `min(outputMaxTokens, 256, 2048 − inputTokens)`.
+
+| Surface | Input (est) | Output need | On stock |
+|---|---|---|---|
+| Reflection | ~700 (less w/ compact) | ~150–180 | ✅ fits |
+| Check-in turn | ~600–1000 | <100 | ✅ fits |
+| Chunk-1 / phase | ~1846 canonical → **~1400 with compact prompt** | ~150–210 | ✅ with compact prompt (canonical: ⚠️ ~202-tok bound) |
+| Chunks 2–5 | canonical ~2500–2900; compact lowers but history still grows | ~150–210 | ⚠️/❌ marginal even with compact — needs trim of history block or a larger bundle |
+| Any >256-tok output | — | >256 | ❌ impossible on stock (compiled decode cap) |
+
+The compact system prompt is what moves chunk-1 from "fragile, ~202-token
+output bound" to "comfortably decode-cap bound." It does **not** fully
+rescue chunks 4–5 (history accumulation) or any surface needing >256
+output tokens — those need llama.rn/GGUF or a re-exported bundle (Wave#14).
+
+## Reproduce the on-device build (no EAS credits)
+
+Full detail in memory `litert-fork-signing-setup`. Summary:
+
+```
+export DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer
+cd mobile && npm install                         # resolves fork @ f9dbf28; postinstall pulls v0.10.2 framework
+npx expo prebuild                                 # generates mobile/ios/ (git-ignored, CNG)
+# pods install during prebuild
+# signing: eas credentials -p ios -> "Download credentials from EAS to credentials.json"
+#   import credentials/ios/dist-cert.p12 into login keychain
+#   copy credentials/ios/profile.mobileprovision -> ~/Library/Developer/Xcode/UserData/Provisioning Profiles/<UUID>.mobileprovision
+xcodebuild -workspace <abs>/mobile/ios/Wave.xcworkspace -scheme Wave \
+  -configuration Debug -destination 'generic/platform=iOS' \
+  -derivedDataPath <abs>/mobile/ios/build/DD \
+  CODE_SIGN_STYLE=Manual DEVELOPMENT_TEAM=8TADX8KSDK \
+  PROVISIONING_PROFILE_SPECIFIER=<profile UUID> \
+  CODE_SIGN_IDENTITY=<EAS dist cert SHA1> build
+xcrun devicectl device install app --device <coredevice-id> \
+  <abs>/mobile/ios/build/DD/Build/Products/Debug-iphoneos/Wave.app
+npx expo start                                    # Metro; open Wave on device -> /tests/litert-stock
+```
+
+`credentials.json` + `credentials/` are git-ignored (private key). EAS was
+abandoned for builds (out of credits); this local path is the supported one.
+
+## Known-good commits
+
+- `362a806` Path A fork wiring · `ea790aa` react-native-fs peer dep ·
+  `280be1f` pin `f9dbf28` · `19d8d98` verified-win docs ·
+  `c1fc871` outputMaxTokens 200→256 · (this commit) compact prompt + runbook.
