@@ -149,6 +149,20 @@ export function isSpeaking(): boolean {
   return speaking;
 }
 
+/**
+ * Assert a playback-only audio session (issue #26 Step 4). The check-in
+ * voice loop's native PCM mic stream leaves the iOS session in
+ * PlayAndRecord / VoiceChat / VoiceProcessing(AGC) — a louder output
+ * gain stage — and its teardown never restores it. A subsequent
+ * speaking-only phase (chunk narration, reflection) then plays into
+ * that elevated-gain session = uniformly loud. Call this at the start
+ * of any speaking-only phase to normalize the route to the known-good
+ * KokoroTestScreen config (no allowsRecording) before the first speak().
+ */
+export async function ensurePlaybackSession(): Promise<void> {
+  await setAudioModeAsync({ playsInSilentMode: true }).catch(() => {});
+}
+
 /** Stop playback + cancel any in-flight synthesis and release the player. */
 export async function stopSpeaking(): Promise<void> {
   const engine = enginePromise ? await enginePromise.catch(() => null) : null;

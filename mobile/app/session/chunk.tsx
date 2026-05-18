@@ -14,7 +14,7 @@ import { generateChunk } from "@/gemma/chunk";
 import { chunkContextFromState } from "@/session/build-context";
 import { useSession } from "@/session/session-context";
 import { useModelReady } from "@/session/use-model-ready";
-import { speak, stopSpeaking } from "@/voice/kokoro";
+import { ensurePlaybackSession, speak, stopSpeaking } from "@/voice/kokoro";
 
 const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
 
@@ -99,6 +99,11 @@ export default function ChunkScreenRoute() {
     const fallbackBeat = state.demoMode ? 1600 : 3600;
 
     (async () => {
+      // Step 4 (issue #26): normalize the audio route before speaking.
+      // A prior check-in's mic stream leaves the session in
+      // PlayAndRecord/VoiceChat (louder gain) and never restores it, so
+      // chunk 2+ would otherwise play uniformly loud.
+      await ensurePlaybackSession();
       for (let i = 0; i < lines.length; i++) {
         if (cancelled) return;
         setLineIdx(i);

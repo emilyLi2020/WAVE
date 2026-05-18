@@ -13,7 +13,7 @@ import { generateReflection } from "@/gemma/session";
 import type { ReflectionPayload } from "@/lib/prompts/schemas";
 import { reflectionContextFromState } from "@/session/build-context";
 import { useSession } from "@/session/session-context";
-import { speak, stopSpeaking } from "@/voice/kokoro";
+import { ensurePlaybackSession, speak, stopSpeaking } from "@/voice/kokoro";
 
 type Stage =
   | { status: "thinking" }
@@ -46,7 +46,12 @@ export default function ReflectionScreenRoute() {
         if (!alive) return;
         console.log(`[wave][reflection] ok source=${res.source}`);
         setStage({ status: "ready", payload: res.payload, source: res.source });
-        speak(`${headline} ${res.payload.insight}`).catch(() => {});
+        // Step 4 (issue #26): normalize the audio route — the prior
+        // check-in's mic stream left the session in PlayAndRecord/
+        // VoiceChat (louder) and never restored it.
+        ensurePlaybackSession()
+          .then(() => speak(`${headline} ${res.payload.insight}`))
+          .catch(() => {});
       })
       .catch((err: unknown) => {
         if (!alive) return;
