@@ -313,11 +313,17 @@ export default function CombinedVoiceTestScreen() {
                 firstChunkAt = Date.now();
                 speakingStartedAtRef.current = firstChunkAt;
                 playerSr = c.sampleRate;
+                console.log(
+                  `[voiceloop] tts turn ${turnNo} startPcmPlayer(sr=${c.sampleRate})…`,
+                );
                 eng
                   .startPcmPlayer(c.sampleRate, 1)
                   .then(() => {
                     pcmPlayerActiveRef.current = true;
                     playbackStartedAt = Date.now();
+                    console.log(
+                      `[voiceloop] tts turn ${turnNo} startPcmPlayer OK`,
+                    );
                     // sherpa's startTtsPcmPlayer forces the shared
                     // AVAudioSession to Playback (output-only), which kills
                     // the createPcmLiveStream mic queue → no VAD during TTS
@@ -331,9 +337,28 @@ export default function CombinedVoiceTestScreen() {
                     }).catch(() => {});
                     return eng.writePcmChunk(c.samples);
                   })
-                  .catch(() => {});
+                  .catch((e) =>
+                    console.log(
+                      `[voiceloop] tts turn ${turnNo} startPcmPlayer/write ERR: ${
+                        e instanceof Error ? e.message : String(e)
+                      }`,
+                    ),
+                  );
               } else {
-                eng.writePcmChunk(c.samples).catch(() => {});
+                if (!pcmPlayerActiveRef.current) {
+                  console.log(
+                    `[voiceloop] tts turn ${turnNo} WRITE w/o active player (skip-start path — player not ready)`,
+                  );
+                }
+                eng
+                  .writePcmChunk(c.samples)
+                  .catch((e) =>
+                    console.log(
+                      `[voiceloop] tts turn ${turnNo} writePcmChunk ERR: ${
+                        e instanceof Error ? e.message : String(e)
+                      }`,
+                    ),
+                  );
               }
               chunkCount += 1;
               totalSamples += c.samples.length;
