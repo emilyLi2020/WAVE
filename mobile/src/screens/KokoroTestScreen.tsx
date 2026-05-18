@@ -121,6 +121,15 @@ export default function KokoroTestScreen() {
     zeroChunkCalls: number;
   } | null>(null);
   const streamCancelRef = useRef(false);
+  // Simulated LLM token rate. Lower delay = faster stream → chunks
+  // arrive back-to-back so the player doesn't underrun between tiny
+  // word-by-word chunks (less audible "spacing").
+  const SPEED_PRESETS = [
+    { label: "Fast ~50 tok/s", ms: 20 },
+    { label: "Normal ~22 tok/s", ms: 45 },
+    { label: "Slow ~12 tok/s", ms: 80 },
+  ] as const;
+  const [wordDelayMs, setWordDelayMs] = useState(20);
 
   // Configure the audio session so playback works even with the silent
   // switch on (sherpa's PCM player honors the app's AVAudioSession).
@@ -389,8 +398,8 @@ export default function KokoroTestScreen() {
     }, drainMs);
   };
 
-  // The LLM always streams word-by-word (45 ms/word ≈ 22 tok/s). What
-  // changes between tests is the TTS chunk granularity:
+  // The LLM always streams word-by-word at wordDelayMs (speed presets).
+  // What changes between tests is the TTS chunk granularity:
   //   wordThreshold 12 → "sentence" stream (fewer, larger gen calls)
   //   wordThreshold 2  → "word-by-word" stream (many tiny gen calls,
   //                       lowest TTFA, tests choppiness + reuse stress)
@@ -419,12 +428,12 @@ export default function KokoroTestScreen() {
     let firstAudioWall = 0;
     const log: { idx: number; text: string; chunks: number; ms: number }[] = [];
 
-    // Producer: 45 ms/word ≈ a ~22 tok/s LLM.
+    // Producer: emit a word every wordDelayMs (the simulated LLM rate).
     (async () => {
       for (const w of words) {
         if (streamCancelRef.current) break;
         for (const s of buf.push(w + " ")) stream.enqueue(s);
-        await sleep(45);
+        await sleep(wordDelayMs);
       }
       for (const s of buf.flush()) stream.enqueue(s);
       stream.close();
@@ -683,6 +692,32 @@ export default function KokoroTestScreen() {
         placeholder="LLM reply to simulate streaming…"
         placeholderTextColor="#6B7280"
       />
+
+      <Text style={styles.label}>Simulated LLM speed</Text>
+      <View style={[styles.buttonRow, { flexDirection: "row", gap: 8 }]}>
+        {SPEED_PRESETS.map((p) => {
+          const active = wordDelayMs === p.ms;
+          const disabled = streamPhase === "running";
+          return (
+            <Pressable
+              key={p.ms}
+              style={[
+                styles.button,
+                { flex: 1 },
+                !active && { backgroundColor: "#23232F" },
+                disabled && styles.buttonDisabled,
+              ]}
+              disabled={disabled}
+              onPress={() => setWordDelayMs(p.ms)}
+            >
+              <Text style={styles.buttonText}>
+                {active ? "● " : ""}
+                {p.label}
+              </Text>
+            </Pressable>
+          );
+        })}
+      </View>
 
       <View style={styles.buttonRow}>
         {(
