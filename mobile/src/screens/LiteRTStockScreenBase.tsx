@@ -38,14 +38,11 @@ import type {
   ReflectionContext,
   SessionHistoryEntry,
 } from "@/prompts/schemas";
-// A/B (#25): both check-in surfaces use the COMPACT persona at the
-// Wave#15-verified eng2048 (the prize-demo config). Surface #2 keeps the
-// original ad-hoc `endConversation{…}` literal — this is the ground-truth
-// test of whether compact+literal actually fires the tool (the claim
-// we'd been ASSUMING). Surface #3 (full 5-turn arc) uses Gemma's
-// documented tool_code function-call format instead — the cheap
-// experiment, at the genuine ending turn.
-import { WAVE_SYSTEM_PROMPT_STOCK_COMPACT } from "@/prompts/wave-system";
+// Check-in (#25): single-shot JSON output-contract with a self-contained,
+// JSON-native check-in prompt (see ciSystemJson). The shared
+// WAVE_SYSTEM_PROMPT* prompts say "no JSON / next agent turn only", which
+// contradicted the contract and stopped endConversation ever firing — so
+// we no longer prefix them here. Phase/reflection use their own builders.
 import { ensureModel, getModelDir } from "@/runtime/model-cache";
 import { createLLM, type LiteRTLMInstance } from "react-native-litert-lm";
 
@@ -407,20 +404,25 @@ export default function LiteRTStockScreenBase({
       // Both check-in surfaces share this prompt; they differ only by
       // turn count (#2 quick 3-turn vs #3 full 5-turn arc → ending).
       setNote("2/4 · check-in JSON (3 quick turns)…");
-      const ciSystemJson = `${WAVE_SYSTEM_PROMPT_STOCK_COMPACT}
+      // Self-contained JSON-native check-in prompt. We deliberately do
+      // NOT prefix WAVE_SYSTEM_PROMPT_STOCK_COMPACT: its OUTPUT line says
+      // "the next agent turn only ... no JSON", which directly contradicts
+      // this contract and made the model keep asking questions forever
+      // (endConversation never fired — see [citrace]). Persona/tone/arc
+      // kept; the end trigger is now blunt and unmissable.
+      const ciSystemJson = `You are WAVE, a trauma-informed, calm, concrete urge-surfing companion for people in substance-use recovery, running a short post-chunk check-in. Warm, unhurried, nonjudgmental. Never lecture, minimize, or rush.
 
-You are running a post-chunk voice check-in. The patient's first message is their craving score (1-10). Each turn: validate what they said, then ask one question.
+The patient's first message is their craving score (1-10). Each turn: briefly validate what they just said, then (unless ending) ask exactly one open question. 1-3 short plain sentences. Track the craving score.
 
-<output_contract>
-Respond with ONLY a single JSON object, nothing else, matching exactly:
+ENDING — read this every turn, it is the most important rule:
+- If the patient's LATEST message clearly signals they are ready to continue (e.g. "I'm ready", "let's keep going", "yeah, go on", "I'm good to continue"), you MUST end now. Do NOT ask another question. Set "endConversation" to an object with their latest craving score and the obstacle, and make "reply" a brief warm closing line with NO question.
+- In every other case "endConversation" MUST be null and "reply" ends with exactly one question.
 
-{"reply": "<patient-facing prose, 1-3 short plain sentences>", "endConversation": null | {"cravingScore": <integer 1-10>, "obstacleCategory": "<one of: ${TOOL_OBSTACLES}>"}}
+obstacleCategory is one of: ${TOOL_OBSTACLES}. Use "none" if no clear obstacle was reported.
 
-Rules:
-- "reply" is the ONLY text the patient hears. Plain spoken prose. No markdown, no lists, no emoji.
-- "endConversation" stays null until the patient has clearly said they are ready to continue; then set it (use obstacleCategory "none" if no clear obstacle).
-- Output nothing outside the JSON object — no preamble, no code fences, no extra keys.
-</output_contract>`;
+Respond with ONLY a single JSON object, nothing else, exactly this shape:
+{"reply": "<patient-facing prose, 1-3 short plain sentences, no markdown/lists/emoji>", "endConversation": null | {"cravingScore": <integer 1-10>, "obstacleCategory": "<one category>"}}
+Output nothing outside the JSON object — no preamble, no code fences, no extra keys.`;
       // Real multi-turn: just the patient utterances, sent sequentially.
       const ciTurns = [
         "6",
