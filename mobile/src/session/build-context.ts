@@ -3,6 +3,7 @@
 // schema objects.
 
 import type {
+  CheckInContextPayload,
   ChunkGenerationContextPayload,
   ReflectionContext,
 } from "@/lib/prompts/schemas";
@@ -29,6 +30,24 @@ export function chunkContextFromState(state: State): ChunkGenerationContextPaylo
     // sessionHistory entries are already SessionHistoryEntry-shaped in
     // the reducer; cap mirrors the schema's .max(20).
     sessionHistory: state.sessionHistory.slice(-20),
+  };
+}
+
+export function checkInContextFromState(state: State): CheckInContextPayload {
+  const scoreHistory = state.checkIns.map((c) => c.cravingScore).slice(-5);
+  const intakeIntensity = state.intake?.intakeIntensity ?? 5;
+  const lastScore = scoreHistory.length
+    ? scoreHistory[scoreHistory.length - 1]
+    : intakeIntensity;
+  return {
+    chunkNumber: state.currentChunk as ChunkNumber,
+    cravingScore: lastScore,
+    scoreHistory,
+    obstacleHint: null,
+    profile: profileFromState(state),
+    intakeIntensity,
+    sessionHistory: state.sessionHistory.slice(-20),
+    demoMode: state.demoMode,
   };
 }
 
