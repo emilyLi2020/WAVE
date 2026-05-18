@@ -42,9 +42,17 @@ export default function ChunkScreenRoute() {
     setGenError(null);
     setLineIdx(0);
     let alive = true;
-    generateChunk({ context: chunkContextFromState(state) })
+    const ctx = chunkContextFromState(state);
+    console.log(
+      `[wave][chunk] generate #${chunkNo} demo=${state.demoMode}`,
+      JSON.stringify({ profile: ctx.profile, intakeIntensity: ctx.intakeIntensity, history: ctx.sessionHistory.length }),
+    );
+    generateChunk({ context: ctx })
       .then((res) => {
         if (!alive) return;
+        console.log(
+          `[wave][chunk] #${chunkNo} ok source=${res.source} lines=${res.lines.length} attempts=${res.attempts}`,
+        );
         dispatch({
           type: "chunkGenerated",
           chunk: res.chunk,
@@ -55,7 +63,9 @@ export default function ChunkScreenRoute() {
       .catch((err: unknown) => {
         if (!alive) return;
         generatedForRef.current = null;
-        setGenError(err instanceof Error ? err.message : String(err));
+        const message = err instanceof Error ? `${err.name}: ${err.message}` : String(err);
+        console.error(`[wave][chunk] #${chunkNo} generate failed:`, message);
+        setGenError(message);
       });
     return () => {
       alive = false;

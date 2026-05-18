@@ -24,21 +24,20 @@ export function useModelReady(): ModelReadyState {
     if (startedRef.current) return;
     startedRef.current = true;
     let alive = true;
+    console.log("[wave][model] preload start");
     preloadWaveLiteRT({
       onProgress: (pct) => {
         if (alive) setState({ status: "loading", pct });
       },
     })
       .then(() => {
+        console.log("[wave][model] ready");
         if (alive) setState({ status: "ready" });
       })
       .catch((err: unknown) => {
-        if (alive) {
-          setState({
-            status: "error",
-            message: err instanceof Error ? err.message : String(err),
-          });
-        }
+        const message = err instanceof Error ? `${err.name}: ${err.message}` : String(err);
+        console.error("[wave][model] preload error:", message);
+        if (alive) setState({ status: "error", message });
       });
     return () => {
       alive = false;

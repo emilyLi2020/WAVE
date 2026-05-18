@@ -155,26 +155,41 @@ export function preloadLiteRT(
   let entry = llmRegistry.get(key);
   if (!entry) {
     entry = (async () => {
-      // ensureModel is idempotent — cheap on a cache hit.
-      const fileUri = await ensureModel(config.modelId, {
-        onProgress: opts?.onProgress,
-      });
-      // The LiteRT-LM C++ engine stat()s the raw path (HybridLiteRTLM.cpp
-      // ~line 348/392); expo-file-system hands back file:// URIs which
-      // fail stat() with errno 2. Strip the scheme before loadModel.
-      const nativePath = fileUri.replace(/^file:\/\//, "");
-      const llm = createLLM({ enableMemoryTracking: true });
-      await llm.loadModel(nativePath, {
-        backend: config.backend,
-        engineMaxTokens: config.engineMaxTokens,
-        outputMaxTokens: config.outputMaxTokens,
-        ...(config.systemPrompt
-          ? { systemPrompt: config.systemPrompt }
-          : {}),
-        temperature: config.temperature ?? 0,
-        topK: config.topK ?? 1,
-      });
-      return llm;
+      const tag = `[wave][litert] ${config.modelId}/${config.backend}`;
+      try {
+        console.log(`${tag} ensureModel… (${cacheKey(config)})`);
+        // ensureModel is idempotent — cheap on a cache hit.
+        const fileUri = await ensureModel(config.modelId, {
+          onProgress: (pct) => {
+            console.log(`${tag} download ${Math.round(pct * 100)}%`);
+            opts?.onProgress?.(pct);
+          },
+        });
+        // The LiteRT-LM C++ engine stat()s the raw path (HybridLiteRTLM.cpp
+        // ~line 348/392); expo-file-system hands back file:// URIs which
+        // fail stat() with errno 2. Strip the scheme before loadModel.
+        const nativePath = fileUri.replace(/^file:\/\//, "");
+        console.log(`${tag} loadModel ${nativePath}`);
+        const llm = createLLM({ enableMemoryTracking: true });
+        await llm.loadModel(nativePath, {
+          backend: config.backend,
+          engineMaxTokens: config.engineMaxTokens,
+          outputMaxTokens: config.outputMaxTokens,
+          ...(config.systemPrompt
+            ? { systemPrompt: config.systemPrompt }
+            : {}),
+          temperature: config.temperature ?? 0,
+          topK: config.topK ?? 1,
+        });
+        console.log(`${tag} loaded OK`);
+        return llm;
+      } catch (err) {
+        console.error(
+          `${tag} LOAD FAILED:`,
+          err instanceof Error ? `${err.name}: ${err.message}` : err,
+        );
+        throw err;
+      }
     })();
     llmRegistry.set(key, entry);
     // Drop a rejected load so a retry actually re-loads instead of
@@ -198,17 +213,19 @@ export async function unloadLiteRT(config: LiteRTLoadConfig): Promise<void> {
   }
 }
 
-// litert-wave on CPU, no system prompt: the config every existing generator
-// caller used implicitly. Behavior is unchanged from the old singleton.
+// The session flow runs on STOCK Gemma 4 — the verified on-device path
+// (/tests/litert-stock, LiteRTStockScreenBase, ~50 tok/s GPU). The WAVE
+// fine-tune bundle ("litert-wave") is blocked on the wrapper-rebuild path
+// (Wave issue #13) and fails to load, so pointing the generators at it
+// was the "runtime error when loading model". Config mirrors the proven
+// stock screen exactly: stock bundle, GPU, 2048/512 token budget, no
+// load-time system prompt (each flow passes its full composed prompt as
+// one user message — see streamOnce + the header notes).
 const WAVE_CONFIG: LiteRTLoadConfig = {
-  modelId: "litert-wave",
-  backend: "cpu",
-  // Fork split knobs. The litert-lm-v3 fine-tune bundle was exported with
-  // --cache_length=4096 --prefill_lengths=[512,1024], so the KV budget can
-  // be the full 4096 and the chunk-1/reflection prompts fit. outputMaxTokens
-  // stays at the conservative 256-token decode-chunk default.
-  engineMaxTokens: 4096,
-  outputMaxTokens: 256,
+  modelId: "litert-stock-gemma4",
+  backend: "gpu",
+  engineMaxTokens: 2048,
+  outputMaxTokens: 512,
   temperature: 0,
   topK: 1,
 };
