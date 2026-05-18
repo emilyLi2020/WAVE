@@ -284,6 +284,78 @@ export default function LiteRTStockScreenBase({
     }
   };
 
+  // Single-shot check-in — mirrors production generateWllamaCheckIn.
+  // NO load-time system prompt: each turn we resetConversation() and send
+  // ONE message = systemJson + the flattened transcript-so-far + "WAVE:".
+  // Single-shot keeps the JSON output-contract dominant; multi-turn chat
+  // makes stock Gemma default to prose (phase/reflection prove single
+  // shot emits JSON fine). extractToolCall is JSON-first.
+  const runCheckInSingleShot = async (
+    modelPath: string,
+    label: string,
+    systemJson: string,
+    patientTurns: string[],
+  ): Promise<SurfaceResult> => {
+    let llm: LiteRTLMInstance | null = null;
+    try {
+      llm = createLLM({ enableMemoryTracking: true });
+      await llm.loadModel(modelPath, {
+        backend: REQUESTED_BACKEND,
+        engineMaxTokens: ENGINE_MAX_TOKENS,
+        outputMaxTokens: OUTPUT_MAX_TOKENS,
+        temperature: 0,
+        topK: 1,
+      });
+      const history: { role: "WAVE" | "Patient"; content: string }[] = [];
+      let last = "";
+      let lastTool: string | null = null;
+      for (const pt of patientTurns) {
+        history.push({ role: "Patient", content: pt });
+        const transcript = history
+          .map((h) => `${h.role}: ${h.content}`)
+          .join("\n");
+        const combined = `${systemJson}\n\n${transcript}\n\nWAVE:`;
+        llm.resetConversation();
+        // eslint-disable-next-line no-await-in-loop
+        const raw = await llm.sendMessage(combined);
+        const { reply, tool } = extractToolCall(raw);
+        last = reply;
+        lastTool = tool;
+        history.push({ role: "WAVE", content: reply });
+      }
+      const s = llm.getStats();
+      const mem = llm.getMemoryUsage();
+      return {
+        label,
+        text: last,
+        toolCall: lastTool,
+        stats: {
+          ttftMs: s.timeToFirstToken,
+          totalMs: s.totalTime,
+          promptTokens: s.promptTokens,
+          completionTokens: s.completionTokens,
+          tokensPerSecond: s.tokensPerSecond,
+          residentBytes: mem.residentBytes,
+        },
+        error: null,
+      };
+    } catch (e) {
+      return {
+        label,
+        text: "",
+        toolCall: null,
+        stats: null,
+        error: e instanceof Error ? e.message : String(e),
+      };
+    } finally {
+      try {
+        llm?.close();
+      } catch {
+        /* best-effort */
+      }
+    }
+  };
+
   const onRunDemo = async () => {
     if (busyRef.current) return;
     busyRef.current = true;
@@ -340,9 +412,9 @@ Rules:
         "Yeah, I'm ready, let's keep going.",
       ];
       acc.push(
-        await runSurface(
+        await runCheckInSingleShot(
           modelPath,
-          "Check-in JSON (3 quick turns)",
+          "Check-in JSON single-shot (3 turns)",
           ciSystemJson,
           ciTurns,
         ),
@@ -363,9 +435,9 @@ Rules:
         "Yeah, I'm ready to keep going.",
       ];
       acc.push(
-        await runSurface(
+        await runCheckInSingleShot(
           modelPath,
-          "Check-in JSON (full arc, 5 turns → ending)",
+          "Check-in JSON single-shot (full arc → ending)",
           ciSystemJson,
           ciTurnsFullArc,
         ),
