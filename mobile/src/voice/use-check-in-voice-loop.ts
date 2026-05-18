@@ -106,14 +106,13 @@ export function useCheckInVoiceLoop(): CheckInVoiceLoop {
     async (pcm: Float32Array) => {
       if (busyRef.current || endedRef.current || !mountedRef.current) return;
       busyRef.current = true;
-      // REAL mic release for the whole turn (issue #26 Step 2). setMuted
-      // only flipped a flag — the native PCM live stream stayed UP and
-      // re-asserted the AVAudioSession (PlayAndRecord/VoiceChat) on
-      // restart mid-playback → the loudness jump. Fully stop the stream
-      // here; re-acquire only AFTER speak() has truly drained (finally).
-      // The TTS player stays resident (no stop→restart = no
-      // turn-2-no-voice).
-      await endpointerRef.current?.stopListening();
+      // Mute (do NOT stopListening) the mic for the turn — issue #26
+      // device-proven pattern from CombinedVoiceTestScreen. Real
+      // stopListening / setAudioModeAsync mid-life of the resident
+      // kokoro PCM player silences it. Keeping the mic stream up+muted
+      // holds the AVAudioSession steady (VoiceChat, set before the
+      // opener) so every reply plays at a CONSISTENT volume with audio.
+      endpointerRef.current?.setMuted(true);
       try {
         // ── STT ──
         setPhase("transcribing");
@@ -209,13 +208,12 @@ export function useCheckInVoiceLoop(): CheckInVoiceLoop {
         if (mountedRef.current) setError(msg);
       } finally {
         busyRef.current = false;
-        // Re-acquire the mic ONLY now — speak() has fully drained (Step
-        // 1) and the turn is over, so the stream restart can't re-assert
-        // the session under live TTS audio. Skip if the check-in ended
-        // (finalize/navigation owns teardown).
+        // Just unmute — the mic stream stayed up the whole turn (no
+        // stop/restart), so the session is untouched. Skip if the
+        // check-in ended (finalize/navigation owns teardown).
         if (!endedRef.current && mountedRef.current) {
           setPhase("listening");
-          await endpointerRef.current?.startListening();
+          endpointerRef.current?.setMuted(false);
         }
       }
     },
@@ -266,14 +264,23 @@ export function useCheckInVoiceLoop(): CheckInVoiceLoop {
         historyRef.current = [{ role: "agent", content: OPENING }];
         setMessages([{ role: "assistant", text: OPENING, tool: null }]);
         setPhase("speaking");
+        // Uniform-volume fix (issue #26, device-proven on the Combined
+        // screen): bring the mic stream up — MUTED — BEFORE the opener.
+        // sherpa's PCM mic stream pins the AVAudioSession to
+        // VoiceChat+VPIO; starting it first makes the opener play at the
+        // SAME level as every reply (consistent) instead of
+        // normal-then-loud. Muted so the opener's own TTS can't
+        // self-trigger the VAD. No mid-life setAudioModeAsync, no
+        // player/mic stop-restart.
+        await endpointerRef.current?.startListening();
+        endpointerRef.current?.setMuted(true);
         try {
           await speak(OPENING);
         } catch {
           /* speak failed — still listen so the loop isn't stuck */
         }
         if (!mountedRef.current) return;
-        // Audio session already set at boot (proven config, not toggled).
-        await endpointerRef.current?.startListening();
+        endpointerRef.current?.setMuted(false);
         if (mountedRef.current) setPhase("listening");
       } catch (err) {
         const msg = err instanceof Error ? `${err.name}: ${err.message}` : String(err);
