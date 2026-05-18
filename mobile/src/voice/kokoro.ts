@@ -84,26 +84,42 @@ export async function speak(text: string): Promise<void> {
   await new Promise<void>((resolve, reject) => {
     let firstChunk = true;
     let chain: Promise<unknown> = Promise.resolve();
+    let totalSamples = 0;
+    let sr = 24_000;
+    let playbackStartedAt = 0;
     engine
       .generateSpeechStream(phrase, undefined, {
         onChunk: (c) => {
           if (firstChunk) {
             firstChunk = false;
+            sr = c.sampleRate;
+            // Real playback begins ~when the first PCM enters the player.
+            playbackStartedAt = Date.now();
             if (!playerActive) {
               playerActive = true;
               chain = engine
                 .startPcmPlayer(c.sampleRate, 1)
                 .then(() => engine.writePcmChunk(c.samples))
                 .catch(() => {});
+              totalSamples += c.samples.length;
               return;
             }
           }
+          totalSamples += c.samples.length;
           chain = chain.then(() => engine.writePcmChunk(c.samples).catch(() => {}));
         },
         onEnd: () => {
-          // onEnd = synthesis complete; the tail keeps the last queued
-          // PCM from being cut. ~ proportional to a short fixed drain.
-          setTimeout(resolve, 450);
+          // onEnd = SYNTHESIS done (fast). The PCM player is still
+          // draining real-time audio. Resolving now (the old flat 450ms)
+          // returned before the phrase finished — so the opener got cut
+          // / the turn passed before WAVE spoke, and replies were
+          // truncated when finalize() navigated away. Wait for the
+          // ACTUAL remaining audio duration (CombinedVoiceTestScreen's
+          // proven drain calc) + a margin for the player's scheduling.
+          const audioMs = (totalSamples / (sr || 24_000)) * 1000;
+          const elapsed = playbackStartedAt ? Date.now() - playbackStartedAt : 0;
+          const drainMs = Math.max(0, audioMs - elapsed) + 600;
+          setTimeout(resolve, drainMs);
         },
         onError: (e) => reject(new Error(e.message)),
       })
