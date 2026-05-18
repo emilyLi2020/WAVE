@@ -5,7 +5,11 @@
 // transcript overwrite and "2nd turn didn't respond".
 
 import assert from "node:assert/strict";
-import { ConversationController, extractToolCall } from "./conversation.ts";
+import {
+  ConversationController,
+  extractToolCall,
+  sanitizeForVoice,
+} from "./conversation.ts";
 
 let passed = 0;
 async function test(name: string, fn: () => void | Promise<void>) {
@@ -165,6 +169,44 @@ await test("extractToolCall: no tool => reply passthrough", () => {
   const { reply, tool } = extractToolCall("  just a normal reply  ");
   assert.equal(reply, "just a normal reply");
   assert.equal(tool, null);
+});
+
+await test("sanitizeForVoice strips emoji", () => {
+  assert.equal(
+    sanitizeForVoice("Hello! How can I help you today? 😊"),
+    "Hello! How can I help you today?",
+  );
+  assert.equal(sanitizeForVoice("Nice 👍🏽 work 🎉"), "Nice work");
+});
+
+await test("sanitizeForVoice strips markdown", () => {
+  assert.equal(
+    sanitizeForVoice("**Tip:** try _box breathing_ now"),
+    "Tip: try box breathing now",
+  );
+  assert.equal(
+    sanitizeForVoice("# Heading\n- one\n- two\n> quote"),
+    "Heading one two quote",
+  );
+  assert.equal(
+    sanitizeForVoice("see [the guide](https://x.com/y) please"),
+    "see the guide please",
+  );
+});
+
+await test("sanitizeForVoice keeps normal prose + punctuation intact", () => {
+  const s = "A six, and it's still in your chest — that's worth naming.";
+  assert.equal(sanitizeForVoice(s), s);
+});
+
+await test("runTurn stores the sanitized reply (no emoji/markdown)", async () => {
+  const c = new ConversationController();
+  const { send } = scriptedSend(["**Hey!** I hear you 😊 Take a breath."]);
+  const r = await c.runTurn("hi", send);
+  assert.ok(r);
+  assert.equal(r.reply, "Hey! I hear you Take a breath.");
+  assert.equal(c.messages[1].text, "Hey! I hear you Take a breath.");
+  assert.ok(!/[*_😊]/.test(c.messages[1].text));
 });
 
 await test("reset clears history", async () => {

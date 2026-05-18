@@ -51,6 +51,33 @@ export function extractToolCall(raw: string): {
   };
 }
 
+// Deterministic output hygiene for voice. Stock Gemma 4 ignores
+// "no emoji / no markdown" system instructions for casual inputs, and a
+// voice agent must never speak "asterisk" or read an emoji — so we
+// normalize in code instead of trusting the model (voice-AI best
+// practice). Applied to the patient-facing reply only; the
+// endConversation tool literal is parsed off before this runs.
+export function sanitizeForVoice(input: string): string {
+  let s = input;
+  // Strip emoji / pictographs / symbol blocks + ZWJ + variation selectors.
+  s = s.replace(
+    /[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}\u{1F1E6}-\u{1F1FF}\u{2300}-\u{23FF}\u{2190}-\u{21FF}\u{FE00}-\u{FE0F}\u{200D}\u{20E3}]/gu,
+    "",
+  );
+  // Markdown links [label](url) -> label
+  s = s.replace(/\[([^\]]+)\]\([^)]*\)/g, "$1");
+  // Headings / blockquote / list markers at line starts
+  s = s.replace(/^[ \t]*#{1,6}[ \t]*/gm, "");
+  s = s.replace(/^[ \t]*>[ \t]?/gm, "");
+  s = s.replace(/^[ \t]*[-*+][ \t]+/gm, "");
+  s = s.replace(/^[ \t]*\d+\.[ \t]+/gm, "");
+  // Emphasis / code markers
+  s = s.replace(/\*\*|__|~~|[*_`#]/g, "");
+  // Collapse whitespace/newlines into speakable prose.
+  s = s.replace(/\s+/g, " ").trim();
+  return s;
+}
+
 export class ConversationController {
   private _messages: ConvMessage[] = [];
   private busy = false;
@@ -104,7 +131,8 @@ export class ConversationController {
       hooks?.onChange?.(this.snapshot());
 
       const raw = await send(text);
-      const { reply, tool } = extractToolCall(raw);
+      const { reply: rawReply, tool } = extractToolCall(raw);
+      const reply = sanitizeForVoice(rawReply);
       assistant.text = reply;
       assistant.tool = tool;
       assistant.pending = false;
