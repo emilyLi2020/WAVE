@@ -759,8 +759,19 @@ export default function CombinedVoiceTestScreen() {
       setCheckInEnded(null);
       convRef.current.seedAssistant(OPENING);
       setMessages(convRef.current.snapshot());
-      await speak(OPENING, ++epochRef.current);
+      // Uniform-volume fix (issue #26): bring the mic stream up BEFORE
+      // the opener (muted, so the opener's own TTS can't self-trigger
+      // the VAD). sherpa's PCM mic stream pins the AVAudioSession to
+      // VoiceChat + VoiceProcessing(AGC); starting it first makes the
+      // opener play at the SAME loud level as every reply (consistent)
+      // instead of normal-then-loud. Crucially this does NOT call
+      // setAudioModeAsync mid-life of the resident PCM player (that
+      // silenced replies — see speak()'s "DO NOT re-assert" note) and
+      // does NOT stop/restart the player or mic.
       await endpointerRef.current?.startListening();
+      endpointerRef.current?.setMuted(true);
+      await speak(OPENING, ++epochRef.current);
+      endpointerRef.current?.setMuted(false);
       setPhase("listening");
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
