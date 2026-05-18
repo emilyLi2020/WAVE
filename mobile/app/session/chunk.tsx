@@ -1,8 +1,8 @@
-// Chunk player — task ①. Ensures the LiteRT model is resident, asks
-// generateChunk() for this round's narration (model → scripted fallback
-// inside the boundary), records it in the reducer, then plays the lines
-// one beat at a time. Kokoro TTS (task ②) will later drive the pacing by
-// speech-end; for now it's a readable timed beat.
+// Chunk player — tasks ① + ②. Ensures the LiteRT model is resident,
+// asks generateChunk() for this round's narration (model → scripted
+// fallback inside the boundary), records it in the reducer, then speaks
+// each line with Kokoro TTS and advances on speech-end (timed beat is
+// the fallback if TTS errors).
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "expo-router";
@@ -14,6 +14,9 @@ import { generateChunk } from "@/gemma/chunk";
 import { chunkContextFromState } from "@/session/build-context";
 import { useSession } from "@/session/session-context";
 import { useModelReady } from "@/session/use-model-ready";
+import { speak, stopSpeaking } from "@/voice/kokoro";
+
+const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
 
 export default function ChunkScreenRoute() {
   const router = useRouter();
@@ -73,28 +76,53 @@ export default function ChunkScreenRoute() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [model.status, chunkNo, isThisChunk]);
 
-  // 2. Play the lines, one timed beat each.
-  useEffect(() => {
-    if (!isThisChunk || lines.length === 0) return;
-    if (lineIdx >= lines.length) return;
-    const beat = state.demoMode ? 1600 : 3600;
-    const t = setTimeout(() => setLineIdx((i) => i + 1), beat);
-    return () => clearTimeout(t);
-  }, [isThisChunk, lineIdx, lines.length, state.demoMode]);
+  // 2. Speak the lines with Kokoro; advance on speech-end. A timed beat
+  //    is the fallback if TTS errors so a failure never strands the flow.
+  const playedRef = useRef<number | null>(null);
+  const finishedRef = useRef(false);
 
   function finishChunk() {
+    if (finishedRef.current) return;
+    finishedRef.current = true;
+    stopSpeaking().catch(() => {});
     dispatch({ type: "chunkCompleted" });
     router.replace("/session/checkin");
   }
 
-  // Auto-advance to the check-in once the last line has shown.
   useEffect(() => {
-    if (isThisChunk && lines.length > 0 && lineIdx >= lines.length) {
-      const t = setTimeout(finishChunk, state.demoMode ? 600 : 1400);
-      return () => clearTimeout(t);
-    }
+    if (!isThisChunk || lines.length === 0) return;
+    if (playedRef.current === chunkNo) return;
+    playedRef.current = chunkNo;
+    finishedRef.current = false;
+    let cancelled = false;
+    const gap = state.demoMode ? 250 : 850;
+    const fallbackBeat = state.demoMode ? 1600 : 3600;
+
+    (async () => {
+      for (let i = 0; i < lines.length; i++) {
+        if (cancelled) return;
+        setLineIdx(i);
+        try {
+          await speak(lines[i]);
+        } catch (err) {
+          console.warn(
+            `[wave][chunk] TTS failed line ${i}, timed fallback:`,
+            err instanceof Error ? err.message : err,
+          );
+          await sleep(fallbackBeat);
+        }
+        if (cancelled) return;
+        await sleep(gap);
+      }
+      if (!cancelled) finishChunk();
+    })();
+
+    return () => {
+      cancelled = true;
+      stopSpeaking().catch(() => {});
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isThisChunk, lineIdx, lines.length]);
+  }, [isThisChunk, chunkNo, lines.length]);
 
   const title = chunk?.title ?? "Settle in";
   const total = state.totalChunks;
