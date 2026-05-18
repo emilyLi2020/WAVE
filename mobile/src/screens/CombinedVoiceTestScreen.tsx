@@ -56,7 +56,7 @@ import {
 } from "@/voice/silero-vad";
 import { useVadEndpointer } from "@/voice/use-vad-endpointer";
 import { writePcmToWavFile } from "@/voice/pcm-wav";
-import { WAVE_SYSTEM_PROMPT_STOCK_COMPACT } from "@/prompts/wave-system";
+import { WAVE_SYSTEM_PROMPT } from "@/prompts/wave-system";
 import {
   ConversationController,
   type ConvMessage,
@@ -68,32 +68,35 @@ import type { LiteRTLMInstance } from "react-native-litert-lm";
 const TOOL_OBSTACLES =
   "none, cannot_visualize, mind_wandering, urge_overwhelming, breath_tight, breath_anxiety, gave_in, guilt_failure, physical_discomfort, sleepiness";
 
-const CI_SYSTEM = `${WAVE_SYSTEM_PROMPT_STOCK_COMPACT}
+// Canonical WAVE persona (now output-agnostic) + the mobile JSON
+// output-contract. Single-shot per turn; the JSON is parsed by
+// conversation.ts extractToolCall — reply is spoken, endConversation is
+// the machine signal. Patient never hears the JSON.
+const CI_SYSTEM = `${WAVE_SYSTEM_PROMPT}
 
-You are running a hands-free post-chunk voice check-in. Everything you write is read aloud by a text-to-speech voice, so write exactly the way people talk.
+This is a hands-free post-chunk VOICE check-in: the "reply" text is spoken aloud by text-to-speech, so write exactly the way people talk — short, warm, plain, contractions, numbers as words.
 
-Every turn:
-- At most four short sentences, and often fewer is better. Validate what they said, then ask one question.
-- Plain spoken prose only. No markdown, asterisks, bullet points, numbered lists, headings, or quotation marks.
-- No emoji and no symbols (no %, $, &, #, /, *). Say them as words.
-- Write numbers as words ("a six", "about ten minutes"), never as digits.
-- Use contractions and a warm, calm, unhurried tone.
+ENDING — read every turn, most important rule:
+- If the patient's LATEST message clearly signals they are ready to continue ("I'm ready", "let's keep going", "yeah, go on"), you MUST end now. Set "endConversation" to {cravingScore, obstacleCategory}. "reply" is a brief warm hand-off that closes the check-in — the app moves on to the next part right after, so NO question, NO new topic, NO "tell me more" (e.g. "Thanks for letting me know. We will move on now.").
+- Otherwise "endConversation" MUST be null and "reply" ends with exactly one question.
 
-Ending: once the patient has clearly said they are ready to continue, give one brief warm hand-off line that closes the check-in — the app moves on to the next part right after, so NO question, NO new topic, NO invitation to say more (e.g. "Thanks for letting me know. We will move on now."). Then on its OWN final line emit exactly:
-endConversation{cravingScore:N,obstacleCategory:CAT}
-where N is their latest craving score as a digit from 1 to 10 and CAT is one of: ${TOOL_OBSTACLES} (use none if no clear obstacle). That final line is the ONLY place digits, braces, or symbols are allowed — it is a silent machine signal, never spoken. Do NOT emit endConversation before the patient is ready, and emit it at most once.`;
+obstacleCategory is one of: ${TOOL_OBSTACLES}. Use "none" if no clear obstacle.
 
-// EXPERIMENT (#25): Gemma's chat template has no real system role — the
-// wrapper fakes a <start_of_turn>system turn the model was never trained
-// on, so CI_SYSTEM-as-system-prompt is weakly followed. Load with NO
-// system prompt and inject CI_SYSTEM into the FIRST user turn instead
-// (kept in history via reset-once; later turns send only the transcript).
+Respond with ONLY a single JSON object, nothing else, exactly:
+{"reply": "<spoken prose, 1-3 short sentences, no markdown/lists/emoji/quotes>", "endConversation": null | {"cravingScore": <integer 1-10>, "obstacleCategory": "<one category>"}}
+Output nothing outside the JSON object — no preamble, no code fences, no extra keys.`;
+
+// Single-shot mobile path (#25): NO load-time system prompt — every
+// turn we resetConversation() and send ONE message = CI_SYSTEM (WAVE +
+// JSON contract) + flattened transcript + "WAVE:". eng4096 so the
+// canonical prompt + contract + growing transcript fit (proven on the
+// litert-stock big-prompt test).
 const STOCK_GPU_CONFIG: LiteRTLoadConfig = {
   modelId: "litert-stock-gemma4",
   backend: "gpu",
-  engineMaxTokens: 2048,
+  engineMaxTokens: 4096,
   outputMaxTokens: 512,
-  // systemPrompt intentionally omitted — see EXPERIMENT note above.
+  // systemPrompt intentionally omitted — single-shot puts it in the msg.
   temperature: 0,
   topK: 1,
 };
@@ -460,7 +463,6 @@ export default function CombinedVoiceTestScreen() {
         const llm = llmRef.current;
         if (!llm) throw new Error("LiteRT not initialized");
         if (!convStartedRef.current) {
-          llm.resetConversation();
           convRef.current.reset();
           convStartedRef.current = true;
         }
@@ -468,20 +470,24 @@ export default function CombinedVoiceTestScreen() {
         const llmT0 = Date.now();
         let rawLen = 0;
         let rawHead = "";
-        // The pure, unit-tested controller owns history + tool parsing
-        // (issue 1 fix). It pushes user + assistant and fires onChange so
-        // the conversation accumulates instead of overwriting.
+        // Single-shot per turn (the proven mobile path): resetConversation
+        // + ONE message = CI_SYSTEM (WAVE persona + JSON output-contract)
+        // + the flattened transcript-so-far + "WAVE:". The controller
+        // owns history/UI; extractToolCall reads reply + endConversation
+        // from the JSON (not raw text).
         const turn = await convRef.current.runTurn(
           text,
-          async (u) => {
-            // Inject the WAVE check-in instructions into the FIRST user
-            // turn (Gemma follows user-turn instructions far more
-            // reliably than the fake system turn). Later turns send only
-            // the transcript — the instruction persists in conversation
-            // history (resetConversation is called once).
-            const composed =
-              turnNo === 1 ? `${CI_SYSTEM}\n\nPatient: ${u}` : u;
-            const raw = await llm.sendMessage(composed);
+          async () => {
+            const lines = convRef.current.messages
+              .filter((m) => !(m.role === "assistant" && m.pending))
+              .map(
+                (m) =>
+                  `${m.role === "user" ? "Patient" : "WAVE"}: ${m.text}`,
+              )
+              .join("\n");
+            const combined = `${CI_SYSTEM}\n\n${lines}\n\nWAVE:`;
+            llm.resetConversation();
+            const raw = await llm.sendMessage(combined);
             rawLen = raw.length;
             rawHead = raw.slice(0, 120);
             return raw;

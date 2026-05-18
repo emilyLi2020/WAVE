@@ -39,6 +39,41 @@ export function extractToolCall(raw: string): {
   reply: string;
   tool: string | null;
 } {
+  // JSON output-contract (the mobile path): a single object
+  // {"reply": "...", "endConversation": null | {cravingScore,obstacleCategory}}.
+  // Read reply/tool from the parsed JSON, not the raw text.
+  const jStart = raw.indexOf("{");
+  const jEnd = raw.lastIndexOf("}");
+  if (jStart !== -1 && jEnd > jStart) {
+    try {
+      const o = JSON.parse(raw.slice(jStart, jEnd + 1)) as {
+        reply?: unknown;
+        endConversation?: {
+          cravingScore?: unknown;
+          obstacleCategory?: unknown;
+        } | null;
+      };
+      if (o && typeof o === "object" && "endConversation" in o) {
+        const reply =
+          typeof o.reply === "string" && o.reply.trim()
+            ? o.reply.trim()
+            : raw.trim();
+        const ec = o.endConversation;
+        if (ec && typeof ec === "object") {
+          const score = String(ec.cravingScore ?? "?");
+          const obst = String(ec.obstacleCategory ?? "none");
+          return {
+            reply,
+            tool: `endConversation{cravingScore:${score},obstacleCategory:${obst}}`,
+          };
+        }
+        return { reply, tool: null };
+      }
+    } catch {
+      /* not valid JSON — fall through to the literal form */
+    }
+  }
+  // Legacy literal fallback: endConversation{...} appended to prose.
   const m = raw.match(/endConversation\s*\{([^}]*)\}/i);
   if (!m) return { reply: raw.trim(), tool: null };
   const args = m[1] ?? "";

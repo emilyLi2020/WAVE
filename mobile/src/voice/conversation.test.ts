@@ -165,6 +165,41 @@ await test("only the LATEST queued turn runs (latest-wins)", async () => {
   );
 });
 
+await test("extractToolCall: JSON contract, endConversation null", () => {
+  const { reply, tool } = extractToolCall(
+    '{"reply": "Take a breath. How is your chest now?", "endConversation": null}',
+  );
+  assert.equal(reply, "Take a breath. How is your chest now?");
+  assert.equal(tool, null);
+});
+
+await test("extractToolCall: JSON contract, endConversation set", () => {
+  const { reply, tool } = extractToolCall(
+    '{"reply": "Thanks for letting me know. We will move on now.", "endConversation": {"cravingScore": 6, "obstacleCategory": "mind_wandering"}}',
+  );
+  assert.equal(reply, "Thanks for letting me know. We will move on now.");
+  assert.equal(
+    tool,
+    "endConversation{cravingScore:6,obstacleCategory:mind_wandering}",
+  );
+});
+
+await test("extractToolCall: JSON with model preamble still parsed", () => {
+  const { reply, tool } = extractToolCall(
+    'Sure! {"reply": "Okay.", "endConversation": null} ',
+  );
+  assert.equal(reply, "Okay.");
+  assert.equal(tool, null);
+});
+
+await test("extractToolCall: legacy literal still works (fallback)", () => {
+  const { reply, tool } = extractToolCall(
+    "You did real work today.\nendConversation{cravingScore:4,obstacleCategory:none}",
+  );
+  assert.equal(reply, "You did real work today.");
+  assert.equal(tool, "endConversation{cravingScore:4,obstacleCategory:none}");
+});
+
 await test("extractToolCall: no tool => reply passthrough", () => {
   const { reply, tool } = extractToolCall("  just a normal reply  ");
   assert.equal(reply, "just a normal reply");

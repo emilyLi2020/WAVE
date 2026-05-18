@@ -82,9 +82,11 @@ Warm, grounded, unhurried. Plain language, short sentences. Never clinical or ro
 Speak like a calm, skilled friend who knows this territory well.
 
 OUTPUT
-Reply with the next agent turn only — short plain prose, no markdown, no bullet lists, no
-JSON. Two to four short sentences is the typical length. Do not announce what turn this is.
-Do not narrate "I'm now going to validate" — just speak.`;
+Patient-facing text is short plain spoken prose — no markdown, no bullet lists, no emoji,
+no quotation marks. Two to four short sentences is the typical length. Do not announce what
+turn this is. Do not narrate "I'm now going to validate" — just speak. The exact response
+format (plain prose vs. a JSON object) is defined by the surface instructions that follow
+this prompt; this rule governs only the spoken wording, not the structure.`;
 
 /**
  * Compact system prompt for the STOCK Gemma 4 LiteRT path ONLY.
