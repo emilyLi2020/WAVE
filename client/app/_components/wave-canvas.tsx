@@ -18,6 +18,8 @@
 
 import { useEffect, useRef } from "react";
 
+import { getWaveIntensity } from "@/lib/session/wave-intensity";
+
 const HORIZON = 0.72; // calm "session" posture
 const LAYERS = [
   { ampFrac: 0.55, freq: 0.0034, speed: 0.00018, phase: 0.0, fillA: 0.2, fillB: 0.02 },
@@ -119,6 +121,15 @@ export function WaveCanvas() {
         c.arc(p.x, p.y, p.r, 0, Math.PI * 2);
         c.fill();
       }
+
+      // Ease the swell toward the live craving intensity, exactly like
+      // the mobile session demo's scoreToAmpFrac (0.12 + (s/10)*0.7).
+      // No override (null) → hold the calm 0.42 default. Per-frame
+      // exponential ease keeps it smooth while the patient drags.
+      const intensity = getWaveIntensity();
+      const targetAmp =
+        intensity == null ? 0.42 : 0.12 + (intensity / 10) * 0.7;
+      s.amp += (targetAmp - s.amp) * 0.04;
 
       const horizonY = h * HORIZON;
       const ampPx = s.amp * (h * 0.42);

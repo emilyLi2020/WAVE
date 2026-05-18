@@ -1,6 +1,33 @@
+import path from "node:path";
+
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // The real app lives in client/ with its own pnpm install. A stray
+  // package-lock.json at the repo root (Wave/, no node_modules there)
+  // makes Turbopack infer Wave/ as the workspace root, so PostCSS then
+  // fails to resolve `tailwindcss` from a directory with no modules.
+  // Pin the root to this directory so resolution stays in client/.
+  turbopack: {
+    root: path.join(__dirname),
+  },
+  // These ML/native/wasm packages are ~1.6 GB on disk (transformers.js
+  // pulls onnxruntime-node's native .node binaries + large wasm). Left
+  // un-externalized, `next dev` (Turbopack) tries to crawl and bundle
+  // them into a single Node process and OOM-kills the dev server.
+  // They're only ever used in the browser via lazy `await import()`
+  // in lib/gemma, lib/voice and lib/wllama, so treating them as
+  // external (required at runtime, never bundled) is behavior-neutral.
+  serverExternalPackages: [
+    "onnxruntime-node",
+    "onnxruntime-web",
+    "@huggingface/transformers",
+    "@browser-ai/transformers-js",
+    "@wllama/wllama",
+    "@mediapipe/tasks-genai",
+    "@mlc-ai/web-llm",
+    "kokoro-js",
+  ],
   async rewrites() {
     return [
       {

@@ -5,6 +5,10 @@
  *
  *   intake → safety → loop(loadingChunk → chunk N → check-in N) for N=1..5 → reflection → done
  *
+ * Demo mode shortens the arc to two generations: chunk 1 (settling)
+ * then chunk 5 (closing reflection chunk), each with its check-in,
+ * then straight to reflection. See the `checkInCompleted` reducer.
+ *
  * The visual flow mirrors the interactive prototype (/demo): immersive
  * full-bleed screens over the WaveSkin ocean, no card/heading chrome.
  * `loadingChunk` is presented as the prototype's breath orb so the
@@ -213,12 +217,21 @@ function reducer(state: State, action: Action): State {
       // Hand off to the chunk loader. The breath orb stays on screen
       // with soft breath cues until the next chunk is ready. There is
       // no fixed-duration countdown.
+      //
+      // Demo mode collapses the five-chunk arc to two generations:
+      // chunk 1 (settling) then chunk 5 (closing reflection chunk),
+      // so check-in 1 jumps straight to chunk 5 and check-in 5 falls
+      // into the `=== 5` branch above → reflection. Chunk 5 keeps the
+      // existing closing check-in shape the full demo already used.
+      const nextChunk: ChunkNumber = state.demoMode
+        ? 5
+        : ((action.checkIn.chunkNumber + 1) as ChunkNumber);
       return {
         ...state,
         checkIns,
         sessionHistory,
         phase: "loadingChunk",
-        currentChunk: (action.checkIn.chunkNumber + 1) as ChunkNumber,
+        currentChunk: nextChunk,
         generatedChunk: null,
       };
     }
@@ -357,7 +370,9 @@ export function SessionMachine() {
     state.phase === "loadingChunk" || state.phase === "chunk";
 
   const reflectionContext: ReflectionContext | null = useMemo(() => {
-    if (!profile || !state.intake || state.checkIns.length < 5) return null;
+    const requiredCheckIns = state.demoMode ? 2 : 5;
+    if (!profile || !state.intake || state.checkIns.length < requiredCheckIns)
+      return null;
     const finalCheckIn = state.checkIns[state.checkIns.length - 1];
     const finalScore = finalCheckIn.cravingScore;
     const durationSeconds = Math.max(
@@ -381,6 +396,7 @@ export function SessionMachine() {
     state.checkIns,
     state.usedSubstanceToday,
     state.startedAt,
+    state.demoMode,
   ]);
 
   // When a session completes, prepend it to the on-device completed-

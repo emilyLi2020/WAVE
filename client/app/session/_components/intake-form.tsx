@@ -14,13 +14,14 @@
  * demo-mode toggle rides in the topbar for reviewers.
  */
 
-import { useRef, useState, useSyncExternalStore } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 
 import {
   getOnboardingMatServerSnapshot,
   getOnboardingMatSnapshot,
   subscribeOnboardingProfile,
 } from "@/lib/onboarding/profile";
+import { setWaveIntensity } from "@/lib/session/wave-intensity";
 import type {
   MatType,
   MedicationStatus,
@@ -94,6 +95,14 @@ export function IntakeForm({ onSubmit }: Props) {
   const [trigger, setTrigger] = useState<TriggerCategory | null>(null);
   const [triggerOther, setTriggerOther] = useState("");
   const [demoMode, setDemoMode] = useState(false);
+
+  // Drive the shared root WaveCanvas swell from the entered craving,
+  // live, like the mobile session demo. Reset on unmount so the rest of
+  // the session (and any other route) returns to the calm default.
+  useEffect(() => {
+    setWaveIntensity(intensity);
+  }, [intensity]);
+  useEffect(() => () => setWaveIntensity(null), []);
 
   const skipsDose = matType === "none";
   const total = matType && !skipsDose ? 4 : 3;
@@ -315,23 +324,28 @@ function IntakeIntensity({
 }) {
   const touched = value != null;
   const current = value ?? 5;
-  const trackRef = useRef<HTMLDivElement>(null);
+  const zoneRef = useRef<HTMLDivElement>(null);
   const min = 1;
   const max = 10;
-  const pct = ((current - min) / (max - min)) * 100;
 
-  function valueAt(clientX: number): number {
-    const r = trackRef.current?.getBoundingClientRect();
-    if (!r) return current;
-    const ratio = (clientX - r.left) / r.width;
-    return Math.round(min + Math.max(0, Math.min(1, ratio)) * (max - min));
+  // Vertical drag: top of the zone = strongest (10), bottom = 1 — the
+  // same mapping as the mobile session demo's drag-the-wave intake
+  // (applyDragY: ratio = 1 - localY/zoneH; v = round(1 + ratio*9)). The
+  // shared ocean rises live with the value via the wave-intensity store.
+  function valueAt(clientY: number): number {
+    const r = zoneRef.current?.getBoundingClientRect();
+    if (!r || r.height === 0) return current;
+    const ratio = 1 - (clientY - r.top) / r.height;
+    return Math.round(
+      min + Math.max(0, Math.min(1, ratio)) * (max - min),
+    );
   }
 
   function onPointerDown(e: React.PointerEvent<HTMLDivElement>) {
     e.preventDefault();
     e.currentTarget.setPointerCapture?.(e.pointerId);
-    onChange(valueAt(e.clientX));
-    const onMove = (ev: PointerEvent) => onChange(valueAt(ev.clientX));
+    onChange(valueAt(e.clientY));
+    const onMove = (ev: PointerEvent) => onChange(valueAt(ev.clientY));
     const onUp = () => {
       window.removeEventListener("pointermove", onMove);
       window.removeEventListener("pointerup", onUp);
@@ -343,11 +357,11 @@ function IntakeIntensity({
   }
 
   function onKeyDown(e: React.KeyboardEvent<HTMLDivElement>) {
-    if (e.key === "ArrowRight" || e.key === "ArrowUp") {
+    if (e.key === "ArrowUp" || e.key === "ArrowRight") {
       e.preventDefault();
       onChange(Math.min(max, current + 1));
     }
-    if (e.key === "ArrowLeft" || e.key === "ArrowDown") {
+    if (e.key === "ArrowDown" || e.key === "ArrowLeft") {
       e.preventDefault();
       onChange(Math.max(min, current - 1));
     }
@@ -361,11 +375,6 @@ function IntakeIntensity({
     }
   }
 
-  const fill = `linear-gradient(90deg,
-    color-mix(in oklab, var(--accent) 65%, transparent) 0%,
-    var(--accent) 60%,
-    var(--wave-peak) 100%)`;
-
   return (
     <>
       <span className="eyebrow">Question 1 · intensity</span>
@@ -373,59 +382,34 @@ function IntakeIntensity({
       <p className="lede" style={{ margin: 0 }}>
         {touched
           ? `${INTENSITY_LABELS[current - 1]}.`
-          : "Drag the slider. There's no wrong answer."}
+          : "Drag the wave up or down. There's no wrong answer."}
       </p>
-      <div style={{ flex: 1, minHeight: 40 }} />
-      <div className="intensity lg">
-        <div className="intensity-readout">
-          <span
-            className="intensity-num"
-            style={{ opacity: touched ? 1 : 0.25 }}
-            aria-live="polite"
-          >
-            {current}
-            <span className="intensity-unit">/10</span>
+      <div
+        ref={zoneRef}
+        className="drag-zone"
+        role="slider"
+        tabIndex={0}
+        aria-label="Craving intensity"
+        aria-valuemin={min}
+        aria-valuemax={max}
+        aria-valuenow={current}
+        aria-valuetext={
+          touched ? `${current} of 10 — ${INTENSITY_LABELS[current - 1]}` : undefined
+        }
+        onPointerDown={onPointerDown}
+        onKeyDown={onKeyDown}
+      >
+        <div
+          className={`drag-readout ${touched ? "touched" : ""}`}
+          aria-hidden
+        >
+          <span className="num">{current}</span>
+          <span className="denom">/10</span>
+          <span className="label">
+            {touched ? INTENSITY_LABELS[current - 1] : "drag the wave"}
           </span>
         </div>
-        <div
-          ref={trackRef}
-          className="intensity-track"
-          role="slider"
-          tabIndex={0}
-          aria-valuemin={min}
-          aria-valuemax={max}
-          aria-valuenow={current}
-          onPointerDown={onPointerDown}
-          onKeyDown={onKeyDown}
-        >
-          <div className="intensity-track-bg" />
-          <div
-            className="intensity-track-fill"
-            style={{ width: `${pct}%`, background: fill }}
-          />
-          <div className="intensity-ticks" aria-hidden>
-            {Array.from({ length: 10 }, (_, i) => (
-              <span
-                key={i}
-                className="intensity-tick"
-                style={{ left: `${(i / 9) * 100}%` }}
-              />
-            ))}
-          </div>
-          <div
-            className="intensity-thumb"
-            style={{ left: `${pct}%` }}
-            aria-hidden
-          >
-            <span className="intensity-thumb-dot" />
-          </div>
-        </div>
-        <div className="scale-rail" style={{ marginTop: 14 }}>
-          <span>Barely there</span>
-          <span>Unbearable</span>
-        </div>
       </div>
-      <div style={{ flex: 1, minHeight: 20 }} />
     </>
   );
 }

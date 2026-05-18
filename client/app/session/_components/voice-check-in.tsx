@@ -4,7 +4,7 @@
  * Voice-driven multi-turn check-in — re-skinned to the interactive
  * prototype's check-in screen:
  *
- *   - crumb "Check-in N of 5"
+ *   - crumb "Check-in N of 5" ("Check-in N of 2" in demo mode)
  *   - big italic-serif score readout (value /10 + intensity word) that
  *     glow-flashes when a new score is committed
  *   - the prototype's 88 px voice orb (ring stack), state-driven
@@ -238,11 +238,32 @@ export function VoiceCheckIn({
         }
       }
 
+      // Demo mode: deterministic 2-patient-turn script, mirroring the
+      // mobile session demo (mobile use-check-in-voice-loop.ts:
+      // `demoMode ? patientTurns >= 2 : …`). The flow is fixed —
+      // opener asks for the 1–10 score → P1 (score) → A1 (reply) → P2
+      // (body location) → A2 (acknowledgment) → end — so we ignore the
+      // model's endConversation/heuristics entirely and finalize once
+      // two patient turns are in. `onTurnComplete` fires only after the
+      // hook has awaited TTS playback to completion, so this lands
+      // exactly when A2 has finished speaking; the reducer then
+      // auto-advances to the next step.
+      const patientTurns = turnsRef.current.filter(
+        (t) => t.role === "patient",
+      ).length;
+      if (demoMode && patientTurns >= 2) {
+        finalizeCheckIn({
+          cravingScore: cravingScoreRef.current ?? resolveActiveScore(),
+          obstacleCategory: null,
+        });
+        return;
+      }
+
       if (event.endConversation) {
         finalizeCheckIn(event.endConversation);
       }
     },
-    [commitScore, finalizeCheckIn, resolveActiveScore],
+    [commitScore, demoMode, finalizeCheckIn, resolveActiveScore],
   );
 
   const handleError = useCallback((err: Error) => {
@@ -318,7 +339,11 @@ export function VoiceCheckIn({
   return (
     <div className="screen">
       <div className="topbar">
-        <span className="crumb">Check-in {chunkNumber} of 5</span>
+        <span className="crumb">
+          {demoMode
+            ? `Check-in ${chunkNumber === 1 ? 1 : 2} of 2`
+            : `Check-in ${chunkNumber} of 5`}
+        </span>
       </div>
 
       <div className="screen-body" style={{ paddingTop: 8, gap: 18 }}>

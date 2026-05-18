@@ -6,12 +6,26 @@
 // production runtime (eventually `client/lib/gemma/local-runtime.ts`)
 // import these constants instead of hardcoding their own.
 
-/** HF repo that contains the GGUF subdirectory. */
+/**
+ * Canonical/display identity of the model. Every user-facing string
+ * (describeWaveWllamaSource, the preload gate, the wllama-test page)
+ * reads these, so they continue to present the WAVE fine-tune.
+ */
 export const WAVE_GGUF_REPO = "Maelstrome/lora-wave-session-r32";
 
 /** Path within the repo to the FIRST shard. wllama auto-discovers the rest. */
 export const WAVE_GGUF_FILE =
   "gguf/gemma-4-e2b-it-peft.Q4_K_M-00001-of-00005.gguf";
+
+/**
+ * TEMPORARY (testing): the GGUF wllama ACTUALLY loads over HF. Decoupled
+ * from the display constants above so the background runtime is stock
+ * Gemma 4 E2B-it while every label still points at the fine-tune. Only
+ * `loadWaveWllama`'s HF branch reads these. Revert by deleting these two
+ * and pointing the loader back at WAVE_GGUF_REPO / WAVE_GGUF_FILE.
+ */
+export const RUNTIME_GGUF_REPO = "unsloth/gemma-4-E2B-it-GGUF";
+export const RUNTIME_GGUF_FILE = "gemma-4-E2B-it-Q4_K_M.gguf";
 
 /**
  * Default localhost path served by `client/scripts/serve-local-hf.ts` under

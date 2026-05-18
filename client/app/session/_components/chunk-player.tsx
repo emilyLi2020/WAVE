@@ -192,7 +192,9 @@ export function ChunkPlayer({
   const pct = total > 0 ? ((currentSegmentIndex + 1) / total) * 100 : 0;
 
   const ack = MAT_ACK[matType] ?? MAT_ACK.none;
-  const crumb = `Chunk ${chunkNumber} of 5 · ${CHUNK_PHASE_WORD[chunkNumber]}`;
+  const crumb = demoMode
+    ? `Chunk ${chunkNumber === 1 ? 1 : 2} of 2 · ${CHUNK_PHASE_WORD[chunkNumber]}`
+    : `Chunk ${chunkNumber} of 5 · ${CHUNK_PHASE_WORD[chunkNumber]}`;
 
   return (
     <div className="screen">

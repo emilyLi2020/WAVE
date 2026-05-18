@@ -17,6 +17,12 @@
    ============================================================ */
 
 .wave-session {
+  /* Immersive full-bleed shell (see page.tsx) — never scroll
+     horizontally. `clip` (not `hidden`) so it doesn't create a scroll
+     container or clip the fixed WaveCanvas behind it. Scoped to
+     .wave-session, so zero blast radius outside the session route. */
+  overflow-x: clip;
+
   /* base tokens */
   --surface: rgba(8, 22, 38, 0.62);
   --surface-mute: rgba(7, 24, 42, 0.45);
@@ -496,11 +502,22 @@
 /* ── drag-the-wave intake ─────────────────────────────────── */
 
 .wave-session .drag-zone {
-  position: absolute;
-  inset: 0;
-  z-index: 5;
+  position: relative;
+  flex: 1;
+  align-self: stretch;
+  min-height: 280px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: ns-resize;
   touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.wave-session .drag-zone:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+  border-radius: 18px;
 }
 .wave-session .drag-readout { text-align: center; pointer-events: none; }
 .wave-session .drag-readout .num {

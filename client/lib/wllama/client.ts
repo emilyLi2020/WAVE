@@ -12,6 +12,8 @@ import {
   isLikelyMobileDevice,
   LOCAL_GGUF_FIRST_SHARD,
   LOCAL_GGUF_HOST,
+  RUNTIME_GGUF_FILE,
+  RUNTIME_GGUF_REPO,
   WAVE_GGUF_DEFAULT_N_CTX,
   WAVE_GGUF_FILE,
   WAVE_GGUF_MOBILE_CACHE_TYPE,
@@ -263,8 +265,11 @@ export async function loadWaveWllama(
     const url = `${localHost}${LOCAL_GGUF_FIRST_SHARD}`;
     await wllama.loadModelFromUrl(url, loadParams);
   } else {
+    // TEMPORARY (testing): load stock Gemma 4 E2B-it in the background.
+    // Display strings still read WAVE_GGUF_REPO/FILE (the fine-tune) —
+    // see config.ts. Revert by switching this back to WAVE_GGUF_*.
     await wllama.loadModelFromHF(
-      { repo: WAVE_GGUF_REPO, file: WAVE_GGUF_FILE },
+      { repo: RUNTIME_GGUF_REPO, file: RUNTIME_GGUF_FILE },
       loadParams,
     );
   }
