@@ -31,7 +31,7 @@ import {
   withTiming,
 } from "react-native-reanimated";
 
-import { WaveColors } from "@/constants/wave-theme";
+import { OCEAN_BACKGROUND_IMAGE, WaveColors } from "@/constants/wave-theme";
 
 const HORIZON = 0.68; // mean sea level as a fraction of screen height
 
@@ -89,8 +89,36 @@ function Particle({
   );
 }
 
-export function WaveBackground({ intensity = 4 }: { intensity?: number }) {
+export function WaveBackground({
+  intensity = 4,
+  paused = false,
+}: {
+  intensity?: number;
+  /**
+   * Freeze the animated Skia canvas and render a static gradient ocean
+   * instead. Used on the model/voice-heavy screens (chunk, check-in):
+   * a continuously-redrawing Metal canvas next to a 2.5 GB LiteRT GPU
+   * model + whisper/onnxruntime Metal contexts was crashing the process
+   * (EXC_BAD_ACCESS during bridge teardown). The static ocean keeps the
+   * look without the per-frame GPU load.
+   */
+  paused?: boolean;
+}) {
   const { width: W, height: H } = useWindowDimensions();
+
+  if (paused) {
+    return (
+      <View
+        style={[StyleSheet.absoluteFill, { experimental_backgroundImage: OCEAN_BACKGROUND_IMAGE }]}
+        pointerEvents="none"
+      />
+    );
+  }
+
+  return <AnimatedOcean intensity={intensity} W={W} H={H} />;
+}
+
+function AnimatedOcean({ intensity, W, H }: { intensity: number; W: number; H: number }) {
   const clock = useClock();
 
   // Smooth amplitude toward the score target (prototype eased toward it).

@@ -26,14 +26,17 @@ export function WaveScreen({
   children,
   intensity,
   contentStyle,
+  staticWave,
 }: {
   children: ReactNode;
   intensity?: number;
   contentStyle?: StyleProp<ViewStyle>;
+  /** Freeze the ocean (static gradient) — for model/voice-heavy screens. */
+  staticWave?: boolean;
 }) {
   return (
     <View style={styles.screen}>
-      <WaveBackground intensity={intensity} />
+      <WaveBackground intensity={intensity} paused={staticWave} />
       <ScrollView
         style={styles.flex}
         contentContainerStyle={[styles.scrollContent, contentStyle]}

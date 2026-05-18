@@ -257,13 +257,20 @@ function streamOnce(
   prompt: string,
   options: GenerateOptions,
 ): Promise<string> {
+  console.log(`[wave][litert] streamOnce: resetConversation (prompt ${prompt.length} chars)`);
   llm.resetConversation();
   return new Promise<string>((resolve, reject) => {
     let accumulated = "";
     let resolved = false;
+    let firstToken = false;
     try {
+      console.log("[wave][litert] sendMessageAsync start");
       llm.sendMessageAsync(prompt, (token, done) => {
         if (resolved) return;
+        if (!firstToken) {
+          firstToken = true;
+          console.log("[wave][litert] first token");
+        }
         if (options.signal?.aborted) {
           resolved = true;
           reject(new DOMException("Aborted", "AbortError"));
@@ -273,10 +280,12 @@ function streamOnce(
         options.onDelta?.(accumulated);
         if (done) {
           resolved = true;
+          console.log(`[wave][litert] stream done (${accumulated.length} chars)`);
           resolve(accumulated);
         }
       });
     } catch (err) {
+      console.error("[wave][litert] sendMessageAsync threw:", err);
       reject(err as Error);
     }
   });
@@ -296,6 +305,9 @@ export async function generateWllamaChunk(
 
   const prompt = buildChunkPrompt(context);
   const combined = `${prompt.systemPrompt}\n\n${prompt.userPrompt}`;
+  console.log(
+    `[wave][litert] chunk prompt built (sys ${prompt.systemPrompt.length} + user ${prompt.userPrompt.length} = ${combined.length} chars)`,
+  );
 
   const raw = await streamOnce(llm, combined, options);
   throwIfAborted(options.signal);
