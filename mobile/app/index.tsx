@@ -1,194 +1,127 @@
-// Dev menu — root entry point during the build-up. After step 6 polish, this
-// becomes either a "start session" landing screen or gets gated behind a dev
-// build flag.
+// Home — the app's landing page (oceanic design).
+//
+// "Something's rising. Let's watch it." → start session enters the demo
+// flow at /session/intake. The old developer menu now lives in a
+// right-edge swipe-in panel (components/debug-drawer.tsx); swipe from the
+// right edge to reach the runtime tests / screen jumps / cache panel.
 
-import { Link } from "expo-router";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Link, useRouter } from "expo-router";
+import { StyleSheet, Text, View } from "react-native";
 
-import CachePanel from "@/screens/CachePanel";
+import { WaveBackground } from "@/components/wave-background";
+import { DebugDrawer } from "@/components/debug-drawer";
+import { WaveButton } from "@/components/wave-ui";
+import { WaveColors, WaveType } from "@/constants/wave-theme";
 
-interface Entry {
-  href: string;
-  title: string;
-  blurb: string;
-  status: "ready" | "wip" | "stub";
-}
-
-const TEST_ENTRIES: Entry[] = [
-  {
-    href: "/tests/litert",
-    title: "LiteRT smoke (fine-tune)",
-    blurb: "Loads our WAVE fine-tune bundle. Blocked on the wrapper-rebuild path (issue #13). Has the stock-Gemma sanity-check button.",
-    status: "wip",
-  },
-  {
-    href: "/tests/litert-stock",
-    title: "LiteRT (stock Gemma 4)",
-    blurb: "Prize demo: stock Gemma 4 E2B on the vendored GPU LiteRT-LM wrapper (~50 tok/s on device) running three real WAVE surfaces — phase narration, a 3-turn check-in that fires the endConversation tool call, and reflection.",
-    status: "ready",
-  },
-  {
-    href: "/tests/litert-stock-custom",
-    title: "LiteRT (stock Gemma 4, custom)",
-    blurb: "Same 3-surface harness as the prize demo, on the from-source libLiteRTLMEngine v0.11.0 dylib instead of PhoneClaw's CLiteRTLM. Passed the HANDOFF step-4 on-device acceptance — coherent output, tok/s in range of the ~50 baseline, MLDrift GPU cache present. The from-source binary is a proven drop-in.",
-    status: "ready",
-  },
-  {
-    href: "/tests/litert-sweep",
-    title: "LiteRT context sweep (Wave#15 Phase 0)",
-    blurb: "Sweeps engineMaxTokens × outputMaxTokens × backend × prompt-variant × WAVE surface on the stock bundle. Measures the real envelope (tokens, JSON validity, RAM, hangs).",
-    status: "wip",
-  },
-  {
-    href: "/tests/whisper",
-    title: "Whisper STT",
-    blurb: "Record audio with mic → whisper.rn (CoreML encoder) → transcript.",
-    status: "ready",
-  },
-  {
-    href: "/tests/kokoro",
-    title: "Kokoro TTS",
-    blurb: "Type/select text → react-native-sherpa-onnx Kokoro → audio playback.",
-    status: "ready",
-  },
-  {
-    href: "/tests/vad",
-    title: "Silero VAD",
-    blurb: "Live mic via sherpa-onnx + onnxruntime-react-native Silero v5. Indicator turns green when speech is detected.",
-    status: "ready",
-  },
-  {
-    href: "/tests/combined",
-    title: "Combined voice loop",
-    blurb: "Full hands-free loop: Silero VAD endpoints speech → Whisper base STT → Gemma 4 GPU LiteRT → Kokoro TTS → playback, with barge-in. See issue for the staged model-memory plan.",
-    status: "wip",
-  },
-];
-
-const SESSION_ENTRIES: Entry[] = [
-  { href: "/session/intake", title: "Intake", blurb: "Patient profile + intake intensity.", status: "stub" },
-  { href: "/session/safety", title: "Safety", blurb: "Rule-based safety screen.", status: "stub" },
-  { href: "/session/chunk", title: "Chunk", blurb: "Generated meditation chunk playback.", status: "stub" },
-  { href: "/session/checkin", title: "Check-in", blurb: "Multi-turn voice check-in.", status: "stub" },
-  { href: "/session/reflection", title: "Reflection", blurb: "Post-session card + next-step chips.", status: "stub" },
-];
-
-const NON_SESSION_ENTRIES: Entry[] = [
-  {
-    href: "/onboarding",
-    title: "Onboarding",
-    blurb: "Name, MAT type, dose time, consent. Hands off to /session/intake.",
-    status: "ready",
-  },
-  {
-    href: "/dashboard",
-    title: "Dashboard",
-    blurb: "Stats, 7×6 risk heatmap, this-week summary. Backed by mock-sessions.",
-    status: "ready",
-  },
-  {
-    href: "/history",
-    title: "History",
-    blurb: "Recent sessions with outcome chips. Export-PDF button is a stub.",
-    status: "ready",
-  },
-  {
-    href: "/insights",
-    title: "Insights",
-    blurb: "Static cards + regenerate via on-device Gemma (LiteRT-backed).",
-    status: "wip",
-  },
-];
-
-function StatusBadge({ status }: { status: Entry["status"] }) {
-  const colors: Record<Entry["status"], string> = {
-    ready: "#34D399",
-    wip: "#FBBF24",
-    stub: "#6B7280",
-  };
+function IconBtn({ href, label }: { href: string; label: string }) {
+  // Two tiny inline glyphs (history / dashboard) — bordered pills so we
+  // don't pull in an icon font just for these.
   return (
-    <View style={[styles.badge, { borderColor: colors[status] }]}>
-      <Text style={[styles.badgeText, { color: colors[status] }]}>{status}</Text>
-    </View>
-  );
-}
-
-function Row({ entry }: { entry: Entry }) {
-  return (
-    <Link href={entry.href as any} asChild>
-      <Pressable
-        style={({ pressed }) => [styles.row, pressed && styles.rowPressed]}
-      >
-        <View style={styles.rowHead}>
-          <Text style={styles.rowTitle}>{entry.title}</Text>
-          <StatusBadge status={entry.status} />
-        </View>
-        <Text style={styles.rowBlurb}>{entry.blurb}</Text>
-      </Pressable>
+    <Link href={href as never} asChild>
+      <View accessibilityRole="button" accessibilityLabel={label} style={styles.iconBtn}>
+        <Text style={styles.iconGlyph}>{label === "History" ? "↺" : "◔"}</Text>
+      </View>
     </Link>
   );
 }
 
-export default function DevMenu() {
+export default function HomeScreen() {
+  const router = useRouter();
+
   return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={styles.content}
-      contentInsetAdjustmentBehavior="automatic"
-    >
-      <Text style={styles.section}>Tests</Text>
-      <Text style={styles.sectionSub}>Isolated runtime smoke checks.</Text>
-      {TEST_ENTRIES.map((e) => (
-        <Row key={e.href} entry={e} />
-      ))}
+    <View style={styles.root}>
+      <WaveBackground intensity={4} />
 
-      <Text style={[styles.section, { marginTop: 24 }]}>Session flow</Text>
-      <Text style={styles.sectionSub}>Production screen skeletons — not yet wired to LiteRT.</Text>
-      {SESSION_ENTRIES.map((e) => (
-        <Row key={e.href} entry={e} />
-      ))}
-
-      <Text style={[styles.section, { marginTop: 24 }]}>Non-session pages</Text>
-      <Text style={styles.sectionSub}>Ports of the web surfaces around the session loop.</Text>
-      {NON_SESSION_ENTRIES.map((e) => (
-        <Row key={e.href} entry={e} />
-      ))}
-
-      <View style={{ marginTop: 24 }}>
-        <CachePanel />
+      <View style={styles.topbar}>
+        <View style={styles.topbarSide}>
+          <IconBtn href="/history" label="History" />
+          <IconBtn href="/dashboard" label="Dashboard" />
+        </View>
+        <Text style={styles.mark}>WAVE</Text>
+        <View style={styles.topbarSide} />
       </View>
-    </ScrollView>
+
+      <View style={styles.body}>
+        <View style={styles.grow} />
+
+        <Text style={styles.headline}>Something&apos;s rising.{"\n"}Let&apos;s watch it.</Text>
+        <Text style={styles.sub}>
+          A wave you don&apos;t have to fight. Just watch it crest and pass.
+        </Text>
+
+        <View style={styles.grow} />
+
+        <WaveButton
+          label="start session"
+          onPress={() => router.push("/session/intake")}
+          style={styles.cta}
+        />
+
+        <Text style={styles.crisis}>
+          In crisis? Call or text 988{"\n"}SAMHSA 1-800-662-HELP
+        </Text>
+      </View>
+
+      <DebugDrawer />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#08080C" },
-  content: { padding: 16, gap: 8 },
-  section: { color: "#F1F1F4", fontSize: 18, fontWeight: "700", marginTop: 4 },
-  sectionSub: { color: "#6B7280", fontSize: 12, marginBottom: 8 },
-  row: {
-    backgroundColor: "#16161F",
-    padding: 12,
-    borderRadius: 8,
-    borderCurve: "continuous",
-    borderWidth: 1,
-    borderColor: "#23232F",
-    marginBottom: 6,
-  },
-  rowPressed: { backgroundColor: "#1C1C28", borderColor: "#3F3F50" },
-  rowHead: {
+  root: { flex: 1, backgroundColor: WaveColors.bgDeep },
+  topbar: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+    paddingHorizontal: 22,
+    paddingTop: 64,
+    paddingBottom: 6,
+    gap: 8,
   },
-  rowTitle: { color: "#F1F1F4", fontSize: 15, fontWeight: "600" },
-  rowBlurb: { color: "#9CA3AF", fontSize: 12, marginTop: 4 },
-  badge: {
+  topbarSide: { flexDirection: "row", gap: 8, minWidth: 68 },
+  iconBtn: {
+    width: 30,
+    height: 30,
+    borderRadius: 999,
     borderWidth: 1,
-    borderRadius: 4,
-    borderCurve: "continuous",
-    paddingHorizontal: 6,
-    paddingVertical: 2,
+    borderColor: WaveColors.border,
+    backgroundColor: WaveColors.surface,
+    alignItems: "center",
+    justifyContent: "center",
   },
-  badgeText: { fontSize: 10, fontWeight: "700", textTransform: "uppercase", letterSpacing: 1 },
+  iconGlyph: { color: WaveColors.inkMute, fontSize: 14, lineHeight: 18 },
+  mark: {
+    fontFamily: WaveType.serif,
+    fontStyle: "italic",
+    fontSize: 20,
+    color: WaveColors.inkSoft,
+  },
+  body: { flex: 1, paddingHorizontal: 28, alignItems: "center", paddingBottom: 40 },
+  grow: { flex: 1, minHeight: 12 },
+  headline: {
+    fontFamily: WaveType.serif,
+    fontStyle: "italic",
+    fontSize: 42,
+    lineHeight: 46,
+    letterSpacing: -1,
+    color: WaveColors.ink,
+    textAlign: "center",
+  },
+  sub: {
+    marginTop: 14,
+    fontSize: 14,
+    lineHeight: 21,
+    color: WaveColors.inkMute,
+    textAlign: "center",
+    fontFamily: WaveType.sans,
+  },
+  cta: { marginBottom: 18 },
+  crisis: {
+    fontFamily: WaveType.mono,
+    fontSize: 11,
+    lineHeight: 18,
+    letterSpacing: 1,
+    color: WaveColors.inkFaint,
+    textAlign: "center",
+  },
 });
