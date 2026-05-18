@@ -316,8 +316,25 @@ export default function LiteRTStockScreenBase({
           .join("\n");
         const combined = `${systemJson}\n\n${transcript}\n\nWAVE:`;
         llm.resetConversation();
+        console.log(
+          `[citrace] turn ${history.length}/${patientTurns.length} ` +
+            `promptLen=${combined.length}\n` +
+            `===== PROMPT SENT TO LLM (sendMessage) =====\n${combined}\n` +
+            `===== END PROMPT =====`,
+        );
         const raw = await llm.sendMessage(combined);
+        console.log(
+          `[citrace] turn ${history.length} rawLen=${raw.length}\n` +
+            `===== RAW LLM OUTPUT =====\n${raw}\n===== END RAW =====`,
+        );
         const { reply, tool } = extractToolCall(raw);
+        console.log(
+          `[citrace] turn ${history.length} parsed: tool=${
+            tool ?? "null"
+          } replyLen=${reply.length} replyHead=${JSON.stringify(
+            reply.slice(0, 100),
+          )}`,
+        );
         last = reply;
         lastTool = tool;
         history.push({ role: "WAVE", content: reply });
