@@ -267,41 +267,36 @@ function streamOnce(
   prompt: string,
   options: GenerateOptions,
 ): Promise<string> {
+  // NON-streaming sendMessage — the proven path used by BOTH working
+  // screens (LiteRTStockScreenBase + CombinedVoiceTestScreen). On this
+  // wrapper, sendMessageAsync's per-token callback yields chat-delta
+  // ENVELOPES — `{"role":"assistant","content":[{"type":"text",
+  // "text":"<piece>"}]}` — one per token; concatenating them verbatim
+  // (what we did before) produced that envelope soup instead of the
+  // model's actual `{"lines":[...]}`. sendMessage returns the already
+  // -decoded plain text, exactly like the two screens that work.
   console.log(`[wave][litert] streamOnce: resetConversation (prompt ${prompt.length} chars)`);
   llm.resetConversation();
-  return new Promise<string>((resolve, reject) => {
-    let accumulated = "";
-    let resolved = false;
-    let firstToken = false;
+  throwIfAborted(options.signal);
+  return (async () => {
+    console.log("[wave][litert] sendMessage start");
+    let accumulated: string;
     try {
-      console.log("[wave][litert] sendMessageAsync start");
-      llm.sendMessageAsync(prompt, (token, done) => {
-        if (resolved) return;
-        if (!firstToken) {
-          firstToken = true;
-          console.log("[wave][litert] first token");
-        }
-        if (options.signal?.aborted) {
-          resolved = true;
-          reject(new AbortError());
-          return;
-        }
-        accumulated += token;
-        options.onDelta?.(accumulated);
-        if (done) {
-          resolved = true;
-          console.log(`[wave][litert] stream done (${accumulated.length} chars)`);
-          console.log(
-            `[wave][litert] ===== RAW MODEL OUTPUT =====\n${accumulated}\n===== END RAW =====`,
-          );
-          resolve(accumulated);
-        }
-      });
+      accumulated = await llm.sendMessage(prompt);
     } catch (err) {
-      console.error("[wave][litert] sendMessageAsync threw:", err);
-      reject(err as Error);
+      console.error("[wave][litert] sendMessage threw:", err);
+      throw err as Error;
     }
-  });
+    throwIfAborted(options.signal);
+    // Preserve the onDelta contract (fire once with the full text — the
+    // check-in path already expected a single end-of-stream emission).
+    options.onDelta?.(accumulated);
+    console.log(`[wave][litert] sendMessage done (${accumulated.length} chars)`);
+    console.log(
+      `[wave][litert] ===== RAW MODEL OUTPUT =====\n${accumulated}\n===== END RAW =====`,
+    );
+    return accumulated;
+  })();
 }
 
 // ────────────────────────────────────────────────────────────────────────
