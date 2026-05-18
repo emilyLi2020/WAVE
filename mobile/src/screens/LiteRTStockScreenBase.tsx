@@ -38,15 +38,19 @@ import type {
   ReflectionContext,
   SessionHistoryEntry,
 } from "@/prompts/schemas";
-// TEST (#25): the check-in surface runs the FULL WAVE_SYSTEM_PROMPT
-// ("the big one"), not the compact variant, to see how stock Gemma 4
-// handles the ~8 KB prompt (coherence vs KV overflow) at eng4096.
-import { WAVE_SYSTEM_PROMPT } from "@/prompts/wave-system";
+// A/B (#25): both check-in surfaces use the COMPACT persona at the
+// Wave#15-verified eng2048 (the prize-demo config). Surface #2 keeps the
+// original ad-hoc `endConversation{…}` literal — this is the ground-truth
+// test of whether compact+literal actually fires the tool (the claim
+// we'd been ASSUMING). Surface #3 (full 5-turn arc) uses Gemma's
+// documented tool_code function-call format instead — the cheap
+// experiment, at the genuine ending turn.
+import { WAVE_SYSTEM_PROMPT_STOCK_COMPACT } from "@/prompts/wave-system";
 import { ensureModel, getModelDir } from "@/runtime/model-cache";
 import { createLLM, type LiteRTLMInstance } from "react-native-litert-lm";
 
 const REQUESTED_BACKEND = "gpu" as const;
-export const ENGINE_MAX_TOKENS = 4096;
+export const ENGINE_MAX_TOKENS = 2048;
 export const OUTPUT_MAX_TOKENS = 512;
 
 const TOOL_OBSTACLES =
@@ -110,16 +114,31 @@ function fmtBytes(b: number): string {
  * with that literal stripped. No JSON wrapper.
  */
 function extractToolCall(raw: string): { reply: string; tool: string | null } {
-  const m = raw.match(/endConversation\s*\{([^}]*)\}/i);
-  if (!m) return { reply: raw.trim(), tool: null };
-  const args = m[1];
-  const score = args.match(/cravingScore\s*[:=]\s*(\d+)/i)?.[1] ?? "?";
-  const obst =
-    args.match(/obstacleCategory\s*[:=]\s*"?([a-zA-Z_]+)"?/i)?.[1] ?? "none";
-  return {
-    reply: raw.replace(m[0], "").trim(),
-    tool: `endConversation{cravingScore:${score},obstacleCategory:${obst}}`,
+  const norm = (
+    args: string,
+    consumed: string,
+  ): { reply: string; tool: string } => {
+    const score = args.match(/cravingScore\s*[:=]\s*"?(\d+)"?/i)?.[1] ?? "?";
+    const obst =
+      args.match(/obstacleCategory\s*[:=]\s*"?([a-zA-Z_]+)"?/i)?.[1] ?? "none";
+    return {
+      reply: raw.replace(consumed, "").trim(),
+      tool: `endConversation{cravingScore:${score},obstacleCategory:${obst}}`,
+    };
   };
+  // Gemma documented function-call: a ```tool_code``` fenced Python call.
+  const fenced = raw.match(/```tool_code\s*([\s\S]*?)```/i);
+  const inner = fenced
+    ? fenced[1].match(/endConversation\s*\(([^)]*)\)/i)
+    : null;
+  if (fenced && inner) return norm(inner[1] ?? "", fenced[0]);
+  // Bare Python-style paren call (no fence).
+  const paren = raw.match(/endConversation\s*\(([^)]*)\)/i);
+  if (paren) return norm(paren[1] ?? "", paren[0]);
+  // Legacy ad-hoc brace literal.
+  const brace = raw.match(/endConversation\s*\{([^}]*)\}/i);
+  if (brace) return norm(brace[1] ?? "", brace[0]);
+  return { reply: raw.trim(), tool: null };
 }
 
 export interface LiteRTStockHarnessProps {
@@ -270,7 +289,7 @@ export default function LiteRTStockScreenBase({
       // the wrapper's chat template produces each assistant turn, and the
       // conversation is preserved across sends (runSurface resets once).
       setNote("2/4 · check-in (3 quick turns)…");
-      const ciSystem = `${WAVE_SYSTEM_PROMPT}
+      const ciSystem = `${WAVE_SYSTEM_PROMPT_STOCK_COMPACT}
 
 You are running a post-chunk check-in with the patient. The patient's first message is their craving score (1-10). Reply naturally in 1-3 short plain sentences each turn — validate, then one question — no markdown.
 
@@ -296,9 +315,34 @@ where N is their latest score and CAT is one of: ${TOOL_OBSTACLES} (use none if 
       // ── 3. Full-arc check-in → ending turn. Drives the real WAVE
       // 5-turn arc (score → body → obstacle → technique landed →
       // readiness confirmed) so the model is AT the genuine ending
-      // point — the test for whether endConversation actually fires
-      // with the full prompt (vs the 3-turn surface which is mid-arc).
-      setNote("3/4 · full-arc check-in (→ ending turn)…");
+      // point, using Gemma's documented tool_code function-call format
+      // (vs surface #2's ad-hoc brace literal — A/B for what fires).
+      setNote("3/4 · full-arc check-in (Gemma tool_code → ending)…");
+      // Gemma's DOCUMENTED function-calling format: declare the tool as a
+      // Python signature, instruct a ```tool_code``` fenced call. This is
+      // the format Gemma was trained to emit — vs surface #2's ad-hoc
+      // brace literal. Compact persona, same eng2048.
+      const ciSystemGemmaTool = `${WAVE_SYSTEM_PROMPT_STOCK_COMPACT}
+
+You are running a post-chunk check-in. The patient's first message is their craving score (1-10). Each turn: validate, then ask one question, in 1-3 short plain sentences. No markdown.
+
+You have access to one tool:
+
+\`\`\`python
+def endConversation(cravingScore: int, obstacleCategory: str) -> None:
+    """Signal the check-in is complete. Call only after the patient has clearly said they are ready to continue.
+
+    Args:
+        cravingScore: the patient's latest craving score, an integer 1-10.
+        obstacleCategory: one of: ${TOOL_OBSTACLES}. Use "none" if no clear obstacle.
+    """
+\`\`\`
+
+When (and only when) the patient has clearly said they are ready to continue, first give one brief warm closing line with no question, then on a new line output the call inside a tool_code block, exactly:
+\`\`\`tool_code
+endConversation(cravingScore=6, obstacleCategory="none")
+\`\`\`
+Do not call it before the patient is ready, and call it at most once.`;
       const ciTurnsFullArc = [
         "It's about a seven.",
         "It's mostly in my chest, tight, but it eased a little near the end.",
@@ -309,8 +353,8 @@ where N is their latest score and CAT is one of: ${TOOL_OBSTACLES} (use none if 
       acc.push(
         await runSurface(
           modelPath,
-          "Full-arc check-in (5 turns → ending)",
-          ciSystem,
+          "Full-arc check-in (Gemma tool_code, 5 turns → ending)",
+          ciSystemGemmaTool,
           ciTurnsFullArc,
         ),
       );
