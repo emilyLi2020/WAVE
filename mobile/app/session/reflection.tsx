@@ -13,7 +13,12 @@ import { generateReflection } from "@/gemma/session";
 import type { ReflectionPayload } from "@/lib/prompts/schemas";
 import { reflectionContextFromState } from "@/session/build-context";
 import { useSession } from "@/session/session-context";
-import { ensurePlaybackSession, speak, stopSpeaking } from "@/voice/kokoro";
+import {
+  ensureSpeakerRoute,
+  releaseSpeakerRoute,
+  speak,
+  stopSpeaking,
+} from "@/voice/kokoro";
 
 type Stage =
   | { status: "thinking" }
@@ -49,7 +54,7 @@ export default function ReflectionScreenRoute() {
         // Step 4 (issue #26): normalize the audio route — the prior
         // check-in's mic stream left the session in PlayAndRecord/
         // VoiceChat (louder) and never restored it.
-        ensurePlaybackSession()
+        ensureSpeakerRoute()
           .then(() => speak(`${headline} ${res.payload.insight}`))
           .catch(() => {});
       })
@@ -62,12 +67,14 @@ export default function ReflectionScreenRoute() {
     return () => {
       alive = false;
       stopSpeaking().catch(() => {});
+      releaseSpeakerRoute().catch(() => {});
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   function finish(choice?: string) {
     stopSpeaking().catch(() => {});
+    releaseSpeakerRoute().catch(() => {});
     if (choice) dispatch({ type: "nextStepPicked", choice });
     dispatch({ type: "sessionFinished" });
     // Snapshot this run as the most-recent History entry BEFORE the

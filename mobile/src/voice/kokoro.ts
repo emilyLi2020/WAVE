@@ -9,7 +9,7 @@
 // setAudioModeAsync({ allowsRecording: true }) while a phrase is
 // playing — sherpa's startPcmPlayer owns the session during playback.
 
-import { setAudioModeAsync } from "expo-audio";
+import { AudioModule, setAudioModeAsync } from "expo-audio";
 
 type StreamingTtsEngine = {
   generateSpeechStream: (
@@ -149,25 +149,65 @@ export function isSpeaking(): boolean {
   return speaking;
 }
 
+// Route-pin: a single resident sherpa PCM input stream that, like the
+// check-in's mic stream, forces the iOS communication route (physical
+// loud speaker, NOT the media bus screen/audio recorders capture).
+let routePinStop: (() => Promise<void>) | null = null;
+
 /**
- * Pin the audio route to the physical loud speaker, NOT the standard
- * media-playback bus (issue #26).
+ * Pin the audio route to the physical loud speaker so chunk/reflection
+ * TTS comes out the device speaker and is NOT piped into screen/audio
+ * recording software (issue #26).
  *
- * `{ playsInSilentMode: true }` alone = AVAudioSession **Playback**
- * category → the normal media route that screen/audio recorders tap, so
- * chunk/reflection TTS got "piped into the recording software". The
- * check-in screen instead uses `{ allowsRecording: true }`
- * (= **PlayAndRecord**); iOS treats that as a communication route +
- * sherpa's startPcmPlayer forces DefaultToSpeaker → it comes out the
- * device's loud speaker and recorders do NOT capture it. Matching the
- * check-in's exact session config here makes every phase behave the
- * same way the (working) check-in does.
+ * The PlayAndRecord *category* alone was NOT enough — the check-in only
+ * gets the speaker/communication route because it keeps an ACTIVE
+ * sherpa PCM input stream open during TTS. So mirror that exactly: set
+ * the same session AND open one muted/discarded input stream (we never
+ * read its data) for the duration of the speaking phase.
+ * `releaseSpeakerRoute()` tears it down on phase exit. Idempotent.
  */
-export async function ensurePlaybackSession(): Promise<void> {
+export async function ensureSpeakerRoute(): Promise<void> {
   await setAudioModeAsync({
     playsInSilentMode: true,
     allowsRecording: true,
   }).catch(() => {});
+  if (routePinStop) return;
+  try {
+    const perm = await AudioModule.requestRecordingPermissionsAsync();
+    if (!perm.granted) return; // category set; can't pin an input stream
+    // Lazy import — keep kokoro web/dev-safe (no static native binding).
+    // `typeof import(...)` is a type-only construct (erased at runtime).
+    const audio = (await import(
+      "react-native-sherpa-onnx/audio"
+    )) as typeof import("react-native-sherpa-onnx/audio");
+    const stream = audio.createPcmLiveStream({
+      sampleRate: 16_000,
+      channelCount: 1,
+    });
+    stream.onError(() => {}); // swallow; we never subscribe to onData
+    await stream.start();
+    routePinStop = () => stream.stop();
+    console.log("[wave][kokoro] speaker route pinned (input stream up)");
+  } catch (err) {
+    routePinStop = null;
+    console.warn(
+      "[wave][kokoro] speaker route-pin failed (falling back to session only):",
+      err instanceof Error ? err.message : err,
+    );
+  }
+}
+
+/** Release the route-pin input stream — call on speaking-phase exit. */
+export async function releaseSpeakerRoute(): Promise<void> {
+  const stop = routePinStop;
+  routePinStop = null;
+  if (stop) {
+    try {
+      await stop();
+    } catch {
+      /* already gone */
+    }
+  }
 }
 
 /** Stop playback + cancel any in-flight synthesis and release the player. */

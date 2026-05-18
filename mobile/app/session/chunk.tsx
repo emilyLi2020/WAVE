@@ -14,7 +14,12 @@ import { generateChunk } from "@/gemma/chunk";
 import { chunkContextFromState } from "@/session/build-context";
 import { useSession } from "@/session/session-context";
 import { useModelReady } from "@/session/use-model-ready";
-import { ensurePlaybackSession, speak, stopSpeaking } from "@/voice/kokoro";
+import {
+  ensureSpeakerRoute,
+  releaseSpeakerRoute,
+  speak,
+  stopSpeaking,
+} from "@/voice/kokoro";
 
 const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
 
@@ -85,6 +90,7 @@ export default function ChunkScreenRoute() {
     if (finishedRef.current) return;
     finishedRef.current = true;
     stopSpeaking().catch(() => {});
+    releaseSpeakerRoute().catch(() => {});
     dispatch({ type: "chunkCompleted" });
     router.replace("/session/checkin");
   }
@@ -103,7 +109,7 @@ export default function ChunkScreenRoute() {
       // A prior check-in's mic stream leaves the session in
       // PlayAndRecord/VoiceChat (louder gain) and never restores it, so
       // chunk 2+ would otherwise play uniformly loud.
-      await ensurePlaybackSession();
+      await ensureSpeakerRoute();
       for (let i = 0; i < lines.length; i++) {
         if (cancelled) return;
         setLineIdx(i);
@@ -125,6 +131,7 @@ export default function ChunkScreenRoute() {
     return () => {
       cancelled = true;
       stopSpeaking().catch(() => {});
+      releaseSpeakerRoute().catch(() => {});
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isThisChunk, chunkNo, lines.length]);
