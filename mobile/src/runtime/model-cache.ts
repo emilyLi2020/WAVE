@@ -172,16 +172,23 @@ export async function ensureModel(
   const dir = getModelDir(id);
   const file = getModelFile(id);
 
+  const size = file.exists ? (file.size ?? 0) : 0;
   if (opts?.force) {
     deleteFileIfExists(file);
-  } else if (file.exists && file.size === manifest.expectedBytes) {
+  } else if (file.exists && size >= manifest.minBytes) {
+    // Cache HIT. Use the SAME predicate as inspectModel()/the cache
+    // panel's green mark (>= minBytes) and as this function's own
+    // post-download validation. The old check required size ===
+    // expectedBytes EXACTLY, so a fully-downloaded, green-marked model
+    // whose real byte count differed from the hardcoded constant (HF
+    // CDN variance, manifest drift) was treated as a miss, DELETED, and
+    // re-downloaded 2.5 GB from 0% — even though the panel said cached.
     opts?.onProgress?.(1);
     return file.uri;
   } else if (file.exists) {
-    // Size mismatch — either a partial download from a prior attempt OR a
-    // stale bundle from a previous manifest version (e.g. the old 5 GB
-    // MediaPipe-flavored litert-wave bundle, now replaced by the 2.5 GB
-    // litert-torch re-export). Treat as miss either way.
+    // Smaller than minBytes — a genuine partial from an interrupted
+    // attempt, or a stale bundle from a previous manifest version. Can't
+    // be trusted; restart clean.
     deleteFileIfExists(file);
   }
 

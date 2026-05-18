@@ -161,9 +161,14 @@ export function preloadLiteRT(
       try {
         console.log(`${tag} ensureModel… (${cacheKey(config)})`);
         // ensureModel is idempotent — cheap on a cache hit.
+        let lastPctLogged = -1;
         const fileUri = await ensureModel(config.modelId, {
           onProgress: (pct) => {
-            console.log(`${tag} download ${Math.round(pct * 100)}%`);
+            const whole = Math.round(pct * 100);
+            if (whole !== lastPctLogged) {
+              lastPctLogged = whole;
+              console.log(`${tag} download ${whole}%`);
+            }
             opts?.onProgress?.(pct);
           },
         });
