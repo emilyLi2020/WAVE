@@ -57,6 +57,7 @@
       "expo-audio",
       "expo-asset",
       "onnxruntime-react-native",
+      "./plugins/with-local-notifications-only.js",
       "expo-notifications"
     ],
     "experiments": {
