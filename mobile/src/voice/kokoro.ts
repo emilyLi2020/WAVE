@@ -150,17 +150,24 @@ export function isSpeaking(): boolean {
 }
 
 /**
- * Assert a playback-only audio session (issue #26 Step 4). The check-in
- * voice loop's native PCM mic stream leaves the iOS session in
- * PlayAndRecord / VoiceChat / VoiceProcessing(AGC) — a louder output
- * gain stage — and its teardown never restores it. A subsequent
- * speaking-only phase (chunk narration, reflection) then plays into
- * that elevated-gain session = uniformly loud. Call this at the start
- * of any speaking-only phase to normalize the route to the known-good
- * KokoroTestScreen config (no allowsRecording) before the first speak().
+ * Pin the audio route to the physical loud speaker, NOT the standard
+ * media-playback bus (issue #26).
+ *
+ * `{ playsInSilentMode: true }` alone = AVAudioSession **Playback**
+ * category → the normal media route that screen/audio recorders tap, so
+ * chunk/reflection TTS got "piped into the recording software". The
+ * check-in screen instead uses `{ allowsRecording: true }`
+ * (= **PlayAndRecord**); iOS treats that as a communication route +
+ * sherpa's startPcmPlayer forces DefaultToSpeaker → it comes out the
+ * device's loud speaker and recorders do NOT capture it. Matching the
+ * check-in's exact session config here makes every phase behave the
+ * same way the (working) check-in does.
  */
 export async function ensurePlaybackSession(): Promise<void> {
-  await setAudioModeAsync({ playsInSilentMode: true }).catch(() => {});
+  await setAudioModeAsync({
+    playsInSilentMode: true,
+    allowsRecording: true,
+  }).catch(() => {});
 }
 
 /** Stop playback + cancel any in-flight synthesis and release the player. */
