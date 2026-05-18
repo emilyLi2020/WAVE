@@ -36,6 +36,11 @@ export default function RootLayout() {
             screenOptions={{
               headerShown: false,
               contentStyle: { backgroundColor: "#02060d" },
+              // Cross-fade over the shared ocean instead of the iOS
+              // push-slide, so entering the flow (Home → session) and
+              // the side pages feel like one continuous surface.
+              animation: "fade",
+              animationDuration: 220,
             }}
           >
             <Stack.Screen name="index" />
