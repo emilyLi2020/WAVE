@@ -224,14 +224,17 @@ export async function unloadLiteRT(config: LiteRTLoadConfig): Promise<void> {
 // (/tests/litert-stock, LiteRTStockScreenBase, ~50 tok/s GPU). The WAVE
 // fine-tune bundle ("litert-wave") is blocked on the wrapper-rebuild path
 // (Wave issue #13) and fails to load, so pointing the generators at it
-// was the "runtime error when loading model". Config mirrors the proven
-// stock screen exactly: stock bundle, GPU, 2048/512 token budget, no
-// load-time system prompt (each flow passes its full composed prompt as
-// one user message — see streamOnce + the header notes).
+// was the "runtime error when loading model".
+//
+// engineMaxTokens = 4096 (NOT 2048): the multi-turn check-in flattens a
+// growing transcript into one prompt; at 2048 the engine hard-errors
+// "input token ids are too long … 3782 >= 2048". 4096 is the proven
+// voice-path budget (CombinedVoiceTestScreen STOCK_GPU_CONFIG) and fits
+// the canonical prompt + contract + accumulating transcript.
 const WAVE_CONFIG: LiteRTLoadConfig = {
   modelId: "litert-stock-gemma4",
   backend: "gpu",
-  engineMaxTokens: 2048,
+  engineMaxTokens: 4096,
   outputMaxTokens: 512,
   temperature: 0,
   topK: 1,
@@ -288,6 +291,9 @@ function streamOnce(
         if (done) {
           resolved = true;
           console.log(`[wave][litert] stream done (${accumulated.length} chars)`);
+          console.log(
+            `[wave][litert] ===== RAW MODEL OUTPUT =====\n${accumulated}\n===== END RAW =====`,
+          );
           resolve(accumulated);
         }
       });
@@ -318,7 +324,11 @@ export async function generateWllamaChunk(
 
   const raw = await streamOnce(llm, combined, options);
   throwIfAborted(options.signal);
-  return { text: extractFirstJsonObject(raw) };
+  const extracted = extractFirstJsonObject(raw);
+  console.log(
+    `[wave][litert] chunk extracted JSON (${extracted.length} chars): ${extracted}`,
+  );
+  return { text: extracted };
 }
 
 // ────────────────────────────────────────────────────────────────────────
@@ -338,7 +348,11 @@ export async function generateWllamaReflection(
 
   const raw = await streamOnce(llm, combined, options);
   throwIfAborted(options.signal);
-  return { text: extractFirstJsonObject(raw) };
+  const extracted = extractFirstJsonObject(raw);
+  console.log(
+    `[wave][litert] reflection extracted JSON (${extracted.length} chars): ${extracted}`,
+  );
+  return { text: extracted };
 }
 
 // ────────────────────────────────────────────────────────────────────────
@@ -424,6 +438,9 @@ WAVE:`;
 
   const parsed = parseCheckInJson(raw);
   const replyText = sanitizeCheckInModelText(parsed.reply);
+  console.log(
+    `[wave][litert] checkin parsed reply="${replyText}" endConversation=${JSON.stringify(parsed.endConversation)}`,
+  );
   options.onDelta?.(replyText);
 
   const endConversation = normalizeEndConversation(parsed.endConversation);
