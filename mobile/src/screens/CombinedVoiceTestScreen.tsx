@@ -213,13 +213,14 @@ export default function CombinedVoiceTestScreen() {
   const speakingStartedAtRef = useRef(0);
   const mountedRef = useRef(true);
 
-  // Barge-in / duplex mode. Full-duplex (true) keeps the mic live during
-  // TTS so you can talk over the reply — requires the native AEC patch or
-  // headphones, else the speaker self-triggers. Half-duplex (false) mutes
-  // the mic while speaking: no barge-in, but bulletproof on an open
-  // speaker. The demo's guaranteed-safe fallback.
-  const [bargeIn, setBargeInState] = useState(true);
-  const bargeInRef = useRef(true);
+  // Barge-in / duplex mode. Default = half-duplex (false): mic muted
+  // during TTS, no barge-in, bulletproof on an open speaker — the
+  // device-tested, demo-safe path that this PR ships. Full-duplex (true)
+  // keeps the mic live so you can talk over the reply, but needs the
+  // native AEC build or headphones (else the speaker self-triggers);
+  // it's opt-in via the toggle and still unverified on device.
+  const [bargeIn, setBargeInState] = useState(false);
+  const bargeInRef = useRef(false);
   const setBargeIn = useCallback((v: boolean) => {
     bargeInRef.current = v;
     setBargeInState(v);
