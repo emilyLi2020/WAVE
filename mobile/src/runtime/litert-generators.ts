@@ -432,11 +432,41 @@ function throwIfAborted(signal: AbortSignal | undefined): void {
   if (signal?.aborted) throw new AbortError();
 }
 
+// Returns the first COMPLETE, balanced top-level JSON object in `text`.
+//
+// The old impl was slice(firstIndexOf "{", lastIndexOf "}") — fine for
+// the WAVE fine-tune (emits exactly one object), but stock Gemma 4 is
+// verbose: reasoning prose, ```json fences, and often more than one
+// brace block. Spanning the first "{" to the LAST "}" then swept up
+// trailing objects/prose → `JSON Parse error: Unexpected character: {`
+// → two strikes → scripted fallback (the "why is it scripted" symptom).
+//
+// This scans string-aware (so braces inside JSON string values don't
+// miscount) and stops at the matching close of the first object.
 export function extractFirstJsonObject(text: string): string {
   const start = text.indexOf("{");
-  const end = text.lastIndexOf("}");
-  if (start === -1 || end === -1 || end < start) return text.trim();
-  return text.slice(start, end + 1);
+  if (start === -1) return text.trim();
+  let depth = 0;
+  let inStr = false;
+  let esc = false;
+  for (let i = start; i < text.length; i++) {
+    const ch = text[i];
+    if (inStr) {
+      if (esc) esc = false;
+      else if (ch === "\\") esc = true;
+      else if (ch === '"') inStr = false;
+      continue;
+    }
+    if (ch === '"') inStr = true;
+    else if (ch === "{") depth += 1;
+    else if (ch === "}") {
+      depth -= 1;
+      if (depth === 0) return text.slice(start, i + 1);
+    }
+  }
+  // Unterminated — hand back from the first brace so JSON.parse throws a
+  // meaningful error and the two-strikes fallback still engages.
+  return text.slice(start).trim();
 }
 
 interface CheckInJsonOutput {
