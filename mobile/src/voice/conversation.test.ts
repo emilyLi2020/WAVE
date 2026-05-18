@@ -9,6 +9,8 @@ import {
   ConversationController,
   extractToolCall,
   sanitizeForVoice,
+  detectReadyToEnd,
+  parseCravingScore,
 } from "./conversation.ts";
 
 let passed = 0;
@@ -253,6 +255,47 @@ await test("runTurn stores the sanitized reply (no emoji/markdown)", async () =>
   assert.equal(r.reply, "Hey! I hear you Take a breath.");
   assert.equal(c.messages[1].text, "Hey! I hear you Take a breath.");
   assert.ok(!/[*_😊]/.test(c.messages[1].text));
+});
+
+await test("detectReadyToEnd: positives and negatives", () => {
+  for (const s of [
+    "Yeah, I'm ready to keep going.",
+    "let's continue",
+    "I'm done",
+    "okay move on",
+    "yeah let's go on",
+    "that's all, thanks",
+    "we're done here",
+  ]) {
+    assert.equal(detectReadyToEnd(s), true, `should END: "${s}"`);
+  }
+  for (const s of [
+    "It's about a seven.",
+    "My chest feels tight.",
+    "I kept wanting to check my phone.",
+    "Not really sure yet.",
+  ]) {
+    assert.equal(detectReadyToEnd(s), false, `should NOT end: "${s}"`);
+  }
+});
+
+await test("parseCravingScore: digits and words", () => {
+  assert.equal(parseCravingScore("It's about a seven."), 7);
+  assert.equal(parseCravingScore("6"), 6);
+  assert.equal(parseCravingScore("maybe a 10 right now"), 10);
+  assert.equal(parseCravingScore("ten, I think"), 10);
+  assert.equal(parseCravingScore("my chest is tight"), null);
+});
+
+await test("seedAssistant opens with WAVE; transcript is WAVE-first", () => {
+  const c = new ConversationController();
+  c.seedAssistant("On a scale of one to ten, what's your craving?");
+  assert.equal(c.messages.length, 1);
+  assert.equal(c.messages[0].role, "assistant");
+  const flat = c.messages
+    .map((m) => `${m.role === "user" ? "Patient" : "WAVE"}: ${m.text}`)
+    .join("\n");
+  assert.ok(flat.startsWith("WAVE: On a scale"));
 });
 
 await test("reset clears history", async () => {

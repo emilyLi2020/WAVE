@@ -86,6 +86,32 @@ export function extractToolCall(raw: string): {
   };
 }
 
+// Deterministic end-of-check-in detector. Stock Gemma will not reliably
+// set the structured endConversation field even when the patient clearly
+// ends — so the APP decides termination from the patient's words (this
+// is also how production check-in.ts owns turn/termination logic). The
+// model's JSON endConversation is still honored if it ever fires.
+const READY_RE =
+  /\b(i'?m (ready|done|good to (go|continue)|good)|ready to (go|continue|keep going|move on)|let'?s (keep going|continue|go on|move on|do it|begin|start)|keep going|move on|next (one|part|chunk|section)|that'?s (all|it|enough)|we'?re done|i'?m finished|stop( now)?|end (the )?(check ?in|session))\b/i;
+
+export function detectReadyToEnd(patientText: string): boolean {
+  return READY_RE.test(patientText.trim());
+}
+
+/** Pull the first craving score (integer 1-10) the patient stated. */
+export function parseCravingScore(text: string): number | null {
+  const m = text.match(
+    /\b(10|[1-9])\b|\b(one|two|three|four|five|six|seven|eight|nine|ten)\b/i,
+  );
+  if (!m) return null;
+  if (m[1]) return parseInt(m[1], 10);
+  const words: Record<string, number> = {
+    one: 1, two: 2, three: 3, four: 4, five: 5,
+    six: 6, seven: 7, eight: 8, nine: 9, ten: 10,
+  };
+  return words[(m[2] ?? "").toLowerCase()] ?? null;
+}
+
 // Deterministic output hygiene for voice. Stock Gemma 4 ignores
 // "no emoji / no markdown" system instructions for casual inputs, and a
 // voice agent must never speak "asterisk" or read an emoji — so we
@@ -137,6 +163,15 @@ export class ConversationController {
     this._messages = [];
     this.busy = false;
     this.pending = null;
+  }
+
+  /**
+   * Seed an opening agent turn (the session starts with WAVE speaking —
+   * e.g. asking the craving score). No preceding user turn, so the
+   * flattened transcript begins "WAVE: …".
+   */
+  seedAssistant(text: string): void {
+    this._messages.push({ role: "assistant", text, tool: null });
   }
 
   /**

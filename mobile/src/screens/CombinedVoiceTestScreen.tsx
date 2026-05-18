@@ -59,6 +59,8 @@ import { writePcmToWavFile } from "@/voice/pcm-wav";
 import { WAVE_SYSTEM_PROMPT } from "@/prompts/wave-system";
 import {
   ConversationController,
+  detectReadyToEnd,
+  parseCravingScore,
   type ConvMessage,
 } from "@/voice/conversation";
 import type { LiteRTLMInstance } from "react-native-litert-lm";
@@ -85,6 +87,12 @@ obstacleCategory is one of: ${TOOL_OBSTACLES}. Use "none" if no clear obstacle.
 Respond with ONLY a single JSON object, nothing else, exactly:
 {"reply": "<spoken prose, 1-3 short sentences, no markdown/lists/emoji/quotes>", "endConversation": null | {"cravingScore": <integer 1-10>, "obstacleCategory": "<one category>"}}
 Output nothing outside the JSON object — no preamble, no code fences, no extra keys.`;
+
+// The session starts with WAVE speaking — a fixed, reliable opener that
+// asks the craving score (too important to leave to the model). Numbers
+// as words, no punctuation TTS chokes on.
+const OPENING =
+  "Welcome back. Let us start with a quick check in. On a scale of one to ten, what is your craving right now?";
 
 // Single-shot mobile path (#25): NO load-time system prompt — every
 // turn we resetConversation() and send ONE message = CI_SYSTEM (WAVE +
@@ -197,6 +205,7 @@ export default function CombinedVoiceTestScreen() {
   });
   const [error, setError] = useState<string | null>(null);
   const [messages, setMessages] = useState<ConvMessage[]>([]);
+  const [checkInEnded, setCheckInEnded] = useState<string | null>(null);
   const [residentBytes, setResidentBytes] = useState(0);
   const [stats, setStats] = useState({ sttMs: 0, llmMs: 0, tps: 0 });
   // Per-turn diagnostics (issue #25 B): isolate "no LLM text" vs Kokoro
@@ -228,6 +237,10 @@ export default function CombinedVoiceTestScreen() {
   const mountedRef = useRef(true);
   const convRef = useRef(new ConversationController());
   const turnCountRef = useRef(0);
+  // Deterministic check-in termination (the model won't reliably set
+  // endConversation — see logs; the app owns this, like production).
+  const cravingScoreRef = useRef<number | null>(null);
+  const endedRef = useRef(false);
 
   // Barge-in / duplex mode. Default = half-duplex (false): mic muted
   // during TTS, no barge-in, bulletproof on an open speaker — the
@@ -487,7 +500,16 @@ export default function CombinedVoiceTestScreen() {
               .join("\n");
             const combined = `${CI_SYSTEM}\n\n${lines}\n\nWAVE:`;
             llm.resetConversation();
+            console.log(
+              `[citrace] loop turn ${turnNo} promptLen=${combined.length}\n` +
+                `===== PROMPT SENT TO LLM =====\n${combined}\n` +
+                `===== END PROMPT =====`,
+            );
             const raw = await llm.sendMessage(combined);
+            console.log(
+              `[citrace] loop turn ${turnNo} rawLen=${raw.length}\n` +
+                `===== RAW LLM OUTPUT =====\n${raw}\n===== END RAW =====`,
+            );
             rawLen = raw.length;
             rawHead = raw.slice(0, 120);
             return raw;
@@ -495,11 +517,32 @@ export default function CombinedVoiceTestScreen() {
           { onChange: (m) => setMessages(m as ConvMessage[]) },
         );
         const reply = turn?.reply ?? "";
-        const tool = turn?.tool ?? null;
-        // Diagnostic (issue #25 B): is the model returning nothing, only a
-        // tool call, or is TTS the problem (chunk count, set in speak)?
+        const modelTool = turn?.tool ?? null;
+        // Capture the first craving score the patient stated (turn 1).
+        if (cravingScoreRef.current == null) {
+          const sc = parseCravingScore(text);
+          if (sc != null) cravingScoreRef.current = sc;
+        }
+        // Deterministic termination: the model won't reliably set
+        // endConversation, so the app decides — if the patient's words
+        // signal they're ready/done, end the check-in ourselves. The
+        // model's JSON tool is still honored if it ever fires.
+        const ready = detectReadyToEnd(text);
+        const tool =
+          modelTool ??
+          (ready
+            ? `endConversation{cravingScore:${
+                cravingScoreRef.current ?? "?"
+              },obstacleCategory:none}`
+            : null);
+        if (tool) {
+          endedRef.current = true;
+          setCheckInEnded(tool);
+        }
         console.log(
-          `[voiceloop] turn ${turnNo} llm rawLen=${rawLen} replyLen=${reply.length} tool=${tool ? "yes" : "no"} raw="${rawHead}"`,
+          `[voiceloop] turn ${turnNo} llm rawLen=${rawLen} replyLen=${reply.length} tool=${
+            modelTool ? "json" : ready ? "deterministic" : "no"
+          } score=${cravingScoreRef.current ?? "?"} raw="${rawHead}"`,
         );
         let tps = 0;
         try {
@@ -532,17 +575,26 @@ export default function CombinedVoiceTestScreen() {
         // it's re-enabled in finally once the reply finishes.
         if (bargeInRef.current) endpointerRef.current?.setMuted(false);
         await speak(reply, myEpoch);
+        // Check-in ended: speak the hand-off, then stop the loop (the
+        // app would advance to the next section here).
+        if (endedRef.current) {
+          await endpointerRef.current?.stopListening();
+        }
       } catch (e) {
         setError(e instanceof Error ? e.message : String(e));
         setPhase("error");
       } finally {
         llmBusyRef.current = false;
-        endpointerRef.current?.setMuted(false);
-        if (phaseRef.current !== "error") setPhase("listening");
-        const pend = pendingPcmRef.current;
-        if (pend) {
-          pendingPcmRef.current = null;
-          void runTurn(pend);
+        if (endedRef.current && phaseRef.current !== "error") {
+          setPhase("idle");
+        } else {
+          endpointerRef.current?.setMuted(false);
+          if (phaseRef.current !== "error") setPhase("listening");
+          const pend = pendingPcmRef.current;
+          if (pend) {
+            pendingPcmRef.current = null;
+            void runTurn(pend);
+          }
         }
       }
     },
@@ -667,15 +719,25 @@ export default function CombinedVoiceTestScreen() {
       return;
     }
 
-    // All resident — go hands-free.
+    // All resident. Agent speaks FIRST: seed the opening turn (asks the
+    // craving score), speak it, then start listening for the patient.
     try {
+      convRef.current.reset();
+      convStartedRef.current = true; // controller already seeded below
+      turnCountRef.current = 0;
+      cravingScoreRef.current = null;
+      endedRef.current = false;
+      setCheckInEnded(null);
+      convRef.current.seedAssistant(OPENING);
+      setMessages(convRef.current.snapshot());
+      await speak(OPENING, ++epochRef.current);
       await endpointerRef.current?.startListening();
       setPhase("listening");
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
       setPhase("error");
     }
-  }, [setPhase]);
+  }, [setPhase, speak]);
 
   // Deterministic teardown (plan mgmt #3): player → stream → vad →
   // whisper → kokoro → llm.
@@ -841,6 +903,17 @@ export default function CombinedVoiceTestScreen() {
           <Text style={styles.panelHead}>Error</Text>
           <Text selectable style={styles.errorText}>
             {error}
+          </Text>
+        </View>
+      )}
+
+      {checkInEnded && (
+        <View style={[styles.panel, { borderColor: "#34D399" }]}>
+          <Text style={[styles.panelHead, { color: "#34D399" }]}>
+            ✅ Check-in complete
+          </Text>
+          <Text selectable style={styles.toolCall}>
+            🛠 {checkInEnded}
           </Text>
         </View>
       )}
