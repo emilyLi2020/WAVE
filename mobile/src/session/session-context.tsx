@@ -27,6 +27,31 @@ import {
   type Action,
   type State,
 } from "@/session/session-machine";
+import {
+  MEDICATION_LABEL,
+  OUTCOME_LABEL,
+  TRIGGER_LABEL,
+  formatSessionDate,
+  type RecentSessionRow,
+} from "@/data/mock-sessions";
+
+// Build a History row from the just-completed run (demo: the History
+// page shows this as the most-recent entry, overwritten each finish).
+function rowFromState(state: State): RecentSessionRow {
+  const intake = state.intake;
+  const scores = state.checkIns.map((c) => c.cravingScore);
+  const start = intake?.intakeIntensity ?? 5;
+  const end = scores.length ? scores[scores.length - 1] : start;
+  return {
+    id: "s-live",
+    date: formatSessionDate(state.startedAt),
+    start,
+    end,
+    trigger: TRIGGER_LABEL[intake?.trigger ?? "unknown_or_other"],
+    medication: MEDICATION_LABEL[intake?.medicationStatus ?? "none"],
+    outcome: OUTCOME_LABEL[state.outcome ?? "completed"],
+  };
+}
 
 // A reset action layered on top of the ported pure machine (whose
 // closed Action union deliberately has no reset). Kept local so
@@ -46,6 +71,10 @@ interface SessionContextValue {
   setDemoMode: (value: boolean) => void;
   /** Reset to a fresh run. */
   resetSession: () => void;
+  /** Most-recent completed run (demo: top of the History page). */
+  lastSession: RecentSessionRow | null;
+  /** Snapshot the current run as lastSession — call BEFORE resetSession. */
+  commitLastSession: () => void;
 }
 
 const SessionContext = createContext<SessionContextValue | null>(null);
@@ -53,13 +82,27 @@ const SessionContext = createContext<SessionContextValue | null>(null);
 export function SessionProvider({ children }: { children: ReactNode }) {
   const [state, rawDispatch] = useReducer(rootReducer, undefined, initialState);
   const [demoMode, setDemoMode] = useState(false);
+  const [lastSession, setLastSession] = useState<RecentSessionRow | null>(null);
 
   const dispatch = useCallback((action: Action) => rawDispatch(action), []);
   const resetSession = useCallback(() => rawDispatch({ type: "__reset" }), []);
+  // Captures the live reducer state (closure) — call before resetSession.
+  const commitLastSession = useCallback(
+    () => setLastSession(rowFromState(state)),
+    [state],
+  );
 
   const value = useMemo<SessionContextValue>(
-    () => ({ state, dispatch, demoMode, setDemoMode, resetSession }),
-    [state, dispatch, demoMode, resetSession],
+    () => ({
+      state,
+      dispatch,
+      demoMode,
+      setDemoMode,
+      resetSession,
+      lastSession,
+      commitLastSession,
+    }),
+    [state, dispatch, demoMode, resetSession, lastSession, commitLastSession],
   );
 
   return <SessionContext.Provider value={value}>{children}</SessionContext.Provider>;

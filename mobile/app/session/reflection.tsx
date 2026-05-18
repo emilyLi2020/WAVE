@@ -22,7 +22,7 @@ type Stage =
 
 export default function ReflectionScreenRoute() {
   const router = useRouter();
-  const { state, dispatch, resetSession } = useSession();
+  const { state, dispatch, resetSession, commitLastSession } = useSession();
   const [stage, setStage] = useState<Stage>({ status: "thinking" });
   const startedRef = useRef(false);
 
@@ -70,6 +70,9 @@ export default function ReflectionScreenRoute() {
     stopSpeaking().catch(() => {});
     if (choice) dispatch({ type: "nextStepPicked", choice });
     dispatch({ type: "sessionFinished" });
+    // Snapshot this run as the most-recent History entry BEFORE the
+    // reducer reset wipes it (demo: overwritten each finish).
+    commitLastSession();
     resetSession();
     // End of session → History first, then the user continues to the
     // Dashboard, then Home (post-session review flow).

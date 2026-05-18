@@ -17,6 +17,7 @@ import {
 } from "@/components/wave-ui";
 import { WaveColors, WaveType } from "@/constants/wave-theme";
 import { MOCK_RECENT_SESSIONS } from "@/data/mock-sessions";
+import { useSession } from "@/session/session-context";
 
 function outcomeChipStyle(outcome: string) {
   if (outcome === "Surfed") {
@@ -35,6 +36,13 @@ function trendFor(drop: number) {
 }
 
 export default function HistoryScreen() {
+  const { lastSession } = useSession();
+  // Demo: the just-completed run overwrites the most-recent (top) entry
+  // each finish; the rest stay mock so the page still looks populated.
+  const sessions = lastSession
+    ? [lastSession, ...MOCK_RECENT_SESSIONS.slice(1)]
+    : MOCK_RECENT_SESSIONS;
+
   return (
     <WaveScreen>
       <TopBar
@@ -46,7 +54,7 @@ export default function HistoryScreen() {
         }
       />
 
-      <Eyebrow accent>{MOCK_RECENT_SESSIONS.length} sessions</Eyebrow>
+      <Eyebrow accent>{sessions.length} sessions</Eyebrow>
       <Display>Every wave{"\n"}you&apos;ve watched.</Display>
       <Lede>
         Each session keeps its adaptive narration, body-scan location, and
@@ -58,7 +66,7 @@ export default function HistoryScreen() {
       </Pressable>
 
       <View style={styles.list}>
-        {MOCK_RECENT_SESSIONS.map((session) => {
+        {sessions.map((session) => {
           const chip = outcomeChipStyle(session.outcome);
           const drop = session.start - session.end;
           const trend = trendFor(drop);
