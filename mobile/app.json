@@ -56,7 +56,9 @@
       ],
       "expo-audio",
       "expo-asset",
-      "onnxruntime-react-native"
+      "onnxruntime-react-native",
+      "./plugins/with-local-notifications-only.js",
+      "expo-notifications"
     ],
     "experiments": {
       "typedRoutes": true,
