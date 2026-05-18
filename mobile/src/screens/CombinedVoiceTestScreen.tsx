@@ -56,7 +56,6 @@ import {
 } from "@/voice/silero-vad";
 import { useVadEndpointer } from "@/voice/use-vad-endpointer";
 import { writePcmToWavFile } from "@/voice/pcm-wav";
-import { ensurePlaybackSession } from "@/voice/kokoro";
 import { WAVE_SYSTEM_PROMPT } from "@/prompts/wave-system";
 import {
   ConversationController,
@@ -477,20 +476,7 @@ export default function CombinedVoiceTestScreen() {
       }
       llmBusyRef.current = true;
       const myEpoch = ++epochRef.current;
-      if (bargeInRef.current) {
-        // Full-duplex: mic must stay live to barge in.
-        endpointerRef.current?.setMuted(true);
-      } else {
-        // Half-duplex (default): fully RELEASE the mic stream, not just
-        // mute it. A live sherpa PCM mic stream pins the AVAudioSession
-        // to VoiceChat + VoiceProcessing(AGC), so every reply after the
-        // first listen (reply 1+) plays loud while the opener — spoken
-        // before any mic stream — is normal. Stopping the stream lets
-        // the session return to plain playback. The TTS player stays
-        // resident (no stop→restart = no turn-2-no-voice). Issue #26
-        // Steps 2+4 applied to this screen.
-        await endpointerRef.current?.stopListening();
-      }
+      endpointerRef.current?.setMuted(true);
       try {
         // ── STT ──────────────────────────────────────────────────────
         setPhase("transcribing");
@@ -616,16 +602,7 @@ export default function CombinedVoiceTestScreen() {
         // Full-duplex: unmute so VAD can barge-in over playback.
         // Half-duplex: keep the mic muted through TTS (speaker-safe) —
         // it's re-enabled in finally once the reply finishes.
-        if (bargeInRef.current) {
-          endpointerRef.current?.setMuted(false);
-        } else {
-          // Mic stream is down — normalize the route to plain playback
-          // (no VoiceChat/VPIO) so this reply matches the opener's
-          // volume. setAudioModeAsync({playsInSilentMode:true}) with NO
-          // allowsRecording is the loud-but-correct speaker route, NOT
-          // the earpiece path the nearby comment warns about.
-          await ensurePlaybackSession();
-        }
+        if (bargeInRef.current) endpointerRef.current?.setMuted(false);
         await speak(reply, myEpoch);
         // Check-in ended: speak the hand-off, then stop the loop (the
         // app would advance to the next section here).
@@ -640,14 +617,7 @@ export default function CombinedVoiceTestScreen() {
         if (endedRef.current && phaseRef.current !== "error") {
           setPhase("idle");
         } else {
-          if (bargeInRef.current) {
-            endpointerRef.current?.setMuted(false);
-          } else {
-            // Re-arm the mic for the next listen — speak() has fully
-            // drained (Step 1) so restarting the stream now can't
-            // re-assert VoiceChat under live TTS audio.
-            await endpointerRef.current?.startListening();
-          }
+          endpointerRef.current?.setMuted(false);
           if (phaseRef.current !== "error") setPhase("listening");
           const pend = pendingPcmRef.current;
           if (pend) {
