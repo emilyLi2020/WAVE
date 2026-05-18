@@ -38,12 +38,15 @@ import type {
   ReflectionContext,
   SessionHistoryEntry,
 } from "@/prompts/schemas";
-import { WAVE_SYSTEM_PROMPT_STOCK_COMPACT } from "@/prompts/wave-system";
+// TEST (#25): the check-in surface runs the FULL WAVE_SYSTEM_PROMPT
+// ("the big one"), not the compact variant, to see how stock Gemma 4
+// handles the ~8 KB prompt (coherence vs KV overflow) at eng4096.
+import { WAVE_SYSTEM_PROMPT } from "@/prompts/wave-system";
 import { ensureModel, getModelDir } from "@/runtime/model-cache";
 import { createLLM, type LiteRTLMInstance } from "react-native-litert-lm";
 
 const REQUESTED_BACKEND = "gpu" as const;
-export const ENGINE_MAX_TOKENS = 2048;
+export const ENGINE_MAX_TOKENS = 4096;
 export const OUTPUT_MAX_TOKENS = 512;
 
 const TOOL_OBSTACLES =
@@ -267,7 +270,7 @@ export default function LiteRTStockScreenBase({
       // the wrapper's chat template produces each assistant turn, and the
       // conversation is preserved across sends (runSurface resets once).
       setNote("2/3 · check-in (3 turns + endConversation tool call)…");
-      const ciSystem = `${WAVE_SYSTEM_PROMPT_STOCK_COMPACT}
+      const ciSystem = `${WAVE_SYSTEM_PROMPT}
 
 You are running a post-chunk check-in with the patient. The patient's first message is their craving score (1-10). Reply naturally in 1-3 short plain sentences each turn — validate, then one question — no markdown.
 
