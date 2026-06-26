@@ -15,7 +15,9 @@
 > **▶ Live demo:** _<ADD DEPLOYED URL — deployment pending. Do **not** use `waves.vercel.app`; that hostname is an unrelated third‑party app, not this project.>_
 > Runs entirely in your browser (no server, no account). First load downloads the model (~3.2 GB, cached after); toggle DevTools offline afterward and a full session still completes.
 >
-> **▶ Video pitch:** _<ADD YOUTUBE URL — pitch video pending.>_
+> **▶ Video pitch:** _(https://youtu.be/kKaEgNQb-og?si=l5ExTFveLb4BvVn7)_
+> **▶ Web Demo:** _https://youtu.be/i4oN6vK1hgM?si=Es2MISyzaWOpDdEe
+> **▶ App Demo:** _https://youtube.com/shorts/MwjNtcR2dBo?si=QV7_xrsGvWpM4Qpf
 
 ---
 
