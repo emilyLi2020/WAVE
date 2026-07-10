@@ -5,19 +5,26 @@
 // state and routes to /session/intake. Persistence into a real
 // PatientProfile is out of scope here — that will land alongside the
 // session reducer wiring on the intake screen.
+//
+// Re-skinned in the dark oceanic visual system. Logic, state, and the
+// /session/intake handoff are unchanged.
 
 import { useState } from "react";
 import { Link, useRouter } from "expo-router";
-import {
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
+import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 
-const ACCENT = "#6366F1";
+import {
+  Chip,
+  Display,
+  Eyebrow,
+  Hint,
+  Lede,
+  TopBar,
+  WaveButton,
+  WaveCard,
+  WaveScreen,
+} from "@/components/wave-ui";
+import { WaveColors, WaveType } from "@/constants/wave-theme";
 
 const MAT_OPTIONS = [
   "Buprenorphine / Suboxone",
@@ -42,196 +49,143 @@ export default function OnboardingScreen() {
   }
 
   return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={styles.content}
-      contentInsetAdjustmentBehavior="automatic"
-      keyboardShouldPersistTaps="handled"
-    >
-      <Text style={styles.title}>Let&apos;s set up your WAVE</Text>
-      <Text style={styles.subtitle}>
-        Three quick questions. Everything stays on your device. You can skip
+    <WaveScreen>
+      <TopBar crumb="Setup" />
+
+      <Eyebrow accent>Welcome</Eyebrow>
+      <Display>Let&apos;s set up{"\n"}your WAVE.</Display>
+      <Lede>
+        Three quiet questions. Everything stays on your device. You can skip
         any of them.
-      </Text>
+      </Lede>
 
       <View style={styles.field}>
-        <Text style={styles.legend}>
-          What should WAVE call you?{" "}
-          <Text style={styles.legendOptional}>(Optional)</Text>
-        </Text>
+        <Eyebrow>What should WAVE call you?</Eyebrow>
         <TextInput
           value={firstName}
           onChangeText={setFirstName}
           placeholder="First name or nickname"
-          placeholderTextColor="#4B5563"
+          placeholderTextColor={WaveColors.inkFaint}
           autoCapitalize="words"
           style={styles.input}
         />
       </View>
 
       <View style={styles.field}>
-        <Text style={styles.legend}>
-          Are you on Medication-Assisted Treatment (MAT)?
-        </Text>
+        <Eyebrow>Are you on Medication-Assisted Treatment?</Eyebrow>
         <View style={styles.optionGrid}>
-          {MAT_OPTIONS.map((option) => {
-            const selected = matType === option;
-            return (
-              <Pressable
-                key={option}
-                onPress={() => setMatType(option)}
-                style={[styles.option, selected && styles.optionSelected]}
-              >
-                <View
-                  style={[styles.radio, selected && styles.radioSelected]}
-                >
-                  {selected ? <View style={styles.radioDot} /> : null}
-                </View>
-                <Text style={styles.optionText}>{option}</Text>
-              </Pressable>
-            );
-          })}
+          {MAT_OPTIONS.map((option) => (
+            <Chip
+              key={option}
+              label={option}
+              selected={matType === option}
+              onPress={() => setMatType(option)}
+            />
+          ))}
         </View>
       </View>
 
       <View style={styles.field}>
-        <Text style={styles.legend}>
-          When do you usually take your dose?{" "}
-          <Text style={styles.legendOptional}>
-            (Helps WAVE spot missed-dose patterns)
-          </Text>
-        </Text>
+        <Eyebrow>When do you usually take your dose?</Eyebrow>
         <TextInput
           value={doseTime}
           onChangeText={setDoseTime}
           placeholder="HH:MM"
-          placeholderTextColor="#4B5563"
+          placeholderTextColor={WaveColors.inkFaint}
           keyboardType="numbers-and-punctuation"
           maxLength={5}
           style={[styles.input, styles.inputTime]}
         />
+        <Hint>Helps WAVE spot missed-dose patterns. Best guess is fine.</Hint>
       </View>
 
       <Pressable
         onPress={() => setConsent((c) => !c)}
-        style={styles.consentPanel}
         accessibilityRole="checkbox"
         accessibilityState={{ checked: consent }}
       >
-        <View style={[styles.checkbox, consent && styles.checkboxChecked]}>
-          {consent ? <Text style={styles.checkboxMark}>✓</Text> : null}
-        </View>
-        <Text style={styles.consentText}>
-          I understand WAVE is a support tool, not a substitute for a
-          counselor, prescriber, or crisis line. If I am in crisis I will
-          call or text 988, or call 1-800-662-HELP (SAMHSA National
-          Helpline).
-        </Text>
+        <WaveCard accent={consent} style={styles.consentPanel}>
+          <View style={[styles.checkbox, consent && styles.checkboxChecked]}>
+            {consent ? <Text style={styles.checkboxMark}>✓</Text> : null}
+          </View>
+          <Text style={styles.consentText}>
+            I understand WAVE is a support tool, not a substitute for a
+            counselor, prescriber, or crisis line. If I am in crisis I will
+            call or text 988, or call 1-800-662-HELP (SAMHSA National
+            Helpline).
+          </Text>
+        </WaveCard>
       </Pressable>
 
       <View style={styles.footer}>
         <Link href="/" asChild>
           <Pressable hitSlop={8}>
-            <Text style={styles.footerLink}>← Back to dev menu</Text>
+            <Text style={styles.footerLink}>← Dev menu</Text>
           </Pressable>
         </Link>
-        <Pressable
+        <WaveButton
+          label="continue"
           onPress={handleContinue}
-          style={[styles.primaryButton, !consent && styles.primaryButtonDisabled]}
           disabled={!consent}
-        >
-          <Text style={styles.primaryButtonText}>Continue →</Text>
-        </Pressable>
+          style={styles.cta}
+        />
       </View>
-    </ScrollView>
+    </WaveScreen>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#08080C" },
-  content: { padding: 16, gap: 18, paddingBottom: 48 },
-  title: { color: "#F1F1F4", fontSize: 22, fontWeight: "700" },
-  subtitle: { color: "#9CA3AF", fontSize: 13, lineHeight: 19 },
-  field: { gap: 8 },
-  legend: { color: "#F1F1F4", fontSize: 14, fontWeight: "600" },
-  legendOptional: { color: "#6B7280", fontWeight: "400" },
+  field: { gap: 8, marginTop: 4 },
   input: {
-    backgroundColor: "#16161F",
-    borderColor: "#23232F",
+    backgroundColor: WaveColors.surface,
+    borderColor: WaveColors.border,
     borderWidth: 1,
-    borderRadius: 12,
+    borderRadius: 14,
     borderCurve: "continuous",
     paddingHorizontal: 14,
-    paddingVertical: 12,
-    color: "#F1F1F4",
-    fontSize: 14,
+    paddingVertical: 13,
+    color: WaveColors.ink,
+    fontSize: 15,
+    fontFamily: WaveType.sans,
   },
-  inputTime: { alignSelf: "flex-start", minWidth: 120 },
+  inputTime: { alignSelf: "flex-start", minWidth: 130 },
   optionGrid: { gap: 6 },
-  option: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-    backgroundColor: "#16161F",
-    borderColor: "#23232F",
-    borderWidth: 1,
-    borderRadius: 12,
-    borderCurve: "continuous",
-    paddingVertical: 10,
-    paddingHorizontal: 14,
-  },
-  optionSelected: { borderColor: ACCENT },
-  optionText: { color: "#F1F1F4", fontSize: 13 },
-  radio: {
-    width: 16,
-    height: 16,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: "#3F3F50",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  radioSelected: { borderColor: ACCENT },
-  radioDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: ACCENT },
-  consentPanel: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    gap: 10,
-    backgroundColor: "#1C1C28",
-    borderRadius: 12,
-    borderCurve: "continuous",
-    borderWidth: 1,
-    borderColor: "#23232F",
-    padding: 14,
-  },
+  consentPanel: { flexDirection: "row", alignItems: "flex-start", gap: 12 },
   checkbox: {
-    width: 18,
-    height: 18,
-    borderRadius: 4,
+    width: 20,
+    height: 20,
+    borderRadius: 6,
     borderWidth: 1,
-    borderColor: "#3F3F50",
+    borderColor: WaveColors.borderGlow,
     alignItems: "center",
     justifyContent: "center",
-    marginTop: 2,
+    marginTop: 1,
   },
-  checkboxChecked: { backgroundColor: ACCENT, borderColor: ACCENT },
-  checkboxMark: { color: "#F1F1F4", fontSize: 12, fontWeight: "700" },
-  consentText: { color: "#9CA3AF", fontSize: 12, lineHeight: 18, flex: 1 },
+  checkboxChecked: {
+    backgroundColor: WaveColors.waveGlow,
+    borderColor: WaveColors.waveGlow,
+  },
+  checkboxMark: { color: WaveColors.bgDeep, fontSize: 12, fontWeight: "700" },
+  consentText: {
+    color: WaveColors.inkMute,
+    fontSize: 12.5,
+    lineHeight: 19,
+    flex: 1,
+    fontFamily: WaveType.sans,
+  },
   footer: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginTop: 8,
+    marginTop: 12,
     gap: 8,
-    flexWrap: "wrap",
   },
-  footerLink: { color: "#9CA3AF", fontSize: 13 },
-  primaryButton: {
-    backgroundColor: ACCENT,
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    borderRadius: 20,
+  footerLink: {
+    color: WaveColors.inkFaint,
+    fontSize: 11,
+    letterSpacing: 1.4,
+    textTransform: "uppercase",
+    fontFamily: WaveType.mono,
   },
-  primaryButtonDisabled: { opacity: 0.4 },
-  primaryButtonText: { color: "#F1F1F4", fontWeight: "600", fontSize: 13 },
+  cta: { alignSelf: "flex-end", marginRight: 0 },
 });

@@ -1,0 +1,319 @@
+// Hands-free check-in voice loop — production port of the proven
+// CombinedVoiceTestScreen path (Silero VAD endpoint → Whisper base STT →
+// streamCheckInTurn (stock Gemma 4 GPU) → Kokoro TTS), with ZERO screen
+// interaction: it auto-starts, the agent asks the 1–10 opener, then runs
+// the multi-turn loop until the model emits endConversation OR the
+// patient's words signal they're done (deterministic, like production).
+//
+// Half-duplex (demo-safe, per deploy.md): the mic is muted while the
+// agent speaks, so the open speaker can't barge-in on itself. The
+// resident models (Gemma, Kokoro) are already warmed by the chunk
+// player; VAD + Whisper are ensured here.
+
+import { useCallback, useEffect, useRef, useState } from "react";
+import { setAudioModeAsync } from "expo-audio";
+import { initWhisper, type WhisperContext } from "whisper.rn";
+
+import { streamCheckInTurn, type CheckInChatTurnPayload } from "@/gemma/checkin";
+import { ensureModel } from "@/runtime/model-cache";
+import { createSileroVad, VAD_SAMPLE_RATE, type SileroVad } from "@/voice/silero-vad";
+import { useVadEndpointer } from "@/voice/use-vad-endpointer";
+import { writePcmToWavFile } from "@/voice/pcm-wav";
+import { detectReadyToEnd, parseCravingScore } from "@/voice/conversation";
+import { speak, ensureKokoro, stopSpeaking } from "@/voice/kokoro";
+import { checkInContextFromState } from "@/session/build-context";
+import { useSession } from "@/session/session-context";
+import type { ConvMessage } from "@/voice/conversation";
+import type { CheckIn, ChunkNumber, ObstacleCategory } from "@/types/session";
+
+const OPENING =
+  "Welcome back. Let us start with a quick check in. On a scale of one to ten, what is your craving right now?";
+
+export type LoopPhase =
+  | "warming"
+  | "speaking"
+  | "listening"
+  | "recording"
+  | "transcribing"
+  | "thinking"
+  | "done"
+  | "error";
+
+function cleanWhisper(raw: string): string {
+  return raw
+    .replace(/\[[^\]]*\]/g, " ")
+    .replace(/\([^)]*\)/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+export interface CheckInVoiceLoop {
+  phase: LoopPhase;
+  messages: ConvMessage[];
+  score: number | null;
+  error: string | null;
+  /** Manual escape — commits whatever we have and advances. */
+  finishNow: () => void;
+}
+
+export function useCheckInVoiceLoop(): CheckInVoiceLoop {
+  const { state, dispatch } = useSession();
+  const [phase, setPhase] = useState<LoopPhase>("warming");
+  const [messages, setMessages] = useState<ConvMessage[]>([]);
+  const [score, setScore] = useState<number | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const vadRef = useRef<SileroVad | null>(null);
+  const whisperRef = useRef<WhisperContext | null>(null);
+  const historyRef = useRef<CheckInChatTurnPayload[]>([]);
+  const scoreRef = useRef<number | null>(null);
+  const obstacleRef = useRef<ObstacleCategory | null>(null);
+  const endedRef = useRef(false);
+  const busyRef = useRef(false);
+  const mountedRef = useRef(true);
+  const startedRef = useRef(false);
+  const startedAtRef = useRef(Date.now());
+  const chunkNo = state.currentChunk;
+
+  const finalize = useCallback(() => {
+    if (endedRef.current && phase === "done") return;
+    endedRef.current = true;
+    void stopSpeaking();
+    const now = Date.now();
+    const checkIn: CheckIn = {
+      chunkNumber: chunkNo as ChunkNumber,
+      cravingScore: scoreRef.current ?? state.intake?.intakeIntensity ?? 5,
+      turns: historyRef.current.map((t, i) => ({
+        index: i + 1,
+        role: t.role,
+        content: t.content,
+        via: t.role === "patient" ? "patient" : "lora",
+      })),
+      obstacleCategory: obstacleRef.current,
+      readyToContinue: chunkNo >= state.totalChunks ? null : true,
+      startedAt: startedAtRef.current,
+      endedAt: now,
+    };
+    setPhase("done");
+    console.log(
+      `[wave][checkin] finalize chunk=${chunkNo} score=${checkIn.cravingScore} turns=${checkIn.turns.length}`,
+    );
+    dispatch({ type: "checkInCompleted", checkIn });
+  }, [chunkNo, dispatch, phase, state.intake, state.totalChunks]);
+
+  // One serialized turn: STT → LLM (streamCheckInTurn) → speak → re-listen.
+  const runTurn = useCallback(
+    async (pcm: Float32Array) => {
+      if (busyRef.current || endedRef.current || !mountedRef.current) return;
+      busyRef.current = true;
+      // Mute (do NOT stopListening) the mic for the turn — issue #26
+      // device-proven pattern from CombinedVoiceTestScreen. Real
+      // stopListening / setAudioModeAsync mid-life of the resident
+      // kokoro PCM player silences it. Keeping the mic stream up+muted
+      // holds the AVAudioSession steady (VoiceChat, set before the
+      // opener) so every reply plays at a CONSISTENT volume with audio.
+      endpointerRef.current?.setMuted(true);
+      try {
+        // ── STT ──
+        setPhase("transcribing");
+        const ctx = whisperRef.current;
+        if (!ctx) throw new Error("Whisper not initialized");
+        const wavUri = await writePcmToWavFile(pcm, VAD_SAMPLE_RATE);
+        const { promise } = ctx.transcribe(wavUri, { language: "en" });
+        const { result } = await promise;
+        const patientText = cleanWhisper(result);
+        console.log(`[wave][checkin] STT: "${patientText}"`);
+        if (!patientText) return; // finally → unmute + listen again
+
+        historyRef.current.push({ role: "patient", content: patientText });
+        if (scoreRef.current == null) {
+          const sc = parseCravingScore(patientText);
+          if (sc != null) {
+            scoreRef.current = sc;
+            if (mountedRef.current) setScore(sc);
+          }
+        }
+
+        // Rebuild the transcript view from history (patient turn now in).
+        const view: ConvMessage[] = historyRef.current.map((t) => ({
+          role: t.role === "patient" ? "user" : "assistant",
+          text: t.content,
+          tool: null,
+        }));
+        if (mountedRef.current) setMessages(view);
+
+        // ── LLM (production check-in boundary) ──
+        setPhase("thinking");
+        const endHolder: {
+          sig: { cravingScore: number; obstacleCategory: ObstacleCategory | null } | null;
+        } = { sig: null };
+        const res = await streamCheckInTurn({
+          history: historyRef.current,
+          context: checkInContextFromState(state),
+          onEndConversation: (s) => {
+            endHolder.sig = s;
+          },
+        });
+        const reply = res.text.trim();
+        historyRef.current.push({ role: "agent", content: reply });
+        if (mountedRef.current) {
+          setMessages([
+            ...view,
+            { role: "assistant", text: reply, tool: null },
+          ]);
+        }
+        if (endHolder.sig) {
+          scoreRef.current = endHolder.sig.cravingScore ?? scoreRef.current;
+          obstacleRef.current =
+            endHolder.sig.obstacleCategory ?? obstacleRef.current;
+          if (mountedRef.current && scoreRef.current != null) {
+            setScore(scoreRef.current);
+          }
+        }
+
+        // Deterministic termination.
+        //  • Demo mode: EXACTLY 2 patient turns (score + body location),
+        //    i.e. opener → P1 → A1 → P2 → A2 → end. Ignore the model's
+        //    endConversation / "ready" heuristics entirely so the demo
+        //    is always the full 4-turn script the prompt drives.
+        //  • Standard mode: model tool OR the patient signalled done.
+        const patientTurns = historyRef.current.filter(
+          (t) => t.role === "patient",
+        ).length;
+        const ready = detectReadyToEnd(patientText);
+        const ending = state.demoMode
+          ? patientTurns >= 2
+          : !!endHolder.sig || ready;
+
+        // ── TTS ── (mic stays muted — half-duplex)
+        if (reply) {
+          setPhase("speaking");
+          try {
+            await speak(reply);
+          } catch (err) {
+            console.warn("[wave][checkin] TTS failed:", err);
+          }
+        }
+
+        if (ending) {
+          // speak() already drains to the end of audio; add a short
+          // settle so navigation/unmount can't clip the closing line.
+          await new Promise((r) => setTimeout(r, 700));
+          finalize();
+          return;
+        }
+      } catch (err) {
+        const msg = err instanceof Error ? `${err.name}: ${err.message}` : String(err);
+        console.error("[wave][checkin] turn error:", msg);
+        if (mountedRef.current) setError(msg);
+      } finally {
+        busyRef.current = false;
+        // Just unmute — the mic stream stayed up the whole turn (no
+        // stop/restart), so the session is untouched. Skip if the
+        // check-in ended (finalize/navigation owns teardown).
+        if (!endedRef.current && mountedRef.current) {
+          setPhase("listening");
+          endpointerRef.current?.setMuted(false);
+        }
+      }
+    },
+    [finalize, state],
+  );
+
+  const endpointer = useVadEndpointer({
+    vadRef,
+    onSpeechStart: () => {
+      if (!busyRef.current && !endedRef.current) setPhase("recording");
+    },
+    onSpeechEnd: (utterance) => {
+      void runTurn(utterance);
+    },
+    onError: (m) => setError(m),
+  });
+  const endpointerRef = useRef(endpointer);
+  endpointerRef.current = endpointer;
+
+  // Boot: ensure VAD + Whisper + Kokoro, seed + speak the opener, listen.
+  useEffect(() => {
+    if (startedRef.current) return;
+    startedRef.current = true;
+    mountedRef.current = true;
+    startedAtRef.current = Date.now();
+    (async () => {
+      try {
+        // EXACTLY the proven working voice path (CombinedVoiceTestScreen):
+        // one setAudioModeAsync at mount with playsInSilentMode +
+        // allowsRecording, never toggled afterward. Removing
+        // allowsRecording / toggling it around the opener broke sherpa's
+        // PCM player (opener silent). The earlier "quiet opener" was the
+        // OLD Kokoro early-resolve bug clipping it (now fixed by the
+        // playback-drain change), NOT the audio category.
+        await setAudioModeAsync({
+          playsInSilentMode: true,
+          allowsRecording: true,
+        }).catch(() => {});
+        setPhase("warming");
+        console.log("[wave][checkin] warming VAD/Whisper/Kokoro");
+        const vadPath = await ensureModel("silero-vad");
+        vadRef.current = await createSileroVad(vadPath);
+        const wp = await ensureModel("whisper-base-en");
+        whisperRef.current = await initWhisper({ filePath: wp, useGpu: true });
+        await ensureKokoro();
+        if (!mountedRef.current) return;
+
+        historyRef.current = [{ role: "agent", content: OPENING }];
+        setMessages([{ role: "assistant", text: OPENING, tool: null }]);
+        setPhase("speaking");
+        // Uniform-volume fix (issue #26, device-proven on the Combined
+        // screen): bring the mic stream up — MUTED — BEFORE the opener.
+        // sherpa's PCM mic stream pins the AVAudioSession to
+        // VoiceChat+VPIO; starting it first makes the opener play at the
+        // SAME level as every reply (consistent) instead of
+        // normal-then-loud. Muted so the opener's own TTS can't
+        // self-trigger the VAD. No mid-life setAudioModeAsync, no
+        // player/mic stop-restart.
+        await endpointerRef.current?.startListening();
+        endpointerRef.current?.setMuted(true);
+        try {
+          await speak(OPENING);
+        } catch {
+          /* speak failed — still listen so the loop isn't stuck */
+        }
+        if (!mountedRef.current) return;
+        endpointerRef.current?.setMuted(false);
+        if (mountedRef.current) setPhase("listening");
+      } catch (err) {
+        const msg = err instanceof Error ? `${err.name}: ${err.message}` : String(err);
+        console.error("[wave][checkin] warm-up failed:", msg);
+        if (mountedRef.current) {
+          setError(msg);
+          setPhase("error");
+        }
+      }
+    })();
+
+    return () => {
+      mountedRef.current = false;
+      (async () => {
+        try {
+          await endpointerRef.current?.stopListening();
+        } catch {}
+        try {
+          await stopSpeaking();
+        } catch {}
+        try {
+          await vadRef.current?.release();
+        } catch {}
+        try {
+          await whisperRef.current?.release();
+        } catch {}
+      })();
+    };
+  }, []);
+
+  const finishNow = useCallback(() => {
+    finalize();
+  }, [finalize]);
+
+  return { phase, messages, score, error, finishNow };
+}

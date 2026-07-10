@@ -1,13 +1,27 @@
 import { Stack } from "expo-router";
 
+// Session screens are full-bleed over the shared ocean and carry their
+// own in-screen top bars, so the stack header is hidden throughout.
+// The flow is a continuous phase machine, not a nav stack — the default
+// iOS push-slide between routes (intake→safety→chunk→…) reads as
+// "swiping pages" and breaks the single-surface feel. A short cross-fade
+// over the shared ocean matches the prototype's phase transitions.
 export default function SessionLayout() {
   return (
-    <Stack screenOptions={{ headerStyle: { backgroundColor: "#08080C" }, headerTintColor: "#F1F1F4" }}>
-      <Stack.Screen name="intake" options={{ title: "Intake" }} />
-      <Stack.Screen name="safety" options={{ title: "Safety" }} />
-      <Stack.Screen name="chunk" options={{ title: "Chunk" }} />
-      <Stack.Screen name="checkin" options={{ title: "Check-in" }} />
-      <Stack.Screen name="reflection" options={{ title: "Reflection" }} />
+    <Stack
+      screenOptions={{
+        headerShown: false,
+        contentStyle: { backgroundColor: "#02060d" },
+        animation: "fade",
+        animationDuration: 220,
+        gestureEnabled: false,
+      }}
+    >
+      <Stack.Screen name="intake" />
+      <Stack.Screen name="safety" />
+      <Stack.Screen name="chunk" />
+      <Stack.Screen name="checkin" />
+      <Stack.Screen name="reflection" />
     </Stack>
   );
 }

@@ -28,6 +28,8 @@
 //     inside the `reply` string.
 
 import { createLLM } from "react-native-litert-lm";
+import { AbortError } from "@/runtime/abort-error";
+import { extractFirstJsonObject } from "@/runtime/json-extract";
 import type { LiteRTLMInstance } from "react-native-litert-lm";
 
 import { ensureModel, type ModelId } from "@/runtime/model-cache";
@@ -155,26 +157,46 @@ export function preloadLiteRT(
   let entry = llmRegistry.get(key);
   if (!entry) {
     entry = (async () => {
-      // ensureModel is idempotent — cheap on a cache hit.
-      const fileUri = await ensureModel(config.modelId, {
-        onProgress: opts?.onProgress,
-      });
-      // The LiteRT-LM C++ engine stat()s the raw path (HybridLiteRTLM.cpp
-      // ~line 348/392); expo-file-system hands back file:// URIs which
-      // fail stat() with errno 2. Strip the scheme before loadModel.
-      const nativePath = fileUri.replace(/^file:\/\//, "");
-      const llm = createLLM({ enableMemoryTracking: true });
-      await llm.loadModel(nativePath, {
-        backend: config.backend,
-        engineMaxTokens: config.engineMaxTokens,
-        outputMaxTokens: config.outputMaxTokens,
-        ...(config.systemPrompt
-          ? { systemPrompt: config.systemPrompt }
-          : {}),
-        temperature: config.temperature ?? 0,
-        topK: config.topK ?? 1,
-      });
-      return llm;
+      const tag = `[wave][litert] ${config.modelId}/${config.backend}`;
+      try {
+        console.log(`${tag} ensureModel… (${cacheKey(config)})`);
+        // ensureModel is idempotent — cheap on a cache hit.
+        let lastPctLogged = -1;
+        const fileUri = await ensureModel(config.modelId, {
+          onProgress: (pct) => {
+            const whole = Math.round(pct * 100);
+            if (whole !== lastPctLogged) {
+              lastPctLogged = whole;
+              console.log(`${tag} download ${whole}%`);
+            }
+            opts?.onProgress?.(pct);
+          },
+        });
+        // The LiteRT-LM C++ engine stat()s the raw path (HybridLiteRTLM.cpp
+        // ~line 348/392); expo-file-system hands back file:// URIs which
+        // fail stat() with errno 2. Strip the scheme before loadModel.
+        const nativePath = fileUri.replace(/^file:\/\//, "");
+        console.log(`${tag} loadModel ${nativePath}`);
+        const llm = createLLM({ enableMemoryTracking: true });
+        await llm.loadModel(nativePath, {
+          backend: config.backend,
+          engineMaxTokens: config.engineMaxTokens,
+          outputMaxTokens: config.outputMaxTokens,
+          ...(config.systemPrompt
+            ? { systemPrompt: config.systemPrompt }
+            : {}),
+          temperature: config.temperature ?? 0,
+          topK: config.topK ?? 1,
+        });
+        console.log(`${tag} loaded OK`);
+        return llm;
+      } catch (err) {
+        console.error(
+          `${tag} LOAD FAILED:`,
+          err instanceof Error ? `${err.name}: ${err.message}` : err,
+        );
+        throw err;
+      }
     })();
     llmRegistry.set(key, entry);
     // Drop a rejected load so a retry actually re-loads instead of
@@ -198,17 +220,22 @@ export async function unloadLiteRT(config: LiteRTLoadConfig): Promise<void> {
   }
 }
 
-// litert-wave on CPU, no system prompt: the config every existing generator
-// caller used implicitly. Behavior is unchanged from the old singleton.
+// The session flow runs on STOCK Gemma 4 — the verified on-device path
+// (/tests/litert-stock, LiteRTStockScreenBase, ~50 tok/s GPU). The WAVE
+// fine-tune bundle ("litert-wave") is blocked on the wrapper-rebuild path
+// (Wave issue #13) and fails to load, so pointing the generators at it
+// was the "runtime error when loading model".
+//
+// engineMaxTokens = 4096 (NOT 2048): the multi-turn check-in flattens a
+// growing transcript into one prompt; at 2048 the engine hard-errors
+// "input token ids are too long … 3782 >= 2048". 4096 is the proven
+// voice-path budget (CombinedVoiceTestScreen STOCK_GPU_CONFIG) and fits
+// the canonical prompt + contract + accumulating transcript.
 const WAVE_CONFIG: LiteRTLoadConfig = {
-  modelId: "litert-wave",
-  backend: "cpu",
-  // Fork split knobs. The litert-lm-v3 fine-tune bundle was exported with
-  // --cache_length=4096 --prefill_lengths=[512,1024], so the KV budget can
-  // be the full 4096 and the chunk-1/reflection prompts fit. outputMaxTokens
-  // stays at the conservative 256-token decode-chunk default.
+  modelId: "litert-stock-gemma4",
+  backend: "gpu",
   engineMaxTokens: 4096,
-  outputMaxTokens: 256,
+  outputMaxTokens: 512,
   temperature: 0,
   topK: 1,
 };
@@ -240,29 +267,36 @@ function streamOnce(
   prompt: string,
   options: GenerateOptions,
 ): Promise<string> {
+  // NON-streaming sendMessage — the proven path used by BOTH working
+  // screens (LiteRTStockScreenBase + CombinedVoiceTestScreen). On this
+  // wrapper, sendMessageAsync's per-token callback yields chat-delta
+  // ENVELOPES — `{"role":"assistant","content":[{"type":"text",
+  // "text":"<piece>"}]}` — one per token; concatenating them verbatim
+  // (what we did before) produced that envelope soup instead of the
+  // model's actual `{"lines":[...]}`. sendMessage returns the already
+  // -decoded plain text, exactly like the two screens that work.
+  console.log(`[wave][litert] streamOnce: resetConversation (prompt ${prompt.length} chars)`);
   llm.resetConversation();
-  return new Promise<string>((resolve, reject) => {
-    let accumulated = "";
-    let resolved = false;
+  throwIfAborted(options.signal);
+  return (async () => {
+    console.log("[wave][litert] sendMessage start");
+    let accumulated: string;
     try {
-      llm.sendMessageAsync(prompt, (token, done) => {
-        if (resolved) return;
-        if (options.signal?.aborted) {
-          resolved = true;
-          reject(new DOMException("Aborted", "AbortError"));
-          return;
-        }
-        accumulated += token;
-        options.onDelta?.(accumulated);
-        if (done) {
-          resolved = true;
-          resolve(accumulated);
-        }
-      });
+      accumulated = await llm.sendMessage(prompt);
     } catch (err) {
-      reject(err as Error);
+      console.error("[wave][litert] sendMessage threw:", err);
+      throw err as Error;
     }
-  });
+    throwIfAborted(options.signal);
+    // Preserve the onDelta contract (fire once with the full text — the
+    // check-in path already expected a single end-of-stream emission).
+    options.onDelta?.(accumulated);
+    console.log(`[wave][litert] sendMessage done (${accumulated.length} chars)`);
+    console.log(
+      `[wave][litert] ===== RAW MODEL OUTPUT =====\n${accumulated}\n===== END RAW =====`,
+    );
+    return accumulated;
+  })();
 }
 
 // ────────────────────────────────────────────────────────────────────────
@@ -279,10 +313,17 @@ export async function generateWllamaChunk(
 
   const prompt = buildChunkPrompt(context);
   const combined = `${prompt.systemPrompt}\n\n${prompt.userPrompt}`;
+  console.log(
+    `[wave][litert] chunk prompt built (sys ${prompt.systemPrompt.length} + user ${prompt.userPrompt.length} = ${combined.length} chars)`,
+  );
 
   const raw = await streamOnce(llm, combined, options);
   throwIfAborted(options.signal);
-  return { text: extractFirstJsonObject(raw) };
+  const extracted = extractFirstJsonObject(raw);
+  console.log(
+    `[wave][litert] chunk extracted JSON (${extracted.length} chars): ${extracted}`,
+  );
+  return { text: extracted };
 }
 
 // ────────────────────────────────────────────────────────────────────────
@@ -302,7 +343,11 @@ export async function generateWllamaReflection(
 
   const raw = await streamOnce(llm, combined, options);
   throwIfAborted(options.signal);
-  return { text: extractFirstJsonObject(raw) };
+  const extracted = extractFirstJsonObject(raw);
+  console.log(
+    `[wave][litert] reflection extracted JSON (${extracted.length} chars): ${extracted}`,
+  );
+  return { text: extracted };
 }
 
 // ────────────────────────────────────────────────────────────────────────
@@ -388,6 +433,9 @@ WAVE:`;
 
   const parsed = parseCheckInJson(raw);
   const replyText = sanitizeCheckInModelText(parsed.reply);
+  console.log(
+    `[wave][litert] checkin parsed reply="${replyText}" endConversation=${JSON.stringify(parsed.endConversation)}`,
+  );
   options.onDelta?.(replyText);
 
   const endConversation = normalizeEndConversation(parsed.endConversation);
@@ -399,15 +447,13 @@ WAVE:`;
 // ────────────────────────────────────────────────────────────────────────
 
 function throwIfAborted(signal: AbortSignal | undefined): void {
-  if (signal?.aborted) throw new DOMException("Aborted", "AbortError");
+  if (signal?.aborted) throw new AbortError();
 }
 
-export function extractFirstJsonObject(text: string): string {
-  const start = text.indexOf("{");
-  const end = text.lastIndexOf("}");
-  if (start === -1 || end === -1 || end < start) return text.trim();
-  return text.slice(start, end + 1);
-}
+// The balanced-brace extractor now lives in the pure, Node-testable
+// json-extract.ts (no native imports); imported above and re-exported
+// here so the production path and the off-device test share one impl.
+export { extractFirstJsonObject };
 
 interface CheckInJsonOutput {
   reply: string;
